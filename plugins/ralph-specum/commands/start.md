@@ -40,11 +40,23 @@ git rev-parse --verify origin/main 2>/dev/null && echo "main" || echo "master"
    |
    +-- ON DEFAULT BRANCH (main/master):
    |   |
-   |   +-- Automatically create a new feature branch
+   |   +-- Ask user for branch strategy:
+   |   |   "Starting new spec work. How would you like to handle branching?"
+   |   |   1. Create branch in current directory (git checkout -b)
+   |   |   2. Create git worktree (separate directory)
+   |   |
+   |   +-- If user chooses 1 (current directory):
    |   |   - Generate branch name from spec name: feat/$specName
    |   |   - If spec name not yet known, use temp name: feat/spec-work-<timestamp>
    |   |   - Create and switch: git checkout -b <branch-name>
    |   |   - Inform user: "Created branch '<branch-name>' for this work"
+   |   |
+   |   +-- If user chooses 2 (worktree):
+   |   |   - Generate branch name from spec name: feat/$specName
+   |   |   - Determine worktree path: ../<repo-name>-<spec-name> or prompt user
+   |   |   - Create worktree: git worktree add <path> -b <branch-name>
+   |   |   - Inform user: "Created worktree at '<path>' on branch '<branch-name>'"
+   |   |   - Note: User must cd to worktree directory to continue work there
    |   |
    |   +-- Continue to Parse Arguments
    |
@@ -54,17 +66,25 @@ git rev-parse --verify origin/main 2>/dev/null && echo "main" || echo "master"
        |   "You are currently on branch '<current-branch>'.
        |    Would you like to:
        |    1. Continue working on this branch
-       |    2. Create a new branch for this spec"
+       |    2. Create a new branch in current directory
+       |    3. Create git worktree (separate directory)"
        |
        +-- If user chooses 1 (continue):
        |   - Stay on current branch
        |   - Continue to Parse Arguments
        |
        +-- If user chooses 2 (new branch):
+       |   - Generate branch name from spec name: feat/$specName
+       |   - If spec name not yet known, use temp name: feat/spec-work-<timestamp>
+       |   - Create and switch: git checkout -b <branch-name>
+       |   - Continue to Parse Arguments
+       |
+       +-- If user chooses 3 (worktree):
            - Generate branch name from spec name: feat/$specName
-           - If spec name not yet known, use temp name: feat/spec-work-<timestamp>
-           - Create and switch: git checkout -b <branch-name>
-           - Continue to Parse Arguments
+           - Determine worktree path: ../<repo-name>-<spec-name> or prompt user
+           - Create worktree: git worktree add <path> -b <branch-name>
+           - Inform user: "Created worktree at '<path>' on branch '<branch-name>'"
+           - Note: User must cd to worktree directory to continue work there
 ```
 
 ### Branch Naming Convention
@@ -83,10 +103,31 @@ If feat/user-auth exists:
 Branch: feat/user-auth-2
 ```
 
+### Worktree Details
+
+When user chooses worktree option:
+
+```bash
+# Get repo name for path suggestion
+REPO_NAME=$(basename $(git rev-parse --show-toplevel))
+
+# Default worktree path
+WORKTREE_PATH="../${REPO_NAME}-${SPEC_NAME}"
+
+# Create worktree with new branch
+git worktree add "$WORKTREE_PATH" -b "feat/${SPEC_NAME}"
+```
+
+After worktree creation:
+- Inform user of the worktree path
+- Spec files will be created in current directory's `./specs/` (not worktree)
+- User should `cd` to worktree to continue implementation work
+- To clean up later: `git worktree remove <path>`
+
 ### Quick Mode Branch Handling
 
 In `--quick` mode, still perform branch check but skip the user prompt for non-default branches:
-- If on default branch: auto-create feature branch (same as normal mode)
+- If on default branch: auto-create feature branch in current directory (no worktree prompt in quick mode)
 - If on non-default branch: stay on current branch (no prompt, quick mode is non-interactive)
 
 <mandatory>
