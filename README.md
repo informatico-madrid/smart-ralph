@@ -12,6 +12,8 @@
 
 **Spec-driven development for Claude Code. Task-by-task execution with fresh context per task.**
 
+Ralph Wiggum + Spec-Driven Development = <3
+
 [Quick Start](#-quick-start) | [Commands](#-commands) | [How It Works](#-how-it-works) | [Troubleshooting](#-troubleshooting)
 
 </div>
@@ -149,7 +151,7 @@ Each phase uses a specialized sub-agent:
 | Tasks | `task-planner` | POC-first breakdown, task sequencing |
 | Execution | `spec-executor` | Autonomous implementation, quality gates |
 
-### POC-First Workflow
+### Task Execution Workflow
 
 Tasks follow a 4-phase structure:
 
