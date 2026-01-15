@@ -30,6 +30,35 @@ You MUST delegate ALL task execution to the `spec-executor` subagent. This is NO
 Even if a task seems simple, you MUST delegate to `spec-executor`. No exceptions.
 </mandatory>
 
+<mandatory>
+## Fully Autonomous = End-to-End Validation
+
+This is a FULLY AUTONOMOUS process. That means doing everything a human would do to verify a feature works - not just writing code.
+
+**What "complete" really means:**
+- Code is written ✓
+- Code compiles ✓
+- Tests pass ✓
+- **AND the feature is verified working in the real environment** ✓
+
+**Example: PostHog analytics integration**
+A human would:
+1. Write the integration code
+2. Build the project
+3. Load extension in real browser
+4. Perform user actions
+5. **Check PostHog dashboard to confirm events arrived**
+6. Only THEN call it complete
+
+**The agent MUST do the same:**
+- Use MCP browser tools to spawn real browsers
+- Use WebFetch/curl to hit real APIs
+- Verify external systems actually received the data
+- Never mark complete based only on "code compiles"
+
+**If a task cannot be verified end-to-end with available tools, it should have been designed differently in task-planner. Do not mark it complete - let it fail and block.**
+</mandatory>
+
 ## Determine Active Spec
 
 1. Read `./specs/.current-spec` to get active spec
@@ -171,22 +200,53 @@ After successful completion, output exactly:
 TASK_COMPLETE
 
 If verification fails, describe the issue and retry.
+If task requires manual action, describe what's needed and DO NOT output TASK_COMPLETE.
 ```
+
+## Task Completion Verification
+
+**TASK_COMPLETE** - The ONLY valid completion signal
+- Use when: Task steps executed, verification passed, changes committed
+- Stop hook verifies: checkmarks updated, spec files committed, no contradictions
+
+**NEVER use TASK_COMPLETE if:**
+- Task requires manual action (block and describe what user needs to do)
+- Verification failed
+- Implementation is partial
+- Changes not committed
+
+## Stop Hook Verification Layers
+
+The stop hook enforces completion integrity with 4 verification layers:
+
+1. **Contradiction Detection**: Rejects TASK_COMPLETE if output contains phrases like "requires manual", "cannot be automated", "could not complete", etc. Agent cannot claim completion while admitting it didn't complete.
+2. **Uncommitted Files Check**: Rejects completion if tasks.md or .progress.md have uncommitted changes. All spec files must be committed.
+3. **Checkmark Verification**: Validates that task was marked [x] in tasks.md. Counts completed checkmarks and verifies against task index.
+4. **Signal Verification**: Requires TASK_COMPLETE to advance to next task.
+
+If any verification fails, the task retries with a specific error message explaining the violation.
 
 ## After Task Completes
 
 The spec-executor will:
 1. Execute the task
 2. Run verification
-3. Commit changes
+3. Commit changes (including spec files)
 4. Update progress
-5. Say "TASK_COMPLETE"
+5. Output "TASK_COMPLETE"
 
 The stop hook will then:
-1. Increment taskIndex
-2. Reset taskIteration
+1. Run verification layers (see above)
+2. If all pass: Increment taskIndex, reset taskIteration
 3. Return block with continue prompt (fresh context)
 4. OR allow stop if all tasks done
+
+If task seems to require manual action:
+1. NEVER mark complete, lie, or expect user input
+2. Use available tools: Bash, WebFetch, MCP browser tools, CLI commands, Task subagents
+3. Exhaust ALL automated options before concluding impossible
+4. Document each tool attempted and why it didn't work
+5. Only if truly impossible after trying all tools: do NOT output TASK_COMPLETE, let retry loop exhaust
 
 ## Completion
 
