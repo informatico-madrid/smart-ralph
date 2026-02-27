@@ -126,7 +126,7 @@ Read `./specs/$spec/tasks.md` and display:
 
 ```
 Tasks complete for '$spec'.
-Output: ./specs/$spec/tasks.md
+Output: $PWD/specs/$spec/tasks.md
 
 ## What I Planned
 

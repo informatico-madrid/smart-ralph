@@ -115,7 +115,7 @@ Read `./specs/$spec/requirements.md` and display:
 
 ```
 Requirements complete for '$spec'.
-Output: ./specs/$spec/requirements.md
+Output: $PWD/specs/$spec/requirements.md
 
 ## What I Created
 

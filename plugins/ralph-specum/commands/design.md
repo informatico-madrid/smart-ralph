@@ -116,7 +116,7 @@ Read `./specs/$spec/design.md` and display:
 
 ```
 Design complete for '$spec'.
-Output: ./specs/$spec/design.md
+Output: $PWD/specs/$spec/design.md
 
 ## What I Designed
 
