@@ -133,7 +133,7 @@ Read `./specs/$spec/research.md` and display:
 
 ```
 Research complete for '$spec'.
-Output: ./specs/$spec/research.md
+Output: $PWD/specs/$spec/research.md
 
 ## What I Found
 
