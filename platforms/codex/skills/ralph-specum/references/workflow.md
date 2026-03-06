@@ -23,12 +23,13 @@
 
 1. Resolve current repo state, branch, and spec roots.
 2. Start or resume a spec.
-3. Create `research.md`.
-4. Draft `requirements.md`.
-5. Prepare `design.md`.
-6. Compile `tasks.md`.
-7. Implement tasks until complete or blocked.
-8. Use `status`, `switch`, `cancel`, `index`, `refactor`, `feedback`, and `help` as needed.
+3. Wait for explicit direction to continue to research unless the user explicitly asked for quick or autonomous flow.
+4. Create `research.md` and request approval, changes, or continuation to requirements.
+5. Draft `requirements.md` and request approval, changes, or continuation to design.
+6. Prepare `design.md` and request approval, changes, or continuation to tasks.
+7. Compile `tasks.md` and request approval, changes, or continuation to implementation.
+8. Implement tasks until complete or blocked.
+9. Use `status`, `switch`, `cancel`, `index`, `refactor`, `feedback`, and `help` as needed.
 
 ## Start And New
 
@@ -48,6 +49,8 @@ Quick mode does not rely on Claude hooks. In Codex it means:
 3. Count tasks.
 4. Continue directly into implementation in the same run.
 5. Persist `.ralph-state.json` after every task so a later run can resume.
+
+Only use quick mode when the user explicitly asks Ralph to be autonomous, do it quickly, or continue without pauses.
 
 ## Implement
 
@@ -90,3 +93,16 @@ Refactor updates existing spec artifacts after implementation learnings. Review 
 3. `tasks.md`
 
 Cascade downstream updates when upstream requirements or design changes.
+
+## Approval Prompt Shape
+
+When a phase writes `research.md`, `requirements.md`, `design.md`, `tasks.md`, or refactored spec files outside quick mode:
+
+- name the file or files that changed
+- give a short summary
+- end with exactly one explicit choice prompt:
+  - `approve current artifact`
+  - `request changes`
+  - `continue to <named next step>`
+
+Treat `continue to <named next step>` as approval of the current artifact.

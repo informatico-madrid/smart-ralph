@@ -60,11 +60,10 @@ PY
     [ "$status" -eq 0 ]
 }
 
-@test "codex platform: repo root wrapper files are gone" {
+@test "codex platform: legacy Codex wrapper files are gone" {
     local root
     root="$(repo_root)"
 
-    [ ! -e "$root/AGENTS.md" ]
     [ ! -e "$root/tests/codex-wrapper.bats" ]
 
     if [ -d "$root/.agents/skills" ]; then
@@ -82,6 +81,19 @@ PY
         [ -f "$root/platforms/codex/skills/$skill/SKILL.md" ]
         [ -f "$root/platforms/codex/skills/$skill/agents/openai.yaml" ]
     done < <(all_codex_skills)
+}
+
+@test "codex platform: all Codex skill metadata disables implicit invocation" {
+    local root
+    root="$(repo_root)"
+
+    assert_python '
+for skill in (ROOT / "platforms/codex/skills").glob("ralph-specum*"):
+    if not skill.is_dir():
+        continue
+    text = (skill / "agents/openai.yaml").read_text()
+    assert "allow_implicit_invocation: false" in text, skill.name
+' "$root"
 }
 
 @test "codex platform: primary skill ships shared resources" {
@@ -238,6 +250,30 @@ for command, token in required_tokens.items():
 ' "$root"
 }
 
+@test "codex platform: default prompts advertise approval handoffs" {
+    local root
+    root="$(repo_root)"
+
+    assert_python '
+expected = {
+    "ralph-specum": ["approve current artifact", "request changes", "continue to <named next step>"],
+    "ralph-specum-start": ["wait for explicit direction", "research"],
+    "ralph-specum-research": ["approve current artifact", "continue to requirements"],
+    "ralph-specum-requirements": ["approve current artifact", "continue to design"],
+    "ralph-specum-design": ["approve current artifact", "continue to tasks"],
+    "ralph-specum-tasks": ["approve current artifact", "continue to implementation"],
+    "ralph-specum-cancel": ["whether anything was removed", "exactly what if so"],
+    "ralph-specum-triage": ["approve current artifact", "continue to the next spec"],
+    "ralph-specum-refactor": ["approve current artifact", "continue to implementation"],
+}
+
+for skill, tokens in expected.items():
+    text = (ROOT / "platforms/codex/skills" / skill / "agents/openai.yaml").read_text()
+    for token in tokens:
+        assert token in text, {"skill": skill, "token": token}
+' "$root"
+}
+
 @test "codex platform: helper skills retain plugin command semantics" {
     local root
     root="$(repo_root)"
@@ -250,7 +286,7 @@ pairs = {
     "requirements": ["brainstorming", "requirements.md", "awaitingApproval"],
     "design": ["brainstorming", "design.md", "awaitingApproval"],
     "tasks": ["granularity", "[P]", "[VERIFY]", "VE tasks", "taskIndex: first incomplete or totalTasks"],
-    "implement": ["[P]", "[VERIFY]", "VE tasks", "tasks.md", "approval", "file sets do not overlap", "Marker syntax must be explicitly present"],
+    "implement": ["[P]", "[VERIFY]", "VE tasks", "tasks.md", "approval", "quick mode", "explicit user direction", "file sets do not overlap", "Marker syntax must be explicitly present"],
     "status": [".current-epic", "approval state", "granularity", "there is no active spec"],
     "switch": [".current-spec", "approval state"],
     "cancel": [".ralph-state.json", "Safe cancel", "full removal"],
@@ -264,6 +300,51 @@ for name, tokens in pairs.items():
     text = (ROOT / f"platforms/codex/skills/ralph-specum-{name}/SKILL.md").read_text()
     for token in tokens:
         assert token in text, {"skill": name, "token": token}
+' "$root"
+}
+
+@test "codex platform: phase skills require approval handoff text" {
+    local root
+    root="$(repo_root)"
+
+    assert_python '
+expected = {
+    "research": ["approve current artifact", "request changes", "continue to requirements"],
+    "requirements": ["approve current artifact", "request changes", "continue to design"],
+    "design": ["approve current artifact", "request changes", "continue to tasks"],
+    "tasks": ["approve current artifact", "request changes", "continue to implementation"],
+    "triage": ["approve current artifact", "request changes", "continue to the next spec"],
+    "refactor": ["approve current artifact", "request changes", "continue to implementation"],
+}
+
+for name, tokens in expected.items():
+    text = (ROOT / f"platforms/codex/skills/ralph-specum-{name}/SKILL.md").read_text()
+    for token in tokens:
+        assert token in text, {"skill": name, "token": token}
+' "$root"
+}
+
+@test "codex platform: bootstrap and workflow stay aligned with quick mode and triage artifacts" {
+    local root
+    root="$(repo_root)"
+
+    assert_python '
+bootstrap = (ROOT / "platforms/codex/skills/ralph-specum/assets/bootstrap/AGENTS.md").read_text()
+bootstrap_local = (ROOT / "platforms/codex/skills/ralph-specum/assets/bootstrap/ralph-specum.local.md").read_text()
+primary = (ROOT / "platforms/codex/skills/ralph-specum/SKILL.md").read_text()
+workflow = (ROOT / "platforms/codex/skills/ralph-specum/references/workflow.md").read_text()
+path_resolution = (ROOT / "platforms/codex/skills/ralph-specum/references/path-resolution.md").read_text()
+state_contract = (ROOT / "platforms/codex/skills/ralph-specum/references/state-contract.md").read_text()
+
+assert "create, resume, or run in quick mode" in bootstrap
+assert "`quick_mode_default` is removed and ignored" in bootstrap_local
+assert "Use only when the user explicitly invokes `$ralph-specum`" in primary
+assert "## Response Handoff" in primary
+assert "epic.md" not in primary.split("## Current Workflow Expectations")[0]
+assert "epic.md" not in workflow.split("Treat `continue to <named next step>` as approval of the current artifact.")[0]
+assert "Wait for explicit direction to continue to research" in workflow
+assert "quick_mode_default" in path_resolution
+assert "Approval Prompt Shape" in state_contract
 ' "$root"
 }
 
@@ -327,6 +408,7 @@ resolve_paths = (ROOT / "platforms/codex/skills/ralph-specum/scripts/resolve_spe
 assert "$ralph-specum-start" in bootstrap
 assert ".current-spec" in bootstrap
 assert "specs_dirs" in settings
+assert "quick_mode_default" not in settings
 assert "\"total\"" in count_tasks
 assert "\"completed\"" in count_tasks
 assert "\"next_index\"" in count_tasks
@@ -334,5 +416,6 @@ assert "--set" in merge_state
 assert "--json" in merge_state
 assert ".current-spec" in resolve_paths
 assert "specs_dirs" in resolve_paths
+assert "quick_mode_default" not in resolve_paths
 ' "$root"
 }

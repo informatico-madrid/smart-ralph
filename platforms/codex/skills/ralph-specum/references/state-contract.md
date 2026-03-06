@@ -64,6 +64,23 @@ Never rebuild state from scratch once the file exists. Merge only the fields nee
 
 Use `scripts/merge_state.py` for deterministic top-level merges.
 
+## Approval Contract
+
+`awaitingApproval: true` is not enough on its own.
+
+This mirrors `Approval Prompt Shape` in `references/workflow.md` and should stay in sync with that section. Current enforcement is via Codex platform review plus the repo-local metadata and content checks.
+
+When a phase sets `awaitingApproval: true`, the visible assistant response must also:
+
+- name the file or files that changed
+- give a short summary
+- end with exactly one explicit choice prompt:
+  - `approve current artifact`
+  - `request changes`
+  - `continue to <named next step>`
+
+Treat `continue to <named next step>` as approval of the current artifact and permission to move forward.
+
 ## Progress File
 
 `.progress.md` is persistent. Keep:
