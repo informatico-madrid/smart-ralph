@@ -128,6 +128,24 @@ Browser becomes a Phase 5 addition (MCP Playwright), not the foundation.
 - [x] Fork created
 - [x] `FORK_GOALS.md` added
 
+### Phase 0.1 — E2E skill foundation ✅
+- [x] `skills/e2e/selector-map.skill.md` — stable Playwright selector strategy
+  (hierarchy: `getByRole` → `getByLabel` → `getByTestId` → `getByText`;
+  `data-testid` naming convention; anti-patterns; assertion and wait patterns)
+- [x] `skills/e2e/e2e-verify-integration.skill.md` — correct signal contract
+  for ralph-specum (`VERIFICATION_PASS/FAIL` via `qa-engineer`,
+  `ALL_TASKS_COMPLETE` via `stop-watcher` transcript detection; single
+  checkbox per task format; user stories in `requirements.md` not `tasks.md`)
+
+These skills are referenced inline from `tasks.md` task entries:
+```markdown
+- [ ] 2.1 E2E test: [flow description]
+  - **Do**: Create Playwright test following `skills/e2e/selector-map.skill.md`
+  - **Skills**: `skills/e2e/selector-map.skill.md`
+  ...
+```
+Additive only. Zero risk to existing flow.
+
 ### Phase 1 — Verification Contract in specs
 - [ ] Add `## Verification Contract` section to `templates/requirements.md`
 - [ ] Update `product-manager.md` to populate the contract from user stories
@@ -159,7 +177,7 @@ Browser becomes a Phase 5 addition (MCP Playwright), not the foundation.
 
 ## Contribution Strategy
 
-Changes in Phases 1–2 are purely additive and should be PRable upstream.
+Changes in Phases 0.1–2 are purely additive and should be PRable upstream.
 Phases 3–4 touch `stop-watcher.sh` — open a discussion issue on upstream first.
 Phase 5 lives as a separate plugin `ralph-bdd-browser` to keep the core clean.
 
@@ -179,5 +197,5 @@ bump on every plugin change, no features beyond what's asked.
 
 ## Status
 
-**Current phase**: 0 — Fork setup complete, strategy defined.
+**Current phase**: 0.1 complete — E2E skill foundation in place.
 **Next step**: Phase 1 — `templates/requirements.md` Verification Contract section.
