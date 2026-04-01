@@ -14,7 +14,7 @@
 
 Self-contained execution loop. No external dependencies.
 
-[Quick Start](#-quick-start) | [Commands](#-commands) | [How It Works](#-how-it-works) | [Troubleshooting](#-troubleshooting)
+[Quick Start](#-quick-start) | [Commands](#-commands) | [How It Works](#-how-it-works) | [E2E Verification](#-e2e-verification-layer) | [Troubleshooting](#-troubleshooting)
 
 </div>
 
@@ -262,10 +262,11 @@ Each phase uses a specialized sub-agent:
 |-------|-------|------------|
 | Triage | `triage-analyst` | Feature decomposition, dependency graphs, interface contracts |
 | Research | `research-analyst` | Web search, codebase analysis, feasibility checks |
-| Requirements | `product-manager` | User stories, acceptance criteria, business value |
-| Design | `architect-reviewer` | Architecture patterns, technical trade-offs |
-| Tasks | `task-planner` | POC-first breakdown, task sequencing |
-| Execution | `spec-executor` | Autonomous implementation, quality gates |
+| Requirements | `product-manager` | User stories, acceptance criteria, Verification Contract |
+| Design | `architect-reviewer` | Architecture patterns, test strategy, technical trade-offs |
+| Tasks | `task-planner` | POC-first breakdown, VE task auto-injection, task sequencing |
+| Execution | `spec-executor` | Autonomous implementation, quality gates, session management |
+| Verification | `qa-engineer` | Story-level verification, exploratory checks, repair escalation |
 
 ### Task Execution Workflow
 
@@ -282,6 +283,104 @@ Current Ralph planning also supports:
 - `[P]` markers for low-conflict parallel tasks
 - `[VERIFY]` and VE tasks for explicit verification work
 - epic planning through `/ralph-specum:triage` or `$ralph-specum-triage`
+
+---
+
+## E2E Verification Layer
+
+This fork extends Smart Ralph with an **agentic verification loop**: the agent reads a user story, reasons about what "working" looks like, explores the system creatively, and self-corrects when something breaks — without scripted steps or Gherkin.
+
+All E2E skills live in `plugins/ralph-specum/skills/e2e/`.
+
+### Verification Contract
+
+Each `requirements.md` spec gets a `## Verification Contract` section:
+
+```markdown
+## Verification Contract
+
+**Entry points**: routes, endpoints, or UI surfaces this story touches
+**Observable signals**: what PASS looks like (HTTP status, visible element, persisted data)
+**Hard invariants**: what must NEVER break (auth, permissions, adjacent flows)
+**Seed data**: minimum system state needed to verify
+**Dependency map**: other specs/modules that share state with this one
+**Escalate if**: conditions that require human judgment
+```
+
+The agent receives the contract and decides *how* to probe — CLI, HTTP, browser, logs — whatever makes sense. No scripted steps.
+
+### VE Task Sequence
+
+`task-planner` auto-injects VE tasks whenever Playwright is needed:
+
+```
+VE0  → ui-map-init   Build/reuse selector map (MCP-first, static fallback)
+VE1  → Story verify  [STORY-VERIFY] exploratory check against Verification Contract
+VE2  → Regression    Sweep dependent specs (Dependency map)
+VE3  → Fix verify    Confirm repair fixed the failure
+```
+
+VE0 is idempotent — skipped if `ui-map.local.md` already exists and is not stale.
+
+### MCP Playwright Integration
+
+Browser verification uses `@playwright/mcp` as one signal layer — not the only one.
+
+```
+Signal layer       What it catches
+─────────────────────────────────────────────────────
+CLI / test runner  Logic, edge cases, unit behavior
+HTTP / API         Contracts, side effects, data integrity
+Browser (MCP)      Real user flows, render, wiring, UX regressions
+Logs / traces      Root cause, silent failures, perf
+```
+
+**Setup** (one-time, human-configured in MCP client):
+
+```json
+{
+  "mcpServers": {
+    "playwright": {
+      "command": "npx",
+      "args": ["@playwright/mcp@latest", "--isolated", "--caps=testing"]
+    }
+  }
+}
+```
+
+> The agent never launches or kills the MCP server. `--isolated` and `--caps` must be set in the server definition above, not invoked at runtime.
+
+**Dependency:** `@playwright/mcp` requires Node 18+. Never auto-installed by the agent — human installs explicitly.
+
+### UI Map (`ui-map.local.md`)
+
+The UI map is a living selector registry, gitignored and local to each developer:
+
+```
+VE0 (ui-map-init)   → builds the initial map via MCP exploration or static analysis
+spec-executor       → patches the map when new data-testid attributes are added
+qa-engineer         → patches the map after browser exploration in [STORY-VERIFY]
+```
+
+Confidence levels: `high` (MCP-verified) → `medium` (static analysis) → `low` (inferred).
+
+### Repair Loop
+
+When `VERIFICATION_FAIL` is detected:
+
+```
+→ classify failure (impl_bug / env_issue / spec_ambiguity / flaky)
+→ impl_bug: backtrack to originating task, apply targeted fix
+→ rerun verification for that story only
+→ pass: continue to regression sweep
+→ fail again after 2 iterations: escalate to human
+```
+
+### Regression Sweep
+
+After a spec completes, the `Dependency map` in each story's Verification Contract identifies which other specs share state. Only those are swept — not the full suite.
+
+Three tiers: **Local** (dependency map) → **Invariants** (auth, nav, persistence) → **Full** (nightly / final merge).
 
 ---
 
@@ -397,6 +496,12 @@ smart-ralph/
 │   │   ├── agents/             # Sub-agent definitions
 │   │   ├── commands/           # Slash commands
 │   │   ├── hooks/              # Stop watcher (controls execution loop)
+│   │   ├── skills/
+│   │   │   └── e2e/            # Agentic verification loop skills
+│   │   │       ├── playwright-env.skill.md
+│   │   │       ├── mcp-playwright.skill.md
+│   │   │       ├── playwright-session.skill.md
+│   │   │       └── ui-map-init.skill.md
 │   │   ├── templates/          # Spec templates
 │   │   └── schemas/            # Validation schemas
 │   └── ralph-speckit/          # Spec-kit methodology
@@ -419,10 +524,12 @@ Specs live in `./specs/` in your project:
     ├── .ralph-state.json   # Loop state (deleted on completion)
     ├── .progress.md        # Progress tracking
     ├── research.md
-    ├── requirements.md
+    ├── requirements.md     # Includes ## Verification Contract
     ├── design.md
     └── tasks.md
 ```
+
+`ui-map.local.md` lives in the project root (gitignored) — never in `specs/`.
 
 ---
 
@@ -512,6 +619,9 @@ After max iterations, the loop stops. Check `.progress.md` for errors. Fix manua
 
 **Resume existing spec?**
 Just `/ralph-specum:start` - it auto-detects and continues where you left off.
+
+**MCP Playwright not available?**
+The agent will emit `VERIFICATION_DEGRADED` and escalate. Install `@playwright/mcp` (Node 18+ required) and configure it in your MCP client. The agent never auto-installs it.
 
 **More issues?** See the full [Troubleshooting Guide](TROUBLESHOOTING.md).
 
