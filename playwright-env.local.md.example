@@ -1,0 +1,67 @@
+# playwright-env.local.md — example (copy to your project root, gitignored)
+#
+# This file holds non-secret defaults and references to env var names.
+# NEVER put actual passwords, tokens, or cookie values here.
+# Keep this file out of version control (.gitignore entry already added).
+#
+# Usage:
+#   1. Copy to <your-project>/playwright-env.local.md
+#   2. Fill in the values for your project
+#   3. Export the actual secrets in your shell:
+#        export RALPH_LOGIN_USER='your@email.com'
+#        export RALPH_LOGIN_PASS='your-password'
+#
+# Auth mode options: none | form | token | cookie | basic | oauth | storage-state
+
+# ── Core ────────────────────────────────────────────────────────────────────
+appUrl: http://localhost:3000
+appEnv: local
+allowWrite: true
+
+# ── Browser ─────────────────────────────────────────────────────────────────
+browser: chromium
+headless: true
+viewport: desktop
+# viewport: mobile          # emulates 390x844 (iPhone 14)
+# viewport: tablet          # emulates 768x1024
+# viewport: 1440x900        # explicit size
+
+locale: en-US
+timezone: UTC
+
+# ── Auth: form (username + password via login page) ─────────────────────────
+authMode: form
+loginUrl: /login
+loginUserVar: RALPH_LOGIN_USER      # name of the env var holding the username
+loginPassVar: RALPH_LOGIN_PASS      # name of the env var holding the password
+userRole: admin                     # informational — documents which user type
+
+# ── Auth: token ─────────────────────────────────────────────────────────────
+# authMode: token
+# authTokenVar: RALPH_AUTH_TOKEN    # name of the env var holding the token
+
+# ── Auth: cookie ────────────────────────────────────────────────────────────
+# authMode: cookie
+# sessionCookieNameVar: RALPH_SESSION_COOKIE_NAME
+# sessionCookieValueVar: RALPH_SESSION_COOKIE_VALUE
+
+# ── Auth: storage-state (reusable authenticated browser state) ──────────────
+# authMode: storage-state
+# storageStatePath: .ralph-auth-state.json   # local file, gitignored
+
+# ── Auth: oauth / sso ────────────────────────────────────────────────────────
+# authMode: oauth
+# (agent cannot complete external IdP flows autonomously)
+# Prepare a storage-state file with a valid session and switch to storage-state mode.
+
+# ── Auth: basic HTTP ────────────────────────────────────────────────────────
+# authMode: basic
+# loginUserVar: RALPH_LOGIN_USER
+# loginPassVar: RALPH_LOGIN_PASS
+
+# ── Seed / app state ────────────────────────────────────────────────────────
+# seedCommand: npm run seed:e2e     # runs before verification, local/staging only
+
+# ── Multi-tenant / feature flags ────────────────────────────────────────────
+# tenant: acme-corp
+# featureFlags: new-dashboard,beta-reports
