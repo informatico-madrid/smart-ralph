@@ -70,7 +70,21 @@ Extract:
   - escalate_if
 ```
 
-If `## Verification Contract` section is missing or empty → output `VERIFICATION_FAIL` with message: `"Verification Contract not found in requirements.md. Run product-manager to populate it."`
+If `## Verification Contract` section is missing or empty:
+- Append to `<basePath>/.progress.md` under Learnings:
+  ```markdown
+  ### Story Verification: [task title]
+  - Status: FAIL
+  - Reason: verification-contract-missing
+  - Resolution: Run product-manager phase to populate ## Verification Contract in requirements.md
+  ```
+- Output:
+  ```
+  VERIFICATION_FAIL
+    reason: verification-contract-missing
+    resolution: Run product-manager phase to populate ## Verification Contract in requirements.md
+  ```
+- **Stop here** — do NOT proceed to Step 2 (Derive Checks).
 
 ### Step 2 — Derive Checks
 
@@ -113,6 +127,13 @@ Seed data: set up minimum pre-conditions from the contract before probing.
 
 When using browser (Playwright MCP) during story verification or any [VERIFY] task:
 
+**Write-safety guard**: before modifying `ui-map.local.md`, read `allowWrite` from
+`.ralph-state.json → playwrightEnv.allowWrite` (or the `RALPH_ALLOW_WRITE` env var).
+- If `allowWrite = false` (the default for staging/production): skip all map writes,
+  log discovered elements to `<basePath>/.progress.md` under a `### UI Map discoveries (skipped — allowWrite=false)` heading,
+  and surface the message: `"UI map updates skipped: allowWrite=false (staging/prod). Set RALPH_ALLOW_WRITE=true to enable."`
+- If `allowWrite = true` (local environments): proceed with the map updates below.
+
 1. After completing checks on each route, run `browser_snapshot` one final time
 2. Compare discovered elements against the current `<basePath>/ui-map.local.md`
 3. For each interactive element (button, input, link, form) **not already in the map**:
@@ -120,8 +141,9 @@ When using browser (Playwright MCP) during story verification or any [VERIFY] ta
    - Append to `ui-map.local.md` following the **Incremental Update protocol**
      in `ui-map-init.skill.md` (append row to existing route section, or add new section)
 4. If a selector in the map **fails** to locate the element:
-   - Follow the **Broken selector protocol** in `ui-map-init.skill.md`
-   - Mark `confidence: broken`, attempt replacement via `browser_generate_locator`
+   - **Only when `allowWrite=true`**: follow the **Broken selector protocol** in `ui-map-init.skill.md`
+     and attempt replacement via `browser_generate_locator`
+   - **When `allowWrite=false`**: log the broken selector to `.progress.md` without modifying the map
 
 This step runs **after** verification checks — never interrupt a check to update the map.
 

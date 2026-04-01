@@ -344,7 +344,7 @@ Read the "Verification Tooling" section from research.md to determine project ty
 **Why**: Playwright tests that rely on selectors fail silently or flake when the UI structure is unknown. The `ui-map-init` skill explores the running app, catalogs selectors, and writes `ui-map.local.md` so every subsequent Playwright task can reference stable, verified selectors instead of guessing.
 
 **Field `**Skills**`**: All Playwright VE tasks (VE1, VE2, etc.) that interact with the browser MUST also carry:
-```
+```markdown
   - **Skills**: `skills/e2e/playwright-session.skill.md`
 ```
 This signals the executor to load the Playwright session skill before running browser interactions.
