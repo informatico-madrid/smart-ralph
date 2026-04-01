@@ -125,6 +125,8 @@ Create requirements.md following this structure:
 
 ## Verification Contract
 
+**Project type**: [greenfield | change-to-existing | bugfix | spike]
+
 **Entry points**: [routes, endpoints, UI surfaces this story touches]
 
 **Observable signals**:
@@ -144,6 +146,14 @@ Create requirements.md following this structure:
 
 <mandatory>
 For every requirements.md, populate the `## Verification Contract` section:
+
+0. **Project type** — derive from spec context before writing anything else. This field gates VE task generation in `task-planner` and skill loading in `spec-executor`:
+   - `greenfield`: spec creates new files/modules with no prior implementation
+   - `change-to-existing`: spec modifies or extends code that already exists
+   - `bugfix`: spec resolves a reported defect in existing behaviour
+   - `spike`: time-boxed exploration with no production deliverable
+
+   Use codebase analysis (Explore) to confirm: if the target files already exist, it is `change-to-existing` not `greenfield`.
 
 1. **Entry points** — list every route, API endpoint, UI surface, CLI command, or background job this feature touches. Be specific (e.g., `GET /api/invoices?from=&to=`, `InvoiceList component`, `cron: billing-sync`).
 
@@ -179,6 +189,7 @@ Before completing requirements:
 - [ ] Glossary defines domain-specific terms
 - [ ] Success criteria are measurable
 - [ ] Verification Contract populated for every user story
+- [ ] **Project type** set (`greenfield` / `change-to-existing` / `bugfix` / `spike`)
 - [ ] Entry points are specific (routes/endpoints/surfaces named explicitly)
 - [ ] Observable signals describe PASS and FAIL in observable terms
 - [ ] Hard invariants listed (at minimum: auth, permissions)
