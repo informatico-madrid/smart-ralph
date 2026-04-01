@@ -190,23 +190,27 @@ SWEEP_EOF
     # --- Phase 3: Repair Loop ---
     # Detect VERIFICATION_FAIL in transcript and activate repair mode.
     # Max 2 repair iterations per story before escalating to human.
-    if tail -500 "$TRANSCRIPT_PATH" 2>/dev/null | grep -qE '(^|\W)VERIFICATION_FAIL(\W|$)'; then
-        REPAIR_ITER=$(jq -r '.repairIteration // 0' "$STATE_FILE" 2>/dev/null || echo "0")
-        FAILED_STORY=$(jq -r '.failedStory // "unknown"' "$STATE_FILE" 2>/dev/null || echo "unknown")
-        ORIGIN_TASK=$(jq -r '.originTaskIndex // "unknown"' "$STATE_FILE" 2>/dev/null || echo "unknown")
-        MAX_REPAIR=2
+    TRANSCRIPT_TAIL=$(tail -500 "$TRANSCRIPT_PATH" 2>/dev/null || true)
+    # Only activate repair if the most recent verification signal is a FAIL.
+    if echo "$TRANSCRIPT_TAIL" | grep -qE '(^|\W)VERIFICATION_(FAIL|PASS)(\W|$)'; then
+        LAST_SIGNAL_LINE=$(echo "$TRANSCRIPT_TAIL" | grep -E '(^|\W)VERIFICATION_(FAIL|PASS)(\W|$)' | tail -1)
+        if echo "$LAST_SIGNAL_LINE" | grep -qE '(^|\W)VERIFICATION_FAIL(\W|$)'; then
+            REPAIR_ITER=$(jq -r '.repairIteration // 0' "$STATE_FILE" 2>/dev/null || echo "0")
+            FAILED_STORY=$(jq -r '.failedStory // "unknown"' "$STATE_FILE" 2>/dev/null || echo "unknown")
+            ORIGIN_TASK=$(jq -r '.originTaskIndex // "unknown"' "$STATE_FILE" 2>/dev/null || echo "unknown")
+            MAX_REPAIR=2
 
-        echo "[ralph-specum] VERIFICATION_FAIL detected | story: $FAILED_STORY | repair iter: $REPAIR_ITER/$MAX_REPAIR" >&2
+            echo "[ralph-specum] VERIFICATION_FAIL detected | story: $FAILED_STORY | repair iter: $REPAIR_ITER/$MAX_REPAIR" >&2
 
-        STOP_HOOK_ACTIVE=$(echo "$INPUT" | jq -r '.stop_hook_active // false' 2>/dev/null || echo "false")
-        if [ "$STOP_HOOK_ACTIVE" = "true" ]; then
-            echo "[ralph-specum] stop_hook_active=true in repair loop, allowing stop" >&2
-            exit 0
-        fi
+            STOP_HOOK_ACTIVE=$(echo "$INPUT" | jq -r '.stop_hook_active // false' 2>/dev/null || echo "false")
+            if [ "$STOP_HOOK_ACTIVE" = "true" ]; then
+                echo "[ralph-specum] stop_hook_active=true in repair loop, allowing stop" >&2
+                exit 0
+            fi
 
-        if [ "$REPAIR_ITER" -ge "$MAX_REPAIR" ]; then
-            # Escalate to human
-            ESCALATE_REASON=$(cat <<ESCALATE_EOF
+            if [ "$REPAIR_ITER" -ge "$MAX_REPAIR" ]; then
+                # Escalate to human
+                ESCALATE_REASON=$(cat <<ESCALATE_EOF
 [ralph-specum] ESCALATION REQUIRED — Repair loop exhausted for: $FAILED_STORY
 
 The verification for story '$FAILED_STORY' has failed $MAX_REPAIR times.
