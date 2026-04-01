@@ -1,6 +1,6 @@
 ---
 name: playwright-session
-version: 4
+version: 5
 description: Load this skill before any Playwright browser interaction in a VE task. Covers session lifecycle, context isolation, auth flows, stable-state detection, cache isolation, and cleanup. Requires playwright-env to be loaded first.
 agents: [spec-executor, qa-engineer]
 ---
@@ -23,18 +23,24 @@ hardcoded values.
 1. Check `mcpPlaywright` in `.ralph-state.json` — if `missing`, switch to degraded mode (see `mcp-playwright.skill.md`)
 2. Read `playwrightEnv` from `.ralph-state.json` — use `appUrl`, `browser`, `headless`, `viewport`, `locale`, `timezone`, `isolated`
 3. If `isolated = false`: run lock-recovery check from `mcp-playwright.skill.md → Step 0b` before proceeding
-4. Launch MCP server with correct capability flags:
+4. **Stop any previously running MCP server** before launching a new one. With MCP, the browser context is owned by the server process — there is no `browser.newContext()` API to call directly. Starting a fresh server is the equivalent of opening a new context. If a server from a previous session is still running, stop it first:
+   ```bash
+   # Stop any lingering @playwright/mcp process
+   pkill -f "@playwright/mcp" 2>/dev/null || true
+   sleep 1
+   ```
+5. Launch MCP server with correct capability flags:
    - `isolated = true`  → `npx @playwright/mcp --isolated --caps=testing`
    - `isolated = false` → `npx @playwright/mcp --caps=testing`
-5. Open a new browser context — never reuse a context from a previous session
-6. If `authMode` is not `none`, complete auth flow (see Auth Flow below) before navigating to the target URL
-7. Navigate to the target URL
-8. Wait for stable state — see Stable State Detection below
+6. Open a new browser context — each MCP server launch creates a fresh context
+7. If `authMode` is not `none`, complete auth flow (see Auth Flow below) before navigating to the target URL
+8. Navigate to the target URL
+9. Wait for stable state — see Stable State Detection below
 
 ### During
 
-- One context per spec — do not share contexts across different specs
-- Reset context state between unrelated flows (clear cookies/storage if flows must be independent)
+- One server + context per spec — do not share across different specs
+- Reset context state between unrelated flows (restart server if flows must be fully independent)
 - Always re-snapshot after any navigation or significant DOM mutation before continuing
 
 ### End (MANDATORY)
@@ -43,14 +49,18 @@ Always close the session, even if verification failed:
 
 ```
 1. browser_close (or equivalent context close)
-2. Verify no orphaned browser processes
-3. Write session status to .ralph-state.json:
+2. Stop the MCP server process
+3. Verify no orphaned browser processes remain
+4. Write session status to .ralph-state.json:
    jq '.lastPlaywrightSession = "closed"' <basePath>/.ralph-state.json > /tmp/state.json && mv /tmp/state.json <basePath>/.ralph-state.json
 ```
 
 **If `browser_close` fails or the session terminated abnormally** (timeout, tool error, unexpected disconnect):
 
 ```bash
+# Force-stop any lingering MCP server process
+pkill -f "@playwright/mcp" 2>/dev/null || true
+
 # Remove the stale lock file so the next session can start cleanly
 # Only do this if browser_close failed — do not remove a lock that belongs to a live process
 MCP_LOCK="$HOME/.cache/ms-playwright/mcp-chrome/SingletonLock"
@@ -202,9 +212,9 @@ ESCALATE
 
 | Scenario | Rule |
 |---|---|
-| Multiple VE tasks in same spec | Same context OK if flows are sequential and related |
-| Independent user flows (e.g., logged-in vs logged-out) | Separate contexts — clear state between |
-| Parallel VE tasks | Never share context — one context per task |
+| Multiple VE tasks in same spec | Same server + context OK if flows are sequential and related |
+| Independent user flows (e.g., logged-in vs logged-out) | Restart MCP server between flows — clear state completely |
+| Parallel VE tasks | Never share server or context — one server per task |
 
 ---
 
@@ -222,9 +232,9 @@ Reuse the authenticated session within a spec rather than re-authenticating per 
 
 Before marking any VE task complete:
 
-- [ ] Browser context closed
-- [ ] No pending `browser_navigate` or action calls in flight
+- [ ] `browser_close` called (or MCP server stopped if close failed)
+- [ ] MCP server process stopped — no orphaned `@playwright/mcp` processes
 - [ ] Session status written to `.ralph-state.json`
-- [ ] If `browser_close` failed: stale lock removed (see Session End above)
+- [ ] If `browser_close` failed: stale lock removed and server force-stopped (see Session End above)
 - [ ] Screenshots saved to `<basePath>/screenshots/` (create dir if absent)
 - [ ] Signal emitted (`VERIFICATION_PASS`, `VERIFICATION_FAIL`, or `VERIFICATION_DEGRADED`)

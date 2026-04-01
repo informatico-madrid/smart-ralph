@@ -1,6 +1,6 @@
 ---
 name: playwright-env
-version: 4
+version: 5
 description: Load this skill before any MCP Playwright session. Resolves browser execution context — app URL, auth mode, credentials references, seed data, browser config, and safety limits. Emits ESCALATE if critical context is missing or app is unreachable.
 agents: [spec-executor, qa-engineer]
 ---
@@ -53,7 +53,7 @@ a value:
 ### Authentication
 
 | Setting | Env var | Notes |
-|---|---|
+|---|---|---|
 | Auth mode | `RALPH_AUTH_MODE` | `none`, `form`, `token`, `cookie`, `oauth`, `basic`, `storage-state` |
 | Login URL | `RALPH_LOGIN_URL` | Optional. Defaults to `appUrl` if not set |
 | Username / email | `RALPH_LOGIN_USER` | Used by `form` and `basic` modes |

@@ -1,6 +1,6 @@
 ---
 name: mcp-playwright
-version: 4
+version: 5
 description: Load this skill when you need to verify UI features using MCP Playwright browser tools. Covers browser verification protocol, tool selection, dependency check, degradation strategy, cache/lock recovery, and signal emission.
 agents: [spec-executor, qa-engineer]
 ---
@@ -53,13 +53,14 @@ npx @playwright/mcp@latest --version 2>/dev/null && echo MCP_PLAYWRIGHT_AVAILABL
 
 For `appEnv=staging` or `appEnv=production`, if the no-install check fails, emit `ESCALATE` rather than attempting a download.
 
-### 0b — Lock recovery (run BEFORE availability check if a previous session may have crashed)
+### 0b — Lock recovery (run always when `isolated=false`)
 
 The MCP Playwright server uses a persistent user-data-dir at `~/.cache/ms-playwright/mcp-chrome`.
-If a previous session terminated abnormally (timeout, SIGKILL, crash), this directory retains a
-lock file and the next session will fail with `Browser is already in use`.
+When `isolated=false`, this directory can retain a stale lock file from a previously crashed session,
+causing the next session to fail with `Browser is already in use`.
 
-Check and recover before proceeding:
+**Run this check unconditionally at the start of every session when `isolated=false`.
+When `isolated=true`, skip this step — the ephemeral profile has no persistent lock.**
 
 ```bash
 MCP_LOCK="$HOME/.cache/ms-playwright/mcp-chrome/SingletonLock"
@@ -135,6 +136,7 @@ isolated = true  (default)
   Effect: each session uses a fresh in-memory browser profile.
   No HTTP disk cache, cookies, or localStorage persists between sessions.
   This prevents stale-cache contamination between VE tasks.
+  Lock recovery (Step 0b) is NOT needed in this mode.
 
 isolated = false
   → Launch MCP server WITHOUT --isolated:
@@ -143,7 +145,7 @@ isolated = false
   Effect: persistent profile at ~/.cache/ms-playwright/mcp-chrome.
   HTTP disk cache and storage persist between sessions.
   Use only when auth state must survive across separate VE tasks.
-  In this mode, run the lock-recovery check (Step 0b) before EVERY session.
+  Lock recovery (Step 0b) MUST run before every session in this mode.
 ```
 
 > **HTTP disk cache note (isolated=false)**: Playwright browser contexts share
