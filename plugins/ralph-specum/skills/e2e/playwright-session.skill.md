@@ -77,10 +77,30 @@ Always close the session, even if verification failed:
 # Only clean up the stale lock file so the next session can start cleanly.
 # Only do this if browser_close failed — do not remove a lock owned by a live process.
 MCP_LOCK="$HOME/.cache/ms-playwright/mcp-chrome/SingletonLock"
-LOCK_PID=$(cat "$MCP_LOCK" 2>/dev/null | cut -d- -f1)
-if [ -n "$LOCK_PID" ] && ! kill -0 "$LOCK_PID" 2>/dev/null; then
-  rm -f "$MCP_LOCK"
-  echo MCP_LOCK_STALE_REMOVED
+if [ -f "$MCP_LOCK" ]; then
+  # Read the full lock file content first (used for TOCTOU re-check below)
+  LOCK_CONTENT=$(cat "$MCP_LOCK" 2>/dev/null)
+  LOCK_PID=$(echo "$LOCK_CONTENT" | cut -d- -f1)
+  # Validate that the PID is numeric before using it
+  if ! echo "$LOCK_PID" | grep -qE '^[0-9]+$'; then
+    # Invalid / unreadable lock format — safe to remove
+    rm -f "$MCP_LOCK"
+    echo MCP_LOCK_INVALID_FORMAT_REMOVED
+  elif kill -0 "$LOCK_PID" 2>/dev/null; then
+    # PID is live — do not remove
+    echo MCP_LOCK_HELD_BY_LIVE_PROCESS
+  else
+    # PID is gone — re-read to guard against a new process taking the lock
+    # between the kill -0 check and the rm
+    CURRENT_LOCK=$(cat "$MCP_LOCK" 2>/dev/null)
+    if [ "$LOCK_CONTENT" = "$CURRENT_LOCK" ]; then
+      rm -f "$MCP_LOCK"
+      echo MCP_LOCK_STALE_REMOVED
+    else
+      # Lock was replaced by a new owner between our check and now — abort
+      echo MCP_LOCK_CHANGED_DURING_CHECK_RETRY
+    fi
+  fi
 fi
 ```
 
@@ -159,26 +179,37 @@ standard patterns:
 navigating to the app URL — never before. Injecting on `about:blank` writes to
 a different origin and the value will not be available when the app loads.
 
-```javascript
+```
 // Step 1: navigate to the app URL first to establish the correct origin
-await page.goto(appUrl);
-// Step 2: now inject the token into the correct origin's localStorage
-await page.evaluate((token, key) => {
-  localStorage.setItem(key, token);  // key = tokenLocalStorageKey from playwright-env.local.md
-}, process.env.RALPH_AUTH_TOKEN, tokenLocalStorageKey);
+// (use MCP tool: browser_navigate with url=appUrl)
+browser_navigate(appUrl)
+
+// Step 2: inject the token safely — pass the token as a separate argument,
+// never via string concatenation or template literals to avoid injection/syntax errors.
+// The controller reads RALPH_AUTH_TOKEN from the environment and passes it as a
+// parameter — the script body itself is a static string.
+// (use MCP tool: browser_execute_script)
+browser_execute_script(
+  script: "localStorage.setItem(arguments[0], arguments[1])",
+  args: [tokenLocalStorageKey, <value of RALPH_AUTH_TOKEN from env>]
+)
+
 // Step 3: reload so the app reads the token from localStorage on init
-await page.reload();
+// (use MCP tool: browser_navigate to force reload)
+browser_navigate(appUrl)
 ```
 
 Then `browser_snapshot` + stable state check → confirm authenticated state.
 
 **Pattern B — Authorization header** (for apps that read the header on every request):
-```javascript
-// Set default headers on the browser context before navigating
-await context.setExtraHTTPHeaders({
-  Authorization: `Bearer ${process.env.RALPH_AUTH_TOKEN}`
-});
-await page.goto(appUrl);
+```
+// Set default headers on the browser context before navigating.
+// The controller reads RALPH_AUTH_TOKEN from env and passes it as a parameter.
+// (use MCP tool: browser_set_extra_http_headers or equivalent context setup)
+browser_set_extra_http_headers(
+  headers: { "Authorization": "Bearer <value of RALPH_AUTH_TOKEN from env>" }
+)
+browser_navigate(appUrl)
 ```
 Then `browser_snapshot` → confirm authenticated state.
 

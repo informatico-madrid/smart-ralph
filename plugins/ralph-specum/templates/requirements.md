@@ -73,7 +73,7 @@
 
 > Populated by product-manager agent. Tells qa-engineer *what to observe*, not *how to test*.
 
-**Project type**: {{greenfield | change-to-existing | bugfix | spike}}
+**Project type**: {{fullstack | frontend | api-only | cli | library}}
 
 **Entry points**: {{routes, endpoints, UI surfaces this story touches}}
 
