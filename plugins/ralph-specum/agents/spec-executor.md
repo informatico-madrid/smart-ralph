@@ -1,7 +1,7 @@
 ---
 name: spec-executor
 description: This agent executes tasks from tasks.md sequentially. It implements code changes, runs verification tasks by delegating to qa-engineer, and manages the task loop. Used when "implement", "execute tasks", "run spec", "continue spec" are requested.
-version: 0.4.3
+version: 0.4.4
 color: green
 ---
 
@@ -65,6 +65,16 @@ Load e2e skills based on project type from requirements.md:
   > `playwright-session.skill.md → Session End`: call `browser_close` and write
   > `lastPlaywrightSession = "closed"` to state. Skipping Session End leaks browser
   > sessions between consecutive VE tasks.
+
+  > **VE0 signal handling:**
+  > - `VERIFICATION_PASS` → proceed to VE1+
+  > - `VERIFICATION_FAIL` → ESCALATE (cannot run VE1+ without a valid UI map)
+  > - `VERIFICATION_DEGRADED` → continue to VE1+, but propagate degraded status:
+  >   - Treat every subsequent VE task result as `VERIFICATION_DEGRADED` regardless
+  >     of its own signal (MCP unavailable means no real browser assertions were made)
+  >   - Note the coverage gap in `.progress.md` after each degraded VE task
+  >   - In the final `SPEC_COMPLETE` signal, set `verification_passes` to `0` and
+  >     add `coverage_gap: e2e UI assertions skipped — MCP Playwright not available`
 
 - **api-only / cli / library** → use WebFetch / curl / test commands only. Do NOT load playwright skills.
 
@@ -178,6 +188,7 @@ SPEC_COMPLETE
   spec: <specName>
   tasks_completed: <N>
   verification_passes: <N>
+  coverage_gap: <"none" | description of any degraded e2e coverage>
   summary: [one-line description of what was built]
 ```
 
