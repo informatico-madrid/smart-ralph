@@ -316,6 +316,40 @@ Read the "Verification Tooling" section from research.md to determine project ty
 | Mobile | iOS/Android deps (react-native, flutter, xcode) | Simulator if available |
 | Library | No dev server, no UI | Build + import check only |
 
+### Playwright E2E Tasks: ui-map-init Prerequisite
+
+<mandatory>
+**When any VE task uses Playwright for browser automation, ALWAYS insert a `ui-map-init` task immediately before the first Playwright VE task in the spec.**
+
+**Rule**: Insert once per spec — do not repeat if multiple Playwright VE tasks exist.
+
+**Detection**: A VE task uses Playwright when its `Verify` or `Do` field references `playwright`, `npx playwright`, `pnpm exec playwright`, or a `.spec.ts` / `.spec.js` Playwright test file.
+
+**Template** (insert as `VE0` or as the step immediately preceding the first Playwright VE task):
+
+```markdown
+- [ ] VE0 [VERIFY] UI map init: build selector map before Playwright tests
+  - **Do**:
+    1. Check if `ui-map.local.md` already exists: `[ -f <basePath>/ui-map.local.md ] && echo EXISTS`
+    2. If it exists, skip remaining steps — map is already built
+    3. If it does not exist, load skill and run exploration:
+       `<agent loads skills/e2e/ui-map-init.skill.md and follows its instructions>`
+  - **Skills**: `skills/e2e/ui-map-init.skill.md`
+  - **Files**: `<basePath>/ui-map.local.md` (created by skill if absent)
+  - **Done when**: `ui-map.local.md` exists at basePath
+  - **Verify**: `[ -f <basePath>/ui-map.local.md ] && echo VE0_PASS`
+  - **Commit**: None
+```
+
+**Why**: Playwright tests that rely on selectors fail silently or flake when the UI structure is unknown. The `ui-map-init` skill explores the running app, catalogs selectors, and writes `ui-map.local.md` so every subsequent Playwright task can reference stable, verified selectors instead of guessing.
+
+**Field `**Skills**`**: All Playwright VE tasks (VE1, VE2, etc.) that interact with the browser MUST also carry:
+```
+  - **Skills**: `skills/e2e/playwright-session.skill.md`
+```
+This signals the executor to load the Playwright session skill before running browser interactions.
+</mandatory>
+
 ### VE Task Templates
 
 Generate VE tasks using this 3-task structure (startup, check, cleanup):
@@ -879,6 +913,7 @@ Before completing tasks:
 - [ ] Ambiguous tasks surface their assumptions explicitly, not silently (think-first)
 - [ ] Independent tasks marked [P] where file overlap is zero
 - [ ] Set awaitingApproval in state (see below)
+- [ ] If any VE task uses Playwright: VE0 ui-map-init task exists immediately before first Playwright VE task
 
 **POC-specific (GREENFIELD):**
 - [ ] POC phase focuses on validation, not perfection
