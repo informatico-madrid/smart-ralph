@@ -1,7 +1,7 @@
 ---
 name: spec-workflow
 description: This skill should be used when the user asks to "build a feature", "create a spec", "start spec-driven development", "run research phase", "generate requirements", "create design", "plan tasks", "implement spec", "check spec status", "triage a feature", "create an epic", "decompose a large feature", or needs guidance on spec-driven development workflow, phase ordering, or epic orchestration.
-version: 0.3.0
+version: 0.3.1
 ---
 
 # Spec Workflow
@@ -17,6 +17,7 @@ Spec-driven development transforms feature requests into structured specs throug
 | Large feature needing decomposition | `/ralph-specum:triage <goal>` |
 | Resume existing spec | `/ralph-specum:start` (auto-detects) |
 | Jump to specific phase | `/ralph-specum:<phase>` |
+| Restart a phase from scratch | `/ralph-specum:<phase> --fresh` |
 
 ## Single Spec Flow
 
@@ -141,6 +142,23 @@ specs/
 # Decomposes into: auth-core, auth-oauth, auth-rbac
 /ralph-specum:start  # Picks next unblocked spec
 ```
+
+### Restart a phase
+```bash
+/ralph-specum:design --fresh
+# Discards current design.md and reruns the design phase from scratch
+# Warning: skipping requirements means Project type may be missing
+```
+
+## Quick Mode — How Validation Works
+
+With `--quick`:
+- All phases run automatically without pausing for `awaitingApproval`
+- Each artifact is validated by the **same agent that produced it** (self-review pass, max 3 iterations)
+- architect-reviewer validates design.md; task-planner validates tasks.md; etc.
+- There is no separate `spec-reviewer` agent — validation is done inline by the phase agent
+- Project type must be inferable from the codebase — if not, quick mode pauses and asks the user
+- Auto-transitions to execution after tasks phase
 
 ## References
 
