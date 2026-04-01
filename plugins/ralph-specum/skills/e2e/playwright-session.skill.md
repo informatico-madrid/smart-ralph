@@ -1,6 +1,6 @@
 ---
 name: playwright-session
-version: 7
+version: 8
 description: Load this skill before any Playwright browser interaction in a VE task. Covers session lifecycle, context isolation, auth flows, stable-state detection, cache isolation, and cleanup. Requires playwright-env and mcp-playwright to be loaded first.
 agents: [spec-executor, qa-engineer]
 ---
@@ -54,7 +54,10 @@ never from hardcoded values.
 
 ### During
 
-- One context per spec — do not share across different specs
+> **Scope**: "during" means within a single VE task — the steps between Session Start
+> and Session End for one task. Do NOT reuse a session across multiple VE tasks.
+> `spec-executor.md` is the authority on session policy between VE tasks.
+
 - Always re-snapshot after any navigation or significant DOM mutation before continuing
 
 ### End (MANDATORY)
@@ -232,9 +235,12 @@ ESCALATE
 
 | Scenario | Rule |
 |---|---|
-| Multiple VE tasks in same spec | Same context OK if flows are sequential and related |
+| Sub-steps within a single VE task | Reuse the same context — do not re-authenticate between steps of the same task |
 | Independent user flows (e.g., logged-in vs logged-out) | Use `isolated=true` (default) — each session starts with a fresh ephemeral profile. If the server is running with `isolated=false` and full state isolation is needed, emit `ESCALATE` asking the human to restart the MCP server with `--isolated` |
 | Parallel VE tasks | Never share context across tasks — one session per task |
+
+> **Between VE tasks**: always follow Session End before starting the next VE task.
+> `spec-executor.md` is the authority on inter-task session policy.
 
 ---
 
