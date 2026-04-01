@@ -89,6 +89,78 @@ if [ -n "$TRANSCRIPT_PATH" ] && [ -f "$TRANSCRIPT_PATH" ]; then
             fi
         fi
         "$SCRIPT_DIR/update-spec-index.sh" --quiet 2>/dev/null || true
+
+        # --- Phase 4: Regression Sweep ---
+        # After spec completion, re-run verification contracts for specs listed in
+        # the dependency map of the completed spec's requirements.md.
+        # Three tiers: local (dependency map) only. Invariants and full-suite
+        # are left for nightly / final merge (out of scope for this hook).
+        REQUIREMENTS_FILE="$CWD/$SPEC_PATH/requirements.md"
+        if [ -f "$REQUIREMENTS_FILE" ]; then
+            # Extract the Dependency map bullet list from the Verification Contract section
+            DEP_SPECS=$(awk '
+                /^## Verification Contract/,0 {
+                    if (/^\*\*Dependency map\*\*:/) {
+                        # Grab rest of line after the colon
+                        sub(/^\*\*Dependency map\*\*:[[:space:]]*/, "")
+                        print
+                        # Collect continuation lines (indented or starting with -)
+                        next
+                    }
+                }
+            ' "$REQUIREMENTS_FILE" | tr ',' '\n' | sed 's/^[[:space:]]*//' | grep -v '^$' || true)
+
+            if [ -n "$DEP_SPECS" ]; then
+                echo "[ralph-specum] Phase 4 regression sweep: found dependency map entries" >&2
+                SWEEP_LIST=""
+                while IFS= read -r dep; do
+                    # dep may be a spec name or relative path — resolve to spec path
+                    dep=$(echo "$dep" | sed 's/^- //' | tr -d '`')
+                    # Try to find the spec directory matching the dep name
+                    DEP_REQ="$CWD/specs/$dep/requirements.md"
+                    if [ -f "$DEP_REQ" ]; then
+                        SWEEP_LIST="$SWEEP_LIST\n- specs/$dep"
+                    fi
+                done <<< "$DEP_SPECS"
+
+                if [ -n "$SWEEP_LIST" ]; then
+                    STOP_HOOK_ACTIVE=$(echo "$INPUT" | jq -r '.stop_hook_active // false' 2>/dev/null || echo "false")
+                    if [ "$STOP_HOOK_ACTIVE" != "true" ]; then
+                        SWEEP_REASON=$(cat <<SWEEP_EOF
+[ralph-specum] Regression sweep triggered by completion of: $SPEC_NAME
+
+## Specs to sweep (from Dependency map)
+$SWEEP_LIST
+
+## Action
+For each spec listed above:
+1. Read its requirements.md Verification Contract
+2. Delegate a [STORY-VERIFY] task to qa-engineer: verify only the Observable signals and Hard invariants
+3. Emit VERIFICATION_PASS or VERIFICATION_FAIL per spec
+4. Do NOT re-implement. Verification only.
+5. After all sweeps complete, output REGRESSION_SWEEP_COMPLETE
+
+## Critical
+- Do NOT modify any source files
+- Do NOT add new tasks to tasks.md
+- If any sweep emits VERIFICATION_FAIL, treat as a new repair loop (Phase 3)
+SWEEP_EOF
+)
+                        jq -n \
+                          --arg reason "$SWEEP_REASON" \
+                          --arg msg "Ralph-specum Phase 4: regression sweep for $SPEC_NAME dependencies" \
+                          '{
+                            "decision": "block",
+                            "reason": $reason,
+                            "systemMessage": $msg
+                          }'
+                        exit 0
+                    fi
+                fi
+            fi
+        fi
+        # --- End Phase 4 ---
+
         exit 0
     fi
     # Fallback: check last 20 lines for edge cases (very recent signal)
@@ -114,6 +186,101 @@ if [ -n "$TRANSCRIPT_PATH" ] && [ -f "$TRANSCRIPT_PATH" ]; then
         "$SCRIPT_DIR/update-spec-index.sh" --quiet 2>/dev/null || true
         exit 0
     fi
+
+    # --- Phase 3: Repair Loop ---
+    # Detect VERIFICATION_FAIL in transcript and activate repair mode.
+    # Max 2 repair iterations per story before escalating to human.
+    if tail -500 "$TRANSCRIPT_PATH" 2>/dev/null | grep -qE '(^|\W)VERIFICATION_FAIL(\W|$)'; then
+        REPAIR_ITER=$(jq -r '.repairIteration // 0' "$STATE_FILE" 2>/dev/null || echo "0")
+        FAILED_STORY=$(jq -r '.failedStory // "unknown"' "$STATE_FILE" 2>/dev/null || echo "unknown")
+        ORIGIN_TASK=$(jq -r '.originTaskIndex // "unknown"' "$STATE_FILE" 2>/dev/null || echo "unknown")
+        MAX_REPAIR=2
+
+        echo "[ralph-specum] VERIFICATION_FAIL detected | story: $FAILED_STORY | repair iter: $REPAIR_ITER/$MAX_REPAIR" >&2
+
+        STOP_HOOK_ACTIVE=$(echo "$INPUT" | jq -r '.stop_hook_active // false' 2>/dev/null || echo "false")
+        if [ "$STOP_HOOK_ACTIVE" = "true" ]; then
+            echo "[ralph-specum] stop_hook_active=true in repair loop, allowing stop" >&2
+            exit 0
+        fi
+
+        if [ "$REPAIR_ITER" -ge "$MAX_REPAIR" ]; then
+            # Escalate to human
+            ESCALATE_REASON=$(cat <<ESCALATE_EOF
+[ralph-specum] ESCALATION REQUIRED — Repair loop exhausted for: $FAILED_STORY
+
+The verification for story '$FAILED_STORY' has failed $MAX_REPAIR times.
+Automatic repair has been exhausted.
+
+## What happened
+- Story: $FAILED_STORY
+- Origin task index: $ORIGIN_TASK
+- Repair attempts: $REPAIR_ITER/$MAX_REPAIR
+
+## Action required from human
+1. Review $SPEC_PATH/requirements.md — Verification Contract for '$FAILED_STORY'
+2. Review $SPEC_PATH/tasks.md — task at index $ORIGIN_TASK
+3. Check $SPEC_PATH/.progress.md for failure details
+4. Fix manually or clarify the spec
+5. Reset repair state: update .ralph-state.json — set phase back to "execution",
+   repairIteration to 0, remove failedStory and originTaskIndex
+6. Resume with /ralph-specum:implement
+ESCALATE_EOF
+)
+            jq -n \
+              --arg reason "$ESCALATE_REASON" \
+              --arg msg "Ralph-specum Phase 3: ESCALATION — repair exhausted for $FAILED_STORY" \
+              '{
+                "decision": "block",
+                "reason": $reason,
+                "systemMessage": $msg
+              }'
+            exit 0
+        fi
+
+        # Classify failure and trigger targeted repair
+        NEXT_REPAIR=$((REPAIR_ITER + 1))
+        REPAIR_REASON=$(cat <<REPAIR_EOF
+[ralph-specum] Repair loop — attempt $NEXT_REPAIR/$MAX_REPAIR for story: $FAILED_STORY
+
+## State
+Spec: $SPEC_PATH | Failed story: $FAILED_STORY | Origin task index: $ORIGIN_TASK
+
+## Action
+1. Read $SPEC_PATH/requirements.md — Verification Contract for '$FAILED_STORY'
+2. Read $SPEC_PATH/.progress.md — identify root cause of VERIFICATION_FAIL
+3. Classify failure type:
+   - impl_bug: implementation does not match the Observable signals
+   - env_issue: environment/dependency problem (DB, service, config)
+   - spec_ambiguity: the contract is unclear or contradictory
+   - flaky: non-deterministic failure (timing, race condition)
+4. If impl_bug: backtrack to origin task $ORIGIN_TASK in tasks.md, delegate
+   a targeted fix to spec-executor. Do NOT re-implement unrelated tasks.
+5. If env_issue: report the specific env problem and halt (set awaitingApproval=true)
+6. If spec_ambiguity: propose a clarification to the Verification Contract and halt
+7. If flaky: retry the verification once more via qa-engineer [STORY-VERIFY]
+8. After fix: re-run qa-engineer [STORY-VERIFY] for '$FAILED_STORY' only
+9. Update .ralph-state.json: increment repairIteration to $NEXT_REPAIR
+10. On VERIFICATION_PASS: reset repair state (remove failedStory, repairIteration,
+    originTaskIndex), resume normal execution from taskIndex
+11. On VERIFICATION_FAIL again: this hook will escalate on next iteration
+
+## Critical
+- Surgical fix only — do NOT touch unrelated tasks or files
+- Do NOT output ALL_TASKS_COMPLETE until repair resolves and normal flow resumes
+REPAIR_EOF
+)
+        jq -n \
+          --arg reason "$REPAIR_REASON" \
+          --arg msg "Ralph-specum Phase 3: repair $NEXT_REPAIR/$MAX_REPAIR — $FAILED_STORY" \
+          '{
+            "decision": "block",
+            "reason": $reason,
+            "systemMessage": $msg
+          }'
+        exit 0
+    fi
+    # --- End Phase 3 ---
 fi
 
 # Validate state file is readable JSON
