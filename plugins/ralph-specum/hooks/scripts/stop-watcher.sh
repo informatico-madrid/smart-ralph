@@ -119,7 +119,7 @@ if [ -n "$TRANSCRIPT_PATH" ] && [ -f "$TRANSCRIPT_PATH" ]; then
                     # Try to find the spec directory matching the dep name
                     DEP_REQ="$CWD/specs/$dep/requirements.md"
                     if [ -f "$DEP_REQ" ]; then
-                        SWEEP_LIST="$SWEEP_LIST\n- specs/$dep"
+                        SWEEP_LIST="${SWEEP_LIST}"$'\n'"- specs/$dep"
                     fi
                 done <<< "$DEP_SPECS"
 

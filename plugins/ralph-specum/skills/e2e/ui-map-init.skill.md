@@ -54,8 +54,26 @@ silently corrupt subsequent VE tasks.
 
 ## Step 0 — Pre-flight
 
-1. Read `mcpPlaywright` from `.ralph-state.json` — if `missing`, switch to degraded mode (no browser exploration; write a minimal placeholder `ui-map.local.md` and emit `VERIFICATION_DEGRADED`)
-2. Read `playwrightEnv.appUrl` from `.ralph-state.json`
+1. **Check state file exists**: read `.ralph-state.json` from `<basePath>`. If the file
+   is missing, emit `ESCALATE` and stop:
+   ```
+   ESCALATE
+     reason: state-file-missing
+     resolution: playwright-env.skill.md must run first to create .ralph-state.json
+   ```
+2. **Read `mcpPlaywright`** from `.ralph-state.json`:
+   - Value `"available"` → proceed with MCP exploration (Step 1A)
+   - Value `"missing"` or key absent → switch to degraded mode: write a minimal
+     placeholder `ui-map.local.md` (source: static, all selectors confidence: low)
+     and emit `VERIFICATION_DEGRADED` with `reason: mcp-playwright-missing`
+3. **Read `playwrightEnv.appUrl`** from `.ralph-state.json`. If `playwrightEnv`
+   object is absent or `appUrl` is empty/missing, emit `ESCALATE` and stop:
+   ```
+   ESCALATE
+     reason: playwright-env-incomplete
+     resolution: playwright-env.skill.md must complete before ui-map-init;
+                 ensure RALPH_APP_URL is set and playwright-env resolves successfully
+   ```
 
 ---
 
@@ -75,6 +93,16 @@ Use browser tools to explore the live app.
 1. Follow `playwright-session.skill.md → Session Lifecycle → Start` to open a
    browser session **and complete the auth flow** according to `authMode` before
    navigating to any exploration target.
+   - **On auth failure** (wrong credentials, auth service unreachable): emit
+     `VERIFICATION_FAIL` with `reason: session-start-failed-auth` and include
+     the error details from the playwright-session error. Follow
+     `playwright-session.skill.md → Session End` before stopping. Do NOT write
+     a partial `ui-map.local.md`.
+   - **On app unreachable or browser crash / MCP error** (connection refused,
+     timeout, tool error): follow Step 1B (static mode) instead and emit
+     `VERIFICATION_DEGRADED` with `reason: session-start-failed-connectivity`.
+     Ensure Session End still writes `lastPlaywrightSession = "closed"` to state
+     after any error that left a session open.
 2. After `Session Start`, call `browser_snapshot` + stable state check to confirm
    the authenticated state. If auth fails:
    - Emit `VERIFICATION_FAIL` (not `VERIFICATION_DEGRADED`) — a broken auth

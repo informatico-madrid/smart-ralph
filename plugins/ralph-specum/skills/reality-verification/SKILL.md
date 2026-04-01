@@ -26,8 +26,12 @@ If not documented, infer from the codebase:
 
 ```
 Has a UI / browser entry point?
-  ├── YES → project type: fullstack (or frontend)
-  │         → UI entry points are valid → Playwright MCP eligible
+  ├── YES → does the project also expose HTTP API endpoints (REST/GraphQL)?
+  │         ├── YES → project type: fullstack
+  │         │         → UI entry points valid → Playwright MCP eligible
+  │         │         → API endpoints valid → WebFetch/curl eligible
+  │         └── NO  → project type: frontend
+  │                   → UI entry points valid → Playwright MCP eligible
   └── NO  → check further:
             Has HTTP API endpoints (REST/GraphQL)?
               ├── YES → project type: api-only
@@ -44,7 +48,8 @@ Has a UI / browser entry point?
 
 **When project type is `fullstack` or `frontend`:**
 - UI entry points are valid → follow the full e2e skill chain
-- Load `playwright-env` → `playwright-session` / `mcp-playwright` → `ui-map-init`
+- Load `playwright-env` → `mcp-playwright` → `playwright-session` → `ui-map-init`
+- For `fullstack`: also allow API verification via WebFetch/curl for API entry points
 
 **If project type cannot be determined:** emit ESCALATE:
 ```
@@ -79,9 +84,12 @@ VE0    — ui-map-init (selector map generation)
          Only created for fullstack / frontend projects
          Defined in: ui-map-init.skill.md
 
-VE1..N — individual acceptance-criteria verification tasks
-         One per user story or acceptance criterion with a UI/API entry point
-         Load playwright-session + mcp-playwright (UI) or WebFetch (API)
+VE1    — Startup: start dev server/infrastructure in background, record PID, wait for ready
+
+VE2    — Check: test critical user flows via browser (selectors from ui-map.local.md),
+         curl, or CLI; verify expected output against Verification Contract
+
+VE3    — Cleanup: kill process by PID (port fallback), remove PID file, verify port free
 
 4.3    — VF: Verify original issue resolved (fix-type specs only)
          Runs AFTER implementation and PR creation (task 4.2)
