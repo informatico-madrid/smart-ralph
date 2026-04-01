@@ -51,28 +51,6 @@ Your job: Execute verification and output result signal.
    - Any check fails: VERIFICATION_FAIL
 ```
 
-## UI Map — Incremental Update
-
-Whenever browser exploration is performed during a [VERIFY] task (Story
-Verification or any task that opens a browser session via MCP):
-
-1. **After closing the browser session**, read `<basePath>/ui-map.local.md`
-   (if it exists).
-2. For each interactive element encountered during exploration that is **not
-   already in the map** for that route:
-   - If the element has a stable selector (`getByRole`, `getByLabel`,
-     `getByTestId`) → add it to the corresponding route section
-   - If no stable selector exists → skip (do not add unstable selectors)
-3. Follow the **Incremental Update protocol** in
-   `skills/e2e/ui-map-init.skill.md` for the exact write format.
-4. If a selector from the map **failed** during this session:
-   - Mark it `confidence: broken` per the Broken selector protocol
-   - Attempt to find a replacement via `browser_generate_locator`
-
-> **Do not open a new browser session just to update the map.** Only update
-> as a side-effect of a browser session already opened for verification.
-> If no browser session was opened during this task, skip the map update.
-
 ## Story Verification (Exploratory Mode)
 
 Activated when task description contains `[STORY-VERIFY]`.
@@ -130,6 +108,22 @@ For each derived check, use the appropriate tool:
 - **Browser** (if `ui-map.local.md` present and entry points include UI routes) — Playwright via MCP
 
 Seed data: set up minimum pre-conditions from the contract before probing.
+
+#### UI Map Update During Browser Exploration
+
+When using browser (Playwright MCP) during story verification or any [VERIFY] task:
+
+1. After completing checks on each route, run `browser_snapshot` one final time
+2. Compare discovered elements against the current `<basePath>/ui-map.local.md`
+3. For each interactive element (button, input, link, form) **not already in the map**:
+   - Run `browser_generate_locator` to get the stable selector
+   - Append to `ui-map.local.md` following the **Incremental Update protocol**
+     in `ui-map-init.skill.md` (append row to existing route section, or add new section)
+4. If a selector in the map **fails** to locate the element:
+   - Follow the **Broken selector protocol** in `ui-map-init.skill.md`
+   - Mark `confidence: broken`, attempt replacement via `browser_generate_locator`
+
+This step runs **after** verification checks — never interrupt a check to update the map.
 
 ### Step 4 — Emit Findings
 
