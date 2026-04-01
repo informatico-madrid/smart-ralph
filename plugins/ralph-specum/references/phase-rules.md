@@ -284,16 +284,39 @@ VE tasks provide autonomous end-to-end verification by spinning up real infrastr
 VE tasks extend the final verification sequence, after V6 and before Phase 5:
 
 ```text
-V4 (Full local CI) -> V5 (CI pipeline) -> V6 (AC checklist) -> VE1 -> VE2 -> VE3 -> PR Lifecycle
+V4 (Full local CI) -> V5 (CI pipeline) -> V6 (AC checklist) -> VE0 -> VE1 -> VE2 -> VE3 -> PR Lifecycle
 ```
+
+> `VE0` is the UI Map Init task. It runs **once per spec** (first time, or when the map
+> is stale). If `ui-map.local.md` already exists and is not stale, VE0 is skipped and
+> the existing map is reused directly by VE1+.
 
 ### Structure
 
-VE tasks follow a 3-part structure:
+VE tasks follow this structure:
 
+0. **VE0 (UI Map Init)** — Build `ui-map.local.md` by exploring the live app. Runs once;
+   skipped on subsequent runs if the map is current. Skill: `ui-map-init`.
 1. **VE1 (Startup)** — Start dev server/infrastructure in background, record PID, wait for ready
-2. **VE2 (Check)** — Test critical user flows via curl/browser/CLI, verify expected output
+2. **VE2 (Check)** — Test critical user flows via browser (using selectors from `ui-map.local.md`), curl, or CLI. Verify expected output.
 3. **VE3 (Cleanup)** — Kill by PID, kill by port fallback, remove PID file, verify port free
+
+### UI Map Lifecycle
+
+`ui-map.local.md` is a **living document** — it grows incrementally as the spec progresses.
+Never regenerate the full map unless it is explicitly stale.
+
+| Agent | Trigger | What it adds | Confidence |
+|---|---|---|---|
+| `ui-map-init` (VE0) | First run or `stale: true` | All routes in Verification Contract | `high` / `low` |
+| `spec-executor` | After any task that adds `data-testid` to source | New testid rows for affected routes | `medium` |
+| `qa-engineer` | After browser exploration in any [VERIFY] task | Newly discovered interactive elements | `high` |
+
+**Broken selector protocol**: if a selector in the map fails during a VE task, the
+`qa-engineer` marks the row `confidence: broken`, attempts `browser_generate_locator`
+to find a replacement, and emits a `FINDING`. It never silently removes broken rows.
+
+Full protocol details: `${CLAUDE_PLUGIN_ROOT}/skills/e2e/ui-map-init.skill.md → ## Incremental Update`.
 
 ### Rules
 
@@ -303,6 +326,7 @@ VE tasks follow a 3-part structure:
 - **Commands from research.md**: All commands (dev server, port, health endpoint) come from research.md Verification Tooling section. Never hardcoded.
 - **Recovery mode always enabled**: VE failures trigger fix task generation via existing recovery mode, regardless of state file recoveryMode flag.
 - **Max 3 retries per VE task**: After 3 failed attempts, skip to VE-cleanup and report error.
+- **VE0 failure is fatal**: if VE0 emits `VERIFICATION_FAIL`, escalate immediately — VE1+ cannot run without a valid selector map.
 
 ### When Omitted
 
