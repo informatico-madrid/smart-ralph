@@ -19,8 +19,9 @@ Use `basePath` for ALL file operations. Never hardcode `./specs/` paths.
 2. Research similar patterns in the codebase if applicable
 3. Create comprehensive requirements with user stories
 4. Define clear acceptance criteria that are testable
-5. Identify out-of-scope items and dependencies
-6. Append learnings to .progress.md
+5. Populate the Verification Contract for each user story
+6. Identify out-of-scope items and dependencies
+7. Append learnings to .progress.md
 
 ## Use Explore for Codebase Analysis
 
@@ -121,7 +122,52 @@ Create requirements.md following this structure:
 
 ## Success Criteria
 - [Measurable outcome that defines success]
+
+## Verification Contract
+
+**Entry points**: [routes, endpoints, UI surfaces this story touches]
+
+**Observable signals**:
+- PASS looks like: [HTTP status / visible element / persisted data / log output]
+- FAIL looks like: [what wrong state is observable]
+
+**Hard invariants**: [what must NEVER break — auth, permissions, adjacent flows]
+
+**Seed data**: [minimum system state needed to verify]
+
+**Dependency map**: [other specs/modules that share state with this one]
+
+**Escalate if**: [conditions that require human judgment]
 ```
+
+## Verification Contract Guidelines
+
+<mandatory>
+For every requirements.md, populate the `## Verification Contract` section:
+
+1. **Entry points** — list every route, API endpoint, UI surface, CLI command, or background job this feature touches. Be specific (e.g., `GET /api/invoices?from=&to=`, `InvoiceList component`, `cron: billing-sync`).
+
+2. **Observable signals** — describe what PASS and FAIL look like in terms the qa-engineer can observe without reading source code:
+   - HTTP responses, status codes, response body fields
+   - UI elements visible or hidden, text content, state changes
+   - Database records created/updated/deleted
+   - Log lines, events emitted, side effects
+
+3. **Hard invariants** — list behaviors that must never break regardless of this feature's changes. Typically: auth/session validity, permissions enforcement, data belonging to other users/tenants, adjacent unrelated flows.
+
+4. **Seed data** — specify the minimum pre-conditions for verification to be meaningful:
+   - User role/permissions required
+   - Existing records needed (e.g., "at least 3 invoices, one from each of the last 3 months")
+   - Config flags, feature flags, environment variables
+
+5. **Dependency map** — name other specs or modules that share database tables, state, or side effects with this one. The qa-engineer uses this for regression sweep targeting.
+
+6. **Escalate if** — enumerate situations where the agent should stop and ask a human:
+   - Irreversible actions (data deletion, external API calls with billing)
+   - Ambiguous expected behavior found during exploration
+   - Security-sensitive paths
+   - Performance degradation beyond a threshold
+</mandatory>
 
 ## Quality Checklist
 
@@ -132,6 +178,10 @@ Before completing requirements:
 - [ ] Out-of-scope section prevents scope creep
 - [ ] Glossary defines domain-specific terms
 - [ ] Success criteria are measurable
+- [ ] Verification Contract populated for every user story
+- [ ] Entry points are specific (routes/endpoints/surfaces named explicitly)
+- [ ] Observable signals describe PASS and FAIL in observable terms
+- [ ] Hard invariants listed (at minimum: auth, permissions)
 - [ ] Set awaitingApproval in state (see below)
 
 ## Final Step: Set Awaiting Approval
@@ -179,8 +229,9 @@ Every requirements output follows this order:
 1. Goal (1-2 sentences MAX)
 2. User Stories + Acceptance Criteria (bulk)
 3. Requirements tables
-4. Unresolved Questions (ambiguities found)
-5. Numbered Next Steps (ALWAYS LAST)
+4. Verification Contract
+5. Unresolved Questions (ambiguities found)
+6. Numbered Next Steps (ALWAYS LAST)
 
 ```markdown
 ## Unresolved Questions

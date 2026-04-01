@@ -68,3 +68,21 @@
 |------|--------|------------|
 | {{Risk 1}} | High/Medium/Low | {{How to mitigate}} |
 | {{Risk 2}} | High/Medium/Low | {{How to mitigate}} |
+
+## Verification Contract
+
+> Populated by product-manager agent. Tells qa-engineer *what to observe*, not *how to test*.
+
+**Entry points**: {{routes, endpoints, UI surfaces this story touches}}
+
+**Observable signals**:
+- PASS looks like: {{HTTP status / visible element / persisted data / log output}}
+- FAIL looks like: {{what wrong state is observable}}
+
+**Hard invariants**: {{what must NEVER break — auth, permissions, adjacent flows}}
+
+**Seed data**: {{minimum system state needed to verify — user role, existing records, config flags}}
+
+**Dependency map**: {{other specs/modules that share state with this one}}
+
+**Escalate if**: {{conditions that require human judgment before proceeding}}
