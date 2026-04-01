@@ -1,6 +1,6 @@
 ---
 name: mcp-playwright
-version: 1
+version: 2
 description: Load this skill when you need to verify UI features using MCP Playwright browser tools. Covers browser verification protocol, tool selection, dependency check, degradation strategy, and signal emission.
 agents: [spec-executor, qa-engineer]
 ---
@@ -11,9 +11,28 @@ This skill defines the **exact protocol** for browser-based verification using `
 
 ---
 
-## Step 0: Dependency Check (MANDATORY FIRST)
+## Step -1: Resolve Environment Context (MANDATORY FIRST)
 
-Before any browser interaction, verify MCP Playwright is available.
+Before the dependency check, resolve the browser execution context by loading
+`playwright-env.skill.md`.
+
+```
+Load: playwright-env.skill.md
+```
+
+`playwright-env` will:
+- Resolve `appUrl`, `authMode`, `allowWrite`, browser config, locale, timezone
+- Validate that secret env vars are exported and readable
+- Write non-secret resolved values to `.ralph-state.json → playwrightEnv`
+- Emit `ESCALATE` and stop if critical context is missing
+
+**Do not proceed to Step 0 if `playwright-env` emits `ESCALATE`.**
+
+---
+
+## Step 0: Dependency Check (MANDATORY)
+
+After environment context is resolved, verify MCP Playwright is available.
 
 ```bash
 npx @playwright/mcp@latest --version 2>/dev/null && echo MCP_PLAYWRIGHT_AVAILABLE || echo MCP_PLAYWRIGHT_MISSING
@@ -229,3 +248,4 @@ Always use `--caps=testing` as baseline for verification tasks. Add `--caps=devt
 - **Never emit FAIL without console + network inspection**.
 - **Never continue a multi-step flow after an unexpected state** — stop and diagnose.
 - **Never install `@playwright/mcp` automatically** — always escalate to human if missing.
+- **Never start a browser session without first completing Step -1** — environment context must be resolved before any browser tool call.
