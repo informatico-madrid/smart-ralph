@@ -73,6 +73,8 @@
 
 > Populated by product-manager agent. Tells qa-engineer *what to observe*, not *how to test*.
 
+**Project type**: {{greenfield | change-to-existing | bugfix | spike}}
+
 **Entry points**: {{routes, endpoints, UI surfaces this story touches}}
 
 **Observable signals**:
