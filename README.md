@@ -315,9 +315,9 @@ The agent receives the contract and decides *how* to probe — CLI, HTTP, browse
 
 ```
 VE0  → ui-map-init   Build/reuse selector map (MCP-first, static fallback)
-VE1  → Story verify  [STORY-VERIFY] exploratory check against Verification Contract
-VE2  → Regression    Sweep dependent specs (Dependency map)
-VE3  → Fix verify    Confirm repair fixed the failure
+VE1  → Startup       Start dev server/infrastructure, record PID, wait for ready
+VE2  → Check         Test critical user flows via browser/curl/CLI against Verification Contract
+VE3  → Cleanup       Kill by PID, port fallback, remove PID file, verify port free
 ```
 
 VE0 is idempotent — skipped if `ui-map.local.md` already exists and is not stale.

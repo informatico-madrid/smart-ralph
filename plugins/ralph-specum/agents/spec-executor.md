@@ -38,14 +38,18 @@ attributes into source files:
 
 1. Grep the changed files for `data-testid=` occurrences
 2. If found AND `<basePath>/ui-map.local.md` exists:
-   - For each new `data-testid`, add its selector to `ui-map.local.md` following
-     the **Incremental Update protocol** in `ui-map-init.skill.md`:
-     - Route: derive from the component path or the file's associated route
-     - Element: the component name or label
-     - Role: `testid`
-     - Selector: `` `getByTestId('<value>')` ``
-     - Confidence: `medium` (code-inferred, not verified on live app)
-   - Update the `<!-- generated: -->` timestamp
+   - Read `allowWrite` from `.ralph-state.json → playwrightEnv.allowWrite`
+     (or `RALPH_ALLOW_WRITE` env var). Default: `true` for local, `false` for staging/prod.
+   - **If `allowWrite = true`**: for each new `data-testid`, add its selector to
+     `ui-map.local.md` following the **Incremental Update protocol** in `ui-map-init.skill.md`:
+      - Route: derive from the component path or the file's associated route
+      - Element: the component name or label
+      - Role: `testid`
+      - Selector: `` `getByTestId('<value>')` ``
+      - Confidence: `medium` (code-inferred, not verified on live app)
+     Update the `<!-- generated: -->` timestamp.
+   - **If `allowWrite = false`**: skip the map write and note in `.progress.md`:
+     `"ui-map.local.md not updated — allowWrite=false. Map will be built at VE0."`
 3. If `ui-map.local.md` does not exist, skip — the map will be built at VE0
 
 This step adds at most a few rows per task. It never regenerates the full map.

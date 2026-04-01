@@ -88,23 +88,24 @@ MCP_LOCK_STALE_REMOVING       → proceed (stale lock removed)
 MCP_LOCK_CLEAN                → proceed normally
 ```
 
-Write result to `.ralph-state.json`:
+Write result to `.ralph-state.json` — acquire a flock on `.tasks.lock` before the
+read-modify-write to prevent corruption if two VE tasks ever run in parallel:
 
 ```bash
 # If AVAILABLE:
-jq '.mcpPlaywright = "available"' <basePath>/.ralph-state.json > /tmp/state.json && mv /tmp/state.json <basePath>/.ralph-state.json
+(
+  flock -x 200
+  jq '.mcpPlaywright = "available"' <basePath>/.ralph-state.json > /tmp/state.json \
+    && mv /tmp/state.json <basePath>/.ralph-state.json
+) 200><basePath>/.tasks.lock
 
 # If MISSING:
-jq '.mcpPlaywright = "missing"' <basePath>/.ralph-state.json > /tmp/state.json && mv /tmp/state.json <basePath>/.ralph-state.json
+(
+  flock -x 200
+  jq '.mcpPlaywright = "missing"' <basePath>/.ralph-state.json > /tmp/state.json \
+    && mv /tmp/state.json <basePath>/.ralph-state.json
+) 200><basePath>/.tasks.lock
 ```
-
-> ⚠️ **Parallel execution note**: these `jq` writes use a read-modify-write pattern
-> via `/tmp/state.json`. If two VE tasks run in parallel against the same
-> `basePath`, writes can interleave and corrupt `.ralph-state.json`. To avoid
-> this, either (a) run VE tasks sequentially per basePath, or (b) use a
-> basePath-scoped lock file (`.tasks.lock`, already in `.gitignore`) before
-> each `jq` write. Parallel VE execution is not the default — flag this if
-> you enable it.
 
 ### Decision tree after check
 

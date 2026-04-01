@@ -65,7 +65,7 @@ The `task-planner` agent MUST follow these rules when generating VE tasks:
 2. For `fullstack` / `frontend`:
    - Always include `VE0` (ui-map-init) as the first VE task
    - Number subsequent UI verification tasks as `VE1`, `VE2`, etc.
-   - Load skills: `playwright-env` → `mcp-playwright` + `playwright-session` → `ui-map-init`
+   - Load skills: `playwright-env` → `mcp-playwright` → `playwright-session` → `ui-map-init`
 3. For `api-only` / `cli` / `library`:
    - Do NOT generate VE0 or any VE tasks with UI entry points
    - Use `curl`/WebFetch for API tasks, test commands for others
@@ -82,10 +82,16 @@ During task execution, the `spec-executor` subagent loads e2e skills only when:
 Loading order for UI VE tasks:
 ```
 1. playwright-env.skill.md    — resolve app URL, auth, seed, write state
-2. mcp-playwright.skill.md    — dependency check, lock recovery, Protocol A/B
-3. playwright-session.skill.md — session lifecycle, auth flow, stable-state detection
+2. mcp-playwright.skill.md    — dependency check, lock recovery, writes mcpPlaywright to state
+3. playwright-session.skill.md — session lifecycle, auth flow, reads mcpPlaywright from state
 4. ui-map-init.skill.md       — VE0 only: build selector map before VE1+
 ```
+
+> ⚠️ Steps 2 and 3 must be loaded **sequentially, not concurrently**.
+> `playwright-session` reads `.ralph-state.json → mcpPlaywright` which is written
+> by `mcp-playwright` Step 0. Loading `playwright-session` before or in parallel
+> with `mcp-playwright` causes it to find the key absent and fall into degraded
+> mode incorrectly.
 
 For API VE tasks (api-only projects): use WebFetch or `curl` directly — no e2e skills needed.
 
