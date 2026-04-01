@@ -1,6 +1,6 @@
 ---
 name: ui-map-init
-version: 3
+version: 4
 description: Load this skill to build the ui-map.local.md selector map before running Playwright tests. Explores the running app, catalogs stable selectors, and writes the map file. Includes invalidation logic and protected-route auth handling.
 agents: [spec-executor, qa-engineer]
 ---
@@ -17,7 +17,7 @@ Run once per spec, as task `VE0`, immediately before the first Playwright VE tas
 
 Before deciding to skip, run the **freshness check** below. A stale or incomplete map is worse than no map — it causes VE tasks to reference locators that no longer exist.
 
-### Freshness Check (replaces simple EXISTS_SKIP)
+### Freshness Check
 
 ```bash
 MAP_FILE="<basePath>/ui-map.local.md"
@@ -25,8 +25,9 @@ MAP_FILE="<basePath>/ui-map.local.md"
 if [ ! -f "$MAP_FILE" ]; then
   echo NEEDS_INIT
 else
-  # Check age: if the map is older than 4 hours, re-generate
-  MAP_AGE_HOURS=$(( ( $(date +%s) - $(date -r "$MAP_FILE" +%s) ) / 3600 ))
+  # Portable mtime: works on both Linux (stat -c) and macOS (stat -f)
+  MAP_MTIME=$(stat -c %Y "$MAP_FILE" 2>/dev/null || stat -f %m "$MAP_FILE" 2>/dev/null)
+  MAP_AGE_HOURS=$(( ( $(date +%s) - MAP_MTIME ) / 3600 ))
   if [ "$MAP_AGE_HOURS" -ge 4 ]; then
     echo STALE_REINIT
   else
@@ -42,15 +43,18 @@ EXISTS_FRESH  → skip, proceed to VE tasks
 ```
 
 **Additional invalidation triggers** — re-run even if the map is fresh:
-- `requirements.md` was modified after the map's last-modified timestamp
+- `requirements.md` was modified after the map’s last-modified timestamp
 - The agent observes a `VERIFICATION_FAIL` caused by a stale locator (element not found or wrong element matched)
 - The human explicitly requests a map refresh
 
 ```bash
-# Check if requirements.md is newer than the map
+# Check if requirements.md is newer than the map (portable)
 REQ_FILE="<basePath>/requirements.md"
-if [ -f "$REQ_FILE" ] && [ "$REQ_FILE" -nt "$MAP_FILE" ]; then
-  echo REQUIREMENTS_CHANGED_REINIT
+if [ -f "$REQ_FILE" ]; then
+  REQ_MTIME=$(stat -c %Y "$REQ_FILE" 2>/dev/null || stat -f %m "$REQ_FILE" 2>/dev/null)
+  if [ "$REQ_MTIME" -gt "$MAP_MTIME" ]; then
+    echo REQUIREMENTS_CHANGED_REINIT
+  fi
 fi
 ```
 
