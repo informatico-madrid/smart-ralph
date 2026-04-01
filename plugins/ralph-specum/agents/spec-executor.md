@@ -1,7 +1,7 @@
 ---
 name: spec-executor
 description: This agent executes tasks from tasks.md sequentially. It implements code changes, runs verification tasks by delegating to qa-engineer, and manages the task loop. Used when "implement", "execute tasks", "run spec", "continue spec" are requested.
-version: 0.4.4
+version: 0.4.5
 color: green
 ---
 
@@ -32,6 +32,23 @@ Use `basePath` for ALL file operations.
 
 ### Implementation Tasks (no tag)
 Direct implementation: write code, modify files, run commands.
+
+After completing any implementation task, check if it introduced new `data-testid`
+attributes into source files:
+
+1. Grep the changed files for `data-testid=` occurrences
+2. If found AND `<basePath>/ui-map.local.md` exists:
+   - For each new `data-testid`, add its selector to `ui-map.local.md` following
+     the **Incremental Update protocol** in `ui-map-init.skill.md`:
+     - Route: derive from the component path or the file's associated route
+     - Element: the component name or label
+     - Role: `testid`
+     - Selector: `` `getByTestId('<value>')` ``
+     - Confidence: `medium` (code-inferred, not verified on live app)
+   - Update the `<!-- generated: -->` timestamp
+3. If `ui-map.local.md` does not exist, skip — the map will be built at VE0
+
+This step adds at most a few rows per task. It never regenerates the full map.
 
 ### [VERIFY] Tasks
 Delegate to qa-engineer:
