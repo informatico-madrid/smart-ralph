@@ -1,6 +1,6 @@
 ---
 name: playwright-env
-version: 7
+version: 8
 description: Load this skill before any MCP Playwright session. Resolves browser execution context — app URL, auth mode, credentials references, seed data, browser config, and safety limits. Emits ESCALATE if critical context is missing or app is unreachable.
 agents: [spec-executor, qa-engineer]
 ---
@@ -129,12 +129,68 @@ Resolution: use `storage-state` with a pre-authenticated session, or emit `ESCAL
 
 ---
 
-## Connectivity Check (MANDATORY — step 1 after appUrl resolved)
+## Resolution Step — Build RESOLVED_APP_URL and RESOLVED_SEED_COMMAND
 
-Before running the seed command or writing state, verify the app is reachable:
+Before the connectivity check or seed execution, resolve the final values by
+applying the 5-source resolution order. **All subsequent steps must use these
+resolved variables**, never the raw env vars directly.
 
 ```bash
-curl -sf --max-time 5 "$RALPH_APP_URL" -o /dev/null \
+# --- Resolve appUrl ---
+RESOLVED_APP_URL="${RALPH_APP_URL:-}"
+
+# Source 2: playwright-env.local.md
+if [ -z "$RESOLVED_APP_URL" ] && [ -f "<basePath>/playwright-env.local.md" ]; then
+  RESOLVED_APP_URL=$(grep -E '^appUrl:' "<basePath>/playwright-env.local.md" \
+    | head -1 | sed 's/^appUrl:[[:space:]]*//')
+fi
+
+# Source 3: .ralph-state.json cache (stale-check: only if resolvedAt < 2h)
+if [ -z "$RESOLVED_APP_URL" ] && [ -f "<basePath>/.ralph-state.json" ]; then
+  CACHED_URL=$(jq -r '.playwrightEnv.appUrl // empty' "<basePath>/.ralph-state.json" 2>/dev/null)
+  RESOLVED_AT=$(jq -r '.playwrightEnv.resolvedAt // empty' "<basePath>/.ralph-state.json" 2>/dev/null)
+  if [ -n "$CACHED_URL" ] && [ -n "$RESOLVED_AT" ]; then
+    CACHE_AGE=$(( $(date +%s) - $(date -d "$RESOLVED_AT" +%s 2>/dev/null || echo 0) ))
+    if [ "$CACHE_AGE" -lt 7200 ]; then
+      RESOLVED_APP_URL="$CACHED_URL"
+      echo "WARNING: playwright-env resolved appUrl from state cache only. resolvedAt: $RESOLVED_AT. Values may be stale." >&2
+    fi
+  fi
+fi
+
+# Source 4: requirements.md Entry points
+if [ -z "$RESOLVED_APP_URL" ] && [ -f "<basePath>/requirements.md" ]; then
+  RESOLVED_APP_URL=$(grep -A5 'Entry points' "<basePath>/requirements.md" \
+    | grep -oE 'https?://[^[:space:]]+' | head -1)
+fi
+
+# Source 5: ESCALATE
+if [ -z "$RESOLVED_APP_URL" ]; then
+  echo "ESCALATE: appUrl not resolved from any source (env, local.md, state cache, requirements.md)" >&2
+  exit 1
+fi
+
+# --- Resolve seedCommand ---
+RESOLVED_SEED_COMMAND="${RALPH_SEED_COMMAND:-}"
+
+# Source 2: playwright-env.local.md
+if [ -z "$RESOLVED_SEED_COMMAND" ] && [ -f "<basePath>/playwright-env.local.md" ]; then
+  RESOLVED_SEED_COMMAND=$(grep -E '^seedCommand:' "<basePath>/playwright-env.local.md" \
+    | head -1 | sed 's/^seedCommand:[[:space:]]*//')
+fi
+# (seedCommand has no state-cache fallback — it is not written to .ralph-state.json)
+```
+
+---
+
+## Connectivity Check (MANDATORY — step 1 after appUrl resolved)
+
+Before running the seed command or writing state, verify the app is reachable.
+Use `$RESOLVED_APP_URL` — **not** `$RALPH_APP_URL` — so the check works
+regardless of which source provided the URL.
+
+```bash
+curl -sf --max-time 5 "$RESOLVED_APP_URL" -o /dev/null \
   && echo APP_REACHABLE \
   || echo APP_NOT_REACHABLE
 ```
@@ -158,7 +214,8 @@ ESCALATE
 
 ## Seed Command (MANDATORY order — step 2, after connectivity check)
 
-If `RALPH_SEED_COMMAND` or `seedCommand` in `playwright-env.local.md` is set:
+If `$RESOLVED_SEED_COMMAND` is non-empty (resolved from `RALPH_SEED_COMMAND`
+or `seedCommand` in `playwright-env.local.md`):
 
 ```
 appEnv = local OR staging  → run seed command
@@ -168,7 +225,7 @@ appEnv = production        → SKIP — never seed production
 ```bash
 # Run via bash -lc to correctly handle commands with arguments or spaces
 # (e.g. "npm run seed:e2e -- --env=staging" will be handled correctly)
-bash -lc "$RALPH_SEED_COMMAND" && echo SEED_OK || echo SEED_FAILED
+bash -lc "$RESOLVED_SEED_COMMAND" && echo SEED_OK || echo SEED_FAILED
 ```
 
 ```
@@ -177,7 +234,7 @@ SEED_FAILED → emit ESCALATE and stop:
 
 ESCALATE
   reason: seed-command-failed
-  command: <RALPH_SEED_COMMAND value>
+  command: <RESOLVED_SEED_COMMAND value>
   resolution: Fix the seed command, then re-run the VE task.
 ```
 
@@ -281,8 +338,9 @@ ESCALATE
 
 ## Done When
 
-- [ ] `appUrl` resolved
-- [ ] Connectivity check passed (APP_REACHABLE)
+- [ ] `appUrl` resolved into `RESOLVED_APP_URL` (applying all 5 sources)
+- [ ] `seedCommand` resolved into `RESOLVED_SEED_COMMAND` (env var or local.md)
+- [ ] Connectivity check passed (APP_REACHABLE) using `$RESOLVED_APP_URL`
 - [ ] Seed command ran and succeeded — or skipped (not configured / production)
 - [ ] `playwrightEnv` written to `.ralph-state.json` (non-secret fields only, including `resolvedAt`)
 - [ ] `resolvedAt` freshness verified when source 3 (state cache) was used — stale
