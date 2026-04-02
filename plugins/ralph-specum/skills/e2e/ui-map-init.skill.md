@@ -114,9 +114,33 @@ Use browser tools to explore the live app.
 ### Step 1A-explore — Explore Entry Points
 
 3. For each entry point in `requirements.md → Verification Contract → Entry points`
-   that is a browser-navigable route (skip non-browser surfaces such as API
-   endpoints — any entry point whose path starts with `/api/` or whose type is
-   not an HTML-renderable route):
+   that is a browser-navigable route:
+   - First, filter to only browser-capable entry points. Skip non-HTML/API surfaces (for example: entries whose `path` starts with `/api/`, entries with `surface: api`, or entries whose type indicates a machine API rather than an HTTP HTML route). Example predicate (pseudocode):
+
+   ```text
+   # Pseudocode: decide if entry is browser-capable
+   isBrowserEntry(entry) {
+     if entry.surface == "api" then return false
+     if entry.type == "api" then return false
+     if entry.path =~ "^/api/" then return false
+     # optional: check method and expected content-type
+     if entry.method && entry.method != "GET" then return false
+     return true
+   }
+   ```
+
+   - Only run steps (b)–(f) below for entries where `isBrowserEntry(entry)` is true. For skipped entries, record the entry in `ui-map.local.md` as a non-browser surface (note: verification for API endpoints should be handled via HTTP/CLI layers, not VE0 browser exploration).
+   
+   a. Classify the route as **public** (accessible without auth) or **protected** (requires auth)
+   b. `browser_navigate` to the route
+   c. `browser_snapshot` + stable state check — if the page is the login form
+      (detected by the presence of username/password fields in the snapshot),
+      treat as auth-expired: emit `VERIFICATION_FAIL` and stop.
+   d. `browser_snapshot` → extract interactive elements (buttons, inputs, links, forms)
+   e. `browser_generate_locator` for each key element → record selector
+   f. `browser_take_screenshot` → save using the canonical prefixed filename:
+      - Public routes: `<basePath>/screenshots/ve0-public-<route-slug>.png`
+      - Protected routes: `<basePath>/screenshots/ve0-auth-<route-slug>.png`
    a. Classify the route as **public** (accessible without auth) or **protected** (requires auth)
    b. `browser_navigate` to the route
    c. `browser_snapshot` + stable state check — if the page is the login form
