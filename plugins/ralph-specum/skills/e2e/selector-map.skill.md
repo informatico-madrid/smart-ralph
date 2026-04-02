@@ -33,7 +33,7 @@ Elige siempre el selector más semántico y resistente a cambios de UI.
 |---|---|---|
 | `getByRole` | Botones, links, inputs, headings | `getByRole('button', { name: 'Guardar' })` |
 | `getByLabel` | Inputs con `<label>` asociado | `getByLabel('Email')` |
-| `getByTestId` | Componentes sin semántica ARIA / shadow DOM | `getByTestId('user-card-42')` |
+| `getByTestId` | Componentes sin semántica ARIA / shadow DOM | `getByTestId('user-card')` |
 | `getByText` | Mensajes de estado, badges únicos y estables | `getByText('Guardado correctamente')` |
 | `locator('css')` | Nunca en tests nuevos — solo legado | — |
 
