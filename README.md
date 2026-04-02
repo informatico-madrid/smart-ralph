@@ -535,10 +535,14 @@ Specs live in `./specs/` in your project:
     ├── research.md
     ├── requirements.md     # Includes ## Verification Contract
     ├── design.md
-    └── tasks.md
+    ├── tasks.md
+    └── ui-map.local.md     # Selector map for this spec (gitignored, never committed)
 ```
 
-`ui-map.local.md` lives in the project root (gitignored) — never in `specs/`.
+`ui-map.local.md` lives inside each **spec directory** (`./specs/<spec-name>/ui-map.local.md`),
+not at the project root. VE0 (`ui-map-init`) and all downstream VE tasks read and write it at
+`<basePath>/ui-map.local.md`, where `basePath` is the spec directory. Create or update it there
+so VE0 and later steps find it in the expected location.
 
 ---
 
