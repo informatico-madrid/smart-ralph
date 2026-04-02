@@ -147,9 +147,9 @@ Create requirements.md following this structure:
 <mandatory>
 For every requirements.md, populate the `## Verification Contract` section:
 
-0. **Project type** — derive from codebase analysis (Explore). This field gates VE task generation
-   in `task-planner` and skill loading in `spec-executor`. Use the **e2e routing type**, not the
-   spec-intent type:
+0. **Project type** — derive from codebase analysis (Explore). This field gates e2e skill loading
+   in `spec-executor` (note: `task-planner` derives project type from `research.md → Verification
+   Tooling` instead). Use the **e2e routing type**, not the spec-intent type:
    - `fullstack`: project has both a UI (browser entry point) and HTTP API endpoints (REST/GraphQL)
    - `frontend`: project has a UI but no separate HTTP API (pure frontend, e.g. browser extension, SPA with no backend)
    - `api-only`: project exposes HTTP API endpoints but has no browser UI
