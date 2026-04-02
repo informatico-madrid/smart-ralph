@@ -313,7 +313,7 @@ The agent receives the contract and decides *how* to probe — CLI, HTTP, browse
 
 `task-planner` auto-injects VE tasks whenever Playwright is needed:
 
-```
+```text
 VE0  → ui-map-init   Build/reuse selector map (MCP-first, static fallback)
 VE1  → Startup       Start dev server/infrastructure, record PID, wait for ready
 VE2  → Check         Test critical user flows via browser/curl/CLI against Verification Contract
@@ -326,7 +326,7 @@ VE0 is idempotent — skipped if `ui-map.local.md` already exists and is not sta
 
 Browser verification uses `@playwright/mcp` as one signal layer — not the only one.
 
-```
+```text
 Signal layer       What it catches
 ─────────────────────────────────────────────────────
 CLI / test runner  Logic, edge cases, unit behavior
@@ -342,13 +342,22 @@ Logs / traces      Root cause, silent failures, perf
   "mcpServers": {
     "playwright": {
       "command": "npx",
-      "args": ["@playwright/mcp@latest", "--isolated", "--caps=testing"]
+      "args": [
+        "@playwright/mcp@latest",
+        "--isolated",
+        "--caps=testing"
+      ]
     }
   }
 }
 ```
 
-> The agent never launches or kills the MCP server. `--isolated` and `--caps` must be set in the server definition above, not invoked at runtime.
+> **Important:**
+> - The agent never launches or kills the MCP server — these flags must be set in the server definition above, not invoked at runtime.
+> - `--isolated`: Uses an ephemeral browser profile with no disk cache between sessions. Always set this for staging and production verification.
+> - `--caps=testing`: Required to enable `browser_verify_*` assertion tools. Without it, those tools are unavailable and verification will degrade.
+> - `--caps=devtools`: Optional. Adds tracing support for diagnosing intermittent failures.
+> - Do not run with elevated capabilities (e.g., `--caps=all`) in production or CI environments.
 
 **Dependency:** `@playwright/mcp` requires Node 18+. Never auto-installed by the agent — human installs explicitly.
 
@@ -356,7 +365,7 @@ Logs / traces      Root cause, silent failures, perf
 
 The UI map is a living selector registry, gitignored and local to each developer:
 
-```
+```text
 VE0 (ui-map-init)   → builds the initial map via MCP exploration or static analysis
 spec-executor       → patches the map when new data-testid attributes are added
 qa-engineer         → patches the map after browser exploration in [STORY-VERIFY]
@@ -368,7 +377,7 @@ Confidence levels: `high` (MCP-verified) → `medium` (static analysis) → `low
 
 When `VERIFICATION_FAIL` is detected:
 
-```
+```text
 → classify failure (impl_bug / env_issue / spec_ambiguity / flaky)
 → impl_bug: backtrack to originating task, apply targeted fix
 → rerun verification for that story only
