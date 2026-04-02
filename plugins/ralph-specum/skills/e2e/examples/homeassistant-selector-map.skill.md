@@ -67,7 +67,7 @@ Formato: `{dominio}-{entidad}-{variante}-{acción}`
 <ha-card data-testid="ev-route-card">
 
 <!-- Card con variante específica -->
-<ha-card data-testid="ev-route-card-MAD-BCN">
+<ha-card data-testid="ev-route-card-mad-bcn">
 
 <!-- Acción sobre la card -->
 <mwc-button data-testid="ev-route-card-delete">
@@ -119,7 +119,7 @@ await page.getByRole('button', { name: 'Calcular ruta EV' }).click()
 await page.getByLabel('Origen').fill('Madrid')
 
 // Card por testid (componente complejo con shadow DOM)
-const card = page.getByTestId('ev-route-card-MAD-BCN')
+const card = page.getByTestId('ev-route-card-mad-bcn')
 await expect(card).toBeVisible()
 
 // Verificar estado de la ruta
