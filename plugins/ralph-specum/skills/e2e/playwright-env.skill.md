@@ -166,9 +166,9 @@ appEnv = production        → SKIP — never seed production
 ```
 
 ```bash
-# Always run via eval to correctly handle commands with arguments or spaces
-# (e.g. "npm run seed:e2e -- --env=staging" would break without eval)
-eval "$RALPH_SEED_COMMAND" && echo SEED_OK || echo SEED_FAILED
+# Run via bash -lc to correctly handle commands with arguments or spaces
+# (e.g. "npm run seed:e2e -- --env=staging" will be handled correctly)
+bash -lc "$RALPH_SEED_COMMAND" && echo SEED_OK || echo SEED_FAILED
 ```
 
 ```
