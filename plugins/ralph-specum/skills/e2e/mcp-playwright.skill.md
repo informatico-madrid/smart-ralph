@@ -1,6 +1,6 @@
 ---
 name: mcp-playwright
-version: 6
+version: 7
 description: Load this skill when you need to verify UI features using MCP Playwright browser tools. Covers browser verification protocol, tool selection, dependency check, degradation strategy, cache/lock recovery, and signal emission.
 agents: [spec-executor, qa-engineer]
 ---
@@ -45,13 +45,18 @@ After environment context is resolved, verify MCP Playwright is available.
 npx --no-install @playwright/mcp --version 2>/dev/null && echo MCP_PLAYWRIGHT_AVAILABLE || echo MCP_PLAYWRIGHT_MISSING
 ```
 
-If `MCP_PLAYWRIGHT_MISSING`: try the full install path as a fallback **only in local environments** (`appEnv=local`):
+If `MCP_PLAYWRIGHT_MISSING`: emit `ESCALATE` regardless of environment — do **not** attempt a download.
 
-```bash
-npx @playwright/mcp@latest --version 2>/dev/null && echo MCP_PLAYWRIGHT_AVAILABLE || echo MCP_PLAYWRIGHT_MISSING
+```
+ESCALATE
+  reason: mcp-playwright-not-installed
+  resolution: install @playwright/mcp manually and ensure it is available on PATH:
+              npm install -g @playwright/mcp   (or add to project devDependencies)
+              then re-run the verification task
 ```
 
-For `appEnv=staging` or `appEnv=production`, if the no-install check fails, emit `ESCALATE` rather than attempting a download.
+> **Policy**: The agent never auto-installs packages. If `@playwright/mcp` is missing,
+> the human must install it. This applies to all environments: local, staging, and production.
 
 ### 0b — Lock recovery (run always when `isolated=false`)
 
@@ -331,7 +336,7 @@ VERIFICATION_DEGRADED
     - build: PASS/FAIL
     - http: <status code or SKIP>
   coverage_gap: UI interaction and visual assertion not verified
-  install_hint: npx @playwright/mcp@latest --version (requires Node 18+)
+  install_hint: npm install -g @playwright/mcp  (requires Node 18+)
 ```
 
 If spec has UI entry points, emit ESCALATE after VERIFICATION_DEGRADED.
@@ -360,6 +365,7 @@ These flags are set in the **MCP server definition** (human config), not by the 
 - **Never emit FAIL without console + network inspection**.
 - **Never continue a multi-step flow after an unexpected state** — stop and diagnose.
 - **Never attempt to launch or restart the MCP server** — it is managed by the human. If the server is missing or misconfigured, emit `ESCALATE`.
+- **Never auto-install packages** — if `@playwright/mcp` is missing, emit `ESCALATE` and let the human install it.
 - **Never start a browser session without first completing Step -1**.
 - **Never skip the stable state check after navigation or action**.
 - **Never skip lock recovery (Step 0b) when isolated=false** — a stale lock from a crashed session blocks the next one.
