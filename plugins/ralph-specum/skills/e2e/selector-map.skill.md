@@ -19,7 +19,7 @@ Elige siempre el selector más semántico y resistente a cambios de UI.
 
 ## Jerarquía de selectores (orden de preferencia)
 
-```
+```text
 1. getByRole()          — accesibilidad semántica, más estable
 2. getByLabel()         — asociado al label del formulario
 3. getByTestId()        — data-testid explícito, sin semántica UI
