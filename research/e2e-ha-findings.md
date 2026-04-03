@@ -36,9 +36,86 @@
 | 14 | Phase 2 — requirements | ✅ Completado | 9 preguntas → 6 US, 9 FR, 3 NFR. Ver Bloque 17 |
 | 15 | Phase 2 — design | ✅ Completado + Aprobado | 590 líneas. Sólido. Ver Bloque 18 |
 | 16 | Phase 3 — tasks | ✅ Completado | 18 tareas coarse. P15 resuelta. Ver Bloque 19 |
-| 16b | Phase 3 — spec-reviewer (en curso) | 🔍 En curso | Validando tasks antes de implement |
-| 17 | Phase 3 — implement | 🔍 Pendiente | |
+| 16b | Phase 3 — spec-reviewer (8/8 PASS) | ✅ Completado | Pasó sin detectar P16 ni P20. Ver Bloque 19 |
+| 17 | Phase 3 — implement tasks 1.1–1.6 | ✅ Completado | 6 commits locales. Ver Bloque 20 |
+| 17b | Phase 3 — artifact reviewer (en curso) | 🔍 En curso | Leyendo 6 archivos contra design+requirements. Ver Bloque 21 |
 | 18 | qa-engineer verifica | 🔍 Pendiente | |
+
+---
+
+## Bloque 21 — 🔍 Artifact Reviewer: Observaciones forenses (en curso)
+
+### Contexto del reviewer
+El artifact reviewer (spec-reviewer iteration 1/3) está leyendo los 6 archivos producidos por tasks 1.1–1.6 contra `design.md` y `requirements.md`.
+
+### Engram consultado antes de leer el código
+Antes de abrir ningún archivo, el reviewer recibió el Session Briefing del engram con:
+- **202 memorias sobre Playwright** acumuladas de sesiones anteriores
+- **292 memorias sobre HA**
+- Memoria específica: `tests/e2e/auth.setup.ts: fixed getByPlaceholder, increased wait times` — corrección de una sesión anterior
+- Memoria: `HA 2026.3.4 JavaScript error` — bug conocido en la versión en uso
+- Memoria: `MCP Playwright browser cachea agresivamente el JS de HA`
+- Memoria: `CORRECCIÓN CRÍTICA: Ubicación de los scripts de la skill ha-e2e-testing` — los scripts están en ubicación inesperada
+
+### Pregunta forense activa
+**¿Detectará P16?** Con el código real delante (`playwright.config.ts`), el reviewer debería poder ver si falta el campo `dependencies: ['setup']` en el proyecto Chromium. Sin el engram ni la pizarra, no tenía esa señal — ahora sí tiene el código.
+
+---
+
+## Bloque 20 — ✅ Phase 3 Implement tasks 1.1–1.6: Análisis forense
+
+### Los 6 commits producidos (en repo local, pendientes de push)
+
+```
+1b3ef20 feat(e2e): add trip.spec.ts for US-3, US-4, and US-5
+ee18b61 docs(e2e): mark Task 1.3 complete in progress and tasks
+ddbc107 feat(e2e): add EVTripPlannerPage POM with Shadow DOM pierce selectors
+f3f19d9 feat(e2e): add auth.setup.ts for Config Flow authentication
+b4d8b2c feat(e2e): add vehicle.spec.ts for US-1 and US-2
+bf5985e feat(e2e): add ConfigFlowPage POM
+ed596d7 feat(e2e): add playwright.config.ts with globalSetup and Chromium project
+```
+
+### Observación crítica: ejecución paralela (executors 2, 3, 5)
+El coordinador lanzó 6 subagentes en paralelo. Cada executor recibió su prompt de tarea individualmente. Esto confirma que el sistema ralph-specum tiene capacidad de paralelización real en fase implement.
+
+### P19 NUEVA — El engram como sustituto implícito de skills
+**Observación:** Los executors 2, 3 y 5 disponían de 1535 memorias (202 sobre Playwright, 292 sobre HA). El executor-3 (`auth.setup.ts`) encontró en el engram la corrección previa de `getByPlaceholder` y la aplicó sin que nadie se la indicara explícitamente.
+
+**Implicación:** El engram actúa como un sistema de skills informal y acumulativo. Cuando las skills formales no están disponibles o están mal ubicadas (ver P20), el engram puede compensar parcialmente.
+
+**Riesgo:** El engram es específico del proyecto/usuario. Un agente en otro entorno sin ese historial no tendría esa compensación. Las skills formales siguen siendo necesarias para garantizar el comportamiento correcto en cualquier entorno.
+
+**Fix candidato M:** Documentar en `phase-rules.md` que las skills formales deben referenciarse explícitamente en tasks, no asumir que el engram las compensa.
+
+### Engram cross-project (hallazgo adicional)
+**Observación:** El Session Briefing muestra actividad reciente de proyectos completamente distintos (`mnt/informatico-madrid` — VPS, nginx, UniFi). El vault es **global por usuario**, no aislado por proyecto.
+
+**Implicación para ralph-specum:** Si el agente tiene memoria de un proyecto de infraestructura de red junto a memorias de tests Playwright, podría haber contaminación de contexto o simplemente ruido. En este caso no parece haber causado problemas, pero es un riesgo latente.
+
+---
+
+## Plan de investigación: estado
+
+| # | Pregunta | Estado |
+|---|---|---|
+| P1–P4 | Auth, 404, routing, bugs | ✅ Resueltos |
+| P5 | ¿El agente tenía info disponible? | ✅ Sí, en copilot-instructions y global.setup.ts |
+| P6 | ¿Qué fix minimal habría evitado los fallos? | 💬 Fix F + E + G |
+| P7 | ¿Habría llegado solo al 404/sidebar? | 🔍 A observar en Phase 3 implement |
+| P8 | ¿Por qué falló tras conocer la causa? | ✅ IIFE baseURL |
+| P9 | ¿Playwright-best-practices tiene info de hass-taste-test? | ⚠️ Web search rota |
+| P10 | ¿Copilot-instructions describe infra inexistente? | ✅ CONFIRMADO |
+| P11 | ¿global.teardown.ts tiene path hardcodeado? | ✅ CONFIRMADO |
+| P12 | ¿Agente actualiza plan Docker → hass-taste-test? | ✅ SÍ — design phase |
+| P13 | ¿Mecanismo subagentes tiene timeout? | ❌ NO |
+| P14 | ¿Web search funciona en el entorno? | ❌ NO — API Error 400 |
+| P15 | ¿Detectará bug scope `page` en deleteTrip()? | ✅ SÍ — tarea 2.1 en tasks |
+| P16 | ¿Conectará auth.setup.ts como dependency? | 🔍 En curso — artifact reviewer con código real |
+| P17 | ¿Corregirá global.teardown.ts path hardcodeado? | ❌ NO en tasks — solo en CI failure |
+| P18 | ¿Skills ausentes en tasks — problema de diseño? | 🔍 NUEVA — ver Bloque 19 |
+| P19 | ¿El engram compensa la ausencia de skills formales? | ✅ PARCIALMENTE — executor-3 aplicó fix previo de engram |
+| P20 | ¿Scripts de skill ha-e2e-testing en ubicación incorrecta? | ✅ CONFIRMADO — engram lo registra como corrección crítica |
 
 ---
 
@@ -65,7 +142,7 @@ El task-planner releyó el design con ojo crítico y detectó el bug sin que nad
 
 El path hardcodeado `/mnt/bunker_data/...` no aparece como tarea de fix. **Confirmado: el bug solo se descubrirá en VE3/CI.** Esto es el hallazgo esperado.
 
-### P18 — 🔍 NUEVO: Skills ausentes en tasks.md
+### P18 — 🔍 Skills ausentes en tasks.md
 
 **Observación:** Ninguna tarea referencia skills del sistema (`playwright-best-practices`, `ha-e2e-testing`, etc.). Las tareas describen qué hacer pero no indican qué skill consultar durante la implementación.
 
@@ -103,7 +180,7 @@ projects: [
   { name: 'chromium', dependencies: ['setup'], use: { storageState: '...' } }
 ]
 ```
-🔍 ¿Lo detectará el spec-reviewer? ¿Lo corregirá en implement?
+🔍 ¿Lo detectará el artifact reviewer con el código real?
 
 ---
 
@@ -163,23 +240,7 @@ const rootDir = process.cwd(); // ✅
 
 ## Plan de investigación: estado
 
-| # | Pregunta | Estado |
-|---|---|---|
-| P1–P4 | Auth, 404, routing, bugs | ✅ Resueltos |
-| P5 | ¿El agente tenía info disponible? | ✅ Sí, en copilot-instructions y global.setup.ts |
-| P6 | ¿Qué fix minimal habría evitado los fallos? | 💬 Fix F + E + G |
-| P7 | ¿Habría llegado solo al 404/sidebar? | 🔍 A observar en Phase 3 implement |
-| P8 | ¿Por qué falló tras conocer la causa? | ✅ IIFE baseURL |
-| P9 | ¿Playwright-best-practices tiene info de hass-taste-test? | ⚠️ Web search rota |
-| P10 | ¿Copilot-instructions describe infra inexistente? | ✅ CONFIRMADO |
-| P11 | ¿global.teardown.ts tiene path hardcodeado? | ✅ CONFIRMADO |
-| P12 | ¿Agente actualiza plan Docker → hass-taste-test? | ✅ SÍ — design phase |
-| P13 | ¿Mecanismo subagentes tiene timeout? | ❌ NO |
-| P14 | ¿Web search funciona en el entorno? | ❌ NO — API Error 400 |
-| P15 | ¿Detectará bug scope `page` en deleteTrip()? | ✅ SÍ — tarea 2.1 en tasks |
-| P16 | ¿Conectará auth.setup.ts como dependency? | 🔍 A observar — ¿spec-reviewer lo detecta? |
-| P17 | ¿Corregirá global.teardown.ts path hardcodeado? | ❌ NO en tasks — solo en CI failure |
-| P18 | ¿Skills ausentes en tasks — problema de diseño? | 🔍 NUEVA — ver Bloque 19 |
+*(Ver tabla consolidada arriba en esta sección)*
 
 ---
 
@@ -199,6 +260,7 @@ const rootDir = process.cwd(); // ✅
 | J | `global.teardown.ts` | Llamar `.close()` en instancia HA (o matar por PID) | Alta |
 | K | `playwright.config.ts` | `auth.setup.ts` debe ser dependency del proyecto Chromium | Alta |
 | L | `tasks.md` template | Incluir campo `skills` por tarea con skills relevantes a consultar | Media |
+| M | `phase-rules.md` | Skills formales > engram. No asumir que engram compensa skills ausentes | Media |
 
 ---
 
@@ -213,4 +275,4 @@ const rootDir = process.cwd(); // ✅
 
 ---
 
-*Última actualización: 2026-04-03 04:22 CEST — tasks completado (18 tareas). P15 resuelta (agente detectó bug scope solo). P17 confirmada (teardown bug no en tasks). P18 nueva (skills ausentes). Fix L añadido. Spec-reviewer corriendo.*
+*Última actualización: 2026-04-03 04:53 CEST — Implement 1.1–1.6 completado (6 commits locales). P19 nueva (engram como skills implícitas). P20 confirmada (scripts ha-e2e-testing mal ubicados). Fix M añadido. Engram cross-project documentado. Artifact reviewer en curso (iteration 1/3).*
