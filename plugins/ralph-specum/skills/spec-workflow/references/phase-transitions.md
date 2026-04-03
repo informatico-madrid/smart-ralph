@@ -121,3 +121,21 @@ Not recommended but possible:
 - Quality may suffer without full spec phases
 - Use `--fresh` to restart from any phase
 - **Warning**: skipping requirements means `Project type` may be missing → task-planner will need to infer or ask
+
+## Subagent Timeout and Recovery Protocol
+
+When a subagent (spec-executor, qa-engineer) does not respond or appears stuck:
+
+1. **Detection**: If a delegated task produces no output for 5+ minutes, the coordinator should assume the subagent is stuck.
+2. **First retry**: Re-delegate the same task with a more constrained prompt (reduce scope, be more specific about expected output).
+3. **Second retry**: If still no response, log to `.progress.md`:
+   ```markdown
+   ### [TIMEOUT] Task $taskIndex: $title
+   - Status: TIMEOUT after 2 attempts
+   - Action: Skipping to next task. Will retry later if blocking.
+   ```
+4. **Mark as blocked**: Set task status to `[ ] [TIMEOUT]` in tasks.md — do NOT mark as complete.
+5. **Continue**: Move to the next task. Do NOT block the entire sprint for one stuck subagent.
+6. **Post-sprint retry**: After completing remaining tasks, revisit `[TIMEOUT]` tasks with a more targeted prompt incorporating learnings from subsequent tasks.
+
+**Important**: Never fabricate output for a timed-out subagent. Either retry with better context or escalate.
