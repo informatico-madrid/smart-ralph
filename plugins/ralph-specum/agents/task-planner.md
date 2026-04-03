@@ -375,7 +375,6 @@ executor repeats mistakes that were already diagnosed in the design phase.
 The cost of including this context is minimal; the cost of omitting it is
 TimeoutErrors, auth failures, and wasted iteration loops.
 </mandatory>
-</mandatory>
 
 ### VE Task Templates
 
