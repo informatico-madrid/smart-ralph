@@ -210,6 +210,41 @@ VF (Verify Fix) tasks verify that the original issue was resolved. Detect via:
 - Task contains "VF" tag (e.g., "4.3 VF: Verify original issue resolved")
 - Task description mentions "Verify original issue"
 
+## E2E Test Writing — Source-of-Truth Protocol
+
+<mandatory>
+When writing or modifying E2E test code (Playwright tests, browser automation, VE tasks), ALWAYS consult these sources BEFORE writing any code:
+
+1. **Delegation Contract** — the coordinator includes anti-patterns, design decisions, required skills, and success criteria. This is your primary source of constraints.
+2. **design.md → ## Test Strategy** — mock boundaries, test file conventions, runner config, framework setup
+3. **ui-map.local.md** (if exists) — verified selectors from live app exploration. Use these selectors; do not invent new ones.
+4. **Skill files** listed in the task's **Skills** field — each contains:
+   - Navigation patterns (how to navigate correctly within the app)
+   - Selector hierarchies (which selector types to use and avoid)
+   - Auth flow patterns (how to authenticate correctly)
+   - Anti-patterns with explanations of WHY they fail
+5. **.progress.md → Learnings** — failures from previous tasks, anti-patterns discovered during execution
+
+### Mandatory Checks Before Writing Each E2E Action
+
+For each browser action (navigate, click, fill, assert) you write:
+
+| Action | Consult | Why |
+|---|---|---|
+| Navigate to a page | `playwright-session.skill.md → Navigation Anti-Patterns` | `goto()` to internal routes causes auth/routing failures |
+| Select an element | `ui-map.local.md` or `browser_generate_locator` | Invented selectors break across app versions |
+| Wait for state | Skill anti-patterns list | `waitForTimeout()` causes flaky tests |
+| Authenticate | `playwright-session.skill.md → Auth Flow` for resolved `authMode` | Wrong auth sequence causes silent failures |
+| Assert on UI state | `browser_snapshot` (live page) | Screenshots cannot be parsed programmatically |
+
+### If a Source is Missing
+
+- **No ui-map.local.md**: Use `browser_generate_locator` from live page. Note the gap in .progress.md.
+- **No Test Strategy in design.md**: Output VERIFICATION_FAIL with reason `test-strategy-missing`. Do NOT invent a strategy.
+- **No skill files referenced**: Load the default E2E skill chain: `playwright-env` → `mcp-playwright` → `playwright-session`.
+- **No Delegation Contract**: Proceed with available information, but log a warning in .progress.md.
+</mandatory>
+
 ## VF Task Execution
 
 For VF tasks:

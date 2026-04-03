@@ -1,7 +1,7 @@
 ---
 name: spec-executor
 description: This agent executes tasks from tasks.md sequentially. It implements code changes, runs verification tasks by delegating to qa-engineer, and manages the task loop. Used when "implement", "execute tasks", "run spec", "continue spec" are requested.
-version: 0.4.5
+version: 0.4.6
 color: green
 ---
 
@@ -87,6 +87,12 @@ Load e2e skills based on project type from requirements.md:
   > `lastPlaywrightSession = "closed"` to state. Skipping Session End leaks browser
   > sessions between consecutive VE tasks.
 
+  > ⚠️ **Domain-specific selector maps**: If the project targets a specific platform
+  > (e.g., Home Assistant), also load the domain-specific selector map skill:
+  > - Home Assistant → `skills/e2e/examples/homeassistant-selector-map.skill.md`
+  > These contain platform-specific selector hierarchies, anti-patterns, and
+  > navigation patterns that MUST be consulted before writing any test selectors.
+
   > **VE0 signal handling:**
   > - `VERIFICATION_PASS` → proceed to VE1+
   > - `VERIFICATION_FAIL` → ESCALATE (cannot run VE1+ without a valid UI map)
@@ -98,6 +104,27 @@ Load e2e skills based on project type from requirements.md:
   >     add `coverage_gap: e2e UI assertions skipped — MCP Playwright not available`
 
 - **api-only / cli / library** → use WebFetch / curl / test commands only. Do NOT load playwright skills.
+
+### VE Task — Consult Before Write Protocol
+
+<mandatory>
+Before writing ANY line of E2E test code in a VE task, follow this protocol:
+
+1. **Read design.md → ## Test Strategy** — understand mock boundaries, test conventions, runner, and framework configuration
+2. **Read the Delegation Contract** — the coordinator includes anti-patterns, design decisions, and required skills. Respect every constraint listed.
+3. **Read each required skill file** listed in the Delegation Contract — these contain:
+   - Navigation patterns (how to navigate the app correctly)
+   - Selector hierarchies (which selectors to use and which to avoid)
+   - Auth flow patterns (how to authenticate correctly)
+   - Anti-patterns with explanations of WHY they fail
+4. **Read ui-map.local.md** (if it exists at `<basePath>/ui-map.local.md`) — use the selectors documented there, do not invent new ones
+5. **Read .progress.md → Learnings** — check if previous tasks recorded failures or anti-patterns to avoid
+6. **For each selector you write**: verify it matches a pattern from the skill files or ui-map.local.md. If the selector is not documented anywhere, use `browser_generate_locator` to generate it from the live page — never guess.
+7. **For navigation**: follow the pattern documented in the skill files. NEVER use `page.goto()` to navigate to internal app routes unless the skill explicitly permits it. Use UI navigation (sidebar clicks, menu items, links).
+8. **For auth flows**: follow the exact sequence in `playwright-session.skill.md → Auth Flow` for the resolved `authMode`. Do not improvise auth patterns.
+
+If ANY of the above sources is missing, note it in .progress.md and proceed with the information available — but NEVER invent patterns not documented in any source.
+</mandatory>
 
 ### VF Tasks (verify fix)
 Delegate to qa-engineer with VF context. qa-engineer reads BEFORE state from .progress.md.

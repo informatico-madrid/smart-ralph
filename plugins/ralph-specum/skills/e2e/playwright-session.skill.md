@@ -1,6 +1,6 @@
 ---
 name: playwright-session
-version: 8
+version: 9
 description: Load this skill before any Playwright browser interaction in a VE task. Covers session lifecycle, context isolation, auth flows, stable-state detection, cache isolation, and cleanup. Requires playwright-env and mcp-playwright to be loaded first.
 agents: [spec-executor, qa-engineer]
 ---
@@ -289,6 +289,58 @@ Reuse the authenticated session within a spec rather than re-authenticating per 
 2. `browser_snapshot` + stable state check to confirm auth state before proceeding to first VE task
 3. If auth expires mid-flow, treat as `VERIFICATION_FAIL` (unexpected state) and run diagnostic
 4. Do NOT re-authenticate silently — surface the expiry in the failure report
+
+---
+
+## Navigation Anti-Patterns (MANDATORY for all VE tasks)
+
+<mandatory>
+### NEVER use `page.goto()` for internal app routes
+
+For single-page applications and platforms with client-side routing (e.g., Home Assistant, React apps, Angular apps), using `page.goto('/some/internal/route')` bypasses the app's routing and auth state management. This causes:
+- **Auth failures**: the app expects session state established during initial load
+- **404/blank pages**: client-side routes are not directly addressable via server requests
+- **TimeoutErrors**: the page loads but never reaches the expected state
+
+**✅ CORRECT — navigate via UI elements:**
+```typescript
+// Navigate using sidebar/menu clicks
+await page.locator('[data-panel-id="config"]').click();
+await page.waitForSelector('ha-config-dashboard', { state: 'visible', timeout: 15000 });
+```
+
+**❌ WRONG — direct URL navigation to internal routes:**
+```typescript
+// This bypasses client-side routing and auth state
+await page.goto('/config/integrations');
+await page.goto(baseUrl + '/config/integrations');
+```
+
+**Exception**: `page.goto()` to the **base URL** (app root) is correct for initial navigation and auth flows. Only internal sub-routes are problematic.
+
+### NEVER use consumed OAuth/auth callback URLs
+
+If the test infrastructure (e.g., `hass-taste-test`, auth setup scripts) returns a URL with `auth_callback`, `code=`, or `state=` parameters, these tokens are **already consumed** by the setup process. Navigating the browser to these URLs produces auth failures.
+
+**✅ CORRECT — use the base URL (origin only):**
+```typescript
+const baseUrl = new URL(serverInfo.link).origin; // "http://127.0.0.1:8542"
+await page.goto(baseUrl);
+```
+
+**❌ WRONG — use the full callback URL:**
+```typescript
+await page.goto(serverInfo.link); // "http://127.0.0.1:8542/?auth_callback=1&code=...&state=..."
+```
+
+### NEVER duplicate waitForURL calls
+Each `waitForURL` should appear exactly once per expected navigation. Duplicating them is dead code and a sign of uncertainty — investigate the actual expected state instead.
+
+### Platform-specific navigation patterns
+For platform-specific navigation (Home Assistant sidebar, etc.), load the domain-specific selector map skill:
+- **Home Assistant**: `skills/e2e/examples/homeassistant-selector-map.skill.md`
+- The skill documents the exact selectors (`data-panel-id`) and patterns for safe navigation.
+</mandatory>
 
 ---
 

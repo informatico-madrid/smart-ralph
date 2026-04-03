@@ -1,6 +1,6 @@
 ---
 name: playwright-env
-version: 8
+version: 9
 description: Load this skill before any MCP Playwright session. Resolves browser execution context — app URL, auth mode, credentials references, seed data, browser config, and safety limits. Emits ESCALATE if critical context is missing or app is unreachable.
 agents: [spec-executor, qa-engineer]
 ---
@@ -336,6 +336,25 @@ ESCALATE
 
 ---
 
+## Domain-Specific Resources
+
+After resolving the environment, check if the project targets a specific platform
+that has a dedicated selector map skill. Load the appropriate skill alongside
+this one to ensure correct selectors and navigation patterns.
+
+| Platform | Skill to load | Key content |
+|---|---|---|
+| Home Assistant | `skills/e2e/examples/homeassistant-selector-map.skill.md` | HA sidebar navigation (`data-panel-id`), shadow DOM traversal, `data-testid` conventions, HA-specific anti-patterns (no `entity_id` in selectors, no CSS class selectors, no `waitForTimeout`) |
+| Generic web app | `skills/e2e/selector-map.skill.md` | Base selector hierarchy and utilities |
+
+> **Why this matters**: Platform-specific skills contain anti-patterns that cause
+> test failures unique to that platform. For example, Home Assistant's sidebar
+> requires `data-panel-id` clicks — using `page.goto('/config/integrations')`
+> causes auth failures and TimeoutErrors because HA does not support deep linking
+> without an established session.
+
+---
+
 ## Done When
 
 - [ ] `appUrl` resolved into `RESOLVED_APP_URL` (applying all 5 sources)
@@ -351,4 +370,5 @@ ESCALATE
 - [ ] `tokenLocalStorageKey` documented in `playwright-env.local.md` if `tokenBootstrapRule=localStorage`
 - [ ] Secret env vars referenced, not stored
 - [ ] `allowWrite` posture confirmed
+- [ ] Domain-specific selector map skill identified and noted for loading
 - [ ] Missing critical context results in `ESCALATE`, not improvisation

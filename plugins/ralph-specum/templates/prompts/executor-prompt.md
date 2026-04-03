@@ -1,7 +1,7 @@
 # Executor Dispatch Template
 
 > Used by: implement.md coordinator
-> Placeholders: {SPEC_NAME}, {TASK_TEXT}, {TASK_INDEX}, {CONTEXT}, {PROGRESS}
+> Placeholders: {SPEC_NAME}, {TASK_TEXT}, {TASK_INDEX}, {CONTEXT}, {PROGRESS}, {DESIGN_DECISIONS}, {ANTI_PATTERNS}, {REQUIRED_SKILLS}, {SUCCESS_CRITERIA}
 
 ## Task Tool Parameters
 
@@ -24,15 +24,32 @@ You are executing task {TASK_INDEX} for spec `{SPEC_NAME}`.
 
 {PROGRESS}
 
+## Delegation Contract
+
+### Design Decisions
+{DESIGN_DECISIONS}
+
+### Anti-Patterns (DO NOT)
+{ANTI_PATTERNS}
+
+### Required Skills
+{REQUIRED_SKILLS}
+
+### Success Criteria
+{SUCCESS_CRITERIA}
+
 ## Instructions
 
 1. Read the full task description carefully
 2. Read any referenced spec files for additional context
-3. Implement exactly what is specified — no more, no less
-4. Verify your implementation works in the real environment
-5. Commit changes with a descriptive conventional commit message
-6. Update the task checkmark in tasks.md (mark as `- [x]`)
-7. Update .progress.md with what you did and any learnings
-8. Output TASK_COMPLETE when done
+3. **Before writing ANY test or verification code**: read design.md → ## Test Strategy for mock boundaries, test conventions, and runner configuration
+4. **Before writing ANY E2E test**: load all skills listed in Required Skills above. Read each skill file BEFORE writing code — they contain anti-patterns that will save you from common failures
+5. **Verify source of truth**: for selectors, auth flows, and navigation patterns, ALWAYS consult the skill files and ui-map.local.md FIRST — never invent selectors from memory
+6. Implement exactly what is specified — no more, no less
+7. Verify your implementation works in the real environment
+8. Commit changes with a descriptive conventional commit message
+9. Update the task checkmark in tasks.md (mark as `- [x]`)
+10. Update .progress.md with what you did and any learnings
+11. Output TASK_COMPLETE when done
 
 If you encounter issues you cannot resolve, output a detailed error description instead of TASK_COMPLETE.
