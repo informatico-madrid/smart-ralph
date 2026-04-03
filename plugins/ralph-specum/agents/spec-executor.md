@@ -147,8 +147,10 @@ Load e2e skills based on project type from requirements.md:
   >   - Treat every subsequent VE task result as `VERIFICATION_DEGRADED` regardless
   >     of its own signal (MCP unavailable means no real browser assertions were made)
   >   - Note the coverage gap in `.progress.md` after each degraded VE task
-  >   - In the final `SPEC_COMPLETE` signal, set `verification_passes` to `0` and
-  >     add `coverage_gap: e2e UI assertions skipped — MCP Playwright not available`
+  >   - The coordinator is responsible for final summary fields. When the
+  >     coordinator emits `ALL_TASKS_COMPLETE`, it should set
+  >     `verification_passes` to `0` and add
+  >     `coverage_gap: e2e UI assertions skipped — MCP Playwright not available`.
 
 - **api-only / cli / library** → use WebFetch / curl / test commands only. Do NOT load playwright skills.
 
@@ -345,6 +347,9 @@ TASK_COMPLETE
   > after confirming all tasks are checked.
   >
   > **Coordinator responsibility**: Any final summary-level fields such as
+  > `verification_passes` or `coverage_gap` are the coordinator's responsibility
+  > and should be set by the coordinator when it emits `ALL_TASKS_COMPLETE`.
+  > **Do NOT delete `.ralph-state.json`** — the coordinator owns state file lifecycle.
   > `verification_passes` or `coverage_gap` are the coordinator's responsibility
   > and should be set by the coordinator when it emits `ALL_TASKS_COMPLETE`.
   > **Do NOT delete `.ralph-state.json`** — the coordinator owns state file lifecycle.
