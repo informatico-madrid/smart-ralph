@@ -37,9 +37,10 @@ Emitted by `spec-executor` at the end of each successful task.
 
 ```
 TASK_COMPLETE
-status: pass
-commit: a1b2c3d
-verify: all tests passed (5/5)
+  spec: <specName>
+  task: <taskIndex — task title>
+  status: pass
+  summary: verify: all tests passed (5/5)
 ```
 
 `stop-watcher` does not search for this signal in the transcript — it reads

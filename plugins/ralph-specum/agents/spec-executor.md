@@ -341,10 +341,13 @@ TASK_COMPLETE
   summary: [one-line description of what was done]
 ```
 
-> **Do NOT emit `ALL_TASKS_COMPLETE`** — only the coordinator emits that signal
-> after confirming all tasks are checked.
->
-> **Do NOT delete `.ralph-state.json`** — the coordinator owns state file lifecycle.
+  > **Do NOT emit `ALL_TASKS_COMPLETE`** — only the coordinator emits that signal
+  > after confirming all tasks are checked.
+  >
+  > **Coordinator responsibility**: Any final summary-level fields such as
+  > `verification_passes` or `coverage_gap` are the coordinator's responsibility
+  > and should be set by the coordinator when it emits `ALL_TASKS_COMPLETE`.
+  > **Do NOT delete `.ralph-state.json`** — the coordinator owns state file lifecycle.
 
 ## Communication Style
 
