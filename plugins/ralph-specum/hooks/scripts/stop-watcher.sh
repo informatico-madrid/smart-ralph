@@ -62,6 +62,29 @@ if command -v stat >/dev/null 2>&1; then
     fi
 fi
 
+# ── Helper: update epic state when a spec completes ──────────────────────────
+_update_epic_state() {
+    local epic_name_val
+    epic_name_val=$(jq -r '.epicName // empty' "$STATE_FILE" 2>/dev/null || true)
+    local current_epic_file="$CWD/specs/.current-epic"
+    if [ -n "$epic_name_val" ] && [ -f "$current_epic_file" ]; then
+        local epic_state_file="$CWD/specs/_epics/$epic_name_val/.epic-state.json"
+        if [ -f "$epic_state_file" ]; then
+            local tmp_file
+            tmp_file=$(mktemp "${epic_state_file}.tmp.XXXXXX")
+            if jq --arg spec "$SPEC_NAME" \
+              '.specs |= map(if .name == $spec then .status = "completed" else . end)' \
+              "$epic_state_file" > "$tmp_file"; then
+                mv "$tmp_file" "$epic_state_file"
+            else
+                rm -f "$tmp_file"
+            fi
+            echo "[ralph-specum] Updated epic '$epic_name_val': spec '$SPEC_NAME' marked completed" >&2
+        fi
+    fi
+}
+# ─────────────────────────────────────────────────────────────────────────────
+
 # Check for ALL_TASKS_COMPLETE in transcript (backup termination detection)
 # Use specific pattern to avoid false positives from code/comments containing the phrase
 TRANSCRIPT_PATH=$(echo "$INPUT" | jq -r '.transcript_path // empty' 2>/dev/null || true)
@@ -71,23 +94,7 @@ if [ -n "$TRANSCRIPT_PATH" ] && [ -f "$TRANSCRIPT_PATH" ]; then
         echo "[ralph-specum] ALL_TASKS_COMPLETE detected in transcript" >&2
         # Note: State file cleanup is handled by the coordinator (implement.md Section 10)
         # Do not delete here to avoid race condition
-        # Update epic state if this spec belongs to an epic
-        EPIC_NAME_VAL=$(jq -r '.epicName // empty' "$STATE_FILE" 2>/dev/null || true)
-        CURRENT_EPIC_FILE="$CWD/specs/.current-epic"
-        if [ -n "$EPIC_NAME_VAL" ] && [ -f "$CURRENT_EPIC_FILE" ]; then
-            EPIC_STATE_FILE="$CWD/specs/_epics/$EPIC_NAME_VAL/.epic-state.json"
-            if [ -f "$EPIC_STATE_FILE" ]; then
-                TMP_FILE=$(mktemp "${EPIC_STATE_FILE}.tmp.XXXXXX")
-                if jq --arg spec "$SPEC_NAME" '
-                  .specs |= map(if .name == $spec then .status = "completed" else . end)
-                ' "$EPIC_STATE_FILE" > "$TMP_FILE"; then
-                    mv "$TMP_FILE" "$EPIC_STATE_FILE"
-                else
-                    rm -f "$TMP_FILE"
-                fi
-                echo "[ralph-specum] Updated epic '$EPIC_NAME_VAL': spec '$SPEC_NAME' marked completed" >&2
-            fi
-        fi
+        _update_epic_state
         "$SCRIPT_DIR/update-spec-index.sh" --quiet 2>/dev/null || true
 
         # --- Phase 4: Regression Sweep ---
@@ -237,23 +244,7 @@ SWEEP_EOF
     # Fallback: check last 20 lines for edge cases (very recent signal)
     if tail -20 "$TRANSCRIPT_PATH" 2>/dev/null | grep -qE '(^|\W)ALL_TASKS_COMPLETE(\W|$)'; then
         echo "[ralph-specum] ALL_TASKS_COMPLETE detected in transcript (tail-end)" >&2
-        # Update epic state if this spec belongs to an epic
-        EPIC_NAME_VAL=$(jq -r '.epicName // empty' "$STATE_FILE" 2>/dev/null || true)
-        CURRENT_EPIC_FILE="$CWD/specs/.current-epic"
-        if [ -n "$EPIC_NAME_VAL" ] && [ -f "$CURRENT_EPIC_FILE" ]; then
-            EPIC_STATE_FILE="$CWD/specs/_epics/$EPIC_NAME_VAL/.epic-state.json"
-            if [ -f "$EPIC_STATE_FILE" ]; then
-                TMP_FILE=$(mktemp "${EPIC_STATE_FILE}.tmp.XXXXXX")
-                if jq --arg spec "$SPEC_NAME" '
-                  .specs |= map(if .name == $spec then .status = "completed" else . end)
-                ' "$EPIC_STATE_FILE" > "$TMP_FILE"; then
-                    mv "$TMP_FILE" "$EPIC_STATE_FILE"
-                else
-                    rm -f "$TMP_FILE"
-                fi
-                echo "[ralph-specum] Updated epic '$EPIC_NAME_VAL': spec '$SPEC_NAME' marked completed" >&2
-            fi
-        fi
+        _update_epic_state
         "$SCRIPT_DIR/update-spec-index.sh" --quiet 2>/dev/null || true
         exit 0
     fi
@@ -316,6 +307,7 @@ DEGRADED_EOF
 
             echo "[ralph-specum] VERIFICATION_FAIL detected | story: $FAILED_STORY | repair iter: $REPAIR_ITER/$MAX_REPAIR" >&2
 
+            # FIX Bug 2: check stop_hook_active before BOTH the escalation AND the repair paths
             STOP_HOOK_ACTIVE=$(echo "$INPUT" | jq -r '.stop_hook_active // false' 2>/dev/null || echo "false")
             if [ "$STOP_HOOK_ACTIVE" = "true" ]; then
                 echo "[ralph-specum] stop_hook_active=true in repair loop, allowing stop" >&2
@@ -345,20 +337,20 @@ Automatic repair has been exhausted.
 6. Resume with /ralph-specum:implement
 ESCALATE_EOF
 )
-            jq -n \
-              --arg reason "$ESCALATE_REASON" \
-              --arg msg "Ralph-specum Phase 3: ESCALATION — repair exhausted for $FAILED_STORY" \
-              '{
-                "decision": "block",
-                "reason": $reason,
-                "systemMessage": $msg
-              }'
-            exit 0
-        fi
+                jq -n \
+                  --arg reason "$ESCALATE_REASON" \
+                  --arg msg "Ralph-specum Phase 3: ESCALATION — repair exhausted for $FAILED_STORY" \
+                  '{
+                    "decision": "block",
+                    "reason": $reason,
+                    "systemMessage": $msg
+                  }'
+                exit 0
+            fi  # FIX Bug 1: fi explícito que cierra el bloque REPAIR_ITER >= MAX_REPAIR
 
-        # Classify failure and trigger targeted repair
-        NEXT_REPAIR=$((REPAIR_ITER + 1))
-        REPAIR_REASON=$(cat <<REPAIR_EOF
+            # Classify failure and trigger targeted repair
+            NEXT_REPAIR=$((REPAIR_ITER + 1))
+            REPAIR_REASON=$(cat <<REPAIR_EOF
 [ralph-specum] Repair loop — attempt $NEXT_REPAIR/$MAX_REPAIR for story: $FAILED_STORY
 
 ## State
@@ -388,18 +380,17 @@ Spec: $SPEC_PATH | Failed story: $FAILED_STORY | Origin task index: $ORIGIN_TASK
 - Do NOT output ALL_TASKS_COMPLETE until repair resolves and normal flow resumes
 REPAIR_EOF
 )
-        jq -n \
-          --arg reason "$REPAIR_REASON" \
-          --arg msg "Ralph-specum Phase 3: repair $NEXT_REPAIR/$MAX_REPAIR — $FAILED_STORY" \
-          '{
-            "decision": "block",
-            "reason": $reason,
-            "systemMessage": $msg
-          }'
-        exit 0
-    fi
-    fi  # closes: elif echo "$LAST_SIGNAL_LINE" | grep -qE VERIFICATION_FAIL
-    fi  # closes: if echo "$TRANSCRIPT_TAIL" | grep -qE VERIFICATION_(FAIL|PASS|DEGRADED)
+            jq -n \
+              --arg reason "$REPAIR_REASON" \
+              --arg msg "Ralph-specum Phase 3: repair $NEXT_REPAIR/$MAX_REPAIR — $FAILED_STORY" \
+              '{
+                "decision": "block",
+                "reason": $reason,
+                "systemMessage": $msg
+              }'
+            exit 0
+        fi  # closes: elif VERIFICATION_FAIL
+    fi  # closes: if VERIFICATION_(FAIL|PASS|DEGRADED)
     # --- End Phase 3 ---
 fi  # closes: if [ -n "$TRANSCRIPT_PATH" ] && [ -f "$TRANSCRIPT_PATH" ]
 
@@ -479,7 +470,8 @@ fi
 if [ "$PHASE" = "execution" ] && [ "$TASK_INDEX" -ge "$TOTAL_TASKS" ] && [ "$TOTAL_TASKS" -gt 0 ]; then
     TASKS_FILE="$CWD/$SPEC_PATH/tasks.md"
     if [ -f "$TASKS_FILE" ]; then
-        UNCHECKED=$(grep -c '^\s*- \[ \]' "$TASKS_FILE" 2>/dev/null || echo "0")
+        # FIX Quality 2: POSIX-portable [[:space:]] en lugar de \s (no soportado en BSD/macOS grep)
+        UNCHECKED=$(grep -cE '^[[:space:]]*- \[ \]' "$TASKS_FILE" 2>/dev/null || echo "0")
         if [ "$UNCHECKED" -gt 0 ]; then
             echo "[ralph-specum] State says complete but tasks.md has $UNCHECKED unchecked items" >&2
             REASON=$(cat <<EOF
@@ -538,12 +530,11 @@ if [ "$PHASE" = "execution" ] && [ "$TASK_INDEX" -lt "$TOTAL_TASKS" ]; then
     TASKS_FILE="$CWD/$SPEC_PATH/tasks.md"
     TASK_BLOCK=""
     if [ -f "$TASKS_FILE" ]; then
-        # Extract task at TASK_INDEX (0-based) by counting unchecked+checked task lines
-        # If TASK_INDEX exceeds number of tasks, awk outputs nothing (TASK_BLOCK stays empty)
-        # and the coordinator falls back to reading tasks.md directly
-        # Note: awk count variable starts at 0 (default) to match 0-based TASK_INDEX
+        # FIX Bug 3: match only unchecked tasks (- [ ]) so completed [x] tasks
+        # are not counted in the index and never re-dispatched to the coordinator.
+        # TASK_INDEX is 0-based and always points to the next pending task.
         TASK_BLOCK=$(awk -v idx="$TASK_INDEX" '
-            /^- \[[ x]\]/ {
+            /^- \[ \]/ {
                 if (count == idx) { found=1; print; next }
                 if (found) { exit }
                 count++
@@ -562,8 +553,9 @@ if [ "$PHASE" = "execution" ] && [ "$TASK_INDEX" -lt "$TOTAL_TASKS" ]; then
 
     # When parallel marker detected, scan for all consecutive [P] tasks from TASK_INDEX
     if [ "$IS_PARALLEL" = "true" ] && [ -f "$TASKS_FILE" ]; then
+        # FIX Bug 3 (parallel): same fix — only count unchecked tasks for index alignment
         PARALLEL_TASKS=$(awk -v idx="$TASK_INDEX" -v max_group=5 '
-            /^- \[[ x]\]/ {
+            /^- \[ \]/ {
                 if (count >= idx) {
                     if (/\[P\]/ && pcount < max_group) { found=1; pcount++; block=block $0 "\n"; next }
                     else if (found) { exit }
