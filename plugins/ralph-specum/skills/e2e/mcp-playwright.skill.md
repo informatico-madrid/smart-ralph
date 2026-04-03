@@ -45,18 +45,9 @@ After environment context is resolved, verify MCP Playwright is available.
 npx --no-install @playwright/mcp --version 2>/dev/null && echo MCP_PLAYWRIGHT_AVAILABLE || echo MCP_PLAYWRIGHT_MISSING
 ```
 
-If `MCP_PLAYWRIGHT_MISSING`: emit `ESCALATE` regardless of environment — do **not** attempt a download.
-
-```
-ESCALATE
-  reason: mcp-playwright-not-installed
-  resolution: install @playwright/mcp manually and ensure it is available on PATH:
-              npm install -g @playwright/mcp   (or add to project devDependencies)
-              then re-run the verification task
-```
-
-> **Policy**: The agent never auto-installs packages. If `@playwright/mcp` is missing,
-> the human must install it. This applies to all environments: local, staging, and production.
+If `MCP_PLAYWRIGHT_MISSING`: write `mcpPlaywright: "missing"` to state and proceed to the
+decision tree below. Do **not** emit `ESCALATE` here — the decision tree determines the
+correct degradation path based on whether the spec has UI entry points.
 
 ### 0b — Lock recovery (run always when `isolated=false`)
 

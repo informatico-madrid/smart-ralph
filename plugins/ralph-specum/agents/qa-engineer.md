@@ -359,14 +359,11 @@ Detect the following warning signs:
 2. **Missing Real Imports**:
    - Test file only imports testing/mocking libraries (jest, vitest, sinon, @testing-library)
    - No import of the actual module under test
-   - Check: use `rg -P` (ripgrep with PCRE) or `grep -P` to run the negative-lookahead pattern:
+   - Check: find import statements that are NOT from testing libraries:
      ```bash
-     rg -P "import.*from.*['\"]((?!.*test|.*mock|.*jest|.*vitest).)*['\"]" <test-file>
-     # Alternative (GNU grep):
-     grep -P "import.*from.*['\"]((?!.*test|.*mock|.*jest|.*vitest).)*['\"]" <test-file>
+     rg "import.*from" <test-file> | grep -vE "test|mock|jest|vitest|sinon|testing-library"
      ```
-     Standard `grep` (POSIX/BRE/ERE) does **not** support `(?!...)` negative lookahead.
-     Always use `rg -P` or `grep -P` for this check.
+     If output is empty → the file only imports mocking/testing libraries (red flag).
 
 3. **Behavioral Over State Testing**:
    - All assertions check mock interactions (toHaveBeenCalled, spy.calledWith)

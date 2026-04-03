@@ -352,6 +352,7 @@ Read the "Verification Tooling" section from research.md to determine project ty
     - `skills/e2e/examples/homeassistant-selector-map.skill.md` (if HA project)
 ```
 This signals the executor to load the full Playwright skill chain before running browser interactions.
+</mandatory>
 
 ### E2E Skill References and Anti-Pattern Propagation
 
