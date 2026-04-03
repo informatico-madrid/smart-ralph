@@ -1,8 +1,7 @@
 # E2E HA Findings — Pizarra de Investigación Forense
 
 > Rama de trabajo: `research/e2e-ha-findings`  
-> **Objetivo:** Reducir el gap entre agentes escribiendo tests malos y tests correctos para HA custom components.  
-> **No estamos arreglando el fork.** Estamos analizando por qué el agente falló y qué cambiar en el sistema.
+> **Objetivo:** Reducir el gap entre agentes escribiendo tests malos y tests correctos para HA custom components.
 
 ---
 
@@ -18,140 +17,143 @@
 
 ---
 
-## LA PREGUNTA FORENSE CENTRAL
+## Hipótesis central (A + B + C)
 
-> **¿Por qué el agente lleva horas y rondas de depuración sin llegar solo a la causa raíz?**
-
-**Hipótesis actualizada (A + B + C):**
-
-- **A) Le falta información** — no sabe cómo funciona HA por dentro (404 vs redirect, sidebar nav, Shadow DOM)
-- **B) Le falta metodología** — no experimenta antes de escribir tests, no verifica que la infraestructura descrita existe
-- **C) La fuente de verdad del proyecto está rota** — `copilot-instructions.md` describe un `test-ha/docker-compose.yml` que no existe y asocia `localhost:8123` a tests cuando es producción
+- **A) Le falta información** — HA routing, 404, sidebar nav
+- **B) Le falta metodología** — no experimenta, no verifica que la infra existe
+- **C) La fuente de verdad está rota** — `copilot-instructions.md` describe infra inexistente
 
 ---
 
 ## PLAN DE PRUEBA — Estado completo
 
-### Tabla de seguimiento
-
 | Paso | Acción | Estado | Observaciones |
 |---|---|---|---|
-| 1 | `/start` | ✅ Completado | Skill discovery correcto |
-| 2 | Q1 Scope | ✅ Completado | Happy-path only |
-| 3 | Q2 Structure | ✅ Completado | POM — ❌ NO mencionó Shadow DOM |
-| 4 | Q3 Test data | ✅ Completado | Per-test setup/teardown, localhost:8123 es real |
-| 5 | Q4 Cleanup | ✅ Completado | Delete after each test |
-| 6 | Q5 Test HA | ✅ Completado | Docker compose — ❌ NO mencionó `hass-taste-test` |
-| 7 | Q6 Browsers | ✅ Completado | Chromium only |
-| 8 | Q7 CI | ✅ Completado | GitHub Actions on PR |
-| 9 | Q8 MVP | ✅ Completado | Separate tests per action |
-| 10 | Q9 Approach | ✅ Completado | Full-stack Docker (A) |
-| 11 | Phase 1 — research-analyst | 🔍 EN CURSO | Web research: `hass-taste-test` + Shadow DOM + Docker HA |
-| 12 | Phase 1 — Explore codebase | 🔍 EN CURSO | Codebase: panel structure, package.json, existing infra |
-| 13 | Phase 2 — scaffold | 🔍 Pendiente | ¿`baseURL` seguro? |
-| 14 | Phase 3 — implement | 🔍 Pendiente | ¿Usa `navigateViaSidebar`? ¿Shadow DOM correcto? |
-| 15 | qa-engineer verifica | 🔍 Pendiente | ¿Emite señal correcta? |
+| 1-10 | Interview (9 preguntas) | ✅ Completado | Ver Bloque 12 |
+| 11 | Phase 1 — Explore codebase | ✅ Completado | Ver Bloque 14 — resultados excelentes |
+| 12 | Phase 1 — research-analyst | ⚠️ Bloqueado/timeout | Agente no retornó. Flujo detenido. |
+| 13 | Phase 2 — scaffold | 🔍 Pendiente | Desbloqueado manualmente |
+| 14 | Phase 3 — implement | 🔍 Pendiente | |
+| 15 | qa-engineer verifica | 🔍 Pendiente | |
 
 ---
 
-## Bloque 12 — ✅ INTERVIEW COMPLETA: Análisis forense
+## Bloque 14 — ✅ Phase 1 Explore: Hallazgos críticos
 
-### Resumen del agente (tal como lo documentó en progress.md)
+### Hallazgo 14.1 — ⚠️ CONTRADICCIÓN DOCKER CONFIRMADA (Fix F validado)
 
-| Topic | Respuesta capturada |
-|---|---|
-| Scope | Happy-path only |
-| Structure | Page Object Model |
-| Test data | Per-test setup/teardown + explicit delete |
-| Test instance | Docker compose, NOT localhost:8123 (producción) |
-| Browsers | Chromium only |
-| CI | GitHub Actions on PR |
-| MVP | Separate tests per action |
-| Approach | Full-stack Docker (A) |
+Existen **dos docker-compose distintos** en el repo:
 
-**Observación clave:** El agente capturó correctamente TODAS las decisiones de negocio. Pero su mental model al final de la interview era 100% genérico Playwright — sin ningún constraint específico de HA.
+| Archivo | Propósito real | Estado |
+|---|---|---|
+| `docker-compose.yml` (raíz) | Manual testing. Puerto **8124**. Volumenes locales hardcodeados. | Existe, pero NO es para CI |
+| `test-ha/docker-compose.yml` | Lo que describe `copilot-instructions.md` para tests | **NO EXISTE** |
 
-### Lo que la interview capturó vs. lo que no
+`copilot-instructions.md` apunta a `test-ha/docker-compose.yml` que no existe. El agente en la interview dijo "Docker compose" asumiendo que existe. **Fix F es urgente e independiente del experimento.**
+
+### Hallazgo 14.2 — ✅ hass-taste-test ya lo gestiona todo (invalida el Docker approach)
+
+**Esto es el hallazgo más importante de Phase 1:**
+
+`global.setup.ts` ya existe y usa `hass-taste-test` para levantar HA efímero:
+```typescript
+import { HomeAssistant, PlaywrightBrowser } from 'hass-taste-test';
+const hassInstance = await HomeAssistant.create(`...yaml config...`, {
+  python: process.env.PYTHON_PATH || 'python3',
+  browser: new PlaywrightBrowser('chromium'),
+  customComponents: [evTripPlannerPath],
+});
+// Guarda server-info.json con el puerto dinámico
+```
+
+**Implicación crítica:** El agente propuso crear `test-ha/docker-compose.yml` (approach A de la interview), pero **el codebase ya tiene una solución mejor**: `hass-taste-test` levanta HA efímero sin Docker. El GitHub Actions workflow ya lo usa correctamente:
+```yaml
+- name: Get Python path for hass-taste-test
+  run: echo "PYTHON_PATH=$(which python3)" >> $GITHUB_ENV
+```
+
+**Pregunta forense activa:** ¿El agente, al leer este `global.setup.ts`, actualizará su plan y abandonará el approach Docker en favor de `hass-taste-test`? O ¿creará `test-ha/docker-compose.yml` de todas formas porque la interview lo decidió?
+
+### Hallazgo 14.3 — ⚠️ Shadow DOM: Explore NO encontró `navigateViaSidebar`
+
+El Explore agent documentó correctamente las opciones de Shadow DOM:
+- `locator('ev-trip-planner-panel').locator('pierce/.trip-card')`
+- `page.evaluate()` para acceder al Shadow DOM
+
+Pero **no encontró** ningún patrón de navegación al panel. Solo documentó la URL: `/ev-trip-planner-{vehicle_id}`.
+
+❌ **NO hay `navigateViaSidebar` en el codebase** — no existe como función implementada. El agente tendrá que inventarla o usar `page.goto()` directo.
+
+**Pregunta forense:** ¿Sabe el agente que `page.goto('/ev-trip-planner-chispitas')` dará 404 sin auth correcta? ¿O asumirá que basta el storageState?
+
+### Hallazgo 14.4 — ✅ CSS selectors del panel (disponibles)
+
+El Explore agent identificó los selectores reales del panel:
+- Botón añadir viaje: `.add-trip-btn`
+- Modal formulario: `.trip-form-overlay`, `.trip-form-container`
+- Lista viajes: `.trips-list`, `.trip-card[data-trip-id]`
+- Estado vacío: `.no-trips`
+
+**Nota:** Estos selectores están dentro del Shadow DOM de `ev-trip-planner-panel`.
+
+### Hallazgo 14.5 — Tensión Jest vs Playwright
+
+`package.json` tiene dos frameworks mezclados:
+- `jest` ^30.3.0 (tests existentes con `.test.js`)
+- `@playwright/test` ^1.58.2 (para e2e con `.spec.ts`)
+
+Los scripts `test:e2e` y `test:ui` usan `jest`, no `playwright`. El workflow de GitHub Actions usa `npx playwright test tests/e2e/`. **El agente tendrá que decidir cuál usa** — si copia el patrón de `package.json` usará jest, si sigue el workflow usará playwright.
+
+### Hallazgo 14.6 — Incidente: research-analyst bloqueado
+
+El agente principal se quedó esperando al research-analyst que no retornó. El flujo se detuvo.
+
+**Implicación para el sistema:** El mecanismo de coordinación de subagentes no tiene timeout. Si un subagente falla o tarda, el agente principal se bloquea indefinidamente. ⇒ **Fix H candidato:** `phase-rules.md` debería especificar un timeout máximo de espera y cómo proceder cuando un subagente no retorna.
+
+---
+
+## Bloque 12 — Interview: Análisis forense
 
 | Capturado | NO capturado |
 |---|---|
-| Happy-path, POM, Docker, CI, Chromium | Shadow DOM (`>> selector`) |
-| Docker test HA ≠ localhost:8123 | `navigateViaSidebar` vs `goto` directo |
+| Happy-path, POM, Docker, CI, Chromium | Shadow DOM (`pierce/` selector) |
+| Docker test HA ≠ localhost:8123 | `page.goto` vs sidebar nav |
 | Separate tests per action | `baseURL` dinámico / puerto efímero |
-| | `hass-taste-test` como runner real |
+| | `hass-taste-test` reemplaza Docker |
 
-**Conclusión de la interview:** 9 preguntas, 0 constraints técnicos específicos de HA. Esto era esperable — la interview es para decisiones de producto/arquitectura, no para descubrimiento técnico. **El descubrimiento técnico debe ocurrir en Phase 1.** La pregunta forense ahora es: ¿lo hace?
-
-### ⚠️ Hallazgo positivo: progress.md menciona Shadow DOM
-
-El agente sí escribió esto en `progress.md`:
-> *"The component uses Shadow DOM for panel rendering, requiring Playwright’s shadow DOM combinator for element selection."*
-
-Este dato vino de leer `copilot-instructions.md` (que tiene el ejemplo de Shadow DOM). **El agente lo sabía pero no lo puso como constraint explícito en la interview.** Predice que lo usará en Phase 3... pero ¿bien? ¡Eso es lo que observamos!
+**Progreso.md sí mencionó Shadow DOM** (de copilot-instructions). Pero no como constraint de arquitectura.
 
 ---
 
-## Bloque 13 — Phase 1 arrancada (2026-04-03 03:28)
+## Plan de investigación: estado
 
-### Agent 1: research-analyst
-- **Topic:** Playwright + hass-taste-test best practices, Shadow DOM, Docker HA
-- **Output:** `./specs/e2e-ev-trip-planner/.research-playwright-ha.md`
-- **WebSearches planificadas:** `hass-taste-test Playwright Home Assistant E2E`, `Playwright shadow DOM testing HA`, `Home Assistant Core E2E testing Docker compose`
-- ✅ **Positivo:** el agente SBÍ nombra `hass-taste-test` — lo descubrió (probablemente de `package.json` o su skill)
-- 🔍 **Vigilar:** ¿encontará el patrón de puerto dinámico? ¿la API REST de onboarding?
-
-### Agent 2: Explore codebase
-- **Topic:** Panel structure, Shadow DOM, package.json, GitHub Actions workflows
-- **Output:** `./specs/e2e-ev-trip-planner/.research-codebase.md`
-- 🔍 **Vigilar:** ¿Leerá `panel.py`? ¿Descubrirá que `test-ha/docker-compose.yml` no existe?
-
-### Preguntas forenses activas para Phase 1
-
-1. ¿El Explore agent verifica que `test-ha/docker-compose.yml` realmente existe?
-2. ¿El research-analyst encuentra el patrón de puerto dinámico de `hass-taste-test`?
-3. ¿Alguno de los dos menciona `navigateViaSidebar` o el problema del 404 en custom panels?
-4. ¿El Explore agent lee `panel.py` o solo los archivos de test?
-5. ¿Al mergear los dos reports, el agente sintetiza los constraints HA-específicos correctamente?
+| # | Pregunta | Estado |
+|---|---|---|
+| P1-P4 | Auth, 404, routing, bugs | ✅ Resueltos |
+| P5 | ¿El agente tenía info disponible? | ✅ Confirmado: sí, en copilot-instructions y global.setup.ts |
+| P6 | ¿Qué fix minimal habría evitado los fallos? | 💬 Fix F (copilot-instructions) + E (hass-taste-test skill) + G (verificar infra) |
+| P7 | ¿Habría llegado solo al 404/sidebar? | 🔍 A observar en Phase 3 |
+| P8 | ¿Por qué falló tras conocer la causa? | ✅ IIFE baseURL |
+| P9 | ¿Playwright-best-practices tiene info de hass-taste-test? | ⚠️ Probable sí (agente lo nombró en research) |
+| P10 | ¿Copilot-instructions describe infra inexistente? | ✅ CONFIRMADO |
+| P11 | ¿Explore agent verifica que docker-compose no existe? | ⚠️ Parcial — detectó que `test-ha/` no existe, propuso hass-taste-test como alternativa |
+| P12 | ¿Agente actualiza plan Docker → hass-taste-test al ver global.setup.ts? | 🔍 A observar en Phase 2 |
+| P13 | ¿El mecanismo de subagentes tiene timeout? | ❌ NO — agente bloqueado indefinidamente |
 
 ---
 
-## Plan de investigación: estado actual
+## Bloque 9 — Fixes candidatos (actualizado)
 
-| # | Pregunta | Estado | Bloque |
+| Fix | Dónde | Qué | Prioridad |
 |---|---|---|---|
-| P1-P4 | Auth, 404, routing, bugs | ✅ Resueltos | Bloques 2,7,10 |
-| P5 | ¿El agente tenía información disponible? | ⚠️ Parcial — Shadow DOM en copilot-instructions, pero no conectado en interview | Bloque 12 |
-| P6 | ¿Qué cambio minimal habría evitado los fallos? | 💬 En debate — Fix F (copilot-instructions) + Fix G (verificar infra) prioritarios | Bloque 9 |
-| P7 | ¿Habría llegado solo al 404/sidebar? | 🔍 A observar en Phase 1 — ¿res-analyst menciona sidebar? | Bloque 13 |
-| P8 | ¿Por qué falló tras conocer la causa? | ✅ Resuelto (IIFE baseURL) | Bloque 10 |
-| P9 | ¿Contiene playwright-best-practices info sobre `hass-taste-test`? | ⚠️ Probable que sí — el agente lo nombró en research topic | Bloque 13 |
-| P10 | ¿copilot-instructions describe infra inexistente? | ✅ CONFIRMADO | Bloque P10 |
-| P11 | ¿El Explore agent verifica existencia de `test-ha/docker-compose.yml`? | 🔍 A observar — resultado Phase 1 | Bloque 13 |
-
----
-
-## Bloque 9 — Fixes candidatos
-
-| Fix | Dónde | Qué | Impacto | Costo | Prioridad |
-|---|---|---|---|---|---|
-| A | `phase-rules.md` Phase 1 | Experimenta antes de escribir tests | Alto | Bajo | Alta |
-| B | `phase-rules.md` Phase 1 | Lee el sistema bajo test, no solo tests | Alto | Bajo | Alta |
-| C | `ha-e2e-testing.skill.md` | Auth HA: 404, sidebar nav obligatoria | Medio | Medio | Media |
-| D | `playwright-session.skill.md` | No IIFEs en baseURL | Alto | Bajo | Alta |
-| E | `playwright-best-practices` skill | `hass-taste-test`, puertos dinámicos | Alto | Medio | Alta |
-| F | `ha-ev-trip-planner/copilot-instructions.md` | Corregir: `test-ha/` no existe, usar `hass-taste-test` | **CRÍTICO** | Bajo | **Urgente** |
-| G | `phase-rules.md` Phase 1 | Verificar que infra descrita en instrucciones existe | Alto | Bajo | Alta |
-
-**Fix F es el más urgente** — independientemente del experimento, `copilot-instructions.md` está roto y confunde a todo agente que trabaje en el proyecto.
-
----
-
-## Bloque 10 — ✅ Bug baseURL IIFE
-
-```typescript
-baseURL: (() => { return 'http://localhost:8123'; })()
-// IIFE al cargar config — antes de globalSetup — siempre falla en puerto dinámico
-```
+| A | `phase-rules.md` | Experimenta antes de escribir tests | Alta |
+| B | `phase-rules.md` | Lee el sistema bajo test | Alta |
+| C | `ha-e2e-testing.skill.md` | Auth HA: 404, sidebar nav | Media |
+| D | `playwright-session.skill.md` | No IIFEs en baseURL | Alta |
+| E | `playwright-best-practices` skill | `hass-taste-test`, puertos dinámicos | Alta |
+| F | `ha-ev-trip-planner/copilot-instructions.md` | Corregir infra inexistente | **Urgente** |
+| G | `phase-rules.md` | Verificar que infra descrita existe | Alta |
+| H | `phase-rules.md` | Timeout para subagentes + cómo proceder si no retornan | Media |
 
 ---
 
@@ -159,24 +161,11 @@ baseURL: (() => { return 'http://localhost:8123'; })()
 
 | Sistema | URLs | Auth |
 |---|---|---|
-| React Router (SPA) | `/`, `/config`, `/lovelace` | Redirect a login |
+| React Router (SPA) | `/`, `/config` | Redirect a login |
 | Custom Panels | `/ev-trip-planner-{id}` | **404** si no auth |
 
-**Regla:** NUNCA `page.goto('/panel-url')`. Siempre `navigateViaSidebar()`.
+**Regla:** NUNCA `page.goto('/panel-url')` directo. Confirmar si `navigateViaSidebar` existe o hay que crearlo.
 
 ---
 
-## Decisiones tomadas
-
-| # | Decisión | Fecha | Razonamiento |
-|---|---|---|---|
-| D1 | Prueba nueva desde `/start` con proyecto limpio | 2026-04-03 | Caja negra completa |
-| D2 | Prompt inicial intencionalmente escueto | 2026-04-03 | El agente debe descubrir patrones HA |
-| D3-D7 | (ver historial) | 2026-04-03 | |
-| D8 | Mantener experimento limpio | 2026-04-03 | No dar info técnica que usuario no sabría |
-| D9 | Fix F prioritario: corregir `copilot-instructions.md` | 2026-04-03 | Fuente de verdad rota |
-| D10 | Continuar experimento sin corregir Fix F aún | 2026-04-03 | Para observar cómo el agente gestiona infra inexistente en Phase 1 |
-
----
-
-*Última actualización: 2026-04-03 03:28 CEST — Interview completa (9 preguntas). Phase 1 arrancada con 2 agentes en paralelo. Hipotesis A+B+C confirmada. Fix F urgente pendiente. Esperando resultados Phase 1.*
+*Última actualización: 2026-04-03 03:32 CEST — Phase 1 Explore completado. research-analyst bloqueado. Fix H añadido. Pregunta forense P12 añadida: ¿El agente actualiza Docker → hass-taste-test?*
