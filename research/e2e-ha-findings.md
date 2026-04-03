@@ -39,47 +39,169 @@
 | 16b | Phase 3 — spec-reviewer (8/8 PASS) | ✅ Completado | Pasó sin detectar P16 ni P20. Ver Bloque 19 |
 | 17 | Phase 3 — implement tasks 1.1–1.6 | ✅ Completado | 6 commits locales. Ver Bloque 20 |
 | 17b | Phase 3 — artifact reviewer | ✅ Completado | REVIEW_FAIL: 3 críticos, 3 importantes. Ver Bloque 21 |
-| 17c | Phase 3 — fix tasks 1.1.1, 1.3.1, 1.5.1, 1.6.1 | ❌ BLOQUEADO | spec-executor unknown. Ver Bloque 22 |
-| 18 | qa-engineer verifica | 🔍 Pendiente | |
+| 17c | Phase 3 — fix tasks 1.1.1, 1.3.1, 1.5.1, 1.6.1 | ✅ Completado (parcialmente) | spec-executor → coordinador ejecutó fixes directamente. Ver Bloque 22 y 23 |
+| 17d | Fix adicional coordinador — scope `page` en trip.spec.ts | ✅ Completado | Bug P22 detectado y corregido por coordinador. Ver Bloque 23 |
+| 18 | qa-engineer verifica task 1.8 — VE1 | 🔍 Delegado | Ver Bloque 25 |
 
 ---
 
-## Bloque 22 — ❌ Fix Tasks bloqueadas: P21 NUEVA — `spec-executor` no existe como skill
+## Bloque 25 — 🔍 VE1: qa-engineer recibe task 1.8 — PENDIENTE RESULTADO
+
+### Contexto
+Tras marcar `taskIndex = 8` y completar todos los fix tasks, el coordinador delegó la tarea 1.8 (POC verification — Run tests against ephemeral HA) a `qa-engineer`.
+
+### La tarea delegada
+```
+Execute verification task 1.8 for spec e2e-ev-trip-planner.
+
+Task: POC verification - Run tests against ephemeral HA
+
+Do:
+1. Run npx playwright test tests/e2e/vehicle.spec.ts --timeout=180000
+   - global.setup.ts starts ephemeral HA
+   - Config Flow runs via global.setup.ts's auth integration
+   - vehicle.spec.ts creates a vehicle via Config Flow and verifies panel opens
+   - afterEach cleanup removes the integration
+
+2. If vehicle.spec.ts passes, also run trip.spec.ts
+
+Verify:
+- Exit code 0 from playwright test
+- No TypeScript errors
+- Config Flow completes successfully in logs
+- Panel opens and is accessible
+```
+
+### Preguntas forenses P23 (nuevas)
+
+**P23a — ¿Qué ocurre cuando VE1 corre contra `hass-taste-test`?**
+La pregunta central: ¿`global.setup.ts` arrancará correctamente `hass-taste-test` via docker-compose? ¿El auth flow de Config Flow funcionará en el HA ephemeral?
+
+Hipótesis:
+- **H1:** `hass-taste-test` arranca pero el Config Flow selector `hass-integration-card` falla porque el selector en el código tiene espacio inicial (bug I2, marcado como importante no crítico en REVIEW_FAIL — ¿fue corregido en los fix tasks?)
+- **H2:** El auth flow falla porque la URL de HA ephemeral no coincide con `baseURL` en `playwright.config.ts`
+- **H3:** El flow completo funciona y VE1 pasa — en ese caso tenemos un artefacto de infra de test funcional por primera vez
+
+**P23b — ¿El qa-engineer leerá `global.setup.ts` antes de ejecutar?**
+El qa-engineer debería verificar que `global.setup.ts` referencia `hass-taste-test` y no `test-ha/docker-compose.yml`. Si no lo hace, podría ejecutar ciegamente y obtener un error opaco.
+
+**P23c — ¿Hay un race condition entre `global.setup.ts` y el test runner?**
+El `global.setup.ts` arranca HA de forma async. Si playwright lanza los tests antes de que HA esté ready, fallará con errores de conexión, no con errores de test. ¿Tiene health-check el setup?
+
+### Estado
+🔍 Pendiente de resultado del qa-engineer.
+
+---
+
+## Bloque 24 — ✅ taskIndex advancement: coordinador gestiona estado directamente
+
+### Observación forense
+Tras el bloqueo de P21 (`spec-executor` unknown), el **coordinador no se quedó bloqueado indefinidamente**. En la sesión actual:
+
+1. **Ejecutó los fix tasks directamente** (sin delegar a spec-executor)
+2. **Avanzó manualmente el `taskIndex`** de 6 a 8 con jq
+3. **Marcó task 1.7 (TypeScript check) como completa** al verificar que `npx tsc --noEmit` pasaba
+4. **Delegó correctamente task 1.8** al qa-engineer
+
+### Implicación forense
+El coordinador tiene capacidad de auto-recuperación ante el fallo de skill delegation. Cuando `spec-executor` falló (P21), el coordinador adoptó el rol de executor directamente. Esto es:
+- ✅ **Positivo**: El proyecto no quedó bloqueado, los fixes se aplicaron
+- ⚠️ **Riesgo**: El coordinador actuó como executor sin respetar la separación de responsabilidades del sistema ralph-specum. ¿Es esto un comportamiento documentado o es drift?
+
+### Fix candidato O
+Documentar en `phase-rules.md` qué ocurre cuando `spec-executor` no está disponible: ¿el coordinador debe actuar como fallback o debe escalar al usuario?
+
+---
+
+## Bloque 23 — ✅ P22 NUEVA: Bug `page` out-of-scope en test functions de trip.spec.ts
+
+### El bug
+Tras los fix tasks del subagente (1.1.1, 1.3.1, 1.5.1, 1.6.1), el coordinador leyó `trip.spec.ts` y encontró un nuevo bug crítico **que no estaba en los fix tasks originales**:
+
+```typescript
+// ANTES (incorrecto):
+test('US-3 + US-4: create recurring trip...', async () => {
+  await panel.openFromSidebar();
+  await expect(page.locator('ev-trip-planner-panel >> .trip-card')).toContainText('25.5');
+  // ^^^ page no existe en scope — es solo parámetro de beforeEach
+});
+
+// DESPUÉS (correcto):
+test('US-3 + US-4: create recurring trip...', async ({ page }) => {
+  // page destructured desde fixture de Playwright
+  await panel.openFromSidebar();
+  await expect(page.locator('ev-trip-planner-panel >> .trip-card')).toContainText('25.5');
+});
+```
+
+### Commit aplicado
+```
+ce67f27 fix(e2e): add page fixture to trip test functions
+```
+
+Diff concreto: 2 líneas cambiadas (las 2 definiciones de `test()` que faltaban `{ page }`).
+
+### Análisis forense
+
+**¿Por qué el artifact reviewer (Bloque 21) no lo detectó?**
+El reviewer encontró C2 (`browserPage` fixture incorrecta) y C3 (`tripId` undefined), pero NO detectó que las firmas de las funciones `test()` no recibían `page`. Posibles causas:
+1. **El reviewer no ejecutó TypeScript** — solo leyó el código. El TypeScript check hubiera capturado esto.
+2. **El reviewer asumió que `page` venía del outer scope** — error de lectura, `beforeEach({ page })` hace que `page` sea local a ese callback.
+3. **El bug fue introducido por el fix task 1.3.1** (replace `browserPage` with `page`) — al cambiar `browserPage` a `page`, el executor no añadió `{ page }` a la firma del test. El reviewer vio el cambio terminado pero no verificó que la firma fuera correcta.
+
+**¿Por qué el TypeScript check no lo capturó antes?**
+`page` en el outer scope de `test.describe` no existe, por lo que TypeScript debería haber dado error `Cannot find name 'page'`. Sin embargo el coordinador corrió `npx tsc --noEmit` y pasó. Hipótesis: `@playwright/test` declara `page` como global en sus tipos. Esto sería un caso donde **TypeScript no detecta un bug de runtime** porque los tipos de Playwright permiten `page` globalmente.
+
+**Implicación crítica:**
+> El TypeScript check pasó, el artifact reviewer no lo detectó, y el bug solo se hubiera manifestado en runtime cuando los tests corrieran. **El único detector real hubiera sido VE1 (ejecutar los tests).**
+
+### P22 abierta
+¿Por qué `@playwright/test` types declaran `page` como global, enmascarando el error de scope? ¿Es esto un problema conocido del ecosistema Playwright?
+
+---
+
+## Bloque 22 — ⚠️ Fix Tasks: spec-executor bloqueado → coordinador ejecutó directamente
 
 ### Contexto
 El artifact reviewer (Bloque 21) encontró REVIEW_FAIL con 3 críticos. El coordinador intentó delegar 4 fix tasks a subagentes `spec-executor` en paralelo.
 
-### El fallo
+### El fallo original (P21)
 El modelo coordinador (MiniMax-M2.7) intentó:
 ```
 Skill("spec-executor", team_name="fix-e2e", name="fix-1", task_index=6)
-Skill("spec-executor", team_name="fix-e2e", name="fix-2", task_index=7)
-Skill("spec-executor", team_name="fix-e2e", name="fix-3", task_index=8)
-Skill("spec-executor", team_name="fix-e2e", name="fix-4", task_index=9)
+...
 ```
-
 **Resultado para los 4:** `Unknown skill: spec-executor`
 
-### Estado actual
-- `tasks.md` tiene los 4 fix tasks correctamente escritos (1.1.1, 1.3.1, 1.5.1, 1.6.1)
-- `.ralph-state.json` tiene `fixTaskMap` correctamente actualizado con los 4 tasks
-- `.progress.md` tiene el log de REVIEW_FAIL
-- **Nadie ejecutó los fixes** — los executors fallaron en el lanzamiento mismo
+### Lo que ocurrió después (nuevo)
+El coordinador **no se bloqueó** — asumió el rol de executor directamente en la siguiente sesión:
 
-### Pregunta forense P21
-**¿La skill correcta se llama `spec-executor` o tiene otro nombre?**
+#### Fix 1.1.1 — auth.setup.ts + global.setup.ts + playwright.config.ts
+El coordinador reestructuró el auth flow completo:
+- `auth.setup.ts` → convertido de test-as-setup a función `runAuthSetup()` callable
+- `global.setup.ts` → actualizado para importar y llamar `runAuthSetup()`  
+- `playwright.config.ts` → usa `storageState: 'playwright/.auth/user.json'` en lugar de `setupProject` (que no existe en Playwright 1.58)
+- Commit: `5851fc6`
 
-Hipótesis:
-- **H1:** La skill existe pero se llama diferente (ej. `task-executor`, `code-executor`, `implement-executor`)
-- **H2:** El coordinador debería haber usado `Task()` en lugar de `Skill()` para delegar a subagentes
-- **H3:** El nombre cambió entre versiones de ralph-specum y la instrucción del coordinador no se actualizó
-- **H4:** El fix task flow requiere que el usuario lo active manualmente, no automatizado
+#### Fix 1.3.1 — browserPage → page en trip.spec.ts
+- Subagente previo había hecho este cambio (commit `eb8f921`)
+- Pero dejó el bug de scope (P22) que el coordinador encontró después
 
-### Impacto
-El sistema de recuperación de errores (fix task flow) falla silenciosamente: el coordinador cree que lanzó los agents, el estado está actualizado con `attempts=1`, pero ningún fix se ejecutó. El proyecto está en un estado inconsistente: `tasks.md` dice que hay fix tasks pendientes pero el estado dice `attempts=1` (como si hubiera intentado).
+#### Fix 1.5.1 y 1.6.1 — locator space + dialog handler
+- Commits `b876fe6` y `3d28971` aplicados por el subagente
 
-### Fix candidato N
-Verificar el nombre real de la skill de ejecución en ralph-specum. Añadir a `copilot-instructions.md` el nombre correcto para que el coordinador pueda llamarla.
+### Commits de fix (en orden)
+```
+09ee089 fix(e2e): invoke auth.setup.ts via setupProject (WRONG — no existe en PW 1.58)
+3d28971 fix(e2e): move dialog handler from POM deleteTrip to test beforeEach
+b876fe6 fix(e2e): remove leading space from hass-integration-card locator
+eb8f921 fix(e2e): replace browserPage fixture with page in trip.spec.ts
+5851fc6 fix(e2e): update playwright configuration and integrate auth setup (FIX CORRECTO del auth)
+ce67f27 fix(e2e): add page fixture to trip test functions (P22 fix)
+```
+
+### Observación clave
+El commit `09ee089` (setupProject) fue incorrecto y el coordinador lo sobreescribió en `5851fc6`. El sistema de fix tasks generó **un commit incorrecto seguido de un commit de corrección**. Esto es un patrón de "fix sobre fix" que indica que el primer subagent executor no verificó que `setupProject` existiera en Playwright 1.58.
 
 ---
 
@@ -177,6 +299,10 @@ El coordinador lanzó 6 subagentes en paralelo. Cada executor recibió su prompt
 | P19 | ¿El engram compensa la ausencia de skills formales? | ✅ PARCIALMENTE — executor-3 aplicó fix previo de engram |
 | P20 | ¿Scripts de skill ha-e2e-testing en ubicación incorrecta? | ✅ CONFIRMADO — engram lo registra como corrección crítica |
 | P21 | ¿Fix task flow falla porque `spec-executor` no existe? | ✅ CONFIRMADO — Unknown skill: spec-executor |
+| P22 | ¿TypeScript types de Playwright enmascaran bug de scope `page`? | 🔍 NUEVA — ver Bloque 23 |
+| P23a | ¿VE1 pasará contra hass-taste-test ephemeral? | 🔍 NUEVA — pendiente resultado |
+| P23b | ¿El qa-engineer leerá global.setup.ts antes de ejecutar? | 🔍 NUEVA — pendiente |
+| P23c | ¿Race condition entre global.setup.ts y test runner? | 🔍 NUEVA — pendiente |
 
 ---
 
@@ -233,8 +359,9 @@ El path hardcodeado `/mnt/bunker_data/...` no aparece como tarea de fix. **Confi
 | Fix K | Añadir script de verificación de infra pre-test | 🔍 |
 | Fix L | Corregir path hardcodeado en `global.teardown.ts` | 🔍 |
 | Fix M | Documentar skills en phase-rules.md para que tasks las referencien | 🔍 |
-| Fix N | **Verificar nombre real de skill de ejecución en ralph-specum** | ✅ URGENTE |
+| Fix N | Verificar nombre real de skill de ejecución en ralph-specum | ✅ URGENTE |
+| Fix O | Documentar comportamiento fallback coordinador cuando spec-executor falla | 🔍 |
 
 ---
 
-*Última actualización: Bloque 22 — P21 `spec-executor` unknown skill, fix tasks bloqueadas*
+*Última actualización: Bloque 25 — VE1 delegado a qa-engineer, P22/P23 abiertas, Bloque 24 fix-sobre-fix pattern*
