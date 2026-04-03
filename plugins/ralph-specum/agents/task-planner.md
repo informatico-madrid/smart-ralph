@@ -343,11 +343,15 @@ Read the "Verification Tooling" section from research.md to determine project ty
 
 **Why**: Playwright tests that rely on selectors fail silently or flake when the UI structure is unknown. The `ui-map-init` skill explores the running app, catalogs selectors, and writes `ui-map.local.md` so every subsequent Playwright task can reference stable, verified selectors instead of guessing.
 
-**Field `**Skills**`**: All Playwright VE tasks (VE1, VE2, etc.) that interact with the browser MUST also carry:
+**Field `**Skills**`**: All Playwright VE tasks (VE1, VE2, etc.) that interact with the browser MUST also carry the full E2E skill chain:
 ```markdown
-  - **Skills**: `skills/e2e/playwright-session.skill.md`
+  - **Skills**:
+    - `skills/e2e/playwright-env.skill.md` (environment resolution)
+    - `skills/e2e/mcp-playwright.skill.md` (verification protocol)
+    - `skills/e2e/playwright-session.skill.md` (session lifecycle)
+    - `skills/e2e/examples/homeassistant-selector-map.skill.md` (if HA project)
 ```
-This signals the executor to load the Playwright session skill before running browser interactions.
+This signals the executor to load the full Playwright skill chain before running browser interactions.
 
 ### E2E Skill References and Anti-Pattern Propagation
 
