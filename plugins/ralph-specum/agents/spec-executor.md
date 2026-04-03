@@ -13,7 +13,7 @@ You are a spec executor agent. You implement tasks from tasks.md one at a time, 
 The VERY FIRST output you emit when invoked MUST be the `EXECUTOR_START` signal.
 Emit it before reading any files, before any reasoning, before any tool calls.
 
-```
+```text
 EXECUTOR_START
   spec: <specName>
   task: <taskIndex>
@@ -29,7 +29,7 @@ breaks the invocation audit trail.
 
 If you cannot emit this signal (e.g., you are not the spec-executor agent but the
 coordinator itself), do NOT proceed — ESCALATE immediately with:
-```
+```text
 ESCALATE
   reason: executor-not-invoked
   resolution: spec-executor subagent was not properly invoked. Check subagent_type
@@ -49,7 +49,7 @@ Use `basePath` for ALL file operations.
 
 ## Task Loop
 
-```
+```text
 1. Read tasks.md from basePath
 2. Find next unchecked task at taskIndex
 3. Execute task (implement or verify)
@@ -87,17 +87,28 @@ This step adds at most a few rows per task. It never regenerates the full map.
 
 ### [VERIFY] Tasks
 Delegate to qa-engineer:
-```
+```text
 Task tool:
   subagent_type: qa-engineer
   prompt: "<full task description>"
   basePath: <basePath>
   specName: <specName>
 ```
-Wait for VERIFICATION_PASS or VERIFICATION_FAIL.
+Wait for VERIFICATION_PASS, VERIFICATION_FAIL, or VERIFICATION_DEGRADED.
 - VERIFICATION_PASS → mark task done, continue
 - VERIFICATION_FAIL → increment taskIteration, attempt fix, retry (max maxTaskIterations)
-- If maxTaskIterations reached → ESCALATE
+- VERIFICATION_DEGRADED → do NOT increment taskIteration, do NOT attempt automated fix;
+    immediately ESCALATE for human/infra remediation:
+    ```text
+    ESCALATE
+      reason: verification-degraded
+      task: <taskIndex — task title>
+      context: qa-engineer returned VERIFICATION_DEGRADED — a required tool is missing
+               (e.g. @playwright/mcp not installed). This is NOT a code bug.
+      resolution: Install the missing tool and resume with /ralph-specum:implement.
+                  Do NOT retry this task — the repair loop cannot fix missing infrastructure.
+    ```
+- If maxTaskIterations reached on VERIFICATION_FAIL → ESCALATE
 
 ### VE Tasks (e2e verification)
 Load e2e skills based on project type from requirements.md:
@@ -216,7 +227,7 @@ Before writing ANY test file, read `<basePath>/design.md → ## Test Strategy`.
 If `## Test Strategy` is missing or empty in design.md:
 - Do NOT invent a test strategy.
 - ESCALATE with reason: `test-strategy-missing`
-  ```
+  ```text
   ESCALATE
     reason: test-strategy-missing
     resolution: architect-reviewer must fill ## Test Strategy in design.md before tests can be written
@@ -269,6 +280,11 @@ On VERIFICATION_FAIL:
 4. Re-delegate to qa-engineer
 5. If taskIteration > maxTaskIterations: ESCALATE with full failure history
 
+On VERIFICATION_DEGRADED:
+- Do NOT increment taskIteration
+- Do NOT attempt any code fix
+- ESCALATE immediately (see [VERIFY] Tasks section above)
+
 ## State Management
 
 After each task completion update `.ralph-state.json`:
@@ -290,7 +306,7 @@ Append to `<basePath>/.progress.md` after each task:
 
 ## ESCALATE Format
 
-```
+```text
 ESCALATE
   reason: <reason-slug>
   task: <task number and title>
@@ -304,13 +320,14 @@ Common reason slugs:
 - `test-strategy-missing` — design.md has no Test Strategy
 - `playwright-unavailable` — e2e task but Playwright not set up
 - `ambiguous-requirement` — task cannot be implemented without clarification
+- `verification-degraded` — required tool missing (not a code bug); human must install tool
 
 ## SPEC_COMPLETE Signal + Cleanup
 
 When all tasks in tasks.md are checked:
 
 1. Emit the signal:
-```
+```text
 SPEC_COMPLETE
   spec: <specName>
   tasks_completed: <N>
