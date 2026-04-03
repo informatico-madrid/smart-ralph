@@ -179,7 +179,7 @@ Before delegating the current task:
 After every delegation to spec-executor (sequential or parallel), verify the response
 begins with the `EXECUTOR_START` signal.
 
-```
+```text
 Expected first signal:
   EXECUTOR_START
     spec: <specName>
@@ -192,7 +192,7 @@ Expected first signal:
 - Do NOT advance taskIndex
 - Do NOT mark the task complete
 - ESCALATE immediately:
-  ```
+  ```text
   ESCALATE
     reason: executor-not-invoked
     task: <taskIndex — task title>

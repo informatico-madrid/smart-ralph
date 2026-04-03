@@ -251,7 +251,12 @@ Before generating any TypeScript file that resolves paths at module level
 detect the project's module system:
 
 ```bash
-MODULE_TYPE=$(jq -r '.type // "commonjs"' package.json 2>/dev/null || echo "commonjs")
+# Search for the nearest package.json walking up from the spec's base path
+_pkg=$(dir="<basePath>"; while [ "$dir" != "/" ]; do
+  [ -f "$dir/package.json" ] && echo "$dir/package.json" && break
+  dir=$(dirname "$dir")
+done)
+MODULE_TYPE=$([ -n "$_pkg" ] && jq -r '.type // "commonjs"' "$_pkg" 2>/dev/null || echo "commonjs")
 echo "Project module type: $MODULE_TYPE"
 ```
 
