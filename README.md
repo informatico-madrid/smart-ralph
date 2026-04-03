@@ -634,7 +634,7 @@ After max iterations, the loop stops. Check `.progress.md` for errors. Fix manua
 Just `/ralph-specum:start` - it auto-detects and continues where you left off.
 
 **MCP Playwright not available?**
-The agent emits `VERIFICATION_DEGRADED`, falls back to static analysis (source grep, build check, HTTP probes), and records the coverage gap. If the spec has UI entry points, it also emits `ESCALATE` to flag the missing tool for human follow-up. Install `@playwright/mcp` (Node 18+ required) and configure it in your MCP client to restore full browser coverage. The agent never auto-installs it.
+The agent emits `VERIFICATION_DEGRADED`, falls back to static analysis (source grep, build check, HTTP probes), records the coverage gap, and emits `ESCALATE` to flag the missing tool for human follow-up. Install `@playwright/mcp` (Node 18+ required) and configure it in your MCP client to restore full browser coverage. The agent never auto-installs it.
 
 **More issues?** See the full [Troubleshooting Guide](TROUBLESHOOTING.md).
 
