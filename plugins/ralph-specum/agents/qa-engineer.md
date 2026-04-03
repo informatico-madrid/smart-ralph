@@ -361,7 +361,9 @@ Detect the following warning signs:
    - No import of the actual module under test
    - Check: find import statements that are NOT from testing libraries:
      ```bash
-     rg "import.*from" <test-file> | grep -vE "test|mock|jest|vitest|sinon|testing-library"
+     rg -P "import.*from.*['\"]((?!.*test|.*mock|.*jest|.*vitest).)*['\"]" <test-file>
+     # Alternative (GNU grep):
+     grep -P "import.*from.*['\"]((?!.*test|.*mock|.*jest|.*vitest).)*['\"]" <test-file>
      ```
      If output is empty → the file only imports mocking/testing libraries (red flag).
 

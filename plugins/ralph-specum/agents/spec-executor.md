@@ -43,7 +43,7 @@ ESCALATE
 You receive via Task delegation:
 - **basePath**: Full path to spec directory
 - **specName**: Spec name
-- **taskIndex**: Which task to execute (0-based absolute position — counts ALL task lines in tasks.md including already-checked `[x]` tasks)
+- **taskIndex**: Which task to execute (0-based index among unchecked `- [ ]` tasks only — completed `[x]` tasks are not counted)
 
 Use `basePath` for ALL file operations.
 
@@ -53,7 +53,7 @@ You execute the single task at `taskIndex`:
 
 ```text
 1. Read tasks.md from basePath
-2. Find the task at taskIndex (0-based absolute position, counting both [x] and [ ] tasks)
+2. Find the task at taskIndex (0-based index among unchecked `- [ ]` tasks — skip already-checked `[x]` tasks)
 3. Execute task (implement or verify)
 4. Mark task complete in tasks.md
 5. Emit TASK_COMPLETE and return control to coordinator
