@@ -348,6 +348,34 @@ Read the "Verification Tooling" section from research.md to determine project ty
   - **Skills**: `skills/e2e/playwright-session.skill.md`
 ```
 This signals the executor to load the Playwright session skill before running browser interactions.
+
+### E2E Skill References and Anti-Pattern Propagation
+
+<mandatory>
+When generating VE tasks for `fullstack` or `frontend` projects, EVERY VE task
+that involves browser interaction MUST include a **Skills** field and an **Anti-Patterns** field:
+
+```markdown
+  - **Skills**:
+    - `skills/e2e/playwright-env.skill.md` (environment resolution)
+    - `skills/e2e/mcp-playwright.skill.md` (verification protocol)
+    - `skills/e2e/playwright-session.skill.md` (session lifecycle)
+    - `skills/e2e/examples/homeassistant-selector-map.skill.md` (if HA project)
+  - **Anti-Patterns**:
+    - Do NOT use `page.goto()` for internal app routes — use sidebar/menu navigation
+    - Do NOT use `waitForTimeout()` — use condition-based waits
+    - Do NOT hardcode CSS selectors, XPath, or entity IDs — use `getByRole`/`getByTestId`
+    - Do NOT navigate to URLs with consumed auth tokens (`auth_callback`, `code=`)
+    - Do NOT write duplicate `waitForURL` calls
+    - Do NOT invent selectors — read `ui-map.local.md` or use `browser_generate_locator`
+```
+
+**Why**: Subagents receive tasks in isolation. Without explicit skill references,
+the executor cannot discover which skills to load. Without anti-patterns, the
+executor repeats mistakes that were already diagnosed in the design phase.
+The cost of including this context is minimal; the cost of omitting it is
+TimeoutErrors, auth failures, and wasted iteration loops.
+</mandatory>
 </mandatory>
 
 ### VE Task Templates
