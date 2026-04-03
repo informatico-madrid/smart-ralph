@@ -6,6 +6,35 @@ This is the **single source of truth** for E2E anti-patterns. All other files
 reference this list. When adding a new anti-pattern, add it here first, then
 reference it from the relevant files.
 
+## TypeScript Module System Anti-Patterns
+
+> **Root cause**: LLMs have a strong CJS bias from training data. ESM is more recent
+> and less represented, so agents generate `__dirname` patterns without checking
+> `"type": "module"` in package.json.
+
+| Anti-Pattern | Why it fails | Correct pattern |
+|---|---|---|
+| Using `__dirname` in an ESM project without a polyfill | `__dirname` is not defined in ESM modules — causes `ReferenceError` at runtime | Use `fileURLToPath(import.meta.url)` |
+| `path.dirname(new URL(import.meta.url).pathname)` | On Windows, `pathname` returns `/C:/path/file.ts` with a leading `/` before the drive letter, breaking the path | Use `fileURLToPath(import.meta.url)` — it handles Windows paths correctly |
+| Using `import.meta.url` in a CJS project | `import.meta` is not available in CommonJS — causes `SyntaxError` | Use `__dirname` directly |
+| Generating infra files without checking package.json first | Both `global.setup.ts` and `global.teardown.ts` get the same wrong pattern in the same session | Run `jq -r '.type // "commonjs"' package.json` before writing any infrastructure file |
+| `process.cwd()` for resolving paths in Playwright config | `cwd()` changes depending on where `npx playwright` is invoked — paths are unstable | Use `fileURLToPath(import.meta.url)` + `path.dirname` for stable file-relative paths |
+
+**ESM canonical pattern** (when `package.json` has `"type": "module"`):
+```typescript
+import { fileURLToPath } from 'url';
+import path from 'path';
+
+const __filename = fileURLToPath(import.meta.url); // always correct on all platforms
+const __dirname = path.dirname(__filename);
+```
+
+**CJS pattern** (default, when `package.json` has no `"type"` or `"type": "commonjs"`):
+```typescript
+// __dirname is available natively — no polyfill needed
+const configPath = path.join(__dirname, 'playwright/.auth/server-info.json');
+```
+
 ## Navigation Anti-Patterns
 
 | Anti-Pattern | Why it fails | Correct pattern |
