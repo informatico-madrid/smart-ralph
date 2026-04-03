@@ -45,9 +45,11 @@ After environment context is resolved, verify MCP Playwright is available.
 npx --no-install @playwright/mcp --version 2>/dev/null && echo MCP_PLAYWRIGHT_AVAILABLE || echo MCP_PLAYWRIGHT_MISSING
 ```
 
-If `MCP_PLAYWRIGHT_MISSING`: write `mcpPlaywright: "missing"` to state and proceed to the
-decision tree below. Do **not** emit `ESCALATE` here — the decision tree determines the
-correct degradation path based on whether the spec has UI entry points.
+If `MCP_PLAYWRIGHT_MISSING`: record that result in memory and proceed to the decision tree
+below. Do **not** emit `ESCALATE` here — the decision tree determines the correct
+degradation path based on whether the spec has UI entry points. Write
+`mcpPlaywright: "missing"` to state only in the canonical Step 0b state-write flow after
+lock recovery.
 
 ### 0b — Lock recovery (run always when `isolated=false`)
 
