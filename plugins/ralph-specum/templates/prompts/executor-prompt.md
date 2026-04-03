@@ -5,8 +5,14 @@
 
 ## Task Tool Parameters
 
-- **subagent_type:** `ralph-specum:spec-executor`
+- **subagent_type:** `spec-executor`
 - **description:** `Execute task {TASK_INDEX} for {SPEC_NAME}`
+
+> **Note on subagent_type naming**: use the bare agent name `spec-executor` (not
+> `ralph-specum:spec-executor`). The plugin-qualified form can cause routing failures
+> in some Claude Code versions when the plugin is already the active context.
+> Consistent bare names match the pattern used by all other agent delegations
+> in this plugin (`qa-engineer`, `spec-reviewer`, `research-analyst`).
 
 ## Prompt
 

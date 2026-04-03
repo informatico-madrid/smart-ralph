@@ -174,6 +174,45 @@ Before delegating the current task:
 
 **Task Start SHA**: Before delegating any task, record `TASK_START_SHA=$(git rev-parse HEAD)`. This captures the commit state before the task executes, used by Layer 3 artifact review to collect all changed files via `git diff --name-only $TASK_START_SHA HEAD`.
 
+### EXECUTOR_START Verification (MANDATORY after every spec-executor delegation)
+
+After every delegation to spec-executor (sequential or parallel), verify the response
+begins with the `EXECUTOR_START` signal.
+
+```
+Expected first signal:
+  EXECUTOR_START
+    spec: <specName>
+    task: <taskIndex>
+    agent: spec-executor v...
+```
+
+**If `EXECUTOR_START` is absent from spec-executor output:**
+- The delegation silently failed — the coordinator must NOT implement the task itself
+- Do NOT advance taskIndex
+- Do NOT mark the task complete
+- ESCALATE immediately:
+  ```
+  ESCALATE
+    reason: executor-not-invoked
+    task: <taskIndex — task title>
+    diagnosis: spec-executor subagent did not emit EXECUTOR_START.
+               This means either (A) the subagent was never invoked (wrong
+               subagent_type, plugin not loaded), (B) it timed out before
+               emitting the signal, or (C) the coordinator fell back to direct
+               implementation which is forbidden.
+    resolution:
+      1. Verify ralph-specum plugin is loaded (check Claude Code plugin config)
+      2. Verify subagent_type is "spec-executor" (not "ralph-specum:spec-executor")
+      3. Retry: /ralph-specum:implement --recovery-mode
+  ```
+
+> ⚠️ **Anti-pattern: coordinator self-implementation**  
+> The absence of `EXECUTOR_START` in a response that nonetheless contains
+> TASK_COMPLETE is a strong signal that the coordinator implemented the task
+> itself. This MUST be treated as an invocation failure, not a success.
+> Layer 1 contradiction check does NOT catch this — this check does.
+
 ### VERIFY Task Detection
 
 Before standard delegation, check if current task has [VERIFY] marker.
