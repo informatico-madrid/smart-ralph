@@ -174,6 +174,45 @@ Before delegating the current task:
 
 **Task Start SHA**: Before delegating any task, record `TASK_START_SHA=$(git rev-parse HEAD)`. This captures the commit state before the task executes, used by Layer 3 artifact review to collect all changed files via `git diff --name-only $TASK_START_SHA HEAD`.
 
+### EXECUTOR_START Verification (MANDATORY after every spec-executor delegation)
+
+After every delegation to spec-executor (sequential or parallel), verify the response
+begins with the `EXECUTOR_START` signal.
+
+```
+Expected first signal:
+  EXECUTOR_START
+    spec: <specName>
+    task: <taskIndex>
+    agent: spec-executor v...
+```
+
+**If `EXECUTOR_START` is absent from spec-executor output:**
+- The delegation silently failed — the coordinator must NOT implement the task itself
+- Do NOT advance taskIndex
+- Do NOT mark the task complete
+- ESCALATE immediately:
+  ```
+  ESCALATE
+    reason: executor-not-invoked
+    task: <taskIndex — task title>
+    diagnosis: spec-executor subagent did not emit EXECUTOR_START.
+               This means either (A) the subagent was never invoked (wrong
+               subagent_type, plugin not loaded), (B) it timed out before
+               emitting the signal, or (C) the coordinator fell back to direct
+               implementation which is forbidden.
+    resolution:
+      1. Verify ralph-specum plugin is loaded (check Claude Code plugin config)
+      2. Verify subagent_type is "spec-executor" (not "ralph-specum:spec-executor")
+      3. Retry: /ralph-specum:implement --recovery-mode
+  ```
+
+> ⚠️ **Anti-pattern: coordinator self-implementation**  
+> The absence of `EXECUTOR_START` in a response that nonetheless contains
+> TASK_COMPLETE is a strong signal that the coordinator implemented the task
+> itself. This MUST be treated as an invocation failure, not a success.
+> Layer 1 contradiction check does NOT catch this — this check does.
+
 ### VERIFY Task Detection
 
 Before standard delegation, check if current task has [VERIFY] marker.
@@ -195,6 +234,27 @@ Task: [Full task description]
 
 Task Body:
 [Include Do, Verify, Done when sections]
+
+## Delegation Contract
+
+### Design Decisions
+[Extract relevant design decisions from design.md for the verification scope.
+ For E2E verification: include Test Strategy section and any framework-specific decisions.]
+
+### Anti-Patterns (DO NOT)
+[List anti-patterns that apply to verification. For E2E/VE tasks ALWAYS include
+ the relevant sections from `${CLAUDE_PLUGIN_ROOT}/references/e2e-anti-patterns.md`,
+ plus any project-specific anti-patterns from .progress.md Learnings]
+
+### Required Skills (for VE tasks)
+[Same skill paths as sequential delegation — see above]
+
+### Source of Truth
+[Point to the authoritative files the qa-engineer MUST read before writing any code:
+ - design.md → ## Test Strategy (mock boundaries, test conventions, runner)
+ - requirements.md → ## Verification Contract (project type, entry points)
+ - .progress.md → Learnings (what failed before and why)
+ - If HA project: skills/e2e/examples/homeassistant-selector-map.skill.md]
 
 Instructions:
 1. Execute the verification as specified
@@ -226,6 +286,31 @@ Context from .progress.md:
 Current task from tasks.md:
 [Include full task block]
 
+## Delegation Contract
+
+### Design Decisions (from design.md)
+[Extract relevant design decisions for THIS task — architectural constraints,
+ technology choices, patterns chosen and patterns rejected]
+
+### Anti-Patterns (DO NOT)
+[List specific anti-patterns from design.md or .progress.md that apply to this task.
+ For E2E/VE tasks, ALWAYS include the anti-patterns from
+ `${CLAUDE_PLUGIN_ROOT}/references/e2e-anti-patterns.md` relevant to the task,
+ plus any project-specific anti-patterns from .progress.md Learnings]
+
+### Required Skills (for VE tasks)
+[List exact skill file paths the spec-executor must load for this task type.
+ For fullstack/frontend VE tasks:
+ - plugins/ralph-specum/skills/e2e/playwright-env.skill.md
+ - plugins/ralph-specum/skills/e2e/mcp-playwright.skill.md
+ - plugins/ralph-specum/skills/e2e/playwright-session.skill.md
+ If project uses Home Assistant:
+ - plugins/ralph-specum/skills/e2e/examples/homeassistant-selector-map.skill.md]
+
+### Success Criteria
+[Copy the Done when + Verify sections from the task, plus any additional
+ constraints from design.md Test Strategy]
+
 Instructions:
 1. Read Do section and execute exactly
 2. Only modify Files listed
@@ -235,6 +320,12 @@ Instructions:
 6. Mark task [x] in tasks.md
 7. Output TASK_COMPLETE when done
 ```
+
+**Delegation Contract Rules:**
+- The contract is MANDATORY for VE tasks, [VERIFY] tasks, and any Phase 3 (Testing) task.
+- For Phase 1-2 implementation tasks, the contract is optional but recommended when design.md contains relevant constraints.
+- Extract anti-patterns from: design.md Test Strategy, .progress.md Learnings (especially failures from prior tasks), and the task's own context.
+- Never delegate a VE task without listing the required skill paths — the subagent cannot discover skills it was not told about.
 
 Wait for spec-executor to complete. It will output TASK_COMPLETE on success.
 

@@ -151,6 +151,12 @@ Continuing...
    - If `--tasks-size` flag is absent: omit the `granularity` field entirely (do not add it)
 8. Create `.progress.md` with goal
 9. **Skill Discovery Pass 1** -- Scan all skill files and match against the goal text:
+   0. **Mandatory pre-scan: Context Audit** -- Before any semantic matching, ALWAYS invoke the context-auditor skill unconditionally:
+      - Invoke: `Skill({ skill: "ralph-specum:context-auditor" })`
+      - This is mandatory for every spec regardless of goal — do not skip, do not apply relevance matching
+      - On success: add `{ name: "context-auditor", source: "${CLAUDE_PLUGIN_ROOT}/skills/context-auditor/SKILL.md", matchedAt: "start", invoked: true }` to `discoveredSkills`
+      - On failure: add `{ name: "context-auditor", ..., invoked: false }`, log warning, continue
+      - Log in `## Skill Discovery` section: `- **context-auditor** (plugin): always-invoked (reason: mandatory system prompt validation)`
    1. Scan SKILL.md files from all skill paths (collect all skills before matching):
       - **Plugin skills**: `${CLAUDE_PLUGIN_ROOT}/skills/*/SKILL.md` → invoked as `Skill({ skill: "ralph-specum:<name>" })`
       - **Project skills**: `.agents/skills/*/SKILL.md` → invoked as `Skill({ skill: "<name>" })`

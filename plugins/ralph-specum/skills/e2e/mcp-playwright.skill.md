@@ -1,6 +1,6 @@
 ---
 name: mcp-playwright
-version: 7
+version: 8
 description: Load this skill when you need to verify UI features using MCP Playwright browser tools. Covers browser verification protocol, tool selection, dependency check, degradation strategy, cache/lock recovery, and signal emission.
 agents: [spec-executor, qa-engineer]
 ---
@@ -370,3 +370,20 @@ These flags are set in the **MCP server definition** (human config), not by the 
 - **Never skip the stable state check after navigation or action**.
 - **Never skip lock recovery (Step 0b) when isolated=false** — a stale lock from a crashed session blocks the next one.
 - **Never rely on HTTP disk cache being clean when isolated=false** — always assume the cache may contain stale responses.
+- **Never use `page.goto()` to navigate to internal app routes** — use UI navigation (sidebar clicks, menu items, links). `goto()` is only for the initial base URL. See `playwright-session.skill.md → Navigation Anti-Patterns` for details and the correct patterns.
+- **Never use `waitForTimeout()`** — always use condition-based waits: `waitForSelector`, `waitForURL`, `waitForResponse`, or `waitFor({ state })`.
+- **Never navigate to a URL containing `auth_callback`, `code=`, or `state=` parameters** — these are consumed OAuth tokens. Use `new URL(url).origin` to extract the base URL.
+- **Never invent selectors from memory** — read `ui-map.local.md` or use `browser_generate_locator` from the live page. Check the domain-specific selector map skill if the project has one (e.g., `skills/e2e/examples/homeassistant-selector-map.skill.md` for HA projects).
+- **Never write duplicate `waitForURL` calls** — each expected navigation state should have exactly one wait.
+
+---
+
+## Domain-Specific Resources
+
+For projects targeting specific platforms, load the domain selector map skill
+BEFORE writing any selectors or navigation code:
+
+| Platform | Skill | Key patterns |
+|---|---|---|
+| Home Assistant | `skills/e2e/examples/homeassistant-selector-map.skill.md` | `data-panel-id` sidebar nav, shadow DOM traversal, `data-testid` conventions, HA anti-patterns |
+| Generic | `skills/e2e/selector-map.skill.md` | Base selector hierarchy, `getByRole` > `getByTestId` > `locator` preference |

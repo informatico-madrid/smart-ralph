@@ -1,6 +1,6 @@
 ---
 name: playwright-env
-version: 8
+version: 10
 description: Load this skill before any MCP Playwright session. Resolves browser execution context — app URL, auth mode, credentials references, seed data, browser config, and safety limits. Emits ESCALATE if critical context is missing or app is unreachable.
 agents: [spec-executor, qa-engineer]
 ---
@@ -244,9 +244,49 @@ skipping it entirely, produces incorrect test state.
 
 ---
 
+## Module System Detection (MANDATORY — step 3, before writing infrastructure files)
+
+Before generating any TypeScript file that resolves paths at module level
+(`playwright.config.ts`, `global.setup.ts`, `global.teardown.ts`, etc.),
+detect the project's module system:
+
+```bash
+MODULE_TYPE=$(jq -r '.type // "commonjs"' package.json 2>/dev/null || echo "commonjs")
+echo "Project module type: $MODULE_TYPE"
+```
+
+Write result to `.ralph-state.json` alongside `playwrightEnv`:
+
+```bash
+jq --arg mt "$MODULE_TYPE" '.playwrightEnv.moduleType = $mt' \
+  <basePath>/.ralph-state.json > /tmp/state.json && mv /tmp/state.json <basePath>/.ralph-state.json
+```
+
+Values: `"module"` (ESM) or `"commonjs"` (CJS, the default if absent).
+
+**Path resolution rules based on module type:**
+
+| `moduleType` | Pattern to use | Never use |
+|---|---|---|
+| `"module"` (ESM) | `import { fileURLToPath } from 'url'` + `fileURLToPath(import.meta.url)` | `__dirname` bare, `process.cwd()`, `new URL(...).pathname` |
+| `"commonjs"` (CJS) | `__dirname` directly | `import.meta.url` |
+
+Persist in `.progress.md` so subsequent tasks in the same spec reuse the result
+without re-detecting:
+```markdown
+### Module System
+- Project type: ESM | CJS (detected from package.json)
+- Path resolution: fileURLToPath(import.meta.url) | __dirname
+```
+
+> **See also**: `references/e2e-anti-patterns.md → TypeScript Module System Anti-Patterns`
+> for the full table of common mistakes and their correct alternatives.
+
+---
+
 ## Write State
 
-Only after connectivity check passes and seed command succeeds (if set):
+Only after connectivity check passes, seed command succeeds (if set), and module type is detected:
 
 ```bash
 jq '.playwrightEnv = {
@@ -260,6 +300,7 @@ jq '.playwrightEnv = {
   "locale": "<resolved>",
   "timezone": "<resolved>",
   "isolated": <true|false>,
+  "moduleType": "<module|commonjs>",
   "resolvedAt": "<ISO 8601 timestamp — e.g. 2026-04-01T14:30:00Z>"
 }' <basePath>/.ralph-state.json > /tmp/state.json && mv /tmp/state.json <basePath>/.ralph-state.json
 ```
@@ -336,12 +377,33 @@ ESCALATE
 
 ---
 
+## Domain-Specific Resources
+
+After resolving the environment, check if the project targets a specific platform
+that has a dedicated selector map skill. Load the appropriate skill alongside
+this one to ensure correct selectors and navigation patterns.
+
+| Platform | Skill to load | Key content |
+|---|---|---|
+| Home Assistant | `skills/e2e/examples/homeassistant-selector-map.skill.md` | HA sidebar navigation (`data-panel-id`), shadow DOM traversal, `data-testid` conventions, HA-specific anti-patterns (no `entity_id` in selectors, no CSS class selectors, no `waitForTimeout`) |
+| Generic web app | `skills/e2e/selector-map.skill.md` | Base selector hierarchy and utilities |
+
+> **Why this matters**: Platform-specific skills contain anti-patterns that cause
+> test failures unique to that platform. For example, Home Assistant's sidebar
+> requires `data-panel-id` clicks — using `page.goto('/config/integrations')`
+> causes auth failures and TimeoutErrors because HA does not support deep linking
+> without an established session.
+
+---
+
 ## Done When
 
 - [ ] `appUrl` resolved into `RESOLVED_APP_URL` (applying all 5 sources)
 - [ ] `seedCommand` resolved into `RESOLVED_SEED_COMMAND` (env var or local.md)
 - [ ] Connectivity check passed (APP_REACHABLE) using `$RESOLVED_APP_URL`
 - [ ] Seed command ran and succeeded — or skipped (not configured / production)
+- [ ] **`moduleType` detected** from `package.json` (`"module"` or `"commonjs"`) and written to `.ralph-state.json → playwrightEnv.moduleType`
+- [ ] **Module type documented in `.progress.md`** under `### Module System` — enables subsequent tasks to reuse without re-detecting
 - [ ] `playwrightEnv` written to `.ralph-state.json` (non-secret fields only, including `resolvedAt`)
 - [ ] `resolvedAt` freshness verified when source 3 (state cache) was used — stale
   values (>2 hours) must trigger re-resolution from sources 1–2, not silent reuse
@@ -351,4 +413,5 @@ ESCALATE
 - [ ] `tokenLocalStorageKey` documented in `playwright-env.local.md` if `tokenBootstrapRule=localStorage`
 - [ ] Secret env vars referenced, not stored
 - [ ] `allowWrite` posture confirmed
+- [ ] Domain-specific selector map skill identified and noted for loading
 - [ ] Missing critical context results in `ESCALATE`, not improvisation

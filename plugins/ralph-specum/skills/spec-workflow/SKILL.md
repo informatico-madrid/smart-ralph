@@ -1,7 +1,7 @@
 ---
 name: spec-workflow
 description: This skill should be used when the user asks to "build a feature", "create a spec", "start spec-driven development", "run research phase", "generate requirements", "create design", "plan tasks", "implement spec", "check spec status", "triage a feature", "create an epic", "decompose a large feature", or needs guidance on spec-driven development workflow, phase ordering, or epic orchestration.
-version: 0.3.1
+version: 0.3.2
 ---
 
 # Spec Workflow
@@ -92,6 +92,19 @@ Loading order for UI VE tasks:
 > by `mcp-playwright` Step 0. Loading `playwright-session` before or in parallel
 > with `mcp-playwright` causes it to find the key absent and fall into degraded
 > mode incorrectly.
+
+### Domain-Specific Skill Loading
+
+For projects targeting specific platforms, the task-planner and spec-executor must
+also load the domain-specific selector map skill:
+
+| Platform | Detection signal | Additional skill |
+|---|---|---|
+| Home Assistant | `hass`, `home-assistant`, `lovelace`, `ha-` in project files or goal | `skills/e2e/examples/homeassistant-selector-map.skill.md` |
+| Generic web app | No platform-specific signals | `skills/e2e/selector-map.skill.md` (base selector utilities) |
+
+These skills contain navigation patterns and anti-patterns that prevent common
+E2E failures (e.g., HA sidebar requires `data-panel-id` clicks, not `page.goto()`).
 
 For API VE tasks (api-only projects): use WebFetch or `curl` directly — no e2e skills needed.
 

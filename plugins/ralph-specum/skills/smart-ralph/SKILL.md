@@ -1,7 +1,7 @@
 ---
 name: smart-ralph
 description: This skill should be used when the user asks about "ralph arguments", "quick mode", "commit spec", "max iterations", "ralph state file", "execution modes", "ralph loop", "coordinator behavior", "delegate to subagent", or needs guidance on Ralph plugin arguments, state management, delegation patterns, or execution loop behavior. Core behavioral skill for all Ralph Specum operations.
-version: 0.2.0
+version: 0.3.0
 user-invocable: false
 ---
 
@@ -111,5 +111,19 @@ The main agent is a coordinator, not an implementer. Delegate all work to subage
 | Design | architect-reviewer subagent |
 | Task planning | task-planner subagent |
 | Task execution | spec-executor subagent |
+
+### Delegation Contract (MANDATORY for VE/Test tasks)
+
+Every delegation prompt to spec-executor or qa-engineer for VE tasks, [VERIFY] tasks,
+or Phase 3 (Testing) tasks MUST include a Delegation Contract with:
+
+1. **Design Decisions** — relevant constraints from design.md
+2. **Anti-Patterns** — what NOT to do, with reasons (extracted from design.md, .progress.md Learnings, and skill files)
+3. **Required Skills** — exact file paths to skill files the subagent must load
+4. **Success Criteria** — Done when + Verify, plus any additional constraints
+
+See `references/coordinator-pattern.md → Task Delegation → Sequential Execution` for the full contract template.
+
+**Why**: Subagents execute in fresh context with no memory of prior decisions. Without the contract, they repeat diagnosed anti-patterns (e.g., using `page.goto()` for internal routes, hardcoding selectors, reusing consumed OAuth tokens). The contract is the mechanism to transfer accumulated knowledge from the coordinator to the executor.
 
 Quick mode still requires delegation.
