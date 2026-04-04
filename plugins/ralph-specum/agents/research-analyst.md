@@ -124,11 +124,16 @@ Quality Command discovery is essential because projects use different tools and 
    ```
    Look for keywords: `lint`, `typecheck`, `type-check`, `check-types`, `test`, `build`, `e2e`, `integration`, `unit`, `verify`, `validate`, `check`
 
-2. **Makefile** (if exists):
+2. **Makefile** (if exists) — read target names AND their bodies:
    ```bash
-   grep -E '^[a-z]+:' Makefile
+   # Step A: extract names + first 5 lines of each target body
+   grep -A5 -E '^[a-z][a-z_-]*:' Makefile 2>/dev/null | head -80 || echo "No Makefile"
+
+   # Step B: follow any shell scripts delegated from those targets
+   grep -oE '\./[a-zA-Z0-9/_-]+\.sh' Makefile 2>/dev/null | sort -u | \
+     while read s; do [ -f "$s" ] && echo "=== $s ===" && head -60 "$s"; done
    ```
-   Look for keywords: `lint`, `test`, `check`, `build`, `e2e`, `integration`, `unit`, `verify` targets
+   Look for keywords in bodies: `lint`, `test`, `check`, `build`, `e2e`, `integration`, `unit`, `verify`
 
 3. **CI configs** (.github/workflows/*.yml):
    ```bash
@@ -144,8 +149,10 @@ Run these discovery commands during research:
 # Check package.json scripts
 cat package.json | jq -r '.scripts | keys[]' 2>/dev/null || echo "No package.json"
 
-# Check Makefile targets
-grep -E '^[a-z_-]+:' Makefile 2>/dev/null | head -20 || echo "No Makefile"
+# Check Makefile — names + bodies + delegated scripts
+grep -A5 -E '^[a-z][a-z_-]*:' Makefile 2>/dev/null | head -80 || echo "No Makefile"
+grep -oE '\./[a-zA-Z0-9/_-]+\.sh' Makefile 2>/dev/null | sort -u | \
+  while read s; do [ -f "$s" ] && echo "=== $s ===" && head -60 "$s"; done
 
 # Check CI workflow commands
 grep -rh 'run:' .github/workflows/*.yml 2>/dev/null | head -20 || echo "No CI configs"
@@ -179,6 +186,14 @@ If a command type is not found in the project, mark as "Not found" so task-plann
 <mandatory>
 During research, discover available verification tooling for autonomous E2E verification (VE tasks). This data feeds VE1 (startup), VE2 (check), and VE3 (cleanup) task generation in the task-planner.
 
+**Key principle**: `UI Present` and `Browser Automation Installed` are two separate facts.
+- `UI Present` — determined by what the project IS (routes, views, components in source)
+- `Browser Automation Installed` — determined by what tools are available (deps, config files)
+
+The task-planner gates VE task generation on `UI Present`, NOT on `Browser Automation Installed`.
+If UI is present but no browser tool is installed, VE tasks are still generated — qa-engineer
+will emit `VERIFICATION_DEGRADED` and use non-browser signal layers as fallback.
+
 ### Detection Logic
 
 Run these commands to detect available verification tooling:
@@ -188,28 +203,42 @@ Run these commands to detect available verification tooling:
    jq -r '.scripts | to_entries[] | select(.key | test("dev|start|serve")) | "\(.key): \(.value)"' package.json 2>/dev/null || echo "No dev server scripts"
    ```
 
-2. **Browser automation deps** — check dependencies and devDependencies:
+2. **UI presence** — check for route/view/component files in source (project-agnostic signals):
+   ```bash
+   # Look for route definitions, view files, or component directories
+   find . -maxdepth 4 -not -path '*/node_modules/*' -not -path '*/.git/*' \
+     \( -name '*.html' -o -name '*.tsx' -o -name '*.vue' -o -name '*.svelte' \
+        -o -name 'routes.ts' -o -name 'router.ts' -o -name 'App.tsx' -o -name 'App.vue' \) \
+     2>/dev/null | head -10 || echo "No UI files found"
+
+   # Also check for web framework markers
+   jq -r '[(.dependencies // {}), (.devDependencies // {})] | add | to_entries[] |
+     select(.key | test("react|vue|svelte|angular|next|nuxt|remix|solid|astro|express|fastify|hono|koa")) |
+     "\(.key): \(.value)"' package.json 2>/dev/null || echo "No web framework deps"
+   ```
+
+3. **Browser automation deps** — check dependencies and devDependencies:
    ```bash
    jq -r '[(.dependencies // {}), (.devDependencies // {})] | add | to_entries[] | select(.key | test("playwright|puppeteer|cypress|selenium")) | "\(.key): \(.value)"' package.json 2>/dev/null || echo "No browser automation deps"
    ```
 
-3. **E2E config files** — look for framework config files in project root:
+4. **E2E config files** — look for framework config files in project root:
    ```bash
    ls playwright.config.* cypress.config.* cypress.json .cypressrc* wdio.conf.* 2>/dev/null || echo "No E2E config files"
    ```
 
-4. **Port detection** — extract port numbers from env files and package.json scripts:
+5. **Port detection** — extract port numbers from env files and package.json scripts:
    ```bash
    grep -ohE '(PORT|port)[=:]\s*[0-9]+' .env .env.local .env.development 2>/dev/null | head -5 || echo "No port in env files"
    jq -r '.scripts | to_entries[] | .value' package.json 2>/dev/null | grep -oE '\-\-port[= ][0-9]+|:[0-9]{4}' | head -5 || echo "No port in scripts"
    ```
 
-5. **Health endpoints** — search source for health/ready route definitions:
+6. **Health endpoints** — search source for health/ready route definitions:
    ```bash
    grep -rn "health\|healthz\|ready\|readiness" src/ app/ routes/ 2>/dev/null | grep -i "get\|route\|endpoint\|path" | head -5 || echo "No health endpoints found"
    ```
 
-6. **Docker detection** — check for containerization configs:
+7. **Docker detection** — check for containerization configs:
    ```bash
    ls Dockerfile docker-compose.yml docker-compose.yaml .dockerignore 2>/dev/null || echo "No Docker files"
    ```
@@ -224,25 +253,34 @@ Add to research.md:
 | Tool | Command | Detected From |
 |------|---------|---------------|
 | Dev Server | `npm run dev` | package.json scripts.dev |
-| Browser Automation | `playwright` | devDependencies |
+| Browser Automation Installed | `playwright` | devDependencies |
 | E2E Config | `playwright.config.ts` | project root |
 | Port | `3000` | .env / package.json |
 | Health Endpoint | `/api/health` | src/routes/ |
 | Docker | `docker-compose.yml` | project root |
 
+**UI Present**: Yes — routes/views/components found at [paths] / No — no UI files or web framework deps detected / Unknown — ambiguous signals
+**Browser Automation Installed**: Yes (`playwright@x.x`) / No
 **Project Type**: Web App / API / CLI / Mobile / Library
-**Verification Strategy**: Start dev server on port 3000, use curl to check health endpoint, use playwright for critical user flows / Build and verify import / Run CLI commands and check output
+**VE Task Strategy**:
+  - UI Present: Yes + Browser Automation Installed: Yes → VE tasks with playwright
+  - UI Present: Yes + Browser Automation Installed: No → VE tasks generated; qa-engineer uses VERIFICATION_DEGRADED (non-browser layers)
+  - UI Present: No → skip VE tasks; use API/CLI verification only
+**Verification Strategy**: [concrete description based on above]
 ```
 
-If no automated E2E tooling detected, output:
+If no UI and no automated E2E tooling detected, output:
 
 ```markdown
 ## Verification Tooling
 
-No automated E2E tooling detected. Fallback: build + import check only.
+No UI detected. No automated E2E tooling detected.
 
-**Project Type**: Library
-**Verification Strategy**: Build and verify artifact is importable
+**UI Present**: No
+**Browser Automation Installed**: No
+**Project Type**: Library / API / CLI
+**VE Task Strategy**: Skip VE tasks
+**Verification Strategy**: Build and verify artifact is importable / Run CLI commands and check output / curl endpoints
 ```
 </mandatory>
 

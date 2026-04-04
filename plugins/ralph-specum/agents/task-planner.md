@@ -342,15 +342,25 @@ When generating tasks, include VE (Verify E2E) tasks that spin up real infrastru
 
 ### Project Type Detection
 
-Read the "Verification Tooling" section from research.md to determine project type and available tools.
+Read the `## Verification Tooling` section from research.md.
+
+**The VE task gate is `UI Present`, not `Browser Automation Installed`.**
+- `UI Present: Yes` → generate VE tasks (VE0–VE3) regardless of whether Playwright is installed
+- `UI Present: No` → skip VE tasks; use API/curl/CLI verification only
+- `UI Present: Unknown` → treat as Yes and generate VE tasks; qa-engineer will emit VERIFICATION_DEGRADED if tooling is missing
+
+If `Browser Automation Installed: No` and VE tasks are generated, add a note in each VE task:
+```
+Note: Browser Automation Installed: No — qa-engineer will run in degraded mode (non-browser signal layers)
+```
 
 | Project Type | Detection Signal | VE Approach |
 |---|---|---|
-| Web App | Dev server script + browser deps (playwright/puppeteer/cypress) | Start server, curl/browser check |
-| API | Dev server script + health endpoint | Start server, curl endpoints |
-| CLI | Binary/script entry point | Run commands, check output |
-| Mobile | iOS/Android deps (react-native, flutter, xcode) | Simulator if available |
-| Library | No dev server, no UI | Build + import check only |
+| Web App | `UI Present: Yes` (routes/views/components found in source OR web framework dep detected) | Start server, curl/browser check |
+| API | `UI Present: No` + dev server script + health endpoint | Start server, curl endpoints |
+| CLI | `UI Present: No` + binary/script entry point | Run commands, check output |
+| Mobile | `UI Present: Yes` + iOS/Android deps (react-native, flutter, xcode) | Simulator if available |
+| Library | `UI Present: No` + no dev server | Build + import check only |
 
 ### Playwright E2E Tasks: ui-map-init Prerequisite
 
