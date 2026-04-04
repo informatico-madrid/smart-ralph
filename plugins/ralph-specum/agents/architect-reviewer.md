@@ -20,8 +20,9 @@ Use `basePath` for ALL file operations. Never hardcode `./specs/` paths.
 3. Design architecture that satisfies requirements
 4. Document technical decisions and trade-offs
 5. Define interfaces and data flow
-6. **Define Test Strategy** (mandatory — see below)
-7. Append learnings to .progress.md
+6. **Run Testing Discovery Checklist** (mandatory — see below)
+7. **Define Test Strategy** (mandatory — see below)
+8. Append learnings to .progress.md
 
 ## Use Explore for Codebase Analysis
 
@@ -71,6 +72,41 @@ What to append:
 - Existing patterns that must be followed
 - Technical debt that may affect implementation
 - Integration points that are complex or risky
+</mandatory>
+
+## Testing Discovery Checklist
+
+<mandatory>
+Run this checklist AFTER design is drafted, BEFORE marking design complete.
+Purpose: verify the test infrastructure is real before the executor tries to use it.
+
+**Step 1 — Runner detection**
+```bash
+cat package.json | grep -E '"test"|vitest|jest|mocha|playwright'
+```
+- If runner found → document exact command in Test File Conventions
+- If runner NOT found:
+  - WebFetch official docs (vitest.dev, jestjs.io) to find setup steps
+  - Add an infrastructure task to tasks.md: "Configure test runner"
+  - If runner cannot be installed (e.g. locked environment) → ESCALATE before closing design
+
+**Step 2 — Execution command inventory**
+Document in Test File Conventions the exact commands that exist today:
+- Unit: `npm run test` / `vitest run src/`
+- Integration: `vitest run --config vitest.integration.config.ts` (if separate config exists)
+- E2E: `playwright test` (if Playwright is installed)
+
+If a command does not exist yet, mark it as `TO CREATE` — the executor will add the npm script.
+
+**Step 3 — Smoke run**
+```bash
+npm test 2>&1 | head -5
+```
+- Exit 0 with "no test files found" → runner ready, proceed
+- Exit non-0 with config/module error → runner broken → add infrastructure task FIRST, ESCALATE if unresolvable
+- Exit non-0 with actual test failures → existing regression, document in .progress.md before proceeding
+
+**Only proceed to Test Strategy after this checklist passes or is explicitly unblocked.**
 </mandatory>
 
 ## Design Structure
@@ -170,9 +206,9 @@ Use the right type of double for each situation. These are not interchangeable:
 
 | Type | What it does | When to use |
 |---|---|---|
-| **Stub** | Returns predefined data, no behavior | Isolate SUT from external I/O when only the SUT’s output matters |
+| **Stub** | Returns predefined data, no behavior | Isolate SUT from external I/O when only the SUT's output matters |
 | **Fake** | Simplified real implementation (e.g. in-memory DB) | Integration tests needing real behavior without real infrastructure |
-| **Mock** | Verifies interactions (call args, call count) | Only when the interaction itself is the observable outcome (e.g. “email sent”, “API called”) |
+| **Mock** | Verifies interactions (call args, call count) | Only when the interaction itself is the observable outcome (e.g. "email sent", "API called") |
 | **Fixture** | Predefined data state, not code | Any test that needs known initial data — does not replace code, prepares data |
 
 > Own wrapper ≠ external dependency. If you wrote `StripeClient`, it is yours —
@@ -181,13 +217,13 @@ Use the right type of double for each situation. These are not interchangeable:
 > **Consistency rule**: every word you write in a Mock Boundary cell must match
 > one of the four types above. Before filling a cell, ask:
 > - Am I verifying the interaction itself? → **Mock**
-> - Am I just isolating from I/O and only care about the SUT’s return value? → **Stub**
+> - Am I just isolating from I/O and only care about the SUT's return value? → **Stub**
 > - Do I need real behavior but without real infrastructure? → **Fake**
 > - Do I need initial data, not a code replacement? → **Fixture**
 >
 > The most common mistake: using Mock when Stub is correct. If you write
-> `expect(dep).toHaveBeenCalled()` but you actually care about the SUT’s
-> return value — that’s a Stub situation, not a Mock.
+> `expect(dep).toHaveBeenCalled()` but you actually care about the SUT's
+> return value — that's a Stub situation, not a Mock.
 
 ### Mock Boundary
 
@@ -268,18 +304,32 @@ mock-heavy tests — wasting iterations.
 
 **Quality bar:**
 - Mock Boundary: no generic layer names ("Database", "HTTP") — use actual class/module names from this design
-- Mock Boundary cells: each cell must use one of the four types from Test Double Policy — stub / fake / mock / none. If you write "mock" in a cell, the interaction must be the observable outcome. If you write "stub", only the SUT’s return value matters. See the Consistency rule in Test Double Policy.
+- Mock Boundary cells: each cell must use one of the four types from Test Double Policy — stub / fake / mock / none. If you write "mock" in a cell, the interaction must be the observable outcome. If you write "stub", only the SUT's return value matters. See the Consistency rule in Test Double Policy.
 - Test Coverage: if it says "unit test for X" it must say what X returns, not just "test X"
 - Fixtures: if a component needs data to run, that data must be described here
 - Test double column: must say stub/fake/mock/none — not just "mock"
 
+**Cross-table consistency rule:**
+Every component row in Mock Boundary MUST have at least one matching row in the Coverage Table.
+Conversely, every component in the Coverage Table MUST appear in Mock Boundary.
+
+Before closing design, run this check mentally:
+- For each Mock Boundary row → find the Coverage Table row for the same component
+  - If Mock Boundary says "Mock" for unit → Coverage Table must assert an interaction (e.g. "assert send was called"), NOT a return value
+  - If Mock Boundary says "Stub" for unit → Coverage Table must assert the SUT's return value, NOT that the dependency was called
+  - If a component appears in Mock Boundary but NOT in Coverage Table → add the missing row or ESCALATE
+  - If a component appears in Coverage Table but NOT in Mock Boundary → add the missing row or ESCALATE
+
 **Checklist before marking design complete:**
+- [ ] Testing Discovery Checklist passed (runner verified, commands documented)
 - [ ] Test Double Policy filled for this spec's actual boundaries
 - [ ] Mock Boundary uses real component names with unit/integration columns
 - [ ] Mock Boundary cells use the correct type per the Consistency rule (stub ≠ mock)
+- [ ] Every Mock Boundary row has a matching Coverage Table row (cross-table consistency)
+- [ ] Every Coverage Table row has a matching Mock Boundary row (cross-table consistency)
 - [ ] Fixtures & Test Data has one row per stateful component
 - [ ] Test Coverage Table has one row per component with concrete assertion
-- [ ] Test File Conventions filled from actual codebase scan
+- [ ] Test File Conventions filled from actual codebase scan (or marked TO CREATE)
 </mandatory>
 
 ## Analysis Process
@@ -302,7 +352,9 @@ Before completing design:
 - [ ] Interfaces are well-defined
 - [ ] Data flow is documented
 - [ ] Trade-offs are explicit
+- [ ] **Testing Discovery Checklist passed** (runner verified, smoke run clean)
 - [ ] **Test Strategy complete** (Double Policy + Mock Boundary + Fixtures + Coverage Table + Conventions)
+- [ ] **Cross-table consistency verified** (every Mock Boundary row ↔ Coverage Table row)
 - [ ] Follows existing codebase patterns
 - [ ] Set awaitingApproval in state (see below)
 
