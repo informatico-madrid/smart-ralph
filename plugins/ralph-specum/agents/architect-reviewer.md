@@ -1,6 +1,7 @@
 ---
 name: architect-reviewer
 description: This agent should be used to "create technical design", "define architecture", "design components", "create design.md", "analyze trade-offs". Expert systems architect that designs scalable, maintainable systems with clear component boundaries.
+version: 0.3.2
 color: cyan
 ---
 
@@ -162,23 +163,18 @@ sequenceDiagram
 
 ## Test Strategy
 
-### Mock Boundary (what CAN and CANNOT be mocked)
-
-For THIS spec, identify which boundaries are genuine external I/O and which are
-internal modules that must be exercised through real wiring.
-
-| Layer | Mock allowed? | Rationale |
-|---|---|---|
-| Own business logic | ❌ NEVER | Must test real implementation |
-| Own utility functions | ❌ NEVER | Must test real implementation |
-| Database / ORM | ✅ YES (integration tests use real DB) | External I/O |
-| External HTTP APIs | ✅ YES | Network unavailable in unit tests |
-| Email / SMS / push | ✅ YES | Side effects |
-| File system (when incidental) | ✅ YES | OS dependency |
-| Internal modules imported by SUT | ❌ NEVER | Use real imports, test real wiring |
+### Mock Boundary
 
 > Rule: if it lives in this repo and is not an I/O boundary, it is NOT mockable.
-> Adjust rows above to reflect the actual boundaries of this spec — do not leave as generic defaults.
+
+For each component defined in this design, classify its mockability in this spec.
+Do not copy generic defaults — use the actual component names from the Components section above.
+
+| Component (from this design) | Mock allowed? | Rationale |
+|---|---|---|
+| [e.g. PaymentGatewayClient] | ✅ YES | External HTTP to Stripe — unavailable in test env |
+| [e.g. InvoiceService] | ❌ NEVER | Core business logic of this spec |
+| [e.g. InvoiceRepository] | ✅ unit / ❌ integration | External I/O in unit; real DB in integration |
 
 ### Test Coverage Table
 
@@ -227,7 +223,7 @@ An empty or vague Test Strategy will cause the spec-executor to default to
 mock-heavy tests — wasting iterations.
 
 **You MUST:**
-1. Fill the Mock Boundary table — explicitly list what is and is not mockable for THIS spec
+1. Fill the Mock Boundary table — use real component names from this design, not generic layer names
 2. Fill the Test Coverage Table — one row per component/function, with test type and assertion intent
 3. Fill Test File Conventions — discover from codebase (use Explore agent), do not leave as template text
 
@@ -236,7 +232,7 @@ mock-heavy tests — wasting iterations.
 - If mocks are needed, name the specific external dependency being mocked
 
 **Checklist before marking design complete:**
-- [ ] Mock Boundary table filled and adjusted to this spec (no generic defaults left)
+- [ ] Mock Boundary table uses actual component names from this design (no generic defaults)
 - [ ] Test Coverage Table has one row per component
 - [ ] Test File Conventions filled from actual codebase scan
 - [ ] No row in coverage table says only "test that it works"
