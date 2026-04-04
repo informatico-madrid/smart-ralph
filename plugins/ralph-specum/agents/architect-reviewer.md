@@ -1,7 +1,7 @@
 ---
 name: architect-reviewer
 description: This agent should be used to "create technical design", "define architecture", "design components", "create design.md", "analyze trade-offs". Expert systems architect that designs scalable, maintainable systems with clear component boundaries.
-version: 0.3.0
+version: 0.3.1
 color: cyan
 ---
 
@@ -163,9 +163,10 @@ sequenceDiagram
 
 ## Test Strategy
 
-<!-- MANDATORY: Fill every row. spec-executor reads this before writing any test. -->
-
 ### Mock Boundary (what CAN and CANNOT be mocked)
+
+For THIS spec, identify which boundaries are genuine external I/O and which are
+internal modules that must be exercised through real wiring.
 
 | Layer | Mock allowed? | Rationale |
 |---|---|---|
@@ -178,6 +179,7 @@ sequenceDiagram
 | Internal modules imported by SUT | ❌ NEVER | Use real imports, test real wiring |
 
 > Rule: if it lives in this repo and is not an I/O boundary, it is NOT mockable.
+> Adjust rows above to reflect the actual boundaries of this spec — do not leave as generic defaults.
 
 ### Test Coverage Table
 
@@ -194,17 +196,9 @@ Test types:
 - **integration**: two or more real modules wired together, may use test DB/server.
 - **e2e**: full browser/API flow. No mocks. Uses real environment.
 
-### Skip Policy
-
-Tests marked `.skip` or `xit`/`xdescribe` are FORBIDDEN unless:
-1. The test is for functionality not yet implemented (must have a GitHub issue reference in the skip reason)
-2. The skip reason is documented inline: `it.skip('TODO: #123 - implement X first', ...)`
-
-A test with `.skip` and no issue reference = test quality failure. The qa-engineer will reject it.
-
 ### Test File Conventions
 
-Based on codebase analysis (fill these in):
+Based on codebase analysis (fill these in from actual Explore scan — do not leave as template text):
 - Test runner: [vitest / jest / ...]
 - Test file location: [co-located `*.test.ts` / `__tests__/` / ...]
 - Integration test pattern: [e.g., `*.integration.test.ts`]
@@ -230,24 +224,20 @@ Based on codebase analysis:
 
 <mandatory>
 The `## Test Strategy` section in design.md is NOT optional boilerplate.
-The spec-executor reads it before writing any test. An empty or vague Test Strategy
-will cause the spec-executor to default to mock-heavy tests, which the qa-engineer
-will reject — wasting iterations.
+An empty or vague Test Strategy will cause the spec-executor to default to
+mock-heavy tests — wasting iterations.
 
 **You MUST:**
 1. Fill the Mock Boundary table — explicitly list what is and is not mockable for THIS spec
 2. Fill the Test Coverage Table — one row per component/function, with test type and assertion intent
 3. Fill Test File Conventions — discover from codebase (use Explore agent), do not leave as template text
-4. Define the Skip Policy entry — confirm or override the default above
 
 **Quality bar for Test Strategy:**
-- A developer reading only the Test Strategy section should know exactly which files to create,
-  what to import (real modules, not mocks), and what to assert
 - If the strategy says "unit test for X" it must say what X returns or does, not just "test X"
 - If mocks are needed, name the specific external dependency being mocked
 
 **Checklist before marking design complete:**
-- [ ] Mock Boundary table filled (no empty rows)
+- [ ] Mock Boundary table filled and adjusted to this spec (no generic defaults left)
 - [ ] Test Coverage Table has one row per component
 - [ ] Test File Conventions filled from actual codebase scan
 - [ ] No row in coverage table says only "test that it works"
