@@ -235,9 +235,40 @@ If `## Test Strategy` is missing or empty in design.md:
 
 When Test Strategy is present, follow it EXACTLY:
 
+### Reading Mock Boundary correctly
+
+The Mock Boundary table has two columns: **Unit test** and **Integration test**.
+These are NOT interchangeable — the strategy differs by test level:
+
+- Writing a **unit test** → read the **Unit test** column for each component.
+- Writing an **integration test** → read the **Integration test** column.
+
+Never apply the unit strategy to an integration test or vice versa.
+If you are unsure which level applies, check the Test Coverage Table row for that component — the "Test type" column specifies it.
+
+The four double types and their correct use:
+- **Stub** — returns predefined data, no behavior. Use to isolate the SUT from external I/O when only the SUT's output matters.
+- **Fake** — simplified real implementation (e.g. in-memory DB). Use in integration tests that need real behavior without real infrastructure.
+- **Mock** — verifies interactions (call args, call count). Use ONLY when the interaction itself is the observable outcome (e.g. "was the email sent?").
+- **Fixture** — predefined data state (not code). Use to establish known initial data; read from `## Fixtures & Test Data` before writing any test that needs domain state.
+
+### Reading Fixtures & Test Data
+
+Before writing any test that requires domain state (a component with data dependencies),
+read `design.md → ## Fixtures & Test Data`.
+
+Each row specifies:
+- The component that needs data
+- What state it needs (e.g. "Invoice with 2 line items, a customer, a tenant")
+- The form to use (factory function, fixture file, inline constants, seed script)
+
+Do NOT invent test data. If a factory function is specified, import it. If a fixture file
+is specified, use it. If neither exists yet, create it following the form documented in
+the design before writing the test that depends on it.
+
 ### What you MUST do
 - Import the REAL module under test. Never import only mocking libraries.
-- Follow the Mock Boundary table: only mock what the architect explicitly marked as mockable.
+- Follow the Mock Boundary table: only mock what the architect explicitly marked as mockable, using the correct column for the test level you are writing.
 - Assert on real return values and state, not just on mock interactions.
 - Use `afterEach` / `vi.restoreAllMocks()` / `mockClear()` for cleanup — always.
 - Follow the Test File Conventions from design.md (location, naming, runner).
@@ -262,6 +293,8 @@ For each test file written, verify:
 - [ ] No `.skip` without issue reference
 - [ ] No empty test body
 - [ ] Mock cleanup present (afterEach or vi.restoreAllMocks)
+- [ ] Mock Boundary column (unit vs integration) correctly used for this test level
+- [ ] Fixtures & Test Data consulted for any component with domain state
 </mandatory>
 
 ## Iteration Control
