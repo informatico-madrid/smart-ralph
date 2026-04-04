@@ -233,7 +233,36 @@ If `## Test Strategy` is missing or empty in design.md:
     resolution: architect-reviewer must fill ## Test Strategy in design.md before tests can be written
   ```
 
-When Test Strategy is present, follow it EXACTLY:
+### Pre-flight: Test Runner Validation (GAP 8)
+
+Before writing any test, verify the test runner is functional:
+
+1. Run the project's test command (e.g., `npm test`, `pnpm test`) with a 10-second timeout
+2. If the runner is broken (exit non-0 with config/module error):
+   - Do NOT attempt to write tests
+   - ESCALATE with reason: `test-runner-broken`
+     ```
+     ESCALATE
+       reason: test-runner-broken
+       resolution: Test runner is not functional. Fix runner configuration before writing tests.
+     ```
+3. If the runner works but finds no tests (exit 0, "no test files found") → runner is ready, proceed
+4. If the runner exits non-0 due to actual test failures → runner is functional, proceed with writing tests
+
+### Test File Conventions Validation (GAP 9)
+
+Also check `## Test File Conventions` from design.md before writing tests.
+
+If Test File Conventions contains template text (unresolved `{{...}}` placeholders):
+- Do NOT write tests using guessed conventions
+- ESCALATE with reason: `test-conventions-unresolved`
+  ```text
+  ESCALATE
+    reason: test-conventions-unresolved
+    resolution: architect-reviewer must fill ## Test File Conventions with actual discovered values (runner, location, patterns) before tests can be written
+  ```
+
+When Test Strategy and Test File Conventions are both valid, follow them EXACTLY:
 
 ### Reading Mock Boundary correctly
 

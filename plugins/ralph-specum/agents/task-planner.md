@@ -336,14 +336,21 @@ When generating Phase 3 (Testing) tasks, do NOT invent test categories generical
 
 **Protocol**:
 1. Read the Test Coverage Table from design.md. Each row is one component/function with a test type, assertion intent, and test double.
-2. Generate **one task per row** in the table. Do not merge rows or invent additional rows.
-3. For each task, use the row's data directly:
+2. Read the File Structure from design.md. Extract all component names that have a "Create" or "Modify" action.
+3. For each component in the Coverage Table, verify it exists in the File Structure (Create or Modify). If a component appears in Coverage Table but has no corresponding File Structure entry:
+   ```
+   ESCALATE
+     reason: coverage-table-component-not-in-file-structure
+     resolution: Component 'X' appears in Test Coverage Table but was not created or modified in Phase 1/2. Either add it to File Structure or remove it from Coverage Table.
+   ```
+4. Generate **one task per row** in the table. Do not merge rows or invent additional rows.
+5. For each task, use the row's data directly:
    - **Do**: Write the test described in "What to assert" for this component.
    - **Files**: Use the test file location from `## Test File Conventions` in design.md.
    - **Test double**: Use the value in the "Test double" column — `none`, `stub`, `fake`, or `mock`. Do not substitute.
    - **Fixtures**: If the component appears in `## Fixtures & Test Data`, include a sub-step to set up the specified factory/fixture before the test body.
    - **Verify**: Run the test runner scoped to this test file (e.g., `pnpm test -- <file>`).
-4. After all Coverage Table rows, add one `[VERIFY]` quality checkpoint that runs the full test suite.
+6. After all Coverage Table rows, add one `[VERIFY]` quality checkpoint that runs the full test suite.
 
 **If the Test Coverage Table is empty or missing**: do NOT generate Phase 3 tasks. ESCALATE:
 ```text

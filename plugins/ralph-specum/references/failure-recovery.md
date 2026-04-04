@@ -179,7 +179,7 @@ Fix Task ID: $taskId.$attemptNumber
   where attemptNumber = fixTaskMap[taskId].attempts + 1 (or 1 if first attempt)
 
 Fix Task Format:
-- [ ] $taskId.$attemptNumber [FIX $taskId] Fix: $errorSummary
+- [ ] $taskId.$attemptNumber [FIX $taskId] [fix_type:$fixType] Fix: $errorSummary
   - **Do**: Address the error: $failure.error
     1. Analyze the failure: $failure.attemptedFix
     2. Review related code in Files list
@@ -197,6 +197,7 @@ Fix Task Format:
 | errorSummary         | First 50 chars of failure.error     | "task $taskId failure"         |
 | failure.error        | Parsed from Error: line             | "Task execution failed"        |
 | failure.attemptedFix | Parsed from Attempted fix: line     | "No previous fix attempted"    |
+| fixType              | Failure classification (impl_bug / test_quality / env_issue / spec_ambiguity / flaky) | "impl_bug" |
 | originalTask.files   | Files field from original task      | Same directory as original     |
 | originalTask.verify  | Verify field from original task     | "echo 'Verify manually'"      |
 | $scope               | Derived from spec name or task area | "recovery"                     |
@@ -225,7 +226,7 @@ Failure object:
 
 Generated fix task:
 ```markdown
-- [ ] 1.3.1 [FIX 1.3] Fix: File not found: src/parser.ts
+- [ ] 1.3.1 [FIX 1.3] [fix_type:impl_bug] Fix: File not found: src/parser.ts
   - **Do**: Address the error: File not found: src/parser.ts
     1. Analyze the failure: Checked alternate paths
     2. Review related code in Files list
@@ -356,7 +357,7 @@ Use the Edit tool to cleanly insert the fix task after the current task block.
    - Start with newline if needed for spacing
    - Add the complete fix task markdown block:
    ```markdown
-   - [ ] X.Y.N [FIX X.Y] Fix: $errorSummary
+   - [ ] X.Y.N [FIX X.Y] [fix_type:$fixType] Fix: $errorSummary
      - **Do**: Address the error: $errorDetails
        1. Analyze the failure: $attemptedFix
        2. Review related code in Files list
@@ -401,7 +402,7 @@ After insertion:
   - **Verify**: grep pattern
   - **Commit**: feat: add parser
 
-- [ ] 1.3.1 [FIX 1.3] Fix: File not found error
+- [ ] 1.3.1 [FIX 1.3] [fix_type:impl_bug] Fix: File not found error
   - **Do**: Address the error: File not found
     1. Analyze the failure: Checked alternate paths
     2. Review related code in Files list

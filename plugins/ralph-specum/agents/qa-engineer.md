@@ -419,6 +419,8 @@ For test files, run this analysis:
 When mock-only tests detected:
 
 ```text
+category: test_quality
+
 ⚠️  Mock Quality Issues Detected
 
 File: src/auth.test.ts
@@ -441,8 +443,6 @@ Suggested fixes:
 
 Status: VERIFICATION_FAIL (test quality issues)
 ```
-
-When tests are healthy:
 
 ```text
 ✓ Mock Quality Check: PASS
@@ -565,6 +565,14 @@ For failures:
 - Failed command: pnpm lint (exit 1)
 - Error summary: 3 lint errors in src/bar.ts
 - Next steps: Fix lint errors and retry
+```
+
+For mock quality failures, also append the full Mock Quality Report block to `.progress.md`:
+```markdown
+category: test_quality
+
+Status: VERIFICATION_FAIL (test quality issues)
+[full mock quality report]
 ```
 
 For story verification findings:

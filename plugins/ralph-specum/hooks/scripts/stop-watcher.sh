@@ -346,10 +346,13 @@ Automatic repair has been exhausted.
 1. Review $SPEC_PATH/requirements.md — Verification Contract for '$FAILED_STORY'
 2. Review $SPEC_PATH/tasks.md — task at index $ORIGIN_TASK
 3. Check $SPEC_PATH/.progress.md for failure details
-4. Fix manually or clarify the spec
-5. Reset repair state: update .ralph-state.json — set phase back to "execution",
+4. Check $SPEC_PATH/design.md → Mock Boundary
+   The declared double type may be architecturally incorrect for this component
+   (e.g., "Real" for a component with circular dependencies that prevents real testing).
+5. Fix manually or clarify the spec
+6. Reset repair state: update .ralph-state.json — set phase back to "execution",
    repairIteration to 0, remove failedStory and originTaskIndex
-6. Resume with /ralph-specum:implement
+7. Resume with /ralph-specum:implement
 ESCALATE_EOF
 )
             jq -n \
@@ -374,26 +377,28 @@ Spec: $SPEC_PATH | Failed story: $FAILED_STORY | Origin task index: $ORIGIN_TASK
 ## Action
 1. Read $SPEC_PATH/requirements.md — Verification Contract for '$FAILED_STORY'
 2. Read $SPEC_PATH/.progress.md — identify root cause of VERIFICATION_FAIL
-3. Classify failure type:
+3. Check for structured category signal:
+   - grep "category:" $SPEC_PATH/.progress.md | tail -1
+   - If "category: test_quality" found → classify as test_quality (do NOT re-classify as impl_bug)
+4. Classify failure type (skip if category: already determined above):
    - impl_bug: implementation does not match the Observable signals
    - env_issue: environment/dependency problem (DB, service, config)
    - spec_ambiguity: the contract is unclear or contradictory
    - flaky: non-deterministic failure (timing, race condition)
-   - test_quality: test itself is poorly designed (mock assertions pass but test does not verify real behavior)
-     * qa-engineer detected: mock-only tests, missing real imports, high mock/assertion ratio
-     * Fix: delegate a test-rewrite task, NOT an implementation fix
-4. If impl_bug: backtrack to origin task $ORIGIN_TASK in tasks.md, delegate
+   - test_quality: qa-engineer detected mock-only tests, missing real imports, high mock/assertion ratio
+5. If impl_bug: backtrack to origin task $ORIGIN_TASK in tasks.md, delegate
    a targeted fix to spec-executor. Do NOT re-implement unrelated tasks.
-5. If env_issue: report the specific env problem and halt (set awaitingApproval=true)
-6. If spec_ambiguity: propose a clarification to the Verification Contract and halt
-7. If flaky: retry the verification once more via qa-engineer [STORY-VERIFY]
-8. If test_quality: delegate a test-rewrite task (NOT implementation fix) to spec-executor,
+6. If env_issue: report the specific env problem and halt (set awaitingApproval=true)
+7. If spec_ambiguity: propose a clarification to the Verification Contract and halt
+8. If flaky: retry the verification once more via qa-engineer [STORY-VERIFY]
+9. If test_quality: delegate a test-rewrite task (NOT implementation fix) to spec-executor,
    targeting the test file and fixing: real module imports, mock/assertion ratio, state-based assertions
-9. After fix: re-run qa-engineer [STORY-VERIFY] for '$FAILED_STORY' only
-10. Update .ralph-state.json: increment repairIteration to $NEXT_REPAIR
-11. On VERIFICATION_PASS: reset repair state (remove failedStory, repairIteration,
+   Note: Pass fix_type=test_quality in the task delivery so spec-executor knows it is a test rewrite.
+10. After fix: re-run qa-engineer [STORY-VERIFY] for '$FAILED_STORY' only
+11. Update .ralph-state.json: increment repairIteration to $NEXT_REPAIR
+12. On VERIFICATION_PASS: reset repair state (remove failedStory, repairIteration,
     originTaskIndex), resume normal execution from taskIndex
-12. On VERIFICATION_FAIL again: this hook will escalate on next iteration
+13. On VERIFICATION_FAIL again: this hook will escalate on next iteration
 
 ## Critical
 - Surgical fix only — do NOT touch unrelated tasks or files

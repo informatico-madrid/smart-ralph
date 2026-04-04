@@ -378,6 +378,12 @@ Proceed to Progress Merge and State Update.
 
 **Fix Task Bypass**: If the just-completed task is a fix task (task description contains `[FIX`), skip verification layers entirely and proceed directly to retry the original task per `${CLAUDE_PLUGIN_ROOT}/references/failure-recovery.md` "Execute Fix Task and Retry Original" section. Fix tasks are intermediate — only the original task's completion triggers full verification.
 
+When delegating a fix task to spec-executor, extract `fix_type` from the task's `[fix_type:xxx]` tag and pass it explicitly in the task delivery prompt:
+```
+fix_type: <xxx>  # e.g., test_quality — determines whether to fix code or rewrite test
+```
+This lets spec-executor know without inference whether to treat the fix as an implementation correction or a test rewrite. See `failure-recovery.md` "Generate Fix Task Markdown" for the fix_type values.
+
 If spec-executor output contains `TASK_MODIFICATION_REQUEST`:
 1. Process modification per the Modification Request Handler
 2. After processing, check if TASK_COMPLETE was also output (for SPLIT_TASK and ADD_FOLLOWUP)
