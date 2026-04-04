@@ -108,32 +108,59 @@ interface {{ComponentOutput}} {
      spec-executor reads this section before writing any test file.
      An empty or vague Test Strategy causes spec-executor to ESCALATE. -->
 
+### Test Double Policy
+
+| Type | What it does | When to use |
+|---|---|---|
+| **Stub** | Returns predefined data, no behavior | Isolate SUT from external I/O when only the SUT's output matters |
+| **Fake** | Simplified real implementation (e.g. in-memory DB) | Integration tests needing real behavior without real infrastructure |
+| **Mock** | Verifies interactions (call args, call count) | Only when the interaction itself is the observable outcome (e.g. "email sent", "API called") |
+| **Fixture** | Predefined data state, not code | Any test that needs known initial data — does not replace code, prepares data |
+
+> Rule: if it lives in this repo and is not an I/O boundary, test it real — do not stub it.
+
 ### Mock Boundary
 
-| Layer | Mock allowed? | Rationale |
-|---|---|---|
-| Own business logic | ❌ NEVER | Must test real implementation |
-| Own utility functions | ❌ NEVER | Must test real implementation |
-| Internal modules imported by SUT | ❌ NEVER | Use real imports, test real wiring |
-| Database / ORM | ✅ YES (integration tests use real DB) | External I/O |
-| External HTTP APIs | ✅ YES | Network unavailable in unit tests |
-| Email / SMS / push | ✅ YES | Side effects |
-| {{Add project-specific rows}} | {{?}} | {{Rationale}} |
+<!-- Use actual component names from this design. Do NOT use generic layer names ("Database", "HTTP").
+     Columns: unit test | integration test — they differ. Fill both.
+     Each cell must use one of: stub / fake / mock / none
+       mock  → the interaction IS the observable outcome (assert it was called)
+       stub  → only the SUT's return value matters (don't assert the call)
+       fake  → real behavior, simplified infrastructure (e.g. in-memory DB)
+       none  → test it real (own logic, no I/O)
+-->
 
-> Rule: if it lives in this repo and is not an I/O boundary, it is NOT mockable.
+| Component (from this design) | Unit test | Integration test | Rationale |
+|---|---|---|---|
+| {{ComponentA}} | {{stub / fake / mock / none}} | {{stub / fake / mock / none}} | {{Why this type at each level}} |
+| {{ComponentB}} | {{stub / fake / mock / none}} | {{stub / fake / mock / none}} | {{Why this type at each level}} |
+
+### Fixtures & Test Data
+
+<!-- The architect knows the domain model. Specify what data state each component needs.
+     The executor cannot infer this — it must be explicit here. -->
+
+| Component | Required state | Form |
+|---|---|---|
+| {{ComponentA}} | {{e.g. Invoice with 2 line items}} | {{Factory fn / fixture file / inline constants}} |
+| {{E2E flows}} | {{e.g. Seed user with role X}} | {{Seed script, documented in Verification Contract}} |
 
 ### Test Coverage Table
 
-| Component / Function | Test type | What to assert | Mocks needed |
+| Component / Function | Test type | What to assert | Test double |
 |---|---|---|---|
 | {{ComponentA.methodX}} | unit | {{Returns expected value for input Y}} | none |
-| {{ComponentA → ExternalService}} | integration | {{HTTP call made with correct payload}} | mock ExternalService |
-| {{User flow: action → result}} | e2e | {{URL changes, user sees expected state}} | none (real browser) |
+| {{ComponentA → ExternalService}} | integration | {{Response mapped to domain model correctly}} | stub HTTP |
+| {{User flow: action → result}} | e2e | {{URL changes, user sees expected state}} | none (real env) |
 
 Test types:
-- **unit**: pure logic, no I/O, runs in <10ms. Mock only true I/O boundaries.
-- **integration**: two or more real modules wired together, may use test DB/server.
-- **e2e**: full browser/API flow. No mocks. Uses real environment.
+- **unit**: pure logic, no I/O, runs fast. Stub only true I/O boundaries.
+- **integration**: two or more real modules wired together. Use Fake or real test DB, not mocks.
+- **e2e**: full flow, real environment. No doubles of any kind.
+
+> **Cross-table consistency**: every row in Mock Boundary must have a matching row in Coverage Table
+> and vice versa. If Mock Boundary says "mock" for a component, Coverage Table must assert an
+> interaction ("assert X was called"), not a return value.
 
 ### Skip Policy
 
@@ -150,6 +177,7 @@ Tests marked `.skip` / `xit` / `xdescribe` / `test.skip` are FORBIDDEN unless:
 - Integration test pattern: {{e.g. `*.integration.test.ts`}}
 - E2E test pattern: {{e.g. `*.e2e.ts` / Playwright spec files}}
 - Mock cleanup: {{afterEach with mockClear/mockReset / vi.restoreAllMocks}}
+- Fixture/factory location: {{e.g. `src/test/factories/` / co-located `*.factory.ts`}}
 
 ## Existing Patterns to Follow
 
