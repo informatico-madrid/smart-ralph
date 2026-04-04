@@ -702,9 +702,10 @@ Extract the JSON payload:
 2. Insert proposedTask BEFORE current task block using Edit tool
 3. Update totalTasks += 1 in state
 4. Update modificationMap
-5. Delegate prerequisite task to spec-executor
-6. After prereq completes: retry original task
-7. Log in .progress.md: "Added prerequisite $prereqId before $taskId. Reason: $reasoning"
+5. Reset taskIteration to 1 in .ralph-state.json (prerequisite is a new task, original task gets a fresh attempt)
+6. Delegate prerequisite task to spec-executor
+7. After prereq completes: retry original task with taskIteration=1
+8. Log in .progress.md: "Added prerequisite $prereqId before $taskId. Reason: $reasoning"
 
 **ADD_FOLLOWUP**:
 1. Original task should already be marked [x] (executor outputs TASK_COMPLETE too)

@@ -269,7 +269,14 @@ SWEEP_EOF
         LAST_SIGNAL_LINE=$(echo "$TRANSCRIPT_TAIL" | grep -E '(^|\W)VERIFICATION_(FAIL|PASS|DEGRADED)(\W|$)' | tail -1)
         if echo "$LAST_SIGNAL_LINE" | grep -qE '(^|\W)VERIFICATION_DEGRADED(\W|$)'; then
             # DEGRADED is not a code bug — MCP Playwright is simply not installed.
-            # Do NOT enter the repair loop. Block and escalate to the human.
+            # spec-executor already emitted ESCALATE (reason: verification-degraded) for this.
+            # If that ESCALATE is in the transcript, do NOT emit another escalation block —
+            # that would cause double-escalation (both spec-executor and stop-watcher blocking).
+            # Instead, allow the stop so the human sees only the single spec-executor escalation.
+            if echo "$TRANSCRIPT_TAIL" | grep -qE '(^|\W)ESCALATE(\W|$)' && echo "$TRANSCRIPT_TAIL" | grep -qE 'verification-degraded'; then
+                echo "[ralph-specum] DEGRADED + ESCALATE (verification-degraded) already in transcript — allowing stop (spec-executor handled)" >&2
+                exit 0
+            fi
             STOP_HOOK_ACTIVE=$(echo "$INPUT" | jq -r '.stop_hook_active // false' 2>/dev/null || echo "false")
             if [ "$STOP_HOOK_ACTIVE" = "true" ]; then
                 echo "[ralph-specum] stop_hook_active=true in DEGRADED handler, allowing stop" >&2
@@ -372,16 +379,21 @@ Spec: $SPEC_PATH | Failed story: $FAILED_STORY | Origin task index: $ORIGIN_TASK
    - env_issue: environment/dependency problem (DB, service, config)
    - spec_ambiguity: the contract is unclear or contradictory
    - flaky: non-deterministic failure (timing, race condition)
+   - test_quality: test itself is poorly designed (mock assertions pass but test does not verify real behavior)
+     * qa-engineer detected: mock-only tests, missing real imports, high mock/assertion ratio
+     * Fix: delegate a test-rewrite task, NOT an implementation fix
 4. If impl_bug: backtrack to origin task $ORIGIN_TASK in tasks.md, delegate
    a targeted fix to spec-executor. Do NOT re-implement unrelated tasks.
 5. If env_issue: report the specific env problem and halt (set awaitingApproval=true)
 6. If spec_ambiguity: propose a clarification to the Verification Contract and halt
 7. If flaky: retry the verification once more via qa-engineer [STORY-VERIFY]
-8. After fix: re-run qa-engineer [STORY-VERIFY] for '$FAILED_STORY' only
-9. Update .ralph-state.json: increment repairIteration to $NEXT_REPAIR
-10. On VERIFICATION_PASS: reset repair state (remove failedStory, repairIteration,
+8. If test_quality: delegate a test-rewrite task (NOT implementation fix) to spec-executor,
+   targeting the test file and fixing: real module imports, mock/assertion ratio, state-based assertions
+9. After fix: re-run qa-engineer [STORY-VERIFY] for '$FAILED_STORY' only
+10. Update .ralph-state.json: increment repairIteration to $NEXT_REPAIR
+11. On VERIFICATION_PASS: reset repair state (remove failedStory, repairIteration,
     originTaskIndex), resume normal execution from taskIndex
-11. On VERIFICATION_FAIL again: this hook will escalate on next iteration
+12. On VERIFICATION_FAIL again: this hook will escalate on next iteration
 
 ## Critical
 - Surgical fix only — do NOT touch unrelated tasks or files

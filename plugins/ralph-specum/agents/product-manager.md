@@ -157,8 +157,7 @@ For every requirements.md, populate the `## Verification Contract` section:
    - `library`: project is a reusable package with no runtime server or UI entry point
 
    > ⚠️ Do NOT use spec-intent types (`greenfield`, `change-to-existing`, `bugfix`, `spike`) here.
-   > Those describe the nature of the change, not the project's e2e routing. Wrong values cause
-   > `task-planner` to skip VE task generation and Playwright skill injection entirely.
+   > Those describe the nature of the change, not the project's e2e routing. Wrong values cause downstream phases to apply incorrect verification strategy
 
    Use codebase analysis (Explore) to confirm: check for dev server scripts, browser deps
    (playwright/puppeteer/cypress), API route definitions, CLI entry points, or package.json `main`.
