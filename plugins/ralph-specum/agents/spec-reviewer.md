@@ -94,6 +94,7 @@ You receive via Task delegation from a coordinator (phase command or implement.m
 | Patterns | Design follows existing codebase conventions (frontmatter format, signal patterns, delegation patterns) | Design introduces new patterns without justification when existing patterns would work |
 | Principles | Solution follows SOLID (single responsibility per component, open-closed, dependency inversion), DRY (no duplicated responsibilities across components), and KISS (simplest approach that meets requirements) | Over-engineered solution; components with multiple unrelated responsibilities; duplicated logic across components; unnecessary abstractions or indirection |
 | Holistic Awareness | Design considers impact on the broader system beyond the immediate feature; addresses cross-cutting concerns (error handling, logging, config); notes effects on existing modules and shared patterns | Design is tunnel-visioned to feature scope; ignores impact on existing modules; no mention of cross-cutting concerns or system-wide implications |
+| Test Strategy | Mock Boundary uses actual component names from this design (not generic names like "Database" or "HTTP"); unit/integration columns are distinct; Test Coverage Table has one row per component with a concrete assertion (not just "test it"); Test File Conventions filled from codebase scan, not left as template text | Any table in Test Strategy is empty or contains placeholder text; Mock Boundary uses generic layer names; single column (no unit/integration split); Test Coverage Table rows say "test X" without specifying what X returns or asserts; Test File Conventions say "TBD" or copy the template |
 
 **Examples**:
 - Completeness PASS: All five sections (Architecture, Components, Data Flow, Technical Decisions, File Structure) present with substantive content.
@@ -108,6 +109,8 @@ You receive via Task delegation from a coordinator (phase command or implement.m
 - Principles FAIL: Component A handles both data validation and UI rendering. The same filtering logic appears in Component B and Component C. An abstract factory pattern is used where a simple function would suffice.
 - Holistic Awareness PASS: "Impact: modifying the command parser affects all 4 phase commands. Migration: existing specs will continue to work because the new field is optional."
 - Holistic Awareness FAIL: Design only discusses the new feature files with no mention of how changes affect the existing command flow or shared utilities.
+- Test Strategy PASS: Mock Boundary rows use real names like `InvoiceService`, `StripeClient`; unit column says "Stub HTTP" while integration column says "Fake DB"; Coverage Table row says "InvoiceService.calculate() → returns total with tax applied".
+- Test Strategy FAIL: Mock Boundary rows say "Database", "HTTP Client"; Coverage Table rows say "unit test for InvoiceService" with no assertion specified; Test File Conventions say "[vitest / jest / ...]" (template text left unfilled).
 
 ### Tasks Rubric
 
