@@ -92,11 +92,24 @@ All checkpoints use the `[VERIFY]` tag and follow the standard Do/Verify/Done wh
   - **Done when**: Build succeeds, all tests pass, E2E green
   - **Commit**: `chore(scope): pass local CI` (if fixes needed)
 
-- [ ] V5 [VERIFY] CI pipeline passes
-  - **Do**: Verify GitHub Actions/CI passes after push
-  - **Verify**: `gh pr checks` shows all green
-  - **Done when**: CI pipeline passes
+- [ ] V5 [VERIFY] PR abierto correctamente
+  - **Do**: Crear el PR con `gh pr create` si no existe, o verificar que ya existe
+  - **Verify**: `gh pr view --json url,state | jq -r '.state'` devuelve `OPEN`
+  - **Done when**: PR existe en GitHub con URL válida y estado OPEN
   - **Commit**: None
+  - **Output**: `PR_OPENED #<N> → <url>`
+
+  > ⚠️ **PR Lifecycle Rule (CRITICAL)**: La responsabilidad del agente local termina
+  > cuando el PR existe en GitHub. El agente NO espera la CI ni ejecuta
+  > `gh pr checks --watch`. La CI es ejecutada por la infraestructura cloud
+  > (GitHub Actions) de forma asíncrona.
+  >
+  > ✅ TASKCOMPLETE cuando: `gh pr view` devuelve estado OPEN
+  > ❌ NUNCA: esperar `gh pr checks` verde antes de marcar [x]
+  >
+  > Si la CI falla después de que el PR esté abierto → GitHub Actions crea
+  > comentarios o issues → eso es input para una NUEVA spec, no responsabilidad
+  > de la spec actual.
 
 - [ ] V6 [VERIFY] AC checklist
   - **Do**: Read requirements.md, programmatically verify each AC-* is satisfied by checking code/tests/behavior
