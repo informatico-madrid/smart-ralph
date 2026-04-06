@@ -47,6 +47,24 @@ You receive via Task delegation:
 
 Use `basePath` for ALL file operations.
 
+## External Review Protocol
+
+<mandatory>
+Before processing each task, read the external reviewer's task_review.md file if it exists:
+
+**Step 1 — Check existence**: Look for `<basePath>/task_review.md`
+**Step 2 — Read reviews**: Parse review entries from the file
+**Step 3 — Apply rules by status**:
+   - **FAIL**: Task failed reviewer's criteria. Must fix before proceeding.
+   - **PENDING**: Task needs review. Proceed but note in .progress.md.
+   - **WARNING**: Task passed but with concerns. Note in .progress.md.
+   - **PASS**: Task passed external review. Mark complete if implementation done.
+**Step 4 — Append to .progress.md**: Log review outcome in `<basePath>/.progress.md`
+
+This protocol enables an external reviewer agent to communicate task outcomes
+without shared process state — filesystem-only communication.
+</mandatory>
+
 ## Task Loop
 
 ```text
@@ -59,10 +77,51 @@ Use `basePath` for ALL file operations.
 7. When all tasks done: SPEC_COMPLETE + cleanup
 ```
 
+> **Note**: For stuck detection, use `effectiveIterations = taskIteration + external_unmarks[taskId]`.
+
+### external_unmarks field
+
+**Field**: `external_unmarks` (object, default `{}`)
+
+- **Type**: Map of `taskId` (string) → `count` (integer)
+- **Default**: `{}`
+- **Written by**: External reviewer only (task_review.md)
+- **Read by**: spec-executor for stuck detection
+- **Lifetime**: Cumulative across sessions, NEVER reset by spec-executor
+- **Example**:
+  ```json
+  {
+    "1.2": 3,
+    "2.4": 1
+  }
+  ```
+
+This field tracks how many times an external reviewer has unmarked a task for rework.
+It is used in the effectiveIterations formula for stuck detection.
+
 ## Task Types
 
 ### Implementation Tasks (no tag)
 Direct implementation: write code, modify files, run commands.
+
+### Type Consistency Pre-Check (typed Python or TypeScript tasks)
+
+Before implementing typed Python or TypeScript tasks, verify type annotations match usage:
+
+1. **Extract the signature** from the type annotation (e.g., `Callable[[str], int]`)
+2. **Find the usage example** in the same document (usually in a code block)
+3. **Check sync/async consistency**:
+   - If the type is `Callable[..., None]` and the example uses `await`, this is a MISMATCH
+   - If the type is `Awaitable[T]` and the example does NOT use `await`, this is a MISMATCH
+4. **If mismatch found**:
+   - Update the type annotation to match the usage example
+   - OR update the usage example to match the type annotation
+   - Document the change in `.progress.md`
+5. **If no usage example exists**:
+   - Add a usage example to demonstrate the correct sync/async pattern
+   - Document in `.progress.md`
+
+This check catches type annotation errors before implementation begins.
 
 After completing any implementation task, check if it introduced new `data-testid`
 attributes into source files:
@@ -161,6 +220,17 @@ not progress.
      resolution: Human investigation required. The test may need architectural
                  redesign that exceeds autonomous agent scope.
    ```
+
+### Note: Effective Iterations Formula
+
+For stuck detection, use `effectiveIterations = taskIteration + external_unmarks[taskId]` where:
+- `taskIteration`: current session retries (reset on each session)
+- `external_unmarks`: reviewer cycles from prior sessions (cumulative, NEVER reset by spec-executor)
+
+When `effectiveIterations >= maxTaskIterations`, escalate with reason `external-reviewer-repeated-fail`:
+```text
+External reviewer has unmarked this task N times. Human investigation required.
+```
 </mandatory>
 
 ---
