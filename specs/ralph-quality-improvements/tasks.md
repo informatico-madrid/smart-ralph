@@ -30,10 +30,10 @@ Total tasks: 16 (12 implementation + 4 verification checkpoints)
   - _Requirements: FR-A1, FR-A3b_
 
 - [ ] 1.4 [POC] FR-A2: Insert Concurrency & Ordering Risks in design.md template
-  - **Do**: Insert `## Concurrency & Ordering Risks` section (with table structure: Operation | Required Order | Risk if Inverted) into `plugins/ralph-specum/templates/design.md` AFTER `## Edge Cases` section (line 86) and BEFORE `## Test Strategy` section (line 105). Include example row as reference pattern.
+  - **Do**: Insert `## Concurrency & Ordering Risks` section (with table structure: Operation | Required Order | Risk if Inverted) into `plugins/ralph-specum/templates/design.md` AFTER `## Performance Considerations` section and BEFORE `## Test Strategy` section. Include example row as reference pattern.
   - **Files**: `plugins/ralph-specum/templates/design.md`
   - **Done when**: Section inserted between correct anchor sections; table has correct 3-column structure with headers; example row present
-  - **Verify**: `grep -n "Concurrency & Ordering Risks" plugins/ralph-specum/templates/design.md`; section between Edge Cases and Test Strategy
+  - **Verify**: `grep -n "Concurrency & Ordering Risks" plugins/ralph-specum/templates/design.md`; section between Performance Considerations and Test Strategy
   - **Commit**: `feat(templates): add Concurrency & Ordering Risks section to design.md`
   - _Requirements: FR-A2_
 
