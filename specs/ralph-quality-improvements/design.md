@@ -17,8 +17,8 @@ Improve Smart Ralph's spec quality by adding self-review checklists to prevent 5
 **What changes**: `plugins/ralph-specum/agents/architect-reviewer.md`
 
 **Where (anchor sections)**:
-- AFTER: `## Quality Checklist` (line ~347 in current file)
-- BEFORE: `## Final Step: Set Awaiting Approval` (line ~361)
+- AFTER: `## Quality Checklist`
+- BEFORE: `## Final Step: Set Awaiting Approval`
 
 **Resulting structure** (relevant portion):
 
@@ -80,8 +80,8 @@ Quality Checklist addition:
 **What changes**: `plugins/ralph-specum/templates/design.md`
 
 **Where (anchor sections)**:
-- AFTER: `## Edge Cases` section (line ~86)
-- BEFORE: `## Test Strategy` section (line ~105)
+- AFTER: `## Edge Cases` section
+- BEFORE: `## Test Strategy` section
 
 **Resulting structure** (relevant portion):
 
@@ -114,8 +114,8 @@ Note: The example row (capture async callback) is included as a reference patter
 **What changes**: `plugins/ralph-specum/agents/product-manager.md`
 
 **Where (anchor sections)**:
-- AFTER: `## Append Learnings` section (line ~55)
-- BEFORE: `## Requirements Structure` (line ~75)
+- AFTER: `## Append Learnings` section
+- BEFORE: `## Requirements Structure`
 
 **Resulting structure** (relevant portion):
 
@@ -196,7 +196,7 @@ Note: This is separate from the Document Self-Review Checklist (FR-A1). The chec
 **What changes**: `plugins/ralph-specum/agents/spec-executor.md`
 
 **Where (anchor sections)**:
-- AFTER: the `data-testid` update block inside "## Task Types / ### Implementation Tasks" (line ~86)
+- AFTER: the `data-testid` update block inside "## Task Types / ### Implementation Tasks"
 - The subsection has NO `<mandatory>` tag
 
 **Resulting structure** (inside Implementation Tasks section):
@@ -280,8 +280,8 @@ Before implementing any task that involves `Callable`, `Awaitable`,
 **What changes**: `plugins/ralph-specum/agents/spec-executor.md`
 
 **Where (anchor sections)**:
-- AFTER: `## When Invoked` section (line ~41)
-- BEFORE: `## Task Loop` section (line ~50)
+- AFTER: `## When Invoked` section
+- BEFORE: `## Task Loop` section
 
 **Resulting structure** (between When Invoked and Task Loop):
 
@@ -333,8 +333,8 @@ On every task start (before reading tasks.md to find the next task):
 
 **Affected sections**:
 
-1. **Task Loop** (line ~50-60): The iteration increment logic
-2. **Stuck State Protocol** (line ~110-164): The escalation trigger
+1. **Task Loop** section: The iteration increment logic
+2. **Stuck State Protocol** section: The escalation trigger
 
 **Changes**:
 
@@ -390,7 +390,7 @@ IF `effectiveIterations >= maxTaskIterations`: ESCALATE immediately with reason
 
 **What changes**: Documentation of `.ralph-state.json` schema fields
 
-**Where**: The state schema is documented in `plugins/ralph-specum/agents/spec-executor.md` (as it is the primary agent that reads/writes state). Add a note in the **Startup Signal** section or as a comment near the state file operations.
+**Where**: In the **`## Task Loop`** section of `spec-executor.md`, near where `.ralph-state.json` is already documented (the section that describes reading/writing the state file). This is the natural anchor because external_unmarks is read during task loop execution. Add the field documentation as a labeled subsection or comment block within that section, not as a floating comment.
 
 **Field documentation**:
 
@@ -478,7 +478,7 @@ Example:
 |----|------|---------------|--------|
 | FR-A1 | `architect-reviewer.md` | `## Document Self-Review Checklist` exists with 4 steps in `<mandatory>` block; checklist added to Quality Checklist | `grep -n "Document Self-Review Checklist"` and read surrounding lines |
 | FR-A1 | `architect-reviewer.md` | `## On Design Update` exists in `<mandatory>` block; checklist item added | `grep -n "On Design Update"` |
-| FR-A2 | `templates/design.md` | `## Concurrency & Ordering Risks` section exists between Edge Cases and Test Strategy | Read lines ~86-105 of template |
+| FR-A2 | `templates/design.md` | `## Concurrency & Ordering Risks` section exists between Edge Cases and Test Strategy | `grep -n "Concurrency & Ordering Risks" templates/design.md` |
 | FR-A3 | `product-manager.md` | `## On Requirements Update` exists in `<mandatory>` block; checklist item added | `grep -n "On Requirements Update"` |
 | FR-A4 | `spec-executor.md` | `### Type Consistency Pre-Check` exists inside Implementation Tasks section | `grep -n "Type Consistency Pre-Check"` |
 | FR-B1 | `templates/task_review.md` | New file exists with exact structure (title, workflow comment, Reviews section, entry template) | Read file |
@@ -486,7 +486,7 @@ Example:
 | FR-B3 | `spec-executor.md` | `effectiveIterations = taskIteration + external_unmarks[taskId]` formula appears in both Task Loop and Stuck State Protocol | `grep -n "effectiveIterations"` |
 | FR-B3 | `spec-executor.md` | Escalation reason `external-reviewer-repeated-fail` present; escalation message includes reviewer unmark count | `grep -n "external-reviewer-repeated-fail"` |
 | FR-B4 | `spec-executor.md` | `external_unmarks` field documented with type object, optional, written by reviewer, read by executor | `grep -n "external_unmarks"` |
-| NFR-3 | `plugin.json` + `marketplace.json` | Both versions bumped to 4.9.2 | `grep "version" plugins/ralph-specum/.claude-plugin/plugin.json .claude-plugin/marketplace.json` |
+| NFR-3 | `plugin.json` + `marketplace.json` | Both versions bumped by +1 patch (read current version dynamically, do not hardcode) | Read both files, compute patch bump, verify both show same new version |
 
 **Hard invariants** (must not change):
 - No existing content in modified files altered outside target insertion points
@@ -506,18 +506,42 @@ Example:
 
 2. **FR-A3b**: Insert `## On Design Update` in `architect-reviewer.md` after Document Self-Review Checklist, before Karpathy Rules. Add checklist item to Quality Checklist.
 
+[VERIFY] Track A checkpoint 1 — architect-reviewer.md
+- **Verify**: `grep -n "Document Self-Review Checklist" plugins/ralph-specum/agents/architect-reviewer.md` returns section with 4 steps in `<mandatory>`; `grep -n "On Design Update" plugins/ralph-specum/agents/architect-reviewer.md` returns section in `<mandatory>`; both checklist items present in Quality Checklist
+- **Done when**: grep succeeds for all checks; surrounding content unchanged
+
 3. **FR-A2**: Insert `## Concurrency & Ordering Risks` section in `templates/design.md` between Edge Cases and Test Strategy.
+
+[VERIFY] Track A checkpoint 2 — design.md template
+- **Verify**: `grep -n "Concurrency & Ordering Risks" plugins/ralph-specum/templates/design.md` finds section between Edge Cases and Test Strategy; table structure present with headers
+- **Done when**: grep succeeds; section not empty
 
 4. **FR-A3**: Insert `## On Requirements Update` in `product-manager.md` after Append Learnings. Add checklist item to Quality Checklist.
 
 5. **FR-A4**: Insert `### Type Consistency Pre-Check` subsection in `spec-executor.md` inside Implementation Tasks, after data-testid block.
 
+[VERIFY] Track A checkpoint 3 — product-manager.md + spec-executor.md
+- **Verify**: `grep -n "On Requirements Update" plugins/ralph-specum/agents/product-manager.md`; `grep -n "Type Consistency Pre-Check" plugins/ralph-specum/agents/spec-executor.md`
+- **Done when**: both grep succeed
+
 6. **FR-B1**: Create `templates/task_review.md` with exact specified structure.
+
+[VERIFY] Track B checkpoint 1 — task_review.md template
+- **Verify**: `grep -n "Task Review Log" plugins/ralph-specum/templates/task_review.md`; `grep -n "## Reviews" plugins/ralph-specum/templates/task_review.md`; file exists with entry template fields (status, severity, reviewed_at, criterion_failed, evidence, fix_hint, resolved_at)
+- **Done when**: file exists, title and Reviews section present, entry template complete
 
 7. **FR-B2**: Insert `## External Review Protocol` in `spec-executor.md` after When Invoked, before Task Loop.
 
 8. **FR-B3**: Update spec-executor.md Task Loop and Stuck State Protocol to use `effectiveIterations = taskIteration + external_unmarks[taskId]`; update escalation reason to `external-reviewer-repeated-fail`.
 
-9. **FR-B4**: Document `external_unmarks` field schema in spec-executor.md.
+9. **FR-B4**: Document `external_unmarks` field schema in spec-executor.md, in the Task Loop section near the state file documentation (not in Startup Signal).
 
-10. **NFR-3**: Bump version in `plugins/ralph-specum/.claude-plugin/plugin.json` and `.claude-plugin/marketplace.json` from 4.9.1 to 4.9.2 (once, at end of all changes).
+[VERIFY] Track B checkpoint 2 — spec-executor.md external protocol
+- **Verify**: `grep -n "External Review Protocol" plugins/ralph-specum/agents/spec-executor.md`; `grep -n "effectiveIterations" plugins/ralph-specum/agents/spec-executor.md` (appears in Task Loop AND Stuck State Protocol); `grep -n "external-reviewer-repeated-fail" plugins/ralph-specum/agents/spec-executor.md`; `grep -n "external_unmarks" plugins/ralph-specum/agents/spec-executor.md` (field schema documented)
+- **Done when**: all 4 grep succeed; effectiveIterations appears in at least 2 distinct sections
+
+10. **NFR-3**: Bump version in `plugins/ralph-specum/.claude-plugin/plugin.json` and `.claude-plugin/marketplace.json` — READ the current version from plugin.json at execution time and bump patch once from that value. Do NOT hardcode a target version. Apply to BOTH files (once, at end of all changes, not per-file).
+
+[VERIFY] Final — version bump
+- **Verify**: Both files report the same bumped version; difference between old and new is exactly +1 patch
+- **Done when**: `grep` of both version fields shows identical patch-level bump
