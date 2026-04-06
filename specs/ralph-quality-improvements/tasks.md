@@ -1,6 +1,6 @@
 # Tasks: ralph-quality-improvements
 
-Total tasks: 14 (10 implementation + 4 verification checkpoints)
+Total tasks: 16 (12 implementation + 4 verification checkpoints)
 
 ---
 
@@ -27,7 +27,7 @@ Total tasks: 14 (10 implementation + 4 verification checkpoints)
 - [ ] 1.3 [VERIFY] Track A checkpoint 1 — architect-reviewer.md
   - **Do**: Verify FR-A1 and FR-A3b insertions in architect-reviewer.md are present and correctly positioned.
   - **Verify**: `grep -n "Document Self-Review Checklist" plugins/ralph-specum/agents/architect-reviewer.md`; `grep -n "On Design Update" plugins/ralph-specum/agents/architect-reviewer.md`; both non-empty
-  - **Commit**: `test(architect-reviewer): verify FR-A1 and FR-A3b insertions`
+  - _Requirements: FR-A1, FR-A3b_
 
 - [ ] 1.4 [POC] FR-A2: Insert Concurrency & Ordering Risks in design.md template
   - **Do**: Insert `## Concurrency & Ordering Risks` section (with table structure: Operation | Required Order | Risk if Inverted) into `plugins/ralph-specum/templates/design.md` AFTER `## Edge Cases` section (line 86) and BEFORE `## Test Strategy` section (line 105). Include example row as reference pattern.
@@ -79,7 +79,7 @@ Total tasks: 14 (10 implementation + 4 verification checkpoints)
   - **Commit**: `test(templates): verify task_review.md creation`
 
 - [ ] 1.11 [POC] FR-B2: Insert External Review Protocol in spec-executor.md
-  - **Do**: Insert `## External Review Protocol` section (4-step logic in `<mandatory>`) into `plugins/ralph-specum/agents/spec-executor.md` AFTER `## When Invoked` (line 41) and BEFORE `## Task Loop` (line 50). FAIL/PENDING/WARNING/PASS handling, appends to .progress.md.
+  - **Do**: Insert `## External Review Protocol` section (4-step logic in `<mandatory>`) into `plugins/ralph-specum/agents/spec-executor.md` AFTER `## When Invoked` section and BEFORE `## Task Loop` section. Use section names as anchor — file has been modified by prior tasks and line numbers have shifted. FAIL/PENDING/WARNING/PASS handling, appends to .progress.md.
   - **Files**: `plugins/ralph-specum/agents/spec-executor.md`
   - **Done when**: Section inserted at correct anchor position; 4-step review reading logic present; FAIL/PENDING/WARNING/PASS status handling documented
   - **Verify**: `grep -n "External Review Protocol" plugins/ralph-specum/agents/spec-executor.md`
@@ -88,8 +88,8 @@ Total tasks: 14 (10 implementation + 4 verification checkpoints)
 
 - [ ] 1.12 [POC] FR-B3: Update stuck-detection with effectiveIterations formula
   - **Do**: In `plugins/ralph-specum/agents/spec-executor.md`, update two sections:
-    1. In `## Stuck State Protocol` (line 110): Add NOTE: `effectiveIterations = taskIteration + external_unmarks[taskId]` (taskIteration: current session retries; external_unmarks: reviewer cycles, NEVER reset by spec-executor). Update escalation to use `effectiveIterations >= maxTaskIterations` with reason `external-reviewer-repeated-fail`. Message includes "External reviewer has unmarked this task N times. Human investigation required."
-    2. In `## Task Loop` (line 50): Add effectiveIterations reference near stuck-detection description.
+    1. In `## Stuck State Protocol`: Add NOTE: `effectiveIterations = taskIteration + external_unmarks[taskId]` (taskIteration: current session retries; external_unmarks: reviewer cycles, NEVER reset by spec-executor). Use section names as anchor — file has been modified by prior tasks and line numbers have shifted. Update escalation to use `effectiveIterations >= maxTaskIterations` with reason `external-reviewer-repeated-fail`. Message includes "External reviewer has unmarked this task N times. Human investigation required."
+    2. In `## Task Loop`: Add effectiveIterations reference near stuck-detection description.
   - **Files**: `plugins/ralph-specum/agents/spec-executor.md`
   - **Done when**: Stuck State Protocol has effectiveIterations formula; escalation reason is `external-reviewer-repeated-fail`; formula appears in both Stuck State Protocol and Task Loop
   - **Verify**: `grep -n "effectiveIterations" plugins/ralph-specum/agents/spec-executor.md`; `grep -n "external-reviewer-repeated-fail" plugins/ralph-specum/agents/spec-executor.md`; `grep -n "External reviewer has unmarked" plugins/ralph-specum/agents/spec-executor.md`
@@ -97,7 +97,7 @@ Total tasks: 14 (10 implementation + 4 verification checkpoints)
   - _Requirements: FR-B3_
 
 - [ ] 1.13 [POC] FR-B4: Document external_unmarks field schema in spec-executor.md
-  - **Do**: In `plugins/ralph-specum/agents/spec-executor.md`, add `## external_unmarks field` documentation (type object, default {}, written by reviewer only, read by executor for stuck detection, cumulative, NEVER reset by spec-executor). Include JSON example.
+  - **Do**: In `plugins/ralph-specum/agents/spec-executor.md`, in the Task Loop section near where `.ralph-state.json` is documented, add `## external_unmarks field` documentation (type object, default {}, written by reviewer only, read by executor for stuck detection, cumulative, NEVER reset by spec-executor). Use section names as anchor — file has been modified by prior tasks and line numbers have shifted. Include JSON example.
   - **Files**: `plugins/ralph-specum/agents/spec-executor.md`
   - **Done when**: Field documentation present with type, default, written-by, read-by, lifetime, and example fields
   - **Verify**: `grep -n "external_unmarks" plugins/ralph-specum/agents/spec-executor.md`; field schema documented with all required attributes
@@ -107,16 +107,17 @@ Total tasks: 14 (10 implementation + 4 verification checkpoints)
 - [ ] 1.14 [VERIFY] Track B checkpoint 2 — spec-executor.md external protocol
   - **Do**: Verify FR-B2, FR-B3, FR-B4 insertions in spec-executor.md are present.
   - **Verify**: `grep -n "External Review Protocol" plugins/ralph-specum/agents/spec-executor.md`; `grep -n "effectiveIterations" plugins/ralph-specum/agents/spec-executor.md` (at least 2 occurrences); `grep -n "external-reviewer-repeated-fail" plugins/ralph-specum/agents/spec-executor.md`; `grep -n "external_unmarks" plugins/ralph-specum/agents/spec-executor.md`
-  - **Commit**: `test(spec-executor): verify FR-B2, FR-B3, FR-B4 insertions`
+  - _Requirements: FR-B2, FR-B3, FR-B4_
 
----
+- [ ] 1.15 [VERIFY] Regression — surrounding content unchanged
+  - **Do**: Verify critical sections in modified files remain intact and unchanged.
+  - **Verify**: `grep -n "## Karpathy Rules" plugins/ralph-specum/agents/architect-reviewer.md`; `grep -n "## Final Step: Set Awaiting Approval" plugins/ralph-specum/agents/architect-reviewer.md`; `grep -n "## Test Strategy" plugins/ralph-specum/templates/design.md`; `grep -n "## Requirements Structure" plugins/ralph-specum/agents/product-manager.md`; `grep -n "## Stuck State Protocol" plugins/ralph-specum/agents/spec-executor.md`
+  - _Requirements: NFR-1_
 
-## Phase 4: Quality Gates
-
-- [ ] 1.15 [VERIFY] Final — version bump 4.9.1 to 4.9.2
+- [ ] 1.16 [VERIFY] Final — version bump
   - **Do**: Read current version from `plugins/ralph-specum/.claude-plugin/plugin.json`, increment patch version, write updated version to both `plugins/ralph-specum/.claude-plugin/plugin.json` and `.claude-plugin/marketplace.json`. Both must show the same new version (patch +1 from current).
   - **Files**: `plugins/ralph-specum/.claude-plugin/plugin.json`, `.claude-plugin/marketplace.json`
   - **Done when**: Both files have identical version string bumped by +1 patch from current value
   - **Verify**: Read both files, compute patch bump from current version, verify both show same new version; `grep "version" plugins/ralph-specum/.claude-plugin/plugin.json` and `grep "version" .claude-plugin/marketplace.json` show identical bumped version
-  - **Commit**: `chore(version): bump to 4.9.2 for quality improvements release`
+  - **Commit**: `chore(version): bump patch version for quality improvements release`
   - _Requirements: NFR-3_
