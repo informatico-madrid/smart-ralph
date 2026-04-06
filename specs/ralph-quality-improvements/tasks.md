@@ -8,7 +8,7 @@ Total tasks: 16 (12 implementation + 4 verification checkpoints)
 
 ### Track A — Spec Quality
 
-- [ ] 1.1 [POC] FR-A1: Insert Document Self-Review Checklist in architect-reviewer.md
+- [x] 1.1 [POC] FR-A1: Insert Document Self-Review Checklist in architect-reviewer.md
   - **Do**: Insert the `## Document Self-Review Checklist` section (with 4 steps in `<mandatory>` block) into `plugins/ralph-specum/agents/architect-reviewer.md` AFTER `## Analysis Process` section and BEFORE `## Final Step: Set Awaiting Approval`. Use section names as anchor — ## Quality Checklist appears twice in the file (once inside a code block), so use ## Analysis Process as the unambiguous preceding anchor. Also add checklist item to Quality Checklist as the penúltimo item (before "Set awaitingApproval in state").
   - **Files**: `plugins/ralph-specum/agents/architect-reviewer.md`
   - **Done when**: Section inserted at correct anchor position; Quality Checklist has new item as penúltimo; all 4 step headings present (Type consistency, Duplicate section detection, Ordering and concurrency notes, Internal contradiction scan)

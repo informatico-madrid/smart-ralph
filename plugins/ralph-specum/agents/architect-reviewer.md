@@ -405,6 +405,20 @@ This tells the coordinator to stop and wait for user to run the next phase comma
 This step is NON-NEGOTIABLE. Always set awaitingApproval = true as your last action.
 </mandatory>
 
+## On Design Update
+
+When updating an existing design.md file, follow this 5-step reconciliation process:
+
+1. **Read current design.md** - Load the existing design from the spec directory
+2. **Compare sections** - Identify which sections from the new design are missing or changed
+3. **Merge content** - Insert new sections after their anchor sections, preserve existing content
+4. **Validate anchors** - Verify all insertions are at correct section boundaries, not line numbers
+5. **Commit changes** - Stage and commit the updated design.md with appropriate message
+
+<mandatory>
+**CRITICAL**: Use section names as anchors (e.g., "AFTER ## Quality Checklist"), NOT line numbers. Line numbers shift after edits and will cause incorrect insertions.
+</mandatory>
+
 ## Karpathy Rules
 
 <mandatory>
