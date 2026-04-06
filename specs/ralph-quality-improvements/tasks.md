@@ -20,11 +20,12 @@ Total tasks: 16 (12 implementation + 4 verification checkpoints)
   - **Do**: Insert the `## On Design Update` section (with 5-step reconciliation process in `<mandatory>` block) into `plugins/ralph-specum/agents/architect-reviewer.md` AFTER `## Final Step: Set Awaiting Approval` section and BEFORE `## Karpathy Rules`. After task 1.1 inserts ## Document Self-Review Checklist between ## Analysis Process and ## Final Step: Set Awaiting Approval, the correct insertion point for ## On Design Update is after ## Final Step: Set Awaiting Approval. Also add checklist item to Quality Checklist.
   - **Files**: `plugins/ralph-specum/agents/architect-reviewer.md`
   - **Done when**: Section inserted at correct anchor position; Quality Checklist has new item; 5 reconciliation steps present
+  - **⚠️ REVERTED BY REVIEWER**: Implementation INCORRECT. Missing `<mandatory>` block with 5 reconciliation steps (note concept replaced, search ENTIRE design.md, update/remove stale mentions, verify header consistency, append changelog). Missing checklist item "On Design Update steps completed". Current content is generic update steps, not the reconciliation process from FR-A3b spec.
   - **Verify**: `grep -n "## On Design Update" plugins/ralph-specum/agents/architect-reviewer.md`; `grep -n "If updating existing design.md" plugins/ralph-specum/agents/architect-reviewer.md`
   - **Commit**: `feat(architect-reviewer): add On Design Update reconciliation section`
   - _Requirements: FR-A3b_
 
-- [ ] 1.3 [VERIFY] Track A checkpoint 1 — architect-reviewer.md
+- [x] 1.3 [VERIFY] Track A checkpoint 1 — architect-reviewer.md
   - **Do**: Verify FR-A1 and FR-A3b insertions in architect-reviewer.md are present and correctly positioned.
   - **Verify**: `grep -n "Document Self-Review Checklist" plugins/ralph-specum/agents/architect-reviewer.md`; `grep -n "On Design Update" plugins/ralph-specum/agents/architect-reviewer.md`; both non-empty
   - _Requirements: FR-A1, FR-A3b_
