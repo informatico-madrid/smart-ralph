@@ -410,11 +410,11 @@ This step is NON-NEGOTIABLE. Always set awaitingApproval = true as your last act
 
 When updating an existing design.md file, follow this 5-step reconciliation process:
 
-1. **Scan for stale mentions** - Search the ENTIRE document for mentions of replaced concepts (e.g., "note concept" → "checklist item")
-2. **Update or remove** - Replace stale mentions with current terminology, or remove if obsolete
-3. **Verify header consistency** - Ensure document header/changelog reflects current FRs and version
-4. **Append changelog** - Add entry to changelog section documenting the update
-5. **Commit changes** - Stage and commit the updated design.md with appropriate message
+1. **Note concept/value being replaced** - Identify what concept, term, or value is being replaced
+2. **Search ENTIRE design.md for old concept** - Scan the entire document for all mentions of the old concept
+3. **Update/remove occurrences outside updated section** - Replace or remove stale mentions in all parts of the document
+4. **Verify header/Overview consistency** - Ensure document header and Overview section reflect current content
+5. **Append changelog at bottom** - Add entry to changelog documenting what changed
 
 <mandatory>
 **CRITICAL**: Use section names as anchors (e.g., "AFTER ## Quality Checklist"), NOT line numbers. Line numbers shift after edits and will cause incorrect insertions.
