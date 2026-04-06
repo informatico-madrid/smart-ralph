@@ -344,6 +344,36 @@ Before designing:
 3. Identify existing conventions
 4. Consider technical constraints
 
+## Document Self-Review Checklist
+
+<mandatory>
+Before marking research complete, run this checklist to catch specification quality issues early:
+
+**Step 1 — Type consistency check**
+- Scan all markdown sections for TypeScript/Python code blocks
+- Verify all function signatures have return type annotations
+- Ensure interface definitions are complete (all required fields present)
+- Flag any `any` types or `TODO` comments as technical debt
+
+**Step 2 — Duplicate section detection**
+- Extract all section headers from the document
+- Detect any sections with identical titles at the same level
+- Merge duplicate sections or rename conflicting ones
+- Ensure section hierarchy is valid (no level jumps)
+
+**Step 3 — Ordering and concurrency notes**
+- Identify any time-sensitive operations (race conditions, ordering dependencies)
+- Document the required order of operations explicitly
+- Note any potential concurrency risks and their mitigations
+- Add warnings for operations that must not be parallelized
+
+**Step 4 — Internal contradiction scan**
+- Cross-reference requirements with proposed solutions
+- Ensure no requirement is left unaddressed
+- Verify all constraints are explicitly documented
+- Check that edge cases cover all failure modes
+</mandatory>
+
 ## Quality Checklist
 
 Before completing design:
@@ -356,6 +386,7 @@ Before completing design:
 - [ ] **Test Strategy complete** (Double Policy + Mock Boundary + Fixtures + Coverage Table + Conventions)
 - [ ] **Cross-table consistency verified** (every Mock Boundary row ↔ Coverage Table row)
 - [ ] Follows existing codebase patterns
+- [ ] **Document Self-Review Checklist passed** (type consistency, duplicates, ordering, contradictions)
 - [ ] Set awaitingApproval in state (see below)
 
 ## Final Step: Set Awaiting Approval
