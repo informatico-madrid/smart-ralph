@@ -39,12 +39,12 @@ Total tasks: 16 (12 implementation + 4 verification checkpoints)
   - **Commit**: `feat(templates): add Concurrency & Ordering Risks section to design.md`
   - _Requirements: FR-A2_
 
-- [ ] 1.5 [VERIFY] Track A checkpoint 2 — design.md template
+- [x] 1.5 [VERIFY] Track A checkpoint 2 — design.md template
   - **Do**: Verify FR-A2 insertion in templates/design.md is present and correctly positioned between Performance Considerations and Test Strategy.
   - **Verify**: `grep -n "Concurrency & Ordering Risks" plugins/ralph-specum/templates/design.md`; `grep -n "Performance Considerations" plugins/ralph-specum/templates/design.md`; `grep -n "Test Strategy" plugins/ralph-specum/templates/design.md`; section between the two anchors
   - _Requirements: FR-A2_
 
-- [ ] 1.6 [POC] FR-A3: Insert On Requirements Update section in product-manager.md
+- [x] 1.6 [POC] FR-A3: Insert On Requirements Update section in product-manager.md
   - **Do**: Insert `## On Requirements Update` section (with 5-step reconciliation process in `<mandatory>` block) into `plugins/ralph-specum/agents/product-manager.md` AFTER `## Append Learnings` section (line 55) and BEFORE `## Requirements Structure` (line 75). Add checklist item to Quality Checklist.
   - **Files**: `plugins/ralph-specum/agents/product-manager.md`
   - **Done when**: Section inserted at correct anchor position; Quality Checklist has new item; 5 reconciliation steps present
@@ -52,7 +52,7 @@ Total tasks: 16 (12 implementation + 4 verification checkpoints)
   - **Commit**: `feat(product-manager): add On Requirements Update reconciliation section`
   - _Requirements: FR-A3_
 
-- [ ] 1.7 [POC] FR-A4: Insert Type Consistency Pre-Check in spec-executor.md
+- [x] 1.7 [POC] FR-A4: Insert Type Consistency Pre-Check in spec-executor.md
   - **Do**: Insert `### Type Consistency Pre-Check (typed Python or TypeScript tasks)` subsection into `plugins/ralph-specum/agents/spec-executor.md` inside Implementation Tasks section (after line 86 where data-testid block ends), BEFORE Exit Code Gate. NO `<mandatory>` tag. 5-step verification process.
   - **Files**: `plugins/ralph-specum/agents/spec-executor.md`
   - **Done when**: Subsection inserted after data-testid block; 5 verification steps present describing Callable/Awaitable type consistency checking
@@ -60,14 +60,14 @@ Total tasks: 16 (12 implementation + 4 verification checkpoints)
   - **Commit**: `feat(spec-executor): add Type Consistency Pre-Check subsection`
   - _Requirements: FR-A4_
 
-- [ ] 1.8 [VERIFY] Track A checkpoint 3 — product-manager.md + spec-executor.md
+- [x] 1.8 [VERIFY] Track A checkpoint 3 — product-manager.md + spec-executor.md
   - **Do**: Verify FR-A3 and FR-A4 insertions are present.
   - **Verify**: `grep -n "On Requirements Update" plugins/ralph-specum/agents/product-manager.md`; `grep -n "Type Consistency Pre-Check" plugins/ralph-specum/agents/spec-executor.md`; both non-empty
   - _Requirements: FR-A3, FR-A4_
 
 ### Track B — External Reviewer Protocol
 
-- [ ] 1.9 [POC] FR-B1: Create task_review.md template
+- [x] 1.9 [POC] FR-B1: Create task_review.md template
   - **Do**: Create new file `plugins/ralph-specum/templates/task_review.md` with exact structure: title `# Task Review Log`, workflow comment block describing FAIL/WARNING/PASS/PENDING statuses, `## Reviews` section, and entry template with fields (status, severity, reviewed_at, criterion_failed, evidence, fix_hint, resolved_at).
   - **Files**: `plugins/ralph-specum/templates/task_review.md` (NEW)
   - **Done when**: File exists with correct title, workflow comment block, Reviews section, and complete entry template with all required fields
@@ -75,12 +75,12 @@ Total tasks: 16 (12 implementation + 4 verification checkpoints)
   - **Commit**: `feat(templates): add task_review.md for external reviewer protocol`
   - _Requirements: FR-B1_
 
-- [ ] 1.10 [VERIFY] Track B checkpoint 1 — task_review.md template
+- [x] 1.10 [VERIFY] Track B checkpoint 1 — task_review.md template
   - **Do**: Verify the new task_review.md template exists with all required structure elements.
   - **Verify**: `test -f plugins/ralph-specum/templates/task_review.md && echo "EXISTS"`; all grep commands for required fields return non-empty
   - _Requirements: FR-B1_
 
-- [ ] 1.11 [POC] FR-B2: Insert External Review Protocol in spec-executor.md
+- [x] 1.11 [POC] FR-B2: Insert External Review Protocol in spec-executor.md
   - **Do**: Insert `## External Review Protocol` section (4-step logic in `<mandatory>`) into `plugins/ralph-specum/agents/spec-executor.md` AFTER `## When Invoked` section and BEFORE `## Task Loop` section. Use section names as anchor — file has been modified by prior tasks and line numbers have shifted. FAIL/PENDING/WARNING/PASS handling, appends to .progress.md.
   - **Files**: `plugins/ralph-specum/agents/spec-executor.md`
   - **Done when**: Section inserted at correct anchor position; 4-step review reading logic present; FAIL/PENDING/WARNING/PASS status handling documented
@@ -88,7 +88,7 @@ Total tasks: 16 (12 implementation + 4 verification checkpoints)
   - **Commit**: `feat(spec-executor): add External Review Protocol section`
   - _Requirements: FR-B2_
 
-- [ ] 1.12 [POC] FR-B3: Update stuck-detection with effectiveIterations formula
+- [x] 1.12 [POC] FR-B3: Update stuck-detection with effectiveIterations formula
   - **Do**: In `plugins/ralph-specum/agents/spec-executor.md`, update two sections:
     1. In `## Stuck State Protocol`: Add NOTE: `effectiveIterations = taskIteration + external_unmarks[taskId]` (taskIteration: current session retries; external_unmarks: reviewer cycles, NEVER reset by spec-executor). Use section names as anchor — file has been modified by prior tasks and line numbers have shifted. Update escalation to use `effectiveIterations >= maxTaskIterations` with reason `external-reviewer-repeated-fail`. Message includes "External reviewer has unmarked this task N times. Human investigation required."
     2. In `## Task Loop`: Add effectiveIterations reference near stuck-detection description.
