@@ -1,6 +1,6 @@
 # Tasks: ralph-quality-improvements
 
-Total tasks: 25 (12 implementation + 4 verification checkpoints + 9 fix tasks)
+Total tasks: 27 (12 implementation + 4 verification checkpoints + 11 fix/feat tasks)
 
 ---
 
@@ -183,7 +183,6 @@ Total tasks: 25 (12 implementation + 4 verification checkpoints + 9 fix tasks)
     - `specs/ralph-quality-improvements/requirements.md`
     - `specs/ralph-quality-improvements/design.md`
     - `specs/ralph-quality-improvements/tasks.md`
-    
     Each file should have:
     ```yaml
     ---
@@ -193,7 +192,6 @@ Total tasks: 25 (12 implementation + 4 verification checkpoints + 9 fix tasks)
     updated: <date from git history>
     ---
     ```
-    
     Use the git history to determine created/updated dates.
   - **Files**: `specs/ralph-quality-improvements/requirements.md`, `specs/ralph-quality-improvements/design.md`, `specs/ralph-quality-improvements/tasks.md`
   - **Done when**: All three files have valid YAML frontmatter at the top
@@ -206,7 +204,6 @@ Total tasks: 25 (12 implementation + 4 verification checkpoints + 9 fix tasks)
     `- [ ] **If updating existing requirements.md: On Requirements Update steps completed**`
     To:
     `- [ ] If updating existing requirements: On Requirements Update steps completed`
-    
     Also update step 5 of the On Requirements Update section to include the HTML comment format:
     ```
     5. Append a one-line changelog at the bottom of requirements.md:
@@ -220,14 +217,12 @@ Total tasks: 25 (12 implementation + 4 verification checkpoints + 9 fix tasks)
 
 - [ ] 2.9 [FIX] spec-executor.md: Integrate effectiveIterations as the escalation trigger in Stuck State Protocol
   - **Do**: The Stuck State Protocol currently has `effectiveIterations` as a NOTE after the main ESCALATE block. The hardcoded `reason: stuck-state-unresolved` with `attempts: 5` is the primary trigger. This must be replaced so that effectiveIterations is the actual decision point.
-    
     Replace step 6 in the Stuck State Protocol:
     ```
     OLD (step 6):
     6. IF after 2 more attempts (5 total) the test still fails → ESCALATE:
          reason: stuck-state-unresolved
          attempts: 5
-    
     NEW (step 6):
     6. Compute effectiveIterations = taskIteration + external_unmarks[taskId]
        IF effectiveIterations >= maxTaskIterations → ESCALATE:
@@ -235,10 +230,160 @@ Total tasks: 25 (12 implementation + 4 verification checkpoints + 9 fix tasks)
          attempts: <effectiveIterations>
          Note: external_unmarks contributed <N> reviewer cycles
     ```
-    
     Remove the separate "### Note: Effective Iterations Formula" block — integrate its content INTO step 6 so the formula IS the trigger, not a post-hoc note.
   - **Files**: `plugins/ralph-specum/agents/spec-executor.md`
   - **Done when**: Stuck State Protocol step 6 uses effectiveIterations >= maxTaskIterations as the ESCALATE condition; reason is external-reviewer-repeated-fail; no separate "Note: Effective Iterations Formula" block exists (merged into step 6); hardcoded "attempts: 5" removed
-  - **Verify**: `grep -n "stuck-state-unresolved" plugins/ralph-specum/agents/spec-executor.md` returns empty (no occurrences in Stuck State Protocol); `grep -B 3 "effectiveIterations >= maxTaskIterations" plugins/ralph-specum/agents/spec-executor.md` shows it as an IF condition leading to ESCALATE
+  - **Verify**: `grep -n "stuck-state-unresolved" plugins/ralph-specum/agents/spec-executor.md` returns empty; `grep -B 3 "effectiveIterations >= maxTaskIterations" plugins/ralph-specum/agents/spec-executor.md` shows it as an IF condition leading to ESCALATE
   - **Commit**: `fix(spec-executor): integrate effectiveIterations as Stuck State Protocol escalation trigger per FR-B3`
   - _Requirements: FR-B3_
+
+---
+
+## Phase 3: External Reviewer Agent
+
+- [ ] 2.10 [FEAT] Create agents/external-reviewer.md — prompt del agente revisor paralelo
+  - **Do**: Create `plugins/ralph-specum/agents/external-reviewer.md` with el prompt completo del agente revisor externo. El archivo debe contener:
+
+    **Sección 1 — Identidad y contexto**
+    - Nombre: `external-reviewer`
+    - Rol: agente de revisión paralela que se ejecuta en una segunda sesión de Claude Code mientras `spec-executor` implementa tareas en la primera sesión.
+    - Carga SIEMPRE al inicio: `agents/external-reviewer.md` (este archivo) y los archivos de spec activos (`specs/<specName>/requirements.md`, `specs/<specName>/design.md`, `specs/<specName>/tasks.md`).
+
+    **Sección 2 — Principios de revisión (código)**
+    El revisor evalúa cada tarea implementada contra los siguientes principios, leyendo el código real:
+    - **SOLID**: Single Responsibility, Open/Closed, Liskov Substitution, Interface Segregation, Dependency Inversion. Flagear violaciones concretas con línea y razón.
+    - **DRY**: detectar código duplicado ≥ 2 ocurrencias. Proponer extracción como helper o clase base.
+    - **FAIL FAST**: validaciones y guards al inicio de funciones, no al final. Condicionales que fallan pronto antes de ejecutar lógica costosa.
+    - **Principios del codebase existente**: antes de revisar, leer el directorio raíz del proyecto y detectar las convenciones activas (naming, estructura de carpetas, patrones de test, estilo de imports). Aplicar las mismas convenciones en cada feedback.
+    - **Principios adicionales activos**: leer el frontmatter `reviewer-config` de `specs/<specName>/task_review.md` para saber qué principios están activados para esta spec concreta.
+
+    **Sección 3 — Vigilancia de tests (CRÍTICA — máxima prioridad)**
+    La fase de tests es la más propensa a degradación silenciosa. El revisor debe detectar activamente:
+    - **Tests perezosos**: `skip`, `xtest`, `pytest.mark.skip`, `xit` sin justificación → FAIL inmediato.
+    - **Tests trampa**: test que siempre pasa independientemente del código (assert True, mock que devuelve el valor esperado sin ejercer lógica real) → FAIL con evidencia del mock incorrecto.
+    - **Tests débiles**: un solo assert para una función con múltiples rutas → WARNING con sugerencia de casos adicionales.
+    - **Mocks incorrectos**: mock de una dependencia interna en lugar de la frontera del sistema → WARNING con sugerencia de usar fixture.
+    - **Violación TDD inversa**: test escrito DESPUÉS de la implementación sin RED-GREEN-REFACTOR documentado → WARNING.
+    - **Cobertura insuficiente**: si la tarea crea una función con ≥ 3 rutas (happy path + 2 edge cases) y solo hay 1 test → WARNING con lista de rutas sin cubrir.
+    Cuando detecte cualquiera de los anteriores: escribir entrada en `task_review.md` con `status: FAIL` o `WARNING`, incluir la línea exacta, el test afectado y una sugerencia concreta (ej. "refactorizar clase base", "dividir en 3 tests", "usar fixture X en lugar de mock").
+
+    **Sección 4 — Protocolo anti-bloqueos**
+    El revisor monitoriza `.progress.md` de la spec activa. Si detecta cualquiera de estas señales de bloqueo:
+    - Mismo error ≥ 2 veces consecutivas en `.progress.md`
+    - Tarea marcada como `[x]` pero el verify grep falla
+    - `taskIteration` ≥ 3 en `.ralph-state.json`
+    - Salida de contexto: agente reimplementa secciones ya completadas
+    → Escribir en `task_review.md`:
+    ```yaml
+    status: WARNING
+    severity: critical
+    reviewed_at: <ISO timestamp>
+    task_id: <taskId>
+    criterion_failed: anti-stuck intervention
+    evidence: |
+      <descripción exacta del síntoma en .progress.md o .ralph-state.json>
+    fix_hint: <acción concreta>
+    ```
+    Sugerencias de `fix_hint` según el síntoma:
+    - Error repetido → "Stop. Lee el código fuente de la función, no el test. El modelo del problema es incorrecto. Aplica Stuck State Protocol."
+    - Tarea marcada pero verify falla → "Desmarca la tarea. El criterio done-when no está cumplido. Relee el verify command."
+    - Reimplementando completado → "Contexto contaminado. Lee .ralph-state.json → taskIndex para saber dónde estás. No releas tareas completadas."
+    - Test con `make e2e` fallando → "Ejecuta `make e2e` desde raíz. El script incluye limpieza de carpetas y procesos. Verifica que el entorno esté levantado antes de los tests e2e."
+
+    **Sección 5 — Cómo escribir en task_review.md**
+    - Formato canonical: bloque YAML con guiones (NO tabla markdown) para cada entrada:
+      ```yaml
+      ### [task-X.Y] <título de la tarea>
+      - status: FAIL | WARNING | PASS | PENDING
+      - severity: critical | major | minor
+      - reviewed_at: <ISO 8601>
+      - criterion_failed: <texto exacto del criterio que falla, o "none">
+      - evidence: |
+          <texto exacto del error, diff, o output — sin parafrasear>
+      - fix_hint: <sugerencia concreta y accionable>
+      - resolved_at: <!-- spec-executor fills this -->
+      ```
+    - Nunca usar tabla markdown para entries — el carácter `|` en `evidence` (logs, stack traces, comandos bash) rompe el parser de columnas.
+    - Solo escribir `PASS` si has verificado activamente que el criterio done-when en tasks.md está cumplido.
+    - No escribir más de 1 entrada por tarea y ciclo. Si hay múltiples issues, priorizar el más crítico.
+    - Actualizar `.ralph-state.json → external_unmarks[taskId]` cuando desmarcas una tarea (incrementar en 1), para que spec-executor compute `effectiveIterations` correctamente.
+
+    **Sección 6 — Ciclo de revisión**
+    ```
+    1. Leer .ralph-state.json → taskIndex para saber qué tarea acaba de completar spec-executor
+    2. Leer tasks.md → tarea N → extraer done-when y verify command
+    3. Ejecutar el verify command localmente
+    4. Si PASS: escribir entrada PASS en task_review.md y continuar
+    5. Si FAIL: escribir entrada FAIL con evidencia y fix_hint; incrementar external_unmarks[taskId] en .ralph-state.json
+    6. Monitorizar .progress.md para señales de bloqueo (Sección 4)
+    7. Esperar a que spec-executor avance a la siguiente tarea (leer .ralph-state.json cada ~30s)
+    8. Repetir desde 1
+    ```
+
+    **Sección 7 — Nunca hacer**
+    - Nunca modificar `tasks.md` ni archivos de implementación directamente.
+    - Solo escribe en `task_review.md` y en comentarios de PR.
+    - No desmarcar tareas en `tasks.md` directamente — escribir FAIL en task_review.md y dejar que spec-executor gestione el re-intento.
+    - No bloquear por issues de style si no violan ningún principio activo de las secciones 2-3.
+
+  - **Files**: `plugins/ralph-specum/agents/external-reviewer.md` (NEW)
+  - **Done when**: Archivo existe con las 7 secciones; Sección 3 tiene ≥ 5 patrones de tests detectables; Sección 4 tiene ≥ 4 señales de bloqueo con fix_hint; Sección 6 documenta el ciclo completo; referencia a `external_unmarks` y `make e2e` presentes
+  - **Verify**: `test -f plugins/ralph-specum/agents/external-reviewer.md && echo EXISTS`; `grep -c "FAIL" plugins/ralph-specum/agents/external-reviewer.md` devuelve ≥ 5; `grep "anti-stuck" plugins/ralph-specum/agents/external-reviewer.md`; `grep "make e2e" plugins/ralph-specum/agents/external-reviewer.md`; `grep "external_unmarks" plugins/ralph-specum/agents/external-reviewer.md`
+  - **Commit**: `feat(agents): add external-reviewer agent prompt for parallel review workflow`
+  - _Requirements: FR-B2, FR-B3_
+
+- [ ] 2.11 [FEAT] interview-framework: Add parallel reviewer onboarding question
+  - **Do**: Añadir una pregunta al flujo de entrevista (`plugins/ralph-specum/agents/interview-framework.md` o equivalente) que, **al inicio de la fase de implementación** (`/implement`), pregunte al humano si va a ejecutar un revisor externo paralelo.
+
+    **Comportamiento esperado**:
+    1. Al lanzar `/ralph-specum:implement`, antes de delegar a `spec-executor`, el agente coordinador pregunta:
+       ```
+       ¿Vas a ejecutar un revisor externo paralelo durante esta implementación? [s/n]
+
+       Si dices sí:
+       - Se creará specs/<specName>/task_review.md (desde el template de FR-B1)
+       - Recibirás instrucciones para lanzar el revisor en una segunda sesión de Claude Code
+       - El spec-executor leerá automáticamente task_review.md en cada tarea
+       ```
+    2. Si el humano responde **sí**:
+       - Copiar `plugins/ralph-specum/templates/task_review.md` → `specs/<specName>/task_review.md`
+       - Preguntar qué principios de calidad activar:
+         ```
+         ¿Qué principios de calidad quieres que el revisor enforece?
+
+         Principios detectados en el codebase: <listar convenciones encontradas en el repo>
+         Principios recomendados estándar:
+         - SOLID (Single Responsibility, Open/Closed, Liskov, Interface Segregation, Dependency Inversion)
+         - DRY (Don't Repeat Yourself)
+         - FAIL FAST (validaciones al inicio de funciones)
+         - TDD (Red-Green-Refactor)
+
+         ¿Cuáles quieres activar? ("todos", lista, o "ninguno adicional")
+         ```
+       - Escribir los principios seleccionados en el frontmatter de `specs/<specName>/task_review.md`:
+         ```yaml
+         <!-- reviewer-config
+         principles: [SOLID, DRY, FAIL_FAST, TDD]
+         codebase-conventions: <detectadas automáticamente>
+         -->
+         ```
+       - Imprimir instrucciones de onboarding:
+         ```
+         Revisor externo configurado.
+
+         Para lanzar el revisor en paralelo:
+         1. Abre una segunda sesión de Claude Code en el mismo repositorio
+         2. Carga el agente: @external-reviewer
+         3. Dile: "Revisa la spec <specName> mientras spec-executor implementa"
+         4. El revisor leerá y escribirá en specs/<specName>/task_review.md
+
+         El spec-executor ya está configurado para leer task_review.md antes de cada tarea.
+         Cuando el revisor marque algo como FAIL, spec-executor se detendrá y aplicará el fix.
+         ```
+    3. Si el humano responde **no**: continuar el flujo normal sin crear task_review.md.
+
+  - **Files**: `plugins/ralph-specum/agents/interview-framework.md` (o el archivo de coordinación del comando `/implement`)
+  - **Done when**: Al ejecutar `/implement`, el coordinador pregunta sobre el revisor paralelo antes de delegar a spec-executor; si responde sí se crea task_review.md con frontmatter `reviewer-config` y se imprimen instrucciones de onboarding; si responde no, flujo normal
+  - **Verify**: `grep -n "revisor externo" plugins/ralph-specum/agents/interview-framework.md` (o archivo equivalente); `grep -n "external-reviewer" plugins/ralph-specum/agents/interview-framework.md`; `grep -n "reviewer-config" plugins/ralph-specum/agents/interview-framework.md`
+  - **Commit**: `feat(interview-framework): add parallel reviewer onboarding and quality principles selection`
+  - _Requirements: FR-B1, FR-B2_
