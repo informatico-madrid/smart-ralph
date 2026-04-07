@@ -99,6 +99,14 @@ Always use `cat "$TMPFILE" >> <basePath>/chat.md && rm "$TMPFILE"` for appends.
 ```bash
 jq --argjson idx N '.chat.executor.lastReadIndex = $idx' <basePath>/.ralph-state.json > /tmp/state.json && mv /tmp/state.json <basePath>/.ralph-state.json
 ```
+
+**Signal Reference**:
+- **OVER signal**: Blocking signal — after sending OVER, do not start new work until response or 1-task timeout
+  - If timeout: auto-assume CONTINUE, proceed
+  - Exception: if HOLD present at timeout, HOLD takes precedence — do not start next task
+- **HOLD signal**: Pre-task gate only — read at task START, never interrupt mid-task
+  - If HOLD present in unread messages: block until ACK or CONTINUE received
+  - Do NOT stop current task when HOLD received mid-execution
 </mandatory>
 
 ## Task Loop
