@@ -45,3 +45,21 @@ Claude start has explicit worktree prompts. Codex should still support that beha
 ### Parallel Tasks
 
 Claude can batch `[P]` tasks in one delegated message. Codex can do the same only when file overlap and verification risk are low. Otherwise fall back to sequential execution and say why.
+
+## Version Delta (v4.8.4 -> v4.9.1)
+
+Changes in the Claude plugin since the last Codex sync:
+
+| Change | Category | Impact |
+|--------|----------|--------|
+| Added `epic.md` template | Templates | New file, was missing from Codex |
+| Updated `tasks.md` template (192 -> 588 lines) | Templates | Added task writing guide, TDD workflow, intent-based selector |
+| Updated `settings-template.md` (24 -> 79 lines) | Templates | Added extended docs, monorepo example |
+| Added `spec-reviewer` agent | Agents | New rubric-based artifact reviewer |
+| Added `qa-engineer` agent | Agents | New [VERIFY] task executor |
+| Added `refactor-specialist` agent | Agents | New section-by-section spec updater |
+| Added verification-layers to workflow | References | 3-layer verification protocol (contradiction, signal, review) |
+| Added failure-recovery guidance | References | Fix-task generation, retry logic, recovery modes |
+| Added intent classification | References | GREENFIELD/TRIVIAL/REFACTOR/MID_SIZED routing |
+| Hook-driven execution path documented | References | Stop hook `{"decision":"block"}` format for Codex |
+| Manual fallback path documented | References | Step-by-step re-invocation when hooks disabled |

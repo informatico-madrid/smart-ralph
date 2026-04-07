@@ -106,3 +106,77 @@ When a phase writes `research.md`, `requirements.md`, `design.md`, `tasks.md`, o
   - `continue to <named next step>`
 
 Treat `continue to <named next step>` as approval of the current artifact.
+
+## Hook-Driven Execution Path
+
+When the Codex Stop hook is enabled (`[features] codex_hooks = true` in Codex config), the execution loop runs without user re-invocation:
+
+1. The stop-watcher script runs on every agent stop event.
+2. It reads `.ralph-state.json` to determine the current phase and task index.
+3. If tasks remain, it outputs `{"decision": "block", "reason": "<next task prompt>"}` to prevent the session from closing and inject the next task instruction.
+4. The agent resumes, executes the next task, marks the checkbox, updates state, and stops again.
+5. The loop repeats until all tasks are complete or `taskIndex >= totalTasks`.
+6. On completion the script outputs `{"decision": "proceed"}` to allow the session to close normally.
+
+The Stop hook is experimental and requires `codex_hooks = true`. It is disabled by default and not available on Windows. Verify the feature flag is set before relying on hook-driven execution.
+
+## Manual Fallback Path
+
+When hooks are disabled or unavailable, re-invoke the implement skill after each task to advance the loop:
+
+1. Run `$ralph-specum-implement` (or the primary `$ralph-specum` skill with an implement intent).
+2. The skill reads `.ralph-state.json`, finds `taskIndex` pointing to the next incomplete task, and executes it.
+3. After the task completes, the skill updates state and stops.
+4. Repeat step 1 until the skill reports all tasks complete.
+5. If a task is blocked (exceeded retry limit), the skill will report the blocker. Resolve the issue manually, then re-invoke to continue.
+
+Use this path whenever `codex_hooks` is not set, when running on Windows, or when verifying hook behavior during development.
+
+## Hook-Driven Execution Path
+
+When `[features] codex_hooks = true` is set in `config.toml`, the execution loop is automated via the Stop hook.
+
+### How it works
+
+1. User invokes `$ralph-specum-implement`
+2. Skill reads `.ralph-state.json`, delegates current task to a subagent
+3. Subagent completes task, outputs `TASK_COMPLETE`
+4. Codex attempts to stop the turn
+5. Stop hook (`hooks/stop-watcher.sh`) fires, reads state file
+6. If `taskIndex < totalTasks`: outputs `{"decision": "block", "reason": "Continue to task N/M"}`
+7. Codex resumes with the reason as the new prompt
+8. Skill reads updated state, delegates next task
+9. Loop repeats until `taskIndex >= totalTasks`
+10. Stop hook outputs nothing (exit 0), Codex stops naturally
+
+### Stop hook output format
+
+```json
+{"decision": "block", "reason": "Continue to task 5/20. Next: 1.6 Write ralph-specum-research skill"}
+```
+
+### Guard conditions
+
+- `awaitingApproval: true` in state -> exit 0 (do not continue)
+- No `.ralph-state.json` found -> exit 0
+- `taskIndex >= totalTasks` -> exit 0 (all done)
+
+## Manual Fallback Path
+
+When hooks are disabled (no `codex_hooks = true`, or on Windows), run phases manually:
+
+### Step-by-step re-invocation
+
+1. Invoke `$ralph-specum-implement` -- executes first incomplete task
+2. After task completes, Codex stops naturally
+3. Re-invoke `$ralph-specum-implement` -- reads state, picks up next task
+4. Repeat until all tasks complete
+5. Final invocation outputs `ALL_TASKS_COMPLETE`
+
+### Tips for manual mode
+
+- Each invocation handles exactly one task
+- State persists in `.ralph-state.json` between invocations
+- Progress is tracked in `.progress.md`
+- If a task fails, fix the issue and re-invoke -- the same task will retry
+- Use `$ralph-specum-status` to check progress at any time
