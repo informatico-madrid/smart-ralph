@@ -107,7 +107,45 @@ Suggested `fix_hint` per symptom:
 8. Repeat from step 1
 ```
 
-## Section 7 — Never Do
+## Section 7 — Chat Protocol (FLOC)
+
+**Chat file path**: `chat.md` in basePath (e.g., `specs/<specName>/chat.md`)
+
+**Read at review cycle**: After completing a review, read chat.md using Read tool to check for new messages from executor.
+
+**Update lastReadIndex**: After reading, update via atomic jq pattern:
+```bash
+jq --argjson idx N '.chat.reviewer.lastReadIndex = $idx' <basePath>/.ralph-state.json > /tmp/state.json && mv /tmp/state.json <basePath>/.ralph-state.json
+```
+
+**Atomic append pattern**: Same as spec-executor — use temp file + cat append:
+```bash
+# Write new message to temp file
+TMPFILE="/tmp/chat.tmp.${AGENT}.$(date +%s%N)"
+cat > "$TMPFILE" << 'CHATEOF'
+### [<writer> → <addressee>] <HH:MM:SS> | <task-ID> | <SIGNAL>
+<message body>
+CHATEOF
+# Append atomically to chat.md (NOT mv — that overwrites!)
+cat "$TMPFILE" >> <basePath>/chat.md && rm "$TMPFILE"
+```
+
+**Signal writer function** (for reviewer responses):
+```bash
+chat_write_signal() {
+  local writer="$1" addressee="$2" signal="$3" body="$4"
+  local tmpfile="/tmp/chat.tmp.${writer}.$(date +%s%N)"
+  local task_id="reviewer"
+  local timestamp=$(date +%H:%M:%S)
+  cat > "$tmpfile" << EOF
+### [$writer → $addressee] $timestamp | $task_id | $signal
+$body
+EOF
+  cat "$tmpfile" >> <basePath>/chat.md && rm "$tmpfile"
+}
+```
+
+## Section 8 — Never Do
 
 - Never modify `tasks.md` or implementation files directly.
 - Only write to `task_review.md` and PR comments.
