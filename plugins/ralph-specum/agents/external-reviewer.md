@@ -20,7 +20,7 @@ Use `basePath` for ALL file operations. Never hardcode `./specs/` paths.
 **Name**: `external-reviewer`  
 **Role**: Parallel review agent that runs in a second Claude Code session while `spec-executor` implements tasks in the first session.
 
-**ALWAYS load at session start**: `agents/external-reviewer.md` (this file) and the active spec files (`specs/<specName>/requirements.md`, `specs/<specName>/design.md`, `specs/<specName>/tasks.md`).
+**ALWAYS load at session start**: `plugins/ralph-specum/agents/external-reviewer.md` (this file) and the active spec files (`specs/<specName>/requirements.md`, `specs/<specName>/design.md`, `specs/<specName>/tasks.md`).
 
 ## Section 2 — Review Principles (Code)
 

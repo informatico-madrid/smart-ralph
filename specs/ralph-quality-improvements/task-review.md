@@ -227,6 +227,7 @@ Quality Checklist addition:
 - globalIteration → 7
 
 ### Resumen de Estado Actual:
+
 | Task | Status | Notes |
 |------|--------|-------|
 | 1.1 | ✅ PASS | Document Self-Review Checklist - correcto |
@@ -264,6 +265,7 @@ Quality Checklist addition:
 | 1.5+ | ⏳ Sin verificar | Agente puede estar avanzando |
 
 ### Cycle 13 - ✅ TASK 1.2 FIXED! Tasks 1.3-1.6 PASS (2026-04-06T00:36:00Z)
+
 **¡HINT FUNCIONÓ!** El agente corrigió task 1.2 y avanzó rápidamente.
 
 #### Task 1.2 (FR-A3b): ✅ PASS (final)

@@ -59,7 +59,8 @@ create_state_file() {
   "totalTasks": $total_tasks,
   "taskIteration": $task_iteration,
   "specName": "$spec_name",
-  "specPath": "$spec_path"
+  "specPath": "$spec_path",
+  "external_unmarks": {}
 }
 EOF
 }

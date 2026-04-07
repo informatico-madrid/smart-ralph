@@ -27,7 +27,6 @@ Total tasks: 27 (12 implementation + 4 verification checkpoints + 11 fix/feat ta
   - **Do**: Insert the `## On Design Update` section (with 5-step reconciliation process in `<mandatory>` block) into `plugins/ralph-specum/agents/architect-reviewer.md` AFTER `## Final Step: Set Awaiting Approval` section and BEFORE `## Karpathy Rules`. After task 1.1 inserts ## Document Self-Review Checklist between ## Analysis Process and ## Final Step: Set Awaiting Approval, the correct insertion point for ## On Design Update is after ## Final Step: Set Awaiting Approval. Also add checklist item to Quality Checklist.
   - **Files**: `plugins/ralph-specum/agents/architect-reviewer.md`
   - **Done when**: Section inserted at correct anchor position; Quality Checklist has new item; 5 reconciliation steps present
-  - **💡 HINT**: The current file has the 5 steps OUTSIDE `<mandatory>`. You need to WRAP the steps AND intro text inside `<mandatory>...</mandatory>`. The `<mandatory>` block should replace or include the current anchor note. Look at how `## Document Self-Review Checklist` (task 1.1) does it — `<mandatory>` opens BEFORE the steps and closes AFTER them. That's the pattern to follow.
   - **Verify**: `grep -n "## On Design Update" plugins/ralph-specum/agents/architect-reviewer.md`; `grep -n "If updating existing design.md" plugins/ralph-specum/agents/architect-reviewer.md`
   - **Commit**: `feat(architect-reviewer): add On Design Update reconciliation section`
   - _Requirements: FR-A3b_
@@ -35,7 +34,6 @@ Total tasks: 27 (12 implementation + 4 verification checkpoints + 11 fix/feat ta
 - [x] 1.3 [VERIFY] Track A checkpoint 1 — architect-reviewer.md
   - **Do**: Verify FR-A1 and FR-A3b insertions in architect-reviewer.md are present and correctly positioned.
   - **Verify**: `grep -n "Document Self-Review Checklist" plugins/ralph-specum/agents/architect-reviewer.md`; `grep -n "On Design Update" plugins/ralph-specum/agents/architect-reviewer.md`; both non-empty
-  - **⚠️ REVERTED x2**: Cannot pass while task 1.2 remains incomplete
   - _Requirements: FR-A1, FR-A3b_
 
 - [x] 1.4 [POC] FR-A2: Insert Concurrency & Ordering Risks in design.md template
@@ -60,7 +58,7 @@ Total tasks: 27 (12 implementation + 4 verification checkpoints + 11 fix/feat ta
   - _Requirements: FR-A3_
 
 - [x] 1.7 [POC] FR-A4: Insert Type Consistency Pre-Check in spec-executor.md
-  - **Do**: Insert `### Type Consistency Pre-Check (typed Python or TypeScript tasks)` subsection into `plugins/ralph-specum/agents/spec-executor.md` inside Implementation Tasks section (after line 86 where data-testid block ends), BEFORE Exit Code Gate. NO `<mandatory>` tag. 5-step verification process.
+  - **Do**: Insert `### Type Consistency Pre-Check (typed Python or TypeScript tasks)` subsection into `plugins/ralph-specum/agents/spec-executor.md` inside Implementation Tasks section (after the data-testid block ends at line 137), BEFORE Exit Code Gate. NO `<mandatory>` tag. 5-step verification process.
   - **Files**: `plugins/ralph-specum/agents/spec-executor.md`
   - **Done when**: Subsection inserted after data-testid block; 5 verification steps present describing Callable/Awaitable type consistency checking
   - **Verify**: `grep -n "Type Consistency Pre-Check" plugins/ralph-specum/agents/spec-executor.md`

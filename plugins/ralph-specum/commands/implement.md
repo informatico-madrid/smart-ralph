@@ -86,7 +86,8 @@ Update `.ralph-state.json` by merging these fields into the existing object:
   "awaitingApproval": false,
   "nativeTaskMap": {},
   "nativeSyncEnabled": true,
-  "nativeSyncFailureCount": 0
+  "nativeSyncFailureCount": 0,
+  "external_unmarks": {}
 }
 ```
 
@@ -119,7 +120,8 @@ jq --argjson taskIndex <first_incomplete> \
      awaitingApproval: false,
      nativeTaskMap: {},
      nativeSyncEnabled: true,
-     nativeSyncFailureCount: 0
+     nativeSyncFailureCount: 0,
+     external_unmarks: {}
    }
    ' "$SPEC_PATH/.ralph-state.json" > "$SPEC_PATH/.ralph-state.json.tmp" && \
    mv "$SPEC_PATH/.ralph-state.json.tmp" "$SPEC_PATH/.ralph-state.json"
