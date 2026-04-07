@@ -91,51 +91,58 @@ No central state. Each agent tracks its own position via `.chat-state.{agent}.js
 2. Read `chat.md` lines from `lastReadIndex + 1` to end
 3. Update `lastReadIndex` to new end
 
-## Component: Per-Agent State Files
+## Component: Per-Agent State (inside .ralph-state.json)
 
-### `.chat-state.executor.json`
+Following the established pattern in the repo (`jq ... > /tmp/state.json && mv /tmp/state.json .ralph-state.json`), the per-agent chat state is stored inside `.ralph-state.json` rather than separate files. This avoids creating 2 new files and uses the existing atomic write pattern both agents already use for shared state.
+
+### Schema: `chat` field inside `.ralph-state.json`
 
 ```json
 {
-  "agent": "executor",
-  "lastReadIndex": 12,
-  "lastSignal": "OVER",
-  "lastSignalTask": "2.4",
-  "stillTtl": 0,
-  "updatedAt": "2026-04-07T14:32:05Z"
+  "source": "spec",
+  "name": "agent-chat-protocol",
+  "phase": "execution",
+  "taskIndex": 5,
+  "chat": {
+    "executor": {
+      "lastReadIndex": 42,
+      "lastSignal": "OVER",
+      "lastSignalTask": "2.4",
+      "stillTtl": 0
+    },
+    "reviewer": {
+      "lastReadIndex": 38,
+      "lastSignal": "ALIVE",
+      "lastSignalTask": "2.1",
+      "pendingIntentFail": null
+    }
+  }
 }
 ```
 
 | Field | Type | Description |
 |-------|------|-------------|
-| `agent` | string | `"executor"` |
-| `lastReadIndex` | integer | 0-indexed line number of last read message |
-| `lastSignal` | string | Last FLOC signal written or received |
-| `lastSignalTask` | string | task-ID where signal was sent |
-| `stillTtl` | integer | Tasks remaining before alarm (max 3, resets on any signal) |
-| `updatedAt` | ISO8601 | Last modification time |
+| `chat.executor.lastReadIndex` | integer | 0-indexed line number of last read message |
+| `chat.executor.lastSignal` | string | Last FLOC signal written or received |
+| `chat.executor.lastSignalTask` | string | task-ID where signal was sent |
+| `chat.executor.stillTtl` | integer | Tasks remaining before alarm (max 3, resets on any signal) |
+| `chat.reviewer.lastReadIndex` | integer | 0-indexed line number of last read message |
+| `chat.reviewer.lastSignal` | string | Last FLOC signal written or received |
+| `chat.reviewer.lastSignalTask` | string | task-ID where signal was sent |
+| `chat.reviewer.pendingIntentFail` | string | null or task-ID with active INTENT-FAIL (1-task window) |
 
-### `.chat-state.reviewer.json`
+### Atomic Write Pattern
 
-```json
-{
-  "agent": "reviewer",
-  "lastReadIndex": 8,
-  "lastSignal": "ALIVE",
-  "lastSignalTask": "2.1",
-  "pendingIntentFail": null,
-  "updatedAt": "2026-04-07T14:35:22Z"
-}
+Each agent writes only its own `chat.{executor|reviewer}` subsection using the established pattern:
+
+```bash
+# Executor updates its chat state
+jq --argjson idx 42 --arg signal "OVER" --arg task "2.4" \
+  '.chat.executor.lastReadIndex = $idx | .chat.executor.lastSignal = $signal | .chat.executor.lastSignalTask = $task' \
+  .ralph-state.json > /tmp/state.json && mv /tmp/state.json .ralph-state.json
 ```
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `agent` | string | `"reviewer"` |
-| `lastReadIndex` | integer | 0-indexed line number of last read message |
-| `lastSignal` | string | Last FLOC signal written or received |
-| `lastSignalTask` | string | task-ID where signal was sent |
-| `pendingIntentFail` | string | null or task-ID with active INTENT-FAIL (1-task window) |
-| `updatedAt` | ISO8601 | Last modification time |
+**Collision safety**: Executor writes `taskIndex` at end of each task; reviewer writes `external_unmarks`. Both agents already share `.ralph-state.json` today without collision. Adding per-agent `chat` subsections follows the same pattern — each agent writes its own subsection only.
 
 ## FLOC Signal State Machine
 
@@ -317,17 +324,14 @@ Thread closed.
 | File | Action | Purpose |
 |------|--------|---------|
 | `specs/<specName>/chat.md` | **CREATE** | Shared chat channel |
-| `specs/<specName>/.chat-state.executor.json` | **CREATE** | Executor read position and signal state |
-| `specs/<specName>/.chat-state.reviewer.json` | **CREATE** | Reviewer read position and signal state |
+| `.ralph-state.json` | **MODIFY** | Add `chat` field with per-agent lastReadIndex and signal state |
 | `plugins/ralph-specum/templates/chat.md` | **CREATE** | Chat template for new specs |
 | `plugins/ralph-specum/agents/spec-executor.md` | **MODIFY** | Add Chat Protocol section: read at task START, respect HOLD |
 | `plugins/ralph-specum/agents/external-reviewer.md` | **MODIFY** | Implement FLOC signals: ALIVE, INTENT-FAIL, CLOSE, URGENT, DEADLOCK |
 | `specs/<specName>/task_review.md` | No change | Remains authoritative formal channel |
-| `.ralph-state.json` schema | No change | Optional chat metadata stored separately |
 
 ### Files that DO NOT Change
 - `task_review.md` template — stays as formal PASS/FAIL/WARNING channel
-- `.ralph-state.json` schema — chat state is per-agent, not in shared state
 
 ## Error Handling
 
@@ -335,7 +339,7 @@ Thread closed.
 |---------|-----------|----------|
 | Append collision (garbled text) | Message format check: each entry starts with `### [` | Stop both agents. Human repairs chat.md manually. Resume after repair. |
 | Temp file orphaned (rename failed) | Temp file exists but no corresponding entry in chat.md | Clean up temp file. Re-write the message. |
-| State file corrupted (invalid JSON) | `jq .` fails on state file | Overwrite with `{agent, lastReadIndex: 0, lastSignal: null, ...}` (reset position to 0) |
+| State file corrupted (invalid JSON) | `jq .` fails on `.ralph-state.json` | Overwrite the `chat` subsection with defaults: `jq '.chat = {executor: {lastReadIndex: 0}, reviewer: {lastReadIndex: 0}}'` (reset positions to 0) |
 | lastReadIndex ahead of actual lines | State file line count > chat.md actual lines | Reset to `wc -l chat.md` |
 | Chat file missing at read time | File does not exist | Executor: proceed without chat (FR-1). Reviewer: skip chat read. |
 | BLOCKED state timeout (no ACK/CONTINUE) | 1 task passes without response to OVER | Auto-proceed as CONTINUE. Log in .progress.md. |
