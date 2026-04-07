@@ -81,7 +81,7 @@ Focus: Validate the idea works end-to-end. Skip tests, accept hardcoded values.
   - _Requirements: FR-1, FR-2, FR-13, FR-14_
   - _Design: Atomic Write Implementation section, Per-Agent State section_
 
-- [ ] 1.4 Add OVER and HOLD signals to spec-executor.md Chat Protocol
+- [x] 1.4 Add OVER and HOLD signals to spec-executor.md Chat Protocol
   - **Do**:
     1. Add to Chat Protocol section in spec-executor.md:
        - **OVER signal**: Blocking signal — after sending OVER, do not start new work until response or 1-task timeout
@@ -97,7 +97,7 @@ Focus: Validate the idea works end-to-end. Skip tests, accept hardcoded values.
   - _Requirements: FR-3, FR-6_
   - _Design: FLOC Signal State Machine section_
 
-- [ ] 1.5 Add STILL TTL tracking to spec-executor.md Chat Protocol
+- [x] 1.5 Add STILL TTL tracking to spec-executor.md Chat Protocol
   - **Do**:
     1. Add to Chat Protocol section in spec-executor.md:
        - **STILL TTL**: 3-task cycle counter
@@ -113,7 +113,7 @@ Focus: Validate the idea works end-to-end. Skip tests, accept hardcoded values.
   - _Requirements: FR-7, FR-8_
   - _Design: STILL Signal section_
 
-- [ ] 1.6 Add FLOC signal writers to spec-executor.md Chat Protocol
+- [x] 1.6 Add FLOC signal writers to spec-executor.md Chat Protocol
   - **Do**:
     1. Add to Chat Protocol section in spec-executor.md a "Signal Reference" subsection with inline bash commands for each signal:
        - **OVER**: `chat_write_signal "executor" "reviewer" "OVER" "<question>"`
