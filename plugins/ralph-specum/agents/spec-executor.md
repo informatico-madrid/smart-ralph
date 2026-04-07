@@ -56,7 +56,10 @@ Before processing each task, read the external reviewer's task_review.md file if
 **Step 2 — Read reviews**: Parse review entries from the file
 **Step 3 — Apply rules by status**:
    - **FAIL**: Task failed reviewer's criteria. Must fix before proceeding.
-   - **PENDING**: Task needs review. Proceed but note in .progress.md.
+     - treat as VERIFICATION_FAIL
+     - Apply fix using fix_hint as starting point
+     - Mark the entry's resolved_at with timestamp before marking the task complete
+   - **PENDING**: Do NOT start the task. Append to .progress.md: "External review PENDING for task X — waiting one cycle". Skip this task and move to the next unchecked one.
    - **WARNING**: Task passed but with concerns. Note in .progress.md.
    - **PASS**: Task passed external review. Mark complete if implementation done.
 **Step 4 — Append to .progress.md**: Log review outcome in `<basePath>/.progress.md`
@@ -85,8 +88,16 @@ without shared process state — filesystem-only communication.
 
 - **Type**: Map of `taskId` (string) → `count` (integer)
 - **Default**: `{}`
-- **Written by**: External reviewer only (task_review.md)
+- **Written by**: external reviewer only (increments when unmarking a task in .ralph-state.json)
 - **Read by**: spec-executor for stuck detection
+- **Lifetime**: Cumulative across sessions, NEVER reset by spec-executor
+- **Example**:
+  ```json
+  {
+    "1.2": 3,
+    "2.4": 1
+  }
+  ```
 - **Lifetime**: Cumulative across sessions, NEVER reset by spec-executor
 - **Example**:
   ```json
@@ -103,25 +114,6 @@ It is used in the effectiveIterations formula for stuck detection.
 
 ### Implementation Tasks (no tag)
 Direct implementation: write code, modify files, run commands.
-
-### Type Consistency Pre-Check (typed Python or TypeScript tasks)
-
-Before implementing typed Python or TypeScript tasks, verify type annotations match usage:
-
-1. **Extract the signature** from the type annotation (e.g., `Callable[[str], int]`)
-2. **Find the usage example** in the same document (usually in a code block)
-3. **Check sync/async consistency**:
-   - If the type is `Callable[..., None]` and the example uses `await`, this is a MISMATCH
-   - If the type is `Awaitable[T]` and the example does NOT use `await`, this is a MISMATCH
-4. **If mismatch found**:
-   - Update the type annotation to match the usage example
-   - OR update the usage example to match the type annotation
-   - Document the change in `.progress.md`
-5. **If no usage example exists**:
-   - Add a usage example to demonstrate the correct sync/async pattern
-   - Document in `.progress.md`
-
-This check catches type annotation errors before implementation begins.
 
 After completing any implementation task, check if it introduced new `data-testid`
 attributes into source files:
@@ -143,6 +135,23 @@ attributes into source files:
 3. If `ui-map.local.md` does not exist, skip — the map will be built at VE0
 
 This step adds at most a few rows per task. It never regenerates the full map.
+
+### Type Consistency Pre-Check (typed Python or TypeScript tasks)
+
+Before implementing typed Python or TypeScript tasks, verify type annotations match usage:
+
+1. **Extract the signature** from the type annotation (e.g., `Callable[[str], int]`)
+2. **Find the usage example** in the same document (usually in a code block)
+3. **Check sync/async consistency**:
+   - If the type is `Callable[..., None]` and the example uses `await`, this is a MISMATCH
+   - If the type is `Awaitable[T]` and the example does NOT use `await`, this is a MISMATCH
+4. **If mismatch found**:
+   - Update the type annotation to match the usage example
+   - OR update the usage example to match the type annotation
+   - Document the change in `.progress.md`
+5. **If both the type AND the usage are ambiguous** (neither clearly implies sync or async): ESCALATE before implementing, do not guess.
+
+This check catches type annotation errors before implementation begins.
 
 ---
 
