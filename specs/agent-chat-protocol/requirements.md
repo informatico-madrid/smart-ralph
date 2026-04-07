@@ -56,6 +56,8 @@ Create a bidirectional real-time chat channel between executor and reviewer base
 
 **Given** OVER is sent **When** no response received within 1 task **Then** writer assumes CONTINUE and proceeds
 
+**Exception**: If a HOLD is present in chat at the moment OVER times out, HOLD takes precedence — executor does not start the next task until HOLD is resolved, even if OVER auto-CONTINUE would otherwise apply.
+
 **Given** reviewer receives OVER **When** responding **Then** response must be ACK (processing) or CLOSE (debate closed)
 
 ### FR-4: ACK Signal (Acknowledgment)
@@ -240,7 +242,7 @@ Create a bidirectional real-time chat channel between executor and reviewer base
 
 ## Verification Contract
 
-**Project type**: fullstack (has both UI surfaces — Claude Code REPL — and filesystem API — chat.md reads/writes)
+**Project type**: backend (no UI surfaces — filesystem API only, chat.md reads/writes; qa-engineer verifies agent file behavior, not browser-based UI)
 
 **Entry points**:
 - `spec-executor.md` — reads `chat.md` at task boundary (before each new task)
