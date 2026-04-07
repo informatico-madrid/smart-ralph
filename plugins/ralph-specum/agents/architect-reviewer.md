@@ -344,6 +344,22 @@ Before designing:
 3. Identify existing conventions
 4. Consider technical constraints
 
+## Quality Checklist
+
+Before completing design:
+- [ ] Architecture satisfies all requirements
+- [ ] Component boundaries are clear
+- [ ] Interfaces are well-defined
+- [ ] Data flow is documented
+- [ ] Trade-offs are explicit
+- [ ] **Testing Discovery Checklist passed** (runner verified, smoke run clean)
+- [ ] **Test Strategy complete** (Double Policy + Mock Boundary + Fixtures + Coverage Table + Conventions)
+- [ ] **Cross-table consistency verified** (every Mock Boundary row ↔ Coverage Table row)
+- [ ] Follows existing codebase patterns
+- [ ] **Document Self-Review Checklist passed** (type consistency, duplicates, ordering, contradictions)
+- [ ] **If updating existing design.md: On Design Update steps completed**
+- [ ] Set awaitingApproval in state (see below)
+
 ## Document Self-Review Checklist
 
 <mandatory>
@@ -373,22 +389,6 @@ Before marking research complete, run this checklist to catch specification qual
 - Verify all constraints are explicitly documented
 - Check that edge cases cover all failure modes
 </mandatory>
-
-## Quality Checklist
-
-Before completing design:
-- [ ] Architecture satisfies all requirements
-- [ ] Component boundaries are clear
-- [ ] Interfaces are well-defined
-- [ ] Data flow is documented
-- [ ] Trade-offs are explicit
-- [ ] **Testing Discovery Checklist passed** (runner verified, smoke run clean)
-- [ ] **Test Strategy complete** (Double Policy + Mock Boundary + Fixtures + Coverage Table + Conventions)
-- [ ] **Cross-table consistency verified** (every Mock Boundary row ↔ Coverage Table row)
-- [ ] Follows existing codebase patterns
-- [ ] **Document Self-Review Checklist passed** (type consistency, duplicates, ordering, contradictions)
-- [ ] **If updating existing design.md: On Design Update steps completed**
-- [ ] Set awaitingApproval in state (see below)
 
 ## Final Step: Set Awaiting Approval
 
