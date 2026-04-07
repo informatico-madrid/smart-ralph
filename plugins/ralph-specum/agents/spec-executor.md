@@ -117,6 +117,76 @@ jq --argjson idx N '.chat.executor.lastReadIndex = $idx' <basePath>/.ralph-state
   - When executor would decrement stillTtl to 0, check for ALIVE in unread messages first
   - If ALIVE present: reset stillTtl to 3, do not raise alarm
   - Resets the stillTtl counter on the executor side
+
+### Signal Reference (Executor-Side Writers)
+
+**Signal writer functions** — executor uses these to send signals to reviewer:
+
+```bash
+# Timestamp helper
+chat_timestamp() {
+  date +%H:%M:%S
+}
+
+# Task-ID formatter — reads taskIndex from .ralph-state.json
+chat_task_id() {
+  local basePath="$1"
+  jq -r '.taskIndex' "${basePath}/.ralph-state.json" 2>/dev/null || echo "?"
+}
+
+# Atomic signal writer — appends message to chat.md
+# Usage: chat_write_signal <writer> <addressee> <SIGNAL> "<message>"
+chat_write_signal() {
+  local writer="$1"
+  local addressee="$2"
+  local signal="$3"
+  local message="$4"
+  local basePath="${5:-$(pwd)}"
+
+  local tmpfile="/tmp/chat.tmp.${writer}.$(date +%s%N)"
+  local ts
+  ts="$(chat_timestamp)"
+  local tid
+  tid="$(chat_task_id "$basePath")"
+
+  cat > "$tmpfile" << EOF
+### [${writer} → ${addressee}] ${ts} | ${tid} | ${signal}
+${message}
+EOF
+
+  cat "$tmpfile" >> "${basePath}/chat.md" && rm "$tmpfile"
+}
+
+# OVER: Ask reviewer a question, block until response or 1-task timeout
+# Usage: chat_write_signal "executor" "reviewer" "OVER" "<question>"
+chat_send_over() {
+  chat_write_signal "executor" "reviewer" "OVER" "$1"
+}
+
+# CONTINUE: Acknowledge, proceed without waiting
+# Usage: chat_write_signal "executor" "reviewer" "CONTINUE" ""
+chat_send_continue() {
+  chat_write_signal "executor" "reviewer" "CONTINUE" ""
+}
+
+# HOLD: Pause new task starts, require ACK or CONTINUE to resume
+# Usage: chat_write_signal "executor" "reviewer" "HOLD" "<reason>"
+chat_send_hold() {
+  chat_write_signal "executor" "reviewer" "HOLD" "$1"
+}
+
+# DEADLOCK: Escalate to human — neither agent can resolve
+# Usage: chat_write_signal "executor" "reviewer" "DEADLOCK" "<reason>"
+chat_send_deadlock() {
+  chat_write_signal "executor" "reviewer" "DEADLOCK" "$1"
+}
+```
+
+**Usage examples**:
+- Ask a question: `chat_send_over "Should I refactor task 1.2 or skip it?"`
+- Proceed without waiting: `chat_send_continue`
+- Pause new tasks: `chat_send_hold "Waiting for design decision on API shape"`
+- Deadlock: `chat_send_deadlock "Reviewer keeps requesting changes that conflict with each other"`
 </mandatory>
 
 ## Task Loop
