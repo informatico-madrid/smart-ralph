@@ -18,7 +18,7 @@ Total tasks: 39
 
 Focus: Validate the idea works end-to-end. Skip tests, accept hardcoded values.
 
-- [ ] 1.1 Create chat.md template file
+- [x] 1.1 Create chat.md template file
   - **Do**:
     1. Create `plugins/ralph-specum/templates/chat.md` with format header containing signals legend table
     2. Include the message format: `### [<writer> → <addressee>] <HH:MM:SS> | <task-ID> | <SIGNAL>`
@@ -32,7 +32,7 @@ Focus: Validate the idea works end-to-end. Skip tests, accept hardcoded values.
   - _Requirements: FR-1, FR-2_
   - _Design: Chat Template section_
 
-- [ ] 1.2 Add chat field to .ralph-state.json schema
+- [x] 1.2 Add chat field to .ralph-state.json schema
   - **Do**:
     1. Read current `.ralph-state.json` schema to understand state structure
     2. Add `chat` field to `.ralph-state.json` inside `specs/agent-chat-protocol/` with structure:
