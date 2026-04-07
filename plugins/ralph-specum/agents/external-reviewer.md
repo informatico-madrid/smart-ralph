@@ -188,6 +188,30 @@ chat_write_signal "reviewer" "executor" "CONTINUE" ""
 chat_write_signal "reviewer" "executor" "CLOSE" "<resolution summary>"
 ```
 
+**STILL and ALIVE signals**: Heartbeat mechanism to confirm healthy session
+- **STILL**: Non-blocking signal sent when intentionally silent but working
+  - Has 3-task TTL: executor raises alarm after 3 consecutive tasks with no reviewer signal
+  - Resets when ANY reviewer signal is sent (ACK, CONTINUE, CLOSE, ALIVE, etc.)
+  - Executor raises deadlock suspicion when TTL expires
+- **ALIVE**: Non-blocking heartbeat sent every 3 tasks of silence
+  - Resets STILL TTL counter back to 3
+  - Any signal (including ALIVE itself) resets the STILL TTL counter
+
+**STILL/ALIVE TTL tracking in state**: Stored in `.ralph-state.json` under `chat.reviewer.stillTtl`
+- Decrement `stillTtl` each task cycle when no signal sent
+- Reset `stillTtl` to 3 when ANY reviewer signal is sent
+- When TTL reaches 0: executor raises deadlock suspicion alarm
+- Reviewer sends ALIVE when about to go silent for extended period
+
+**Signal writers for STILL/ALIVE**:
+```bash
+# Send ALIVE — heartbeat to confirm healthy session, resets STILL TTL
+chat_write_signal "reviewer" "executor" "ALIVE" ""
+
+# Send STILL — intentional silence notification, non-blocking
+chat_write_signal "reviewer" "executor" "STILL" "<reason for silence>"
+```
+
 ## Section 8 — Never Do
 
 - Never modify `tasks.md` or implementation files directly.
