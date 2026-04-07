@@ -135,7 +135,7 @@ Total tasks: 27 (12 implementation + 4 verification checkpoints + 11 fix/feat ta
 
 ## Phase 2: Fix Verified Issues from Unresolved Comments
 
-- [ ] 2.1 [FIX] architect-reviewer.md: Move Document Self-Review Checklist AFTER Quality Checklist
+- [x] 2.1 [FIX] architect-reviewer.md: Move Document Self-Review Checklist AFTER Quality Checklist
   - **Do**: The `## Document Self-Review Checklist` section (currently at line 347) is positioned BEFORE `## Quality Checklist` (line 382). Per FR-A1 spec, it must be positioned AFTER `## Quality Checklist` and BEFORE `## Final Step: Set Awaiting Approval`. Move the entire section (lines 347-380) to between the Quality Checklist section and the Final Step section.
   - **Files**: `plugins/ralph-specum/agents/architect-reviewer.md`
   - **Done when**: Document Self-Review Checklist appears AFTER Quality Checklist section, BEFORE Final Step
@@ -143,7 +143,7 @@ Total tasks: 27 (12 implementation + 4 verification checkpoints + 11 fix/feat ta
   - **Commit**: `fix(architect-reviewer): reposition Document Self-Review Checklist after Quality Checklist per FR-A1`
   - _Requirements: FR-A1_
 
-- [ ] 2.2 [FIX] spec-executor.md: Fix External Review Protocol PENDING/FAIL handling
+- [x] 2.2 [FIX] spec-executor.md: Fix External Review Protocol PENDING/FAIL handling
   - **Do**: Update the External Review Protocol section (lines 53-65) to match FR-B2 spec:
     - **PENDING**: Change from "Task needs review. Proceed but note in .progress.md." to "do NOT start the task. Append to .progress.md: 'External review PENDING for task X — waiting one cycle'. Skip this task and move to the next unchecked one."
     - **FAIL**: Add "treat as VERIFICATION_FAIL. Apply fix using fix_hint as starting point, then mark the entry's resolved_at with timestamp before marking the task complete in tasks.md"
@@ -153,7 +153,7 @@ Total tasks: 27 (12 implementation + 4 verification checkpoints + 11 fix/feat ta
   - **Commit**: `fix(spec-executor): correct External Review Protocol PENDING/FAIL handling per FR-B2`
   - _Requirements: FR-B2_
 
-- [ ] 2.3 [FIX] spec-executor.md: Fix external_unmarks documentation
+- [x] 2.3 [FIX] spec-executor.md: Fix external_unmarks documentation
   - **Do**: Update the external_unmarks field documentation (lines 88-96) to correctly state where the field lives. Change "Written by: External reviewer only (task_review.md)" to "Written by: external reviewer only (increments when unmarking a task in .ralph-state.json)". The field lives in `.ralph-state.json`, not in `task_review.md`.
   - **Files**: `plugins/ralph-specum/agents/spec-executor.md`
   - **Done when**: Documentation correctly states external_unmarks is written to .ralph-state.json
@@ -161,7 +161,7 @@ Total tasks: 27 (12 implementation + 4 verification checkpoints + 11 fix/feat ta
   - **Commit**: `docs(spec-executor): correct external_unmarks documentation to reference .ralph-state.json`
   - _Requirements: FR-B4_
 
-- [ ] 2.4 [FIX] spec-executor.md: Reorder Type Consistency Pre-Check AFTER data-testid block
+- [x] 2.4 [FIX] spec-executor.md: Reorder Type Consistency Pre-Check AFTER data-testid block
   - **Do**: Move the `### Type Consistency Pre-Check` section (lines 107-123) to AFTER the data-testid update block (which ends around line 145). Per FR-A4 spec, Type Consistency Pre-Check must be "positioned after the existing data-testid update block". Also fix step 5: change from "Add a usage example" to "If both the type AND the usage are ambiguous (neither clearly implies sync or async): ESCALATE before implementing, do not guess."
   - **Files**: `plugins/ralph-specum/agents/spec-executor.md`
   - **Done when**: Type Consistency Pre-Check appears AFTER data-testid block; step 5 says ESCALATE if both ambiguous
@@ -169,7 +169,7 @@ Total tasks: 27 (12 implementation + 4 verification checkpoints + 11 fix/feat ta
   - **Commit**: `fix(spec-executor): reposition Type Consistency Pre-Check after data-testid block per FR-A4`
   - _Requirements: FR-A4_
 
-- [ ] 2.5 [FIX] task_review.md: Update PENDING description to match FR-B2
+- [x] 2.5 [FIX] task_review.md: Update PENDING description to match FR-B2
   - **Do**: Update the task_review.md template workflow comment (lines 9-15) to change PENDING description from "Task needs review - proceed but note status" to match FR-B2: "PENDING: reviewer is working on it, spec-executor should not re-mark this task until status changes. spec-executor: skip this task and move to the next unchecked one."
   - **Files**: `plugins/ralph-specum/templates/task_review.md`
   - **Done when**: PENDING description in workflow comment matches FR-B2 spec
@@ -177,7 +177,7 @@ Total tasks: 27 (12 implementation + 4 verification checkpoints + 11 fix/feat ta
   - **Commit**: `fix(templates): update task_review.md PENDING description to match FR-B2`
   - _Requirements: FR-B1_
 
-- [ ] 2.6 [FIX] Align plugin version with tests
+- [x] 2.6 [FIX] Align plugin version with tests
   - **Do**: The tests/interview-framework.bats expects version 4.9.3 but plugin.json and marketplace.json have 4.9.2. Either update the tests to expect 4.9.2 OR bump the version to 4.9.3. Since NFR-3 of this spec already bumped from 4.9.1 → 4.9.2, and the tests expect 4.9.3, bump both files from 4.9.2 → 4.9.3.
   - **Files**: `plugins/ralph-specum/.claude-plugin/plugin.json`, `.claude-plugin/marketplace.json`
   - **Done when**: Both files show version 4.9.3
@@ -185,7 +185,7 @@ Total tasks: 27 (12 implementation + 4 verification checkpoints + 11 fix/feat ta
   - **Commit**: `chore(version): bump 4.9.2 → 4.9.3 to align with interview-framework.bats tests`
   - _Requirements: NFR-3_
 
-- [ ] 2.7 [FIX] Add YAML frontmatter to ralph-quality-improvements spec files
+- [x] 2.7 [FIX] Add YAML frontmatter to ralph-quality-improvements spec files
   - **Do**: Add standard YAML frontmatter to the three spec files that are missing it:
     - `specs/ralph-quality-improvements/requirements.md`
     - `specs/ralph-quality-improvements/design.md`
