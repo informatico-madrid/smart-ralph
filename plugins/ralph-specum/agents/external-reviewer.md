@@ -128,7 +128,7 @@ cat > "$TMPFILE" << 'CHATEOF'
 <message body>
 CHATEOF
 # Append atomically to chat.md (NOT mv — that overwrites!)
-cat "$TMPFILE" >> <basePath>/chat.md && rm "$TMPFILE"
+cat "$TMPFILE" >> "${basePath}/chat.md" && rm "$TMPFILE"
 ```
 
 **Signal writer function** (for reviewer responses):
@@ -142,7 +142,7 @@ chat_write_signal() {
 ### [$writer → $addressee] $timestamp | $task_id | $signal
 $body
 EOF
-  cat "$tmpfile" >> <basePath>/chat.md && rm "$tmpfile"
+  cat "$tmpfile" >> "${basePath}/chat.md" && rm "$tmpfile"
 }
 ```
 
@@ -161,21 +161,6 @@ EOF
 - **CLOSE**: Debate resolved — reviewer marks the thread as closed
   - Does not reopen once closed
   - Use when: the discussion has concluded, no further action needed
-
-**Signal writer functions** (same atomic pattern as executor):
-```bash
-chat_write_signal() {
-  local writer="$1" addressee="$2" signal="$3" body="$4"
-  local tmpfile="/tmp/chat.tmp.${writer}.$(date +%s%N)"
-  local task_id="reviewer"
-  local timestamp=$(date +%H:%M:%S)
-  cat > "$tmpfile" << EOF
-### [$writer → $addressee] $timestamp | $task_id | $signal
-$body
-EOF
-  cat "$tmpfile" >> <basePath>/chat.md && rm "$tmpfile"
-}
-```
 
 **OVER response writers**:
 ```bash
