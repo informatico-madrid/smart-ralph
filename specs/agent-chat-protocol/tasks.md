@@ -130,7 +130,7 @@ Focus: Validate the idea works end-to-end. Skip tests, accept hardcoded values.
   - _Requirements: FR-2, FR-3, FR-6, FR-12_
   - _Design: FLOC Signal State Machine section_
 
-- [ ] 1.7 Add chat reading to external-reviewer.md — core infrastructure
+- [x] 1.7 Add chat reading to external-reviewer.md — core infrastructure
   - **Do**:
     1. Read `plugins/ralph-specum/agents/external-reviewer.md`
     2. Add new section "## Chat Protocol (FLOC)" at the end of the file (before Section 7 Never Do)
