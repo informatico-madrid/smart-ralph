@@ -107,6 +107,16 @@ jq --argjson idx N '.chat.executor.lastReadIndex = $idx' <basePath>/.ralph-state
 - **HOLD signal**: Pre-task gate only — read at task START, never interrupt mid-task
   - If HOLD present in unread messages: block until ACK or CONTINUE received
   - Do NOT stop current task when HOLD received mid-execution
+- **STILL TTL**: 3-task cycle deadlock detection counter
+  - Decrement `stillTtl` (from `.ralph-state.json → chat.executor.stillTtl`) when reviewer sends no signal for N consecutive tasks
+  - At task START: if no new reviewer signal since last task, decrement stillTtl by 1
+  - When stillTtl reaches 0: raise DEADLOCK alarm (suspicion of reviewer-side deadlock)
+  - ANY reviewer signal (ACK, OVER response, CONTINUE, ALIVE, etc.) resets stillTtl to 3
+  - If ALIVE appears when TTL would expire: reset stillTtl to 3 instead of raising alarm
+- **ALIVE signal**: Heartbeat response — reviewer sends ALIVE to reset TTL before deadlock alarm fires
+  - When executor would decrement stillTtl to 0, check for ALIVE in unread messages first
+  - If ALIVE present: reset stillTtl to 3, do not raise alarm
+  - Resets the stillTtl counter on the executor side
 </mandatory>
 
 ## Task Loop
