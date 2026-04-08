@@ -252,7 +252,12 @@ chat_write_signal() {
 ### [$writer → $addressee] $timestamp | $task_id | $signal
 $body
 EOF
-  cat "$tmpfile" >> "${basePath}/chat.md" && rm "$tmpfile"
+  (
+    exec 200>"${basePath}/chat.md.lock"
+    flock -e 200 || exit 1
+    cat "$tmpfile" >> "${basePath}/chat.md"
+    rm -f "$tmpfile"
+  ) 200>"${basePath}/chat.md.lock"
 }
 ```
 
