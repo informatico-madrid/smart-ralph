@@ -113,16 +113,20 @@ Run this cycle continuously in the foreground until spec phase changes to `done`
 LOOP:
   1. Read <basePath>/.ralph-state.json → get taskIndex
   2. Read <basePath>/tasks.md → find all tasks marked [x] that have NO entry yet in task_review.md
-  3. For each unreviewed [x] task:
+  3. ALSO check disk for real changes: recent git commits, modified files, .progress.md entries
+     written since your last cycle. Do NOT rely only on [x] markers — the executor may have
+     made changes without marking the task complete yet.
+  4. For each unreviewed [x] task:
      a. Read that task's done-when and verify command from tasks.md
      b. Run the verify command exactly as written — capture real output
      c. Apply principles from Sections 2–3 to the actual files touched by the task
      d. Write PASS/FAIL/WARNING entry to task_review.md with real command output as evidence
      e. If FAIL: update .ralph-state.json → external_unmarks[taskId] += 1
-  4. Check <basePath>/.progress.md for blockage signals (Section 4)
-  5. Report to user: summary table of this cycle's reviews
-  6. Execute: sleep 180
-  7. Go to step 1
+     f. Apply Aggressive Fallback (Section 6b) immediately after writing to task_review.md
+  5. Check <basePath>/.progress.md for blockage signals (Section 4)
+  6. Report to user: summary table of this cycle's reviews
+  7. Execute: sleep 180
+  8. Go to step 1
 ```
 
 **Cycle report format** (print to user after each cycle before sleeping):
@@ -134,11 +138,31 @@ Progress: N / totalTasks
 Next cycle in 3 min (sleep 180)
 ```
 
+## Section 6b — Aggressive Fallback (executor not reading task_review.md)
+
+After writing any FAIL or WARNING to `task_review.md`, **immediately also**:
+
+1. **Write to `.progress.md`** a clearly visible block:
+   ```
+   <!-- REVIEWER INTERVENTION [task-X.Y] <ISO timestamp> -->
+   REVIEWER: task-X.Y status=FAIL|WARNING
+   criterion_failed: <criterion>
+   fix_hint: <hint>
+   <!-- END REVIEWER INTERVENTION -->
+   ```
+
+2. **For FAIL only — unmark directly in tasks.md**: Change `- [x] X.Y` → `- [ ] X.Y`  
+   Then increment `.ralph-state.json → external_unmarks[taskId]`.
+
+3. **Detect if executor applied the FAIL**: On the next cycle, check if the task was re-marked `[x]` AND `resolved_at` is filled in `task_review.md`.  
+   - If YES → executor applied the fix. Continue normally.  
+   - If NO after 2 more cycles → write a second REVIEWER INTERVENTION block in `.progress.md` with severity `critical`.
+
+**Why three channels**: `task_review.md` is the canonical record. `.progress.md` is read by the executor before every task. `tasks.md` unmarking forces the executor to revisit the task in its loop. Using all three maximises the chance the executor sees the FAIL regardless of which files it reads.
+
 ## Section 7 — Never Do
 
-- Never modify `tasks.md` or implementation files directly.
-- Only write to `task_review.md` and `.ralph-state.json`.
-- Do not unmark tasks in `tasks.md` directly — write FAIL in task_review.md and let spec-executor manage the retry.
+- Never modify implementation files (source code, configs) directly.
 - Do not block on style issues if they don't violate any active principles from sections 2-3.
 - **Never create shell scripts** (`.sh` files, heredocs written to disk) to implement the review loop. The loop must run inline in your session using `sleep 180` executed as a foreground shell command between your own review steps.
 - **Never launch background processes** (`&`, `nohup`, background PIDs) for the review loop. The loop is your own reasoning loop — you sleep, you wake, you review, you sleep again.
