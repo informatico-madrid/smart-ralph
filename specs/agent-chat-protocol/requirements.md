@@ -156,13 +156,22 @@ Create a bidirectional real-time chat channel between executor and reviewer base
 
 ### NFR-1: Atomic Writes (CRITICAL)
 
-**Statement**: Concurrent filesystem writes from two agents MUST NOT corrupt chat.md
+**Statement**: Concurrent filesystem writes from two agents MUST NOT corrupt data
 
-**Options**:
-- **Option A — O_APPEND**: Unix `O_APPEND` flag ensures atomic append for writes < PIPE_BUF (~4KB). Simple but relies on OS atomicity guarantees. Safe for human-scale messages.
-- **Option B — Temp file + rename**: Write to `chat.tmp.{agent}.{timestamp}`, then atomic `rename()` to final position. More explicit, works across broader file sizes, guaranteed atomic by filesystem.
+**Scope**: This requirement covers two distinct write targets with different mechanisms:
 
-**Decision**: Option B (temp file + rename). Explicit atomicity is more robust across file sizes and filesystem implementations. O_APPEND implicit behavior varies.
+**1. chat.md — flock-based exclusive append**:
+- Both agents append messages to chat.md concurrently.
+- Use `flock` for exclusive access + `cat >>` for safe append:
+  ```bash
+  ( exec 200>"${basePath}/chat.md.lock"; flock -e 200 || exit 1; cat >> "${basePath}/chat.md" << 'EOF' ... EOF ) 200>"${basePath}/chat.md.lock"
+  ```
+- **Note**: `cat >>` WITHOUT flock is NOT atomic on concurrent writes — without locking, appends can interleave or overwrite each other.
+
+**2. .ralph-state.json — temp file + atomic rename**:
+- Each agent updates its own subsection (`chat.executor` or `chat.reviewer`).
+- Use `jq ... > /tmp/state.json && mv /tmp/state.json .ralph-state.json` pattern.
+- Collision safety: each agent writes its own subsection only.
 
 **Verification**: Concurrent write test: both agents append 100 messages simultaneously, verify zero corruption and zero lost messages.
 

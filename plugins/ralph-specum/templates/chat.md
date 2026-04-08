@@ -23,7 +23,7 @@ Example: `[agent-1 → agent-2] 14:32:05 | task-3.2 | OVER`
 
 ## Example Messages
 
-```
+```text
 [spec-executor → coordinator] 09:00:00 | task-1.1 | ALIVE
 [coordinator → spec-executor] 09:00:01 | task-1.1 | ACK
 [spec-executor → coordinator] 09:00:05 | task-1.1 | CONTINUE

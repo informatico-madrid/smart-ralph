@@ -119,7 +119,7 @@ Review entry template:
   a) Eliminar la segunda definición duplicada de chat_write_signal.
   b) Reemplazar <basePath> con ${basePath} en la función del reviewer,
      consistente con spec-executor.md.
-- resolved_at: 2026-04-07T18:35:00Z 2026-04-07T18:35:00Z
+- resolved_at: 2026-04-07T18:35:00Z
 
 ### [task-1.8] Add OVER response signals to external-reviewer.md Chat Protocol
 - status: PASS
