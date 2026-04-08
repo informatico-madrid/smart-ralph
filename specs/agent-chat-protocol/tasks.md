@@ -601,7 +601,7 @@ The atomic write strategy in the original spec is broken. `cat chat.md chat.tmp 
   - **Commit**: `fix(requirements): clarify FR-13 atomic write — flock required`
   - _Review issue: CRITICAL #3 (line 143)_
 
-- [ ] 5.3 [FIX] Fix tasks.md task 1.3 atomic write pattern
+- [x] 5.3 [FIX] Fix tasks.md task 1.3 atomic write pattern
   - **Do**:
     1. Read task 1.3 in `specs/agent-chat-protocol/tasks.md`
     2. Update the atomic append pattern to use flock (same as task 5.1)
