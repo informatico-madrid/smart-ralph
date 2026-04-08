@@ -697,7 +697,7 @@ The atomic write strategy in the original spec is broken. `cat chat.md chat.tmp 
   - **Commit**: `fix(requirements): remove all .chat-state.*.json references — state in .ralph-state.json`
   - _Review issue: MAJOR #5 (line 240) — also covers lines 147-150 (FR-14 section) and Dependency map_
 
-- [ ] 5.10 [FIX] Fix design.md test runner inconsistency — remove vitest, use bats
+- [x] 5.10 [FIX] Fix design.md test runner inconsistency — remove vitest, use bats
   - **Do**:
     1. Read `specs/agent-chat-protocol/design.md` — Test Strategy section
     2. Remove vitest/TypeScript references (lines 356-361)

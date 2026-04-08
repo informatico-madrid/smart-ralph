@@ -330,16 +330,11 @@ Thread closed.
 
 ### Test Discovery
 
-**Runner**: vitest (Node.js)
-**Test file location**: Co-located `*.test.ts` with source
-**Test commands** (from package.json):
-- Unit: `npm run test` / `vitest run src/`
-- Integration: `vitest run --config vitest.integration.config.ts`
-
-Current commands available:
-```bash
-npm test 2>&1 | head -5  # smoke run
-```
+**Runner**: bats (Bash test framework)
+**Test file location**: `tests/` — .bats files in root tests directory
+**Test commands**:
+- `bats tests/chat-protocol.bats` — run chat protocol tests
+- `bats tests/` — run all integration tests
 
 ### Test Double Policy
 
@@ -355,7 +350,7 @@ npm test 2>&1 | head -5  # smoke run
 
 | Component | Unit | Integration | Rationale |
 |---|---|---|---|
-| Filesystem (chat.md read/write) | Stub (mock `readFile`, `writeFile`) | Fake (tempfs) | I/O boundary |
+| Filesystem (chat.md read/write) | Stub (mock shell scripts) | Fake (temp dir with `cp`) | I/O boundary |
 | External reviewer agent | Mock (verify FLOC signals sent) | Stub (fake chat file) | Can't run real reviewer |
 | spec-executor agent | Mock (verify HOLD respected) | Stub (fake chat file) | Can't run real executor |
 | Human intervention | None (not testable) | Fixture (pre-written human message) | Manual action |
@@ -368,7 +363,7 @@ npm test 2>&1 | head -5  # smoke run
 | `ChatReader` | Messages at known indices | Factory function `buildChatMessages(n)` |
 | `StateFile` | Valid JSON, corrupted JSON, missing | Fixture files in `fixtures/` |
 | FLOC state machine | ACTIVE, BLOCKED, HELD, ESCALATED | Inline constants |
-| Concurrent writes | Two agents writing simultaneously | Test with `Promise.all` + temp files |
+| Concurrent writes | Two agents writing simultaneously | Test with background subshells + temp files |
 
 ### Test Coverage Table
 
