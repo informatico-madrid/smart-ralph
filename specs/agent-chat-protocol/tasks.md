@@ -685,7 +685,7 @@ The atomic write strategy in the original spec is broken. `cat chat.md chat.tmp 
   - **Commit**: `fix(design): rename lastReadIndex to lastReadLine across all spec files`
   - _Review issue: MAJOR #4 (line 130) — also covers requirements.md FR-14 and agent files_
 
-- [ ] 5.9 [FIX] Fix requirements.md — remove all .chat-state.*.json references
+- [x] 5.9 [FIX] Fix requirements.md — remove all .chat-state.*.json references
   - **Do**:
     1. Read `specs/agent-chat-protocol/requirements.md`
     2. Fix Dependencies table (around line 240): change "No change" to "Must modify"; remove "lastReadIndex stored separately"
