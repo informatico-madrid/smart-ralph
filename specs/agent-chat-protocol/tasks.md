@@ -565,7 +565,7 @@ The atomic write strategy in the original spec is broken. `cat chat.md chat.tmp 
 
 **Correct fix**: `flock` for exclusive access + `cat >>` for safe append.
 
-- [ ] 5.1 [FIX] Fix atomic write pattern in design.md
+- [x] 5.1 [FIX] Fix atomic write pattern in design.md
   - **Do**:
     1. Read `specs/agent-chat-protocol/design.md` — find "Atomic Write Implementation" section
     2. Replace the broken pattern with `flock`-based atomic append:
