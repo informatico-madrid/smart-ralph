@@ -47,7 +47,7 @@ sequenceDiagram
     participant Human
 
     Note over Executor: Task N starts
-    Executor->>Chat: Read messages since lastReadIndex
+    Executor->>Chat: Read messages since lastReadLine
     Executor->>Chat: Check for HOLD signal
     alt HOLD present
         Executor->>Chat: Wait for ACK/CONTINUE
@@ -84,12 +84,12 @@ No central state. Each agent tracks its own position via `.chat-state.{agent}.js
 1. Write content to `chat.tmp.{agent}.{timestamp}`
 2. Read current `chat.md` line count to determine append position
 3. Atomic rename `chat.tmp.{agent}.{timestamp}` → `chat.md`
-4. Update `lastReadIndex` in `.chat-state.{agent}.json` (atomic write)
+4. Update `lastReadLine` in `.chat-state.{agent}.json` (atomic write)
 
 **Read new messages:**
-1. Read `.chat-state.{agent}.json` → `lastReadIndex`
-2. Read `chat.md` lines from `lastReadIndex + 1` to end
-3. Update `lastReadIndex` to new end
+1. Read `.chat-state.{agent}.json` → `lastReadLine`
+2. Read `chat.md` lines from `lastReadLine + 1` to end
+3. Update `lastReadLine` to new end
 
 ## Component: Per-Agent State (inside .ralph-state.json)
 
@@ -105,13 +105,13 @@ Following the established pattern in the repo (`jq ... > /tmp/state.json && mv /
   "taskIndex": 5,
   "chat": {
     "executor": {
-      "lastReadIndex": 42,
+      "lastReadLine": 42,
       "lastSignal": "OVER",
       "lastSignalTask": "2.4",
       "stillTtl": 0
     },
     "reviewer": {
-      "lastReadIndex": 38,
+      "lastReadLine": 38,
       "lastSignal": "ALIVE",
       "lastSignalTask": "2.1",
       "pendingIntentFail": null
@@ -122,11 +122,11 @@ Following the established pattern in the repo (`jq ... > /tmp/state.json && mv /
 
 | Field | Type | Description |
 |-------|------|-------------|
-| `chat.executor.lastReadIndex` | integer | 0-indexed line number of last read message |
+| `chat.executor.lastReadLine` | integer | 0-indexed line number of last read message |
 | `chat.executor.lastSignal` | string | Last FLOC signal written or received |
 | `chat.executor.lastSignalTask` | string | task-ID where signal was sent |
 | `chat.executor.stillTtl` | integer | Tasks remaining before alarm (max 3, resets on any signal) |
-| `chat.reviewer.lastReadIndex` | integer | 0-indexed line number of last read message |
+| `chat.reviewer.lastReadLine` | integer | 0-indexed line number of last read message |
 | `chat.reviewer.lastSignal` | string | Last FLOC signal written or received |
 | `chat.reviewer.lastSignalTask` | string | task-ID where signal was sent |
 | `chat.reviewer.pendingIntentFail` | string | null or task-ID with active INTENT-FAIL (1-task window) |
@@ -138,7 +138,7 @@ Each agent writes only its own `chat.{executor|reviewer}` subsection using the e
 ```bash
 # Executor updates its chat state
 jq --argjson idx 42 --arg signal "OVER" --arg task "2.4" \
-  '.chat.executor.lastReadIndex = $idx | .chat.executor.lastSignal = $signal | .chat.executor.lastSignalTask = $task' \
+  '.chat.executor.lastReadLine = $idx | .chat.executor.lastSignal = $signal | .chat.executor.lastSignalTask = $task' \
   .ralph-state.json > /tmp/state.json && mv /tmp/state.json .ralph-state.json
 ```
 
@@ -192,58 +192,36 @@ stateDiagram-v2
 
 ## Atomic Write Implementation
 
-### Pattern: Temp File + Atomic Rename
+### Pattern: flock-Based Exclusive Append
 
 ```bash
-# Step 1: Compose message to temp file
-cat > chat.tmp.executor.1712512325 << 'EOF'
-### [executor → reviewer] 14:32:05 | task-2.4 | OVER
-
-Why does the authentication token expire after 30 minutes?
-EOF
-
-# Step 2: Read current line count for append position
-lines=$(wc -l < chat.md)
-
-# Step 3: Read temp file content and append to chat.md using cat redirect (not >>)
-# The rename below is the atomic operation
-cat chat.md chat.tmp.executor.1712512325 > chat.md.tmp
-mv chat.md.tmp chat.md
-
-# Step 4: Clean up temp file
-rm -f chat.tmp.executor.1712512325
-
-# Step 5: Update lastReadIndex atomically
-jq --argjson idx $lines '{agent: "executor", lastReadIndex: $idx, lastSignal: "OVER", lastSignalTask: "2.4", stillTtl: 0, updatedAt: now | todate}' > /tmp/chat-state.tmp.json
-mv /tmp/chat-state.tmp.json .chat-state.executor.json
+(
+  exec 200>"$basePath/chat.md.lock"
+  flock -e 200 || exit 1
+  cat >> "$basePath/chat.md" << 'MSGEOF'
+### [<writer> → <addressee>] <HH:MM:SS> | <task-ID> | <SIGNAL>
+<message body>
+MSGEOF
+) 200>"$basePath/chat.md.lock"
 ```
 
-### Alternative (Single Write, No Concatenation)
+- `200>` opens file descriptor 200 on the lock file (creating it if needed)
+- `flock -e 200` acquires an exclusive lock on that file descriptor
+- `cat >>` appends to chat.md while the lock is held
+- Lock is released when the subshell exits
 
-For lower file size risk, use a single append that guarantees atomicity:
-
-```bash
-# Write message to temp, then atomic rename into chat.md
-# chat.md is append-only — we never modify existing lines
-cat > chat.tmp.executor.1712512325 << 'EOF'
-### [executor → reviewer] 14:32:05 | task-2.4 | OVER
-
-Why does the authentication token expire after 30 minutes?
-EOF
-mv chat.tmp.executor.1712512325 chat.md
-```
-
-**Constraint**: `rename(2)` is atomic on the same filesystem. `chat.md` and temp file MUST be in the same directory.
+**Constraint**: `$basePath` must be the same directory as `chat.md`. Both files must be on the same filesystem for flock to work correctly.
 
 ### Concurrent Write Safety
 
-If two agents write simultaneously:
-1. Agent A writes `chat.tmp.executor.{tsA}` → rename to `chat.md`
-2. Agent B writes `chat.tmp.reviewer.{tsB}` → rename to `chat.md`
-3. Both renames are atomic; one completes first
-4. Result: messages from both agents appear in chat.md (ordering non-deterministic but no corruption)
+`flock` provides exclusive write access:
+1. Agent A acquires lock on `chat.md.lock`, appends message, releases lock
+2. Agent B acquires lock on `chat.md.lock` (blocks until A releases), appends message, releases lock
+3. Writes are serialized — no interleaving, no lost updates
 
-**What MUST NOT happen**: Direct append (`>>`) without atomic rename. This can interleave writes on some filesystems.
+**What MUST NOT happen**:
+- `mv temp chat.md` — overwrites the entire file, destroying history
+- `cat file >> chat.md` without flock — not atomic under concurrent writes
 
 ## Chat Template
 
@@ -324,7 +302,7 @@ Thread closed.
 | File | Action | Purpose |
 |------|--------|---------|
 | `specs/<specName>/chat.md` | **CREATE** | Shared chat channel |
-| `.ralph-state.json` | **MODIFY** | Add `chat` field with per-agent lastReadIndex and signal state |
+| `.ralph-state.json` | **MODIFY** | Add `chat` field with per-agent lastReadLine and signal state |
 | `plugins/ralph-specum/templates/chat.md` | **CREATE** | Chat template for new specs |
 | `plugins/ralph-specum/agents/spec-executor.md` | **MODIFY** | Add Chat Protocol section: read at task START, respect HOLD |
 | `plugins/ralph-specum/agents/external-reviewer.md` | **MODIFY** | Implement FLOC signals: ALIVE, INTENT-FAIL, CLOSE, URGENT, DEADLOCK |
@@ -339,8 +317,8 @@ Thread closed.
 |---------|-----------|----------|
 | Append collision (garbled text) | Message format check: each entry starts with `### [` | Stop both agents. Human repairs chat.md manually. Resume after repair. |
 | Temp file orphaned (rename failed) | Temp file exists but no corresponding entry in chat.md | Clean up temp file. Re-write the message. |
-| State file corrupted (invalid JSON) | `jq .` fails on `.ralph-state.json` | Overwrite the `chat` subsection with defaults: `jq '.chat = {executor: {lastReadIndex: 0}, reviewer: {lastReadIndex: 0}}'` (reset positions to 0) |
-| lastReadIndex ahead of actual lines | State file line count > chat.md actual lines | Reset to `wc -l chat.md` |
+| State file corrupted (invalid JSON) | `jq .` fails on `.ralph-state.json` | Overwrite the `chat` subsection with defaults: `jq '.chat = {executor: {lastReadLine: 0}, reviewer: {lastReadLine: 0}}'` (reset positions to 0) |
+| lastReadLine ahead of actual lines | State file line count > chat.md actual lines | Reset to `wc -l chat.md` |
 | Chat file missing at read time | File does not exist | Executor: proceed without chat (FR-1). Reviewer: skip chat read. |
 | BLOCKED state timeout (no ACK/CONTINUE) | 1 task passes without response to OVER | Auto-proceed as CONTINUE. Log in .progress.md. |
 | STILL TTL exhausted (3 tasks no signal) | stillTtl reaches 0 | Executor raises alarm. Write DEADLOCK. Human must respond. |
@@ -400,7 +378,7 @@ npm test 2>&1 | head -5  # smoke run
 | `ChatWriter.write()` with clean state | unit | Message appears in file, format correct | Stub fs |
 | `ChatWriter.write()` concurrent | integration | No corruption, no lost messages | Real temp files |
 | `ChatWriter.atomicRename()` | unit | Temp file gone, content in target | Stub fs |
-| `ChatReader.readNewMessages()` | unit | Returns only messages after lastReadIndex | Stub state file |
+| `ChatReader.readNewMessages()` | unit | Returns only messages after lastReadLine | Stub state file |
 | `ChatReader.updateLastReadIndex()` | unit | State file updated with correct index | Stub state file |
 | PerAgentState JSON serialization | unit | Valid JSON output from jq pattern | Real jq |
 | PerAgentState JSON deserialization | unit | Parsed state matches expected schema | Real jq |
@@ -442,11 +420,11 @@ npm test 2>&1 | head -5  # smoke run
 
 1. Create `plugins/ralph-specum/templates/chat.md` — chat template with format header and signals legend
 2. Create `specs/<specName>/chat.md` — initialize from template when reviewer activates
-3. Create `.chat-state.executor.json` and `.chat-state.reviewer.json` — initialize with `{agent, lastReadIndex: 0, lastSignal: null, stillTtl: 0}` and `updatedAt: now`
+3. Create `.chat-state.executor.json` and `.chat-state.reviewer.json` — initialize with `{agent, lastReadLine: 0, lastSignal: null, stillTtl: 0}` and `updatedAt: now`
 4. Modify `spec-executor.md` — add Chat Protocol section: at task START, read chat.md for new messages, check HOLD, block if present
 5. Modify `external-reviewer.md` — add FLOC signal implementation: ALIVE every 3 tasks, INTENT-FAIL pre-warning, CLOSE for resolved threads, URGENT for critical, DEADLOCK for escalation
 6. Implement `ChatWriter` utility with atomic temp-file+rename pattern
-7. Implement `ChatReader` utility with lastReadIndex tracking
+7. Implement `ChatReader` utility with lastReadLine tracking
 8. Write unit tests for FLOC state machine transitions
 9. Write integration test for concurrent writes (100 messages, verify zero corruption)
 10. Write integration test for HOLD pre-task gate behavior
