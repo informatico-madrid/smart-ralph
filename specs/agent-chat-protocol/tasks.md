@@ -764,7 +764,7 @@ The atomic write strategy in the original spec is broken. `cat chat.md chat.tmp 
   - **Verify**: `grep "^version:" plugins/ralph-specum/agents/external-reviewer.md`
   - **Commit**: `chore(external-reviewer): bump version to 0.2.0 for reviewer improvements`
 
-- [ ] 5.15 [PR] Update PR #9 with review fixes
+- [x] 5.15 [PR] Update PR #9 with review fixes
   - **Do**:
     1. Stage all changes
     2. Commit: `fix(agent-chat-protocol): address PR #9 review feedback — atomic write bug, inconsistencies, reviewer improvements`
