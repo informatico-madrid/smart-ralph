@@ -340,3 +340,189 @@ Review entry template:
 - fix_hint: Revert Phase 2 changes. Re-implement tasks 2.1-2.3 as
   ADDITIONS to Phase 1 work, not replacements.
 - resolved_at:
+
+### [task-5.1] [FIX] Fix atomic write pattern in design.md
+- status: PASS
+- severity: minor
+- reviewed_at: 2026-04-07T20:06:00Z
+- criterion_failed: none
+- evidence: |
+  Commit 9a561db verified (git diff):
+  - Replaced broken temp-file+rename with flock-based exclusive lock
+  - lastReadIndex → lastReadLine (correct semantic for multi-line messages)
+  - Removed "Alternative (Single Write)" section that used mv (overwrites)
+  - Updated concurrent write safety to describe flock serialization
+  - design.md: 37 insertions, 59 deletions (net cleanup)
+- fix_hint: none
+- resolved_at:
+
+### [task-5.2] [FIX] Fix FR-13 in requirements.md
+- status: PASS
+- severity: minor
+- reviewed_at: 2026-04-07T20:09:00Z
+- criterion_failed: none
+- evidence: |
+  Commit 65d58c6 verified (git diff):
+  - FR-13 fixed: "rename to append position" → "flock + cat >>"
+  - Added explicit note: cat >> without flock is NOT atomic
+  - requirements.md: 3 insertions, 3 deletions (clean targeted fix)
+- fix_hint: none
+- resolved_at:
+
+### [task-5.3] [FIX] Fix tasks.md task 1.3 atomic write pattern
+- status: PASS
+- severity: minor
+- reviewed_at: 2026-04-07T20:09:00Z
+- criterion_failed: none
+- evidence: |
+  Commit fc7ed64 verified (git diff):
+  - Task 1.3 atomic pattern updated with flock (exec 200>... flock -e 200)
+  - Message format preserved correctly
+  - Warning added: cat >> WITHOUT flock is broken for concurrent writes
+  - tasks.md: 8 insertions, 7 deletions
+- fix_hint: none
+- resolved_at:
+
+### [task-5.4] [FIX] Fix external-reviewer.md atomic write pattern
+- status: PASS
+- severity: minor
+- reviewed_at: 2026-04-07T20:10:00Z
+- criterion_failed: none
+- evidence: |
+  Commit 90f3bcf verified (git diff):
+  - chat_write_signal now uses flock: exec 200>... flock -e 200
+  - Temp file cleanup inside flock block (rm -f)
+  - Consistent with design.md and tasks.md patterns
+  - external-reviewer.md: 6 insertions, 1 deletion
+- fix_hint: none
+- resolved_at:
+
+### [task-5.6] [FIX] Fix design.md architecture diagram — remove .chat-state.*.json
+- status: PASS
+- severity: minor
+- reviewed_at: 2026-04-07T20:11:00Z
+- criterion_failed: none
+- evidence: |
+  Commit d64374a verified (git diff):
+  - Mermaid diagram: .chat-state.executor.json + .chat-state.reviewer.json
+    → single .ralph-state.json
+  - All text references updated consistently
+  - design.md: 7 insertions, 8 deletions (clean targeted fix)
+- fix_hint: none
+- resolved_at:
+
+### [task-5.5] [VERIFY] Critical path: atomic write consistency across all 4 files
+- status: PASS
+- severity: minor
+- reviewed_at: 2026-04-07T20:12:00Z
+- criterion_failed: none
+- evidence: |
+  All 4 files use flock-based atomic append:
+  - design.md: flock pattern (commit 9a561db)
+  - requirements.md: FR-13 flock (commit 65d58c6)
+  - tasks.md 1.3: flock pattern (commit fc7ed64)
+  - external-reviewer.md: flock in chat_write_signal (commit 90f3bcf)
+  Consistency verified.
+- fix_hint: none
+- resolved_at:
+
+### [task-5.7] [FIX] Fix Component: Chat Channel section — remove .chat-state references
+- status: PASS
+- severity: minor
+- reviewed_at: 2026-04-07T20:12:00Z
+- criterion_failed: none
+- evidence: |
+  Commit d64374a also covered this:
+  - ".chat-state.{agent}.json" → "chat.{agent} inside .ralph-state.json"
+  - Component section, Interface, State sections all updated
+  - Implementation plan step 3 also corrected
+- fix_hint: none
+- resolved_at:
+
+### [task-5.8] [FIX] Rename lastReadIndex → lastReadLine across all spec files
+- status: PASS
+- severity: minor
+- reviewed_at: 2026-04-07T20:15:00Z
+- criterion_failed: none
+- evidence: |
+  Commit bb5137c verified (git diff, 5 files, 41 insertions, 20 deletions):
+  - requirements.md: FR-14 title, Given/And clauses, table row all renamed
+  - spec-executor.md: JSON fields + jq pattern updated
+  - external-reviewer.md: JSON fields + jq pattern + review cycle updated
+  - Consistent rename with rationale note (line cursor vs message index)
+- fix_hint: none
+- resolved_at:
+
+### [task-5.9] [FIX] Fix requirements.md — remove all .chat-state.*.json references
+- status: PASS
+- severity: minor
+- reviewed_at: 2026-04-07T20:16:00Z
+- criterion_failed: none
+- evidence: |
+  Commit 881d025 verified (git diff):
+  - .chat-state.executor.json + .chat-state.reviewer.json → .ralph-state.json
+  - Impact table updated correctly
+  - requirements.md: 2 insertions, 3 deletions (clean targeted fix)
+- fix_hint: none
+- resolved_at:
+
+### [task-5.10] [FIX] Fix design.md test runner inconsistency — remove vitest, use bats
+- status: PASS
+- severity: minor
+- reviewed_at: 2026-04-07T20:17:00Z
+- criterion_failed: none
+- evidence: |
+  Commit 86abcdd verified (git diff):
+  - vitest → bats consistently
+  - Test Discovery section updated with bats commands
+  - Mock Boundary table updated
+  - design.md: 18 insertions, 13 deletions
+  - grep vitest returns CLEAN
+- fix_hint: none
+- resolved_at:
+
+### [task-5.11] [FIX] Add language identifiers to fenced code blocks (markdownlint MD040)
+- status: PASS
+- severity: minor
+- reviewed_at: 2026-04-07T20:18:00Z
+- criterion_failed: none
+- evidence: |
+  Commit c567b6a verified: language identifiers added to design.md (bash, text),
+  requirements.md (text). Previously 10 blocks without, now fixed.
+  Initial review found WARNING, but fix applied correctly.
+- fix_hint: none
+- resolved_at: 2026-04-07T20:18:00Z
+
+### [task-5.12] [IMPROVE] Add tool permissions, Judge pattern, convergence detection, human as participant
+- status: PASS
+- severity: minor
+- reviewed_at: 2026-04-07T20:18:00Z
+- criterion_failed: none
+- evidence: |
+  Commit 6b3604e verified (git diff):
+  - 121 lines added to external-reviewer.md
+  - Tool permissions, Judge pattern, convergence detection, human participant
+  - All improvements are additive, no breaking changes
+- fix_hint: none
+- resolved_at:
+
+### [task-5.13] [LINT] Run markdownlint on modified spec files
+- status: PASS
+- severity: minor
+- reviewed_at: 2026-04-07T20:19:00Z
+- criterion_failed: none
+- evidence: |
+  Task completed. Linting passed for modified spec files.
+- fix_hint: none
+- resolved_at:
+
+### [task-5.14] [VERSION] Bump external-reviewer.md version for improvements
+- status: PASS
+- severity: minor
+- reviewed_at: 2026-04-07T20:19:00Z
+- criterion_failed: none
+- evidence: |
+  Commit f259711 verified: version bumped 0.1.0 → 0.2.0
+  Reflects all Phase 5 reviewer improvements.
+- fix_hint: none
+- resolved_at:
