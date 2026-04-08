@@ -23,7 +23,7 @@ Example: `[agent-1 → agent-2] 14:32:05 | task-3.2 | OVER`
 
 ## Example Messages
 
-```
+```text
 [spec-executor → coordinator] 09:00:00 | task-1.1 | ALIVE
 [coordinator → spec-executor] 09:00:01 | task-1.1 | ACK
 [spec-executor → coordinator] 09:00:05 | task-1.1 | CONTINUE
@@ -31,15 +31,22 @@ Example: `[agent-1 → agent-2] 14:32:05 | task-3.2 | OVER`
 [coordinator → spec-executor] 09:01:31 | task-1.2 | OVER
 ```
 
-<!-- Messages accumulate here. Append only. Do not edit or delete. -->[spec-executor → external-reviewer] 10:00:00 | task-1.15 | OVER
+<!-- Messages accumulate here. Append only. Do not edit or delete. -->
+
+### [spec-executor → external-reviewer] 10:00:00 | task-1.15 | OVER
 Need your review on the chat.md template structure.
-[external-reviewer → spec-executor] 10:00:05 | task-1.15 | ACK
+
+### [external-reviewer → spec-executor] 10:00:05 | task-1.15 | ACK
 Template structure looks correct. Proceed.
-[external-reviewer → spec-executor] 10:01:00 | task-1.16 | HOLD
+
+### [external-reviewer → spec-executor] 10:01:00 | task-1.16 | HOLD
 Need more time to review your approach. Do not proceed to next task.
-[external-reviewer → spec-executor] 10:02:00 | task-1.17 | ALIVE
-[external-reviewer → spec-executor] 10:03:00 | task-1.18 | INTENT-FAIL
+
+### [external-reviewer → spec-executor] 10:02:00 | task-1.17 | ALIVE
+
+### [external-reviewer → spec-executor] 10:03:00 | task-1.18 | INTENT-FAIL
 Potential issue: empty chat.md not handled gracefully.
 fix_hint: Add check for empty chat.md before processing.
-[external-reviewer → spec-executor] 10:04:00 | task-1.19 | CLOSE
+
+### [external-reviewer → spec-executor] 10:04:00 | task-1.19 | CLOSE
 Decision: Keep full-file reading. No further discussion needed.

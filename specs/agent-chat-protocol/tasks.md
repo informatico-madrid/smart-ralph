@@ -38,8 +38,8 @@ Focus: Validate the idea works end-to-end. Skip tests, accept hardcoded values.
     2. Add `chat` field to `.ralph-state.json` inside `specs/agent-chat-protocol/` with structure:
        ```json
        "chat": {
-         "executor": { "lastReadIndex": 0, "lastSignal": null, "lastSignalTask": null, "stillTtl": 0 },
-         "reviewer": { "lastReadIndex": 0, "lastSignal": null, "lastSignalTask": null, "pendingIntentFail": null }
+         "executor": { "lastReadLine": 0, "lastSignal": null, "lastSignalTask": null, "stillTtl": 0 },
+         "reviewer": { "lastReadLine": 0, "lastSignal": null, "lastSignalTask": null, "pendingIntentFail": null }
        }
        ```
     3. Initialize this in the spec's `.ralph-state.json` if it exists, or create a new one
@@ -57,7 +57,7 @@ Focus: Validate the idea works end-to-end. Skip tests, accept hardcoded values.
     3. Add to the section:
        - **Chat file path**: `chat.md` in basePath
        - **Activation threshold**: chat.md exists AND has >= 1 message
-       - **Read at task START**: Before starting each task, read chat.md using Read tool, parse new messages after lastReadIndex
+       - **Read at task START**: Before starting each task, read chat.md using Read tool, parse new messages after lastReadLine
        - **Atomic append pattern** (CRITICAL — chat.md is append-only):
          ```bash
          # Append atomically to chat.md using flock-based exclusive access
@@ -71,13 +71,13 @@ Focus: Validate the idea works end-to-end. Skip tests, accept hardcoded values.
          ) 200>"${basePath}/chat.md.lock"
          ```
          **IMPORTANT**: `cat >>` WITHOUT flock is also broken for concurrent writes — always use flock for exclusive access. **NEVER use `mv` to write to chat.md** — it overwrites the entire file.
-       - **Update lastReadIndex**: After reading, update via atomic jq pattern:
+       - **Update lastReadLine**: After reading, update via atomic jq pattern:
          ```bash
-         jq --argjson idx N '.chat.executor.lastReadIndex = $idx' <basePath>/.ralph-state.json > /tmp/state.json && mv /tmp/state.json <basePath>/.ralph-state.json
+         jq --argjson idx N '.chat.executor.lastReadLine = $idx' <basePath>/.ralph-state.json > /tmp/state.json && mv /tmp/state.json <basePath>/.ralph-state.json
          ```
   - **Files**: `plugins/ralph-specum/agents/spec-executor.md`
   - **Done when**: spec-executor.md contains Chat Protocol section with file paths, read-at-start logic, and atomic write pattern
-  - **Verify**: `grep -c "Chat Protocol\|chat.md\|lastReadIndex\|atomic" plugins/ralph-specum/agents/spec-executor.md`
+  - **Verify**: `grep -c "Chat Protocol\|chat.md\|lastReadLine\|atomic" plugins/ralph-specum/agents/spec-executor.md`
   - **Commit**: `feat(spec-executor): add Chat Protocol section with atomic read/write`
   - _Requirements: FR-1, FR-2, FR-13, FR-14_
   - _Design: Atomic Write Implementation section, Per-Agent State section_
@@ -138,14 +138,14 @@ Focus: Validate the idea works end-to-end. Skip tests, accept hardcoded values.
     3. Add to the section:
        - **Chat file path**: `chat.md` in basePath
        - **Read at review cycle**: After completing a review, read chat.md using Read tool
-       - **Update lastReadIndex**: After reading, update via atomic jq pattern:
+       - **Update lastReadLine**: After reading, update via atomic jq pattern:
          ```bash
-         jq --argjson idx N '.chat.reviewer.lastReadIndex = $idx' <basePath>/.ralph-state.json > /tmp/state.json && mv /tmp/state.json <basePath>/.ralph-state.json
+         jq --argjson idx N '.chat.reviewer.lastReadLine = $idx' <basePath>/.ralph-state.json > /tmp/state.json && mv /tmp/state.json <basePath>/.ralph-state.json
          ```
        - **Atomic write pattern**: Same temp file + rename as spec-executor
   - **Files**: `plugins/ralph-specum/agents/external-reviewer.md`
   - **Done when**: external-reviewer.md contains Chat Protocol section with read/write infrastructure
-  - **Verify**: `grep -c "Chat Protocol\|chat.md\|lastReadIndex" plugins/ralph-specum/agents/external-reviewer.md`
+  - **Verify**: `grep -c "Chat Protocol\|chat.md\|lastReadLine" plugins/ralph-specum/agents/external-reviewer.md`
   - **Commit**: `feat(external-reviewer): add Chat Protocol section infrastructure`
   - _Requirements: FR-1, FR-2, FR-13, FR-14_
   - _Design: Atomic Write Implementation section_
@@ -256,7 +256,7 @@ Focus: Validate the idea works end-to-end. Skip tests, accept hardcoded values.
     2. Simulate executor writes OVER to chat.md using inline bash (atomic write pattern)
     3. Simulate reviewer reads chat.md, responds with ACK using inline bash
     4. Verify both messages appear in chat.md with correct format
-    5. Verify state file updated correctly (lastReadIndex for both agents)
+    5. Verify state file updated correctly (lastReadLine for both agents)
   - **Files**: `plugins/ralph-specum/agents/spec-executor.md`, `plugins/ralph-specum/agents/external-reviewer.md`
   - **Done when**: OVER and ACK messages appear in chat.md with correct format
   - **Verify**: `grep "OVER\|ACK" specs/agent-chat-protocol/chat.md | wc -l`
@@ -350,7 +350,7 @@ After POC validated, clean up code.
   - **Do**:
     1. Add error recovery for missing chat.md (graceful skip — chat is optional)
     2. Add error recovery for corrupted state file (reset to defaults)
-    3. Add error recovery for lastReadIndex > actual lines (reset to line count)
+    3. Add error recovery for lastReadLine > actual lines (reset to line count)
   - **Files**: `plugins/ralph-specum/agents/spec-executor.md`, `plugins/ralph-specum/agents/external-reviewer.md`
   - **Done when**: Chat handling handles all error cases gracefully
   - **Verify**: `grep "missing\|corrupted\|graceful" plugins/ralph-specum/agents/spec-executor.md`
@@ -580,7 +580,7 @@ The atomic write strategy in the original spec is broken. `cat chat.md chat.tmp 
        MSGEOF
        ) 200>"$basePath/chat.md.lock"
        ```
-    3. Rename `lastReadIndex` → `lastReadLine` throughout (messages are multi-line)
+    3. Rename `lastReadLine` → `lastReadLine` throughout (messages are multi-line)
     4. Delete the "Alternative (Single Write)" section — `mv` overwrites, it does not append
     5. Fix "Concurrent Write Safety" to describe flock behavior
   - **Files**: `specs/agent-chat-protocol/design.md`
@@ -658,7 +658,7 @@ The atomic write strategy in the original spec is broken. `cat chat.md chat.tmp 
   - **Do**:
     1. Read `specs/agent-chat-protocol/design.md` — "Component: Chat Channel" section
     2. Change all `.chat-state.{agent}.json` references to `.ralph-state.json` → `chat.{executor|reviewer}`
-    3. Change `lastReadIndex` → `lastReadLine` throughout
+    3. Change `lastReadLine` → `lastReadLine` throughout
   - **Files**: `specs/agent-chat-protocol/design.md`
   - **Done when**: All .chat-state references removed from Chat Channel section
   - **Verify**: `grep "chat-state" specs/agent-chat-protocol/design.md`
@@ -666,29 +666,29 @@ The atomic write strategy in the original spec is broken. `cat chat.md chat.tmp 
   - _Review issue: MAJOR #3_
   - **Note**: Already fixed — task 5.6 update to architecture diagram propagated to entire file. Verification: `grep "chat-state" specs/agent-chat-protocol/design.md` returns no matches. `lastReadLine` already used throughout.
 
-- [x] 5.8 [FIX] Rename lastReadIndex → lastReadLine across all spec files
+- [x] 5.8 [FIX] Rename lastReadLine → lastReadLine across all spec files
   - **Do**:
-    1. Replace all `lastReadIndex` with `lastReadLine` in design.md
-    2. Replace all `lastReadIndex` with `lastReadLine` in requirements.md (FR-14 references it)
-    3. Replace all `lastReadIndex` with `lastReadLine` in spec-executor.md agent (JSON field name)
-    4. Replace all `lastReadIndex` with `lastReadLine` in external-reviewer.md agent (JSON field name)
+    1. Replace all `lastReadLine` with `lastReadLine` in design.md
+    2. Replace all `lastReadLine` with `lastReadLine` in requirements.md (FR-14 references it)
+    3. Replace all `lastReadLine` with `lastReadLine` in spec-executor.md agent (JSON field name)
+    4. Replace all `lastReadLine` with `lastReadLine` in external-reviewer.md agent (JSON field name)
     5. Add note: "lastReadLine is a line cursor, not message index — messages are multi-line (header + blank line + body)"
   - **Files**: `specs/agent-chat-protocol/design.md`, `specs/agent-chat-protocol/requirements.md`, `plugins/ralph-specum/agents/spec-executor.md`, `plugins/ralph-specum/agents/external-reviewer.md`
-  - **Done when**: `lastReadIndex` gone from all 4 files, `lastReadLine` used with explanatory note
+  - **Done when**: `lastReadLine` gone from all 4 files, `lastReadLine` used with explanatory note
   - **Verify**:
     ```bash
-    echo "=== design.md ===" && grep "lastReadIndex" specs/agent-chat-protocol/design.md || echo "CLEAN"
-    echo "=== requirements.md ===" && grep "lastReadIndex" specs/agent-chat-protocol/requirements.md || echo "CLEAN"
-    echo "=== spec-executor.md ===" && grep "lastReadIndex" plugins/ralph-specum/agents/spec-executor.md || echo "CLEAN"
-    echo "=== external-reviewer.md ===" && grep "lastReadIndex" plugins/ralph-specum/agents/external-reviewer.md || echo "CLEAN"
+    echo "=== design.md ===" && grep "lastReadLine" specs/agent-chat-protocol/design.md || echo "CLEAN"
+    echo "=== requirements.md ===" && grep "lastReadLine" specs/agent-chat-protocol/requirements.md || echo "CLEAN"
+    echo "=== spec-executor.md ===" && grep "lastReadLine" plugins/ralph-specum/agents/spec-executor.md || echo "CLEAN"
+    echo "=== external-reviewer.md ===" && grep "lastReadLine" plugins/ralph-specum/agents/external-reviewer.md || echo "CLEAN"
     ```
-  - **Commit**: `fix(design): rename lastReadIndex to lastReadLine across all spec files`
+  - **Commit**: `fix(design): rename lastReadLine to lastReadLine across all spec files`
   - _Review issue: MAJOR #4 (line 130) — also covers requirements.md FR-14 and agent files_
 
 - [x] 5.9 [FIX] Fix requirements.md — remove all .chat-state.*.json references
   - **Do**:
     1. Read `specs/agent-chat-protocol/requirements.md`
-    2. Fix Dependencies table (around line 240): change "No change" to "Must modify"; remove "lastReadIndex stored separately"
+    2. Fix Dependencies table (around line 240): change "No change" to "Must modify"; remove "lastReadLine stored separately"
     3. Fix FR-14 section (around lines 147-150): remove `.chat-state.executor.json` and `.chat-state.reviewer.json` references — these files do not exist, state is in `.ralph-state.json`
     4. Fix Dependency map section: remove `.chat-state.executor.json` and `.chat-state.reviewer.json` from the map
   - **Files**: `specs/agent-chat-protocol/requirements.md`
@@ -782,7 +782,7 @@ The atomic write strategy in the original spec is broken. `cat chat.md chat.tmp 
 | 3 | FR-13 "rename to append" ambiguous | CRITICAL | requirements.md | 5.2 |
 | 4 | Broken atomic patterns | CRITICAL | tasks.md, external-reviewer.md | 5.3, 5.4 |
 | 5 | .chat-state.*.json vs .ralph-state.json | MAJOR | design.md | 5.6, 5.7 |
-| 6 | lastReadIndex ambiguous (line ≠ message) | MAJOR | design.md | 5.8 |
+| 6 | lastReadLine ambiguous (line ≠ message) | MAJOR | design.md | 5.8 |
 | 7 | Dependencies table contradictory | MAJOR | requirements.md | 5.9 |
 | 8 | vitest vs bats inconsistent | MAJOR | design.md | 5.10 |
 | 9-10 | Code blocks without language id | MINOR | design.md, requirements.md | 5.11 |

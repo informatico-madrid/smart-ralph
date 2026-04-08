@@ -103,22 +103,25 @@ multi-line (header line + blank line + body), so a line cursor accurately tracks
 
 **Atomic append pattern** (CRITICAL — chat.md is append-only):
 ```bash
-# Write new message to temp file
-TMPFILE="/tmp/chat.tmp.${AGENT}.$(date +%s%N)"
-cat > "$TMPFILE" << 'CHATEOF'
+# Append atomically to chat.md using flock-based exclusive access
+(
+  exec 200>"${basePath}/chat.md.lock"
+  flock -e 200 || exit 1
+  cat >> "${basePath}/chat.md" << 'MSGEOF'
 ### [YYYY-MM-DD HH:MM:SS] Writer → Addressee
 **Task**: T<taskIndex>
 
 <message body>
 
-**Expected Response**: ACK | BLOCK | PENDING
-CHATEOF
-# Append atomically to chat.md (NOT mv — that overwrites!)
-cat "$TMPFILE" >> <basePath>/chat.md && rm "$TMPFILE"
+**Expected Response**: ACK | HOLD | PENDING
+MSGEOF
+) 200>"${basePath}/chat.md.lock"
 ```
 
 **NEVER use `mv` to write to chat.md** — it overwrites the entire file.
-Always use `cat "$TMPFILE" >> <basePath>/chat.md && rm "$TMPFILE"` for appends.
+**IMPORTANT**: `cat >>` WITHOUT flock is NOT atomic for concurrent writes —
+the two agents (executor + reviewer) can interleave or overwrite each other.
+Always use flock for exclusive access.
 
 **Update lastReadLine**: After reading, update via atomic jq pattern:
 ```bash
@@ -127,11 +130,11 @@ jq --argjson idx N '.chat.executor.lastReadLine = $idx' <basePath>/.ralph-state.
 
 **Signal Reference**:
 - **ACK**: "I agree with this approach, you can proceed" — executor can advance to next task
-- **BLOCK**: "Stop. I disagree with this approach or you're proceeding too quickly" — executor MUST NOT advance
+- **HOLD**: "Stop. I disagree with this approach or you're proceeding too quickly" — executor MUST NOT advance
 - **PENDING**: "I need more time to think about this" — executor waits, cannot advance
 
 **Blocking conditions** (executor MUST NOT advance to next task if):
-1. chat.md contains BLOCK status for current task
+1. chat.md contains HOLD status for current task
 2. chat.md contains PENDING status for current task  
 3. chat.md contains any message from reviewer that hasn't been ACKed
 
@@ -144,11 +147,11 @@ jq --argjson idx N '.chat.executor.lastReadLine = $idx' <basePath>/.ralph-state.
 
 **Protocol rules**:
 1. Read chat.md BEFORE starting each task
-2. Check for BLOCK/PENDING status — if present, do NOT advance
+2. Check for HOLD/PENDING status — if present, do NOT advance
 3. If reviewer has sent a message, respond before proceeding
 4. After completing a task, write to chat.md explaining what was done
 5. Request ACK from reviewer before advancing to next task
-6. If BLOCK received, explain your reasoning in chat.md before formal FAIL in task_review.md
+6. If HOLD received, explain your reasoning in chat.md before formal FAIL in task_review.md
 </mandatory>
 
 ## Task Loop

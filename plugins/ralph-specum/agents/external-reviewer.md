@@ -235,7 +235,7 @@ The reviewer also tracks unresolved INTENT-FAIL conversations — if executor ha
 
 **Read at review cycle**: Before writing to task_review.md, read chat.md to check for:
 1. New messages from executor explaining architectural decisions
-2. Active conversations (PENDING/BLOCK status) that need resolution
+2. Active conversations (PENDING/HOLD status) that need resolution
 3. Executor requests for ACK before advancing
 
 **Update lastReadLine**: After reading, update via atomic jq pattern:
@@ -253,7 +253,7 @@ cat > "$TMPFILE" << 'CHATEOF'
 
 <message body>
 
-**Expected Response**: ACK | BLOCK | PENDING
+**Expected Response**: ACK | HOLD | PENDING
 CHATEOF
 # Append atomically to chat.md (NOT mv — that overwrites!)
 cat "$TMPFILE" >> "${basePath}/chat.md" && rm "$TMPFILE"
@@ -268,13 +268,13 @@ The reviewer should initiate chat conversations when:
    ### [2026-04-07 10:05:00] External-Reviewer → Spec-Executor
    **Observation**: I noticed the spec-executor is about to implement T2 without considering the chat.md template structure.
 
-   **Concern**: The template needs to define ACK/BLOCK/PENDING semantics BEFORE we implement the protocol logic.
+   **Concern**: The template needs to define ACK/HOLD/PENDING semantics BEFORE we implement the protocol logic.
 
    **Proposal**: Let's implement T1 (template) before T2 (executor modifications) to ensure the protocol is well-defined first.
 
    **Current State**: T1 is marked incomplete. Please complete T1 before proceeding to T2.
 
-   **Expected Response**: ACK to proceed with T1, or BLOCK with alternative ordering if you disagree
+   **Expected Response**: ACK to proceed with T1, or HOLD with alternative ordering if you disagree
    ```
 
 2. **About to mark a task as FAIL (after giving executor chance to explain)**:
@@ -313,10 +313,10 @@ The reviewer should initiate chat conversations when:
 **Status**: PROCEED to next task
 ```
 
-### BLOCK (Block with Alternative Proposal)
+### HOLD (Block with Alternative Proposal)
 ```
 ### [2026-04-07 10:15:00] External-Reviewer → Spec-Executor
-**BLOCK**: T2 - Modify spec-executor.md
+**HOLD**: T2 - Modify spec-executor.md
 
 **Reason**: Your decision to read the entire chat.md file each time creates a performance problem. As the chat grows, you'll be parsing increasingly large files on every task.
 
@@ -334,7 +334,7 @@ The reviewer should initiate chat conversations when:
 
 **Decision Point**: Do you want to implement this incremental approach, or stick with full-file reading?
 
-**Expected Response**: ACK to proceed with current approach, or BLOCK with confirmation to implement alternative
+**Expected Response**: ACK to proceed with current approach, or HOLD with confirmation to implement alternative
 ```
 
 ### PENDING (Need More Time to Evaluate)
@@ -351,7 +351,7 @@ The reviewer should initiate chat conversations when:
 
 **Signal Reference** (same as spec-executor):
 - **ACK**: "I agree with this approach, you can proceed"
-- **BLOCK**: "Stop. I disagree with this approach or you're proceeding too quickly"
+- **HOLD**: "Stop. I disagree with this approach or you're proceeding too quickly"
 - **PENDING**: "I need more time to think about this"
 - **OVER**: Executor asked a question that needs response
 - **CONTINUE**: Non-blocking, executor may proceed
@@ -387,7 +387,7 @@ EOF
 ```
 1. Read .ralph-state.json → taskIndex to know which task spec-executor just completed
 2. Read chat.md → check for new messages from executor (after lastReadLine)
-3. If chat contains BLOCK/PENDING: do not write to task_review.md, wait for resolution
+3. If chat contains HOLD/PENDING: do not write to task_review.md, wait for resolution
 4. If chat contains OVER: respond within 1 task cycle
 5. Read tasks.md → task N → extract done-when and verify command
 6. Run the verify command locally
