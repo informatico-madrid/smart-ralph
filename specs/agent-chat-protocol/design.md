@@ -276,11 +276,11 @@ Investigating. The token expiry is configurable — let me check the env var.
 
 The 30-minute default is from the auth library. It's configurable via AUTH_TOKEN_TTL.
 No change needed — your implementation is correct.
-```
+```bash
 
 ### CLOSE Thread Example
 
-```
+```text
 ### [reviewer → executor] 14:40:00 | task-2.7 | OVER
 
 The error handling in auth.ts does not match the spec's Fail-Fast requirement.
@@ -294,7 +294,7 @@ Understood. Will refactor to re-raise after logging.
 
 Your refactor on line 47 now re-raises after logging. Fail-Fast satisfied.
 Thread closed.
-```
+```text
 
 ## File Structure
 
