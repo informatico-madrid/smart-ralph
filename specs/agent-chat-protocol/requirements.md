@@ -40,7 +40,7 @@ Create a bidirectional real-time chat channel between executor and reviewer base
 ### FR-2: Message Format
 
 **Given** an agent writes to chat **When** composing a message **Then** format is:
-```
+```text
 ### [<writer> → <addressee>] <HH:MM:SS> | <task-ID> | <SIGNAL>
 
 <message body>

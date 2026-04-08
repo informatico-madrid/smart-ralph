@@ -708,7 +708,7 @@ The atomic write strategy in the original spec is broken. `cat chat.md chat.tmp 
   - **Commit**: `fix(design): remove vitest references, use bats consistently`
   - _Review issue: MAJOR #6 (lines 356-361 vs 418-429)_
 
-- [ ] 5.11 [FIX] Add language identifiers to fenced code blocks (markdownlint MD040)
+- [x] 5.11 [FIX] Add language identifiers to fenced code blocks (markdownlint MD040)
   - **Do**:
     1. Read `specs/agent-chat-protocol/design.md`:
        - Line 278: ` ``` ` → ` ```bash `
