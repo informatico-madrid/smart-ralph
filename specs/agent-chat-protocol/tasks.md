@@ -643,7 +643,7 @@ The atomic write strategy in the original spec is broken. `cat chat.md chat.tmp 
 
 ### Phase 5.2: Inconsistencies
 
-- [ ] 5.6 [FIX] Fix design.md architecture diagram — remove .chat-state.*.json
+- [x] 5.6 [FIX] Fix design.md architecture diagram — remove .chat-state.*.json
   - **Do**:
     1. Read `specs/agent-chat-protocol/design.md` — Mermaid diagram
     2. Remove `.chat-state.executor.json` and `.chat-state.reviewer.json` boxes
