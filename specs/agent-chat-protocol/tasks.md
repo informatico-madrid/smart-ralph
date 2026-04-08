@@ -654,7 +654,7 @@ The atomic write strategy in the original spec is broken. `cat chat.md chat.tmp 
   - **Commit**: `fix(design): update architecture diagram to use .ralph-state.json`
   - _Review issue: MAJOR #3 (line 96)_
 
-- [ ] 5.7 [FIX] Fix Component: Chat Channel section — remove .chat-state references
+- [x] 5.7 [FIX] Fix Component: Chat Channel section — remove .chat-state references
   - **Do**:
     1. Read `specs/agent-chat-protocol/design.md` — "Component: Chat Channel" section
     2. Change all `.chat-state.{agent}.json` references to `.ralph-state.json` → `chat.{executor|reviewer}`
@@ -664,6 +664,7 @@ The atomic write strategy in the original spec is broken. `cat chat.md chat.tmp 
   - **Verify**: `grep "chat-state" specs/agent-chat-protocol/design.md`
   - **Commit**: `fix(design): remove .chat-state references, use .ralph-state.json`
   - _Review issue: MAJOR #3_
+  - **Note**: Already fixed — task 5.6 update to architecture diagram propagated to entire file. Verification: `grep "chat-state" specs/agent-chat-protocol/design.md` returns no matches. `lastReadLine` already used throughout.
 
 - [ ] 5.8 [FIX] Rename lastReadIndex → lastReadLine across all spec files
   - **Do**:
