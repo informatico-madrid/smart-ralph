@@ -140,26 +140,35 @@ jq --argjson idx "$LINES" '.chat.executor.lastReadLine = $idx' \
   mv /tmp/state.json "$SPEC_PATH/.ralph-state.json"
 ```
 
-**Step 4 — Apply blocking rules**:
-- If any message contains **HOLD** for the current task → DO NOT delegate. Write to `.progress.md`:
-  `"COORDINATOR BLOCKED: chat.md contains HOLD for task $taskIndex — waiting for reviewer resolution"`
-  Then stop this iteration. The continuation hook will re-invoke the coordinator; repeat Step 1 on next invocation.
-- If any message contains **PENDING** for the current task → same as HOLD.
-- If any message contains **OVER** (reviewer asked a question) → respond in `chat.md` using the atomic append pattern before delegating:
-  ```bash
-  (
-    exec 200>"$SPEC_PATH/chat.md.lock"
-    flock -e 200 || exit 1
-    cat >> "$SPEC_PATH/chat.md" << 'MSGEOF'
-  ### [YYYY-MM-DD HH:MM:SS] Coordinator → External-Reviewer
-  **Task**: T<taskIndex>
+**Step 4 — Apply signal rules** (process all new messages top to bottom):
 
-  <response to reviewer's question>
+| Signal | What coordinator does |
+|--------|----------------------|
+| **HOLD** | DO NOT delegate. Log to `.progress.md`: `"COORDINATOR BLOCKED: HOLD for task $taskIndex"`. Stop this iteration — continuation hook will re-invoke. |
+| **PENDING** | Same as HOLD. |
+| **URGENT** | Treat as HOLD — immediate block regardless of task. |
+| **INTENT-FAIL** | Reviewer is warning before a formal FAIL. Log to `.progress.md`: `"COORDINATOR: INTENT-FAIL received for task $taskIndex — delaying delegation 1 cycle to allow correction"`. Stop this iteration. On the next invocation, if INTENT-FAIL is still present and no CLOSE was written by reviewer, proceed normally (reviewer will escalate to task_review.md if needed). |
+| **DEADLOCK** | HARD STOP. Do NOT delegate. Write to `.progress.md`: `"COORDINATOR STOPPED: DEADLOCK signal in chat.md for task $taskIndex — human arbitration required"`. Output to user: `"DEADLOCK detected in chat.md — reviewer and executor cannot resolve this autonomously. Human must read chat.md and respond with CONTINUE or HOLD."` Do NOT output ALL_TASKS_COMPLETE. |
+| **OVER** | Reviewer asked a question. Respond in `chat.md` using atomic append (see below) before delegating. |
+| **CONTINUE** | No-op. Proceed normally. |
+| **CLOSE** | Thread resolved. No-op. Proceed normally. |
+| **ALIVE** / **STILL** | Heartbeat signals. Ignore, do not block. |
+| **ACK** | Reviewer acknowledged coordinator's last message. Proceed normally. |
 
-  **Signal**: ACK
-  MSGEOF
-  ) 200>"$SPEC_PATH/chat.md.lock"
-  ```
+**Atomic append for OVER response**:
+```bash
+(
+  exec 200>"$SPEC_PATH/chat.md.lock"
+  flock -e 200 || exit 1
+  cat >> "$SPEC_PATH/chat.md" << 'MSGEOF'
+### [YYYY-MM-DD HH:MM:SS] Coordinator → External-Reviewer
+**Task**: T<taskIndex>
+**Signal**: ACK
+
+<response to reviewer's question>
+MSGEOF
+) 200>"$SPEC_PATH/chat.md.lock"
+```
 
 **Step 5 — Announce task** (write to `chat.md` before every delegation):
 ```bash
