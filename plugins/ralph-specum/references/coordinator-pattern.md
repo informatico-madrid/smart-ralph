@@ -120,6 +120,85 @@ Detect markers in task description:
 - [VERIFY] = verification task (delegate to qa-engineer)
 - No marker = sequential task
 
+## Chat Protocol — MANDATORY before every delegation
+
+<mandatory>
+Before delegating any task (sequential, parallel, or [VERIFY]), the coordinator MUST:
+
+**Step 1 — Check existence**: Does `$SPEC_PATH/chat.md` exist?
+- If NO: skip to Step 5 (announce task).
+- If YES: continue.
+
+**Step 2 — Read new messages**: Read `chat.md` from line `chat.executor.lastReadLine`
+(stored in `.ralph-state.json`). Parse all messages after that line.
+
+**Step 3 — Update lastReadLine**: After reading, update state atomically:
+```bash
+LINES=$(wc -l < "$SPEC_PATH/chat.md")
+jq --argjson idx "$LINES" '.chat.executor.lastReadLine = $idx' \
+  "$SPEC_PATH/.ralph-state.json" > /tmp/state.json && \
+  mv /tmp/state.json "$SPEC_PATH/.ralph-state.json"
+```
+
+**Step 4 — Apply blocking rules**:
+- If any message contains **HOLD** for the current task → DO NOT delegate. Write to `.progress.md`:
+  `"COORDINATOR BLOCKED: chat.md contains HOLD for task $taskIndex — waiting for reviewer resolution"`
+  Then stop this iteration. The continuation hook will re-invoke the coordinator; repeat Step 1 on next invocation.
+- If any message contains **PENDING** for the current task → same as HOLD.
+- If any message contains **OVER** (reviewer asked a question) → respond in `chat.md` using the atomic append pattern before delegating:
+  ```bash
+  (
+    exec 200>"$SPEC_PATH/chat.md.lock"
+    flock -e 200 || exit 1
+    cat >> "$SPEC_PATH/chat.md" << 'MSGEOF'
+  ### [YYYY-MM-DD HH:MM:SS] Coordinator → External-Reviewer
+  **Task**: T<taskIndex>
+
+  <response to reviewer's question>
+
+  **Signal**: ACK
+  MSGEOF
+  ) 200>"$SPEC_PATH/chat.md.lock"
+  ```
+
+**Step 5 — Announce task** (write to `chat.md` before every delegation):
+```bash
+(
+  exec 200>"$SPEC_PATH/chat.md.lock"
+  flock -e 200 || exit 1
+  cat >> "$SPEC_PATH/chat.md" << 'MSGEOF'
+### [YYYY-MM-DD HH:MM:SS] Coordinator → External-Reviewer
+**Task**: T<taskIndex> — <task title>
+**Signal**: CONTINUE
+
+Delegating task <taskIndex> to spec-executor:
+- Do: <one-line summary of Do section>
+- Files: <files list>
+- Verify: <verify command>
+MSGEOF
+) 200>"$SPEC_PATH/chat.md.lock"
+```
+
+This is the "pilot callout" — the coordinator announces what it is about to do so the
+reviewer can raise a HOLD before the task executes (on the NEXT cycle if needed).
+
+**Step 6 — After task completes**: After receiving TASK_COMPLETE and passing all 3
+verification layers, write a completion notice to `chat.md`:
+```bash
+(
+  exec 200>"$SPEC_PATH/chat.md.lock"
+  flock -e 200 || exit 1
+  cat >> "$SPEC_PATH/chat.md" << 'MSGEOF'
+### [YYYY-MM-DD HH:MM:SS] Coordinator → External-Reviewer
+**Task**: T<taskIndex> — <task title>
+**Signal**: CONTINUE
+
+Task complete. Advancing to T<taskIndex+1>.
+MSGEOF
+) 200>"$SPEC_PATH/chat.md.lock"
+```
+</mandatory>
+
 ## Parallel Group Detection
 
 If current task has [P] marker, scan for consecutive [P] tasks starting from taskIndex.
