@@ -1,7 +1,7 @@
 ---
 name: reality-verification
 description: This skill should be used when the user asks to "verify a fix", "reproduce failure", "diagnose issue", "check BEFORE/AFTER state", "VF task", "reality check", "check test quality", "mock-only tests", or needs guidance on verifying fixes by reproducing failures before and after implementation, or detecting mock-heavy test anti-patterns.
-version: 0.3.0
+version: 0.2.0
 user-invocable: false
 ---
 

@@ -444,6 +444,8 @@ Suggested fixes:
 Status: VERIFICATION_FAIL (test quality issues)
 ```
 
+When tests are healthy:
+
 ```text
 ✓ Mock Quality Check: PASS
 

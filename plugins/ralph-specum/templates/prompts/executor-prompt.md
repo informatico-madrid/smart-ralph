@@ -5,7 +5,7 @@
 
 ## Task Tool Parameters
 
-- **subagent_type:** `spec-executor`
+- **subagent_type:** `ralph-specum:spec-executor`
 - **description:** `Execute task {TASK_INDEX} for {SPEC_NAME}`
 
 > **Note on subagent_type naming**: use the bare agent name `spec-executor` (not

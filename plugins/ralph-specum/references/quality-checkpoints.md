@@ -92,24 +92,24 @@ All checkpoints use the `[VERIFY]` tag and follow the standard Do/Verify/Done wh
   - **Done when**: Build succeeds, all tests pass, E2E green
   - **Commit**: `chore(scope): pass local CI` (if fixes needed)
 
-- [ ] V5 [VERIFY] PR abierto correctamente
-  - **Do**: Crear el PR con `gh pr create` si no existe, o verificar que ya existe
-  - **Verify**: `gh pr view --json url,state | jq -r '.state'` devuelve `OPEN`
-  - **Done when**: PR existe en GitHub con URL válida y estado OPEN
+- [ ] V5 [VERIFY] PR opened correctly
+  - **Do**: Create the PR with `gh pr create` if it does not exist, or verify it already exists
+  - **Verify**: `gh pr view --json url,state | jq -r '.state'` returns `OPEN`
+  - **Done when**: PR exists on GitHub with a valid URL and state OPEN
   - **Commit**: None
   - **Output**: `PR_OPENED #<N> → <url>`
 
-  > ⚠️ **PR Lifecycle Rule (CRITICAL)**: La responsabilidad del agente local termina
-  > cuando el PR existe en GitHub. El agente NO espera la CI ni ejecuta
-  > `gh pr checks --watch`. La CI es ejecutada por la infraestructura cloud
-  > (GitHub Actions) de forma asíncrona.
+  > ⚠️ **PR Lifecycle Rule (CRITICAL)**: The local agent's responsibility ends
+  > when the PR exists on GitHub. The agent MUST NOT wait for CI nor run
+  > `gh pr checks --watch`. CI is executed asynchronously by the cloud
+  > infrastructure (GitHub Actions).
   >
-  > ✅ TASKCOMPLETE cuando: `gh pr view` devuelve estado OPEN
-  > ❌ NUNCA: esperar `gh pr checks` verde antes de marcar [x]
+  > ✅ TASKCOMPLETE when: `gh pr view` returns state OPEN
+  > ❌ NEVER: wait for `gh pr checks` to be green before marking [x]
   >
-  > Si la CI falla después de que el PR esté abierto → GitHub Actions crea
-  > comentarios o issues → eso es input para una NUEVA spec, no responsabilidad
-  > de la spec actual.
+  > If CI fails after the PR is opened → GitHub Actions will create
+  > comments or issues → that is input for a NEW spec, not the responsibility
+  > of the current spec.
 
 - [ ] V6 [VERIFY] AC checklist
   - **Do**: Read requirements.md, programmatically verify each AC-* is satisfied by checking code/tests/behavior

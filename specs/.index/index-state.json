@@ -52,6 +52,13 @@
       "totalTasks": 13
     },
     {
+      "name": "parallel-tasks-execution",
+      "path": "./specs/parallel-tasks-execution",
+      "phase": "tasks",
+      "taskIndex": 46,
+      "totalTasks": 62
+    },
+    {
       "name": "epic-triage",
       "path": "./specs/epic-triage",
       "phase": "completed",
@@ -59,32 +66,18 @@
       "totalTasks": 11
     },
     {
-      "name": "fix-impl-context-bloat",
-      "path": "./specs/fix-impl-context-bloat",
-      "phase": "tasks",
-      "taskIndex": 47,
-      "totalTasks": 48
-    },
-    {
-      "name": "fork-ralph-wiggum",
-      "path": "./specs/fork-ralph-wiggum",
+      "name": "add-skills-doc",
+      "path": "./specs/add-skills-doc",
       "phase": "completed",
-      "taskIndex": 21,
-      "totalTasks": 21
+      "taskIndex": 5,
+      "totalTasks": 5
     },
     {
-      "name": "goal-interview",
-      "path": "./specs/goal-interview",
+      "name": "enforce-teams-instead",
+      "path": "./specs/enforce-teams-instead",
       "phase": "completed",
-      "taskIndex": 14,
-      "totalTasks": 14
-    },
-    {
-      "name": "implement-ralph-wiggum",
-      "path": "./specs/implement-ralph-wiggum",
-      "phase": "tasks",
-      "taskIndex": 27,
-      "totalTasks": 35
+      "taskIndex": 13,
+      "totalTasks": 13
     },
     {
       "name": "improve-task-generation",
@@ -94,32 +87,11 @@
       "totalTasks": 68
     },
     {
-      "name": "improve-walkthrough-feature",
-      "path": "./specs/improve-walkthrough-feature",
+      "name": "fix-impl-context-bloat",
+      "path": "./specs/fix-impl-context-bloat",
       "phase": "tasks",
-      "taskIndex": 13,
-      "totalTasks": 14
-    },
-    {
-      "name": "iterative-failure-recovery",
-      "path": "./specs/iterative-failure-recovery",
-      "phase": "tasks",
-      "taskIndex": 14,
-      "totalTasks": 20
-    },
-    {
-      "name": "karpathy-skills-rules",
-      "path": "./specs/karpathy-skills-rules",
-      "phase": "completed",
-      "taskIndex": 12,
-      "totalTasks": 12
-    },
-    {
-      "name": "multi-spec-dirs",
-      "path": "./specs/multi-spec-dirs",
-      "phase": "tasks",
-      "taskIndex": 30,
-      "totalTasks": 33
+      "taskIndex": 47,
+      "totalTasks": 48
     },
     {
       "name": "native-task-sync",
@@ -129,20 +101,6 @@
       "totalTasks": 15
     },
     {
-      "name": "parallel-task-execution",
-      "path": "./specs/parallel-task-execution",
-      "phase": "tasks",
-      "taskIndex": 24,
-      "totalTasks": 25
-    },
-    {
-      "name": "parallel-tasks-execution",
-      "path": "./specs/parallel-tasks-execution",
-      "phase": "tasks",
-      "taskIndex": 46,
-      "totalTasks": 62
-    },
-    {
       "name": "plan-source-feature",
       "path": "./specs/plan-source-feature",
       "phase": "completed",
@@ -150,18 +108,25 @@
       "totalTasks": 12
     },
     {
-      "name": "qa-verification",
-      "path": "./specs/qa-verification",
-      "phase": "completed",
-      "taskIndex": 19,
-      "totalTasks": 19
+      "name": "implement-ralph-wiggum",
+      "path": "./specs/implement-ralph-wiggum",
+      "phase": "tasks",
+      "taskIndex": 27,
+      "totalTasks": 35
     },
     {
-      "name": "ralph-speckit",
-      "path": "./specs/ralph-speckit",
+      "name": "token-efficient-executor",
+      "path": "./specs/token-efficient-executor",
       "phase": "completed",
-      "taskIndex": 27,
-      "totalTasks": 27
+      "taskIndex": 5,
+      "totalTasks": 5
+    },
+    {
+      "name": "fork-ralph-wiggum",
+      "path": "./specs/fork-ralph-wiggum",
+      "phase": "completed",
+      "taskIndex": 21,
+      "totalTasks": 21
     },
     {
       "name": "reality-verification-principle",
@@ -171,25 +136,25 @@
       "totalTasks": 11
     },
     {
-      "name": "remove-ralph-wiggum",
-      "path": "./specs/remove-ralph-wiggum",
+      "name": "update-index-on-complete",
+      "path": "./specs/update-index-on-complete",
       "phase": "completed",
-      "taskIndex": 16,
-      "totalTasks": 16
+      "taskIndex": 7,
+      "totalTasks": 7
     },
     {
-      "name": "reviewer-subagent",
-      "path": "./specs/reviewer-subagent",
+      "name": "karpathy-skills-rules",
+      "path": "./specs/karpathy-skills-rules",
       "phase": "completed",
-      "taskIndex": 20,
-      "totalTasks": 20
+      "taskIndex": 12,
+      "totalTasks": 12
     },
     {
-      "name": "smart-skill-swap-retry",
-      "path": "./specs/smart-skill-swap-retry",
+      "name": "adopt-grill-me-interview",
+      "path": "./specs/adopt-grill-me-interview",
       "phase": "tasks",
-      "taskIndex": 21,
-      "totalTasks": 26
+      "taskIndex": 14,
+      "totalTasks": 18
     },
     {
       "name": "speckit-stop-hook",
@@ -206,6 +171,27 @@
       "totalTasks": 24
     },
     {
+      "name": "qa-verification",
+      "path": "./specs/qa-verification",
+      "phase": "completed",
+      "taskIndex": 19,
+      "totalTasks": 19
+    },
+    {
+      "name": "ralph-speckit",
+      "path": "./specs/ralph-speckit",
+      "phase": "completed",
+      "taskIndex": 27,
+      "totalTasks": 27
+    },
+    {
+      "name": "multi-spec-dirs",
+      "path": "./specs/multi-spec-dirs",
+      "phase": "tasks",
+      "taskIndex": 30,
+      "totalTasks": 33
+    },
+    {
       "name": "tdd-bug-fix-pattern",
       "path": "./specs/tdd-bug-fix-pattern",
       "phase": "tasks",
@@ -213,18 +199,81 @@
       "totalTasks": 16
     },
     {
-      "name": "token-efficient-executor",
-      "path": "./specs/token-efficient-executor",
+      "name": "codebase-indexing",
+      "path": "./specs/codebase-indexing",
       "phase": "completed",
-      "taskIndex": 5,
-      "totalTasks": 5
+      "taskIndex": 39,
+      "totalTasks": 39
     },
     {
-      "name": "update-index-on-complete",
-      "path": "./specs/update-index-on-complete",
+      "name": "parallel-task-execution",
+      "path": "./specs/parallel-task-execution",
+      "phase": "tasks",
+      "taskIndex": 24,
+      "totalTasks": 25
+    },
+    {
+      "name": "iterative-failure-recovery",
+      "path": "./specs/iterative-failure-recovery",
+      "phase": "tasks",
+      "taskIndex": 14,
+      "totalTasks": 20
+    },
+    {
+      "name": "reviewer-subagent",
+      "path": "./specs/reviewer-subagent",
       "phase": "completed",
-      "taskIndex": 7,
-      "totalTasks": 7
+      "taskIndex": 20,
+      "totalTasks": 20
+    },
+    {
+      "name": "goal-interview",
+      "path": "./specs/goal-interview",
+      "phase": "completed",
+      "taskIndex": 14,
+      "totalTasks": 14
+    },
+    {
+      "name": "codex-plugin-sync",
+      "path": "./specs/codex-plugin-sync",
+      "phase": "execution",
+      "taskIndex": 33,
+      "totalTasks": 61
+    },
+    {
+      "name": "adaptive-interview",
+      "path": "./specs/adaptive-interview",
+      "phase": "completed",
+      "taskIndex": 22,
+      "totalTasks": 22
+    },
+    {
+      "name": "add-autonomous-e2e-verify",
+      "path": "./specs/add-autonomous-e2e-verify",
+      "phase": "tasks",
+      "taskIndex": 54,
+      "totalTasks": 55
+    },
+    {
+      "name": "remove-ralph-wiggum",
+      "path": "./specs/remove-ralph-wiggum",
+      "phase": "completed",
+      "taskIndex": 16,
+      "totalTasks": 16
+    },
+    {
+      "name": "smart-skill-swap-retry",
+      "path": "./specs/smart-skill-swap-retry",
+      "phase": "tasks",
+      "taskIndex": 21,
+      "totalTasks": 26
+    },
+    {
+      "name": "improve-walkthrough-feature",
+      "path": "./specs/improve-walkthrough-feature",
+      "phase": "tasks",
+      "taskIndex": 13,
+      "totalTasks": 14
     },
     {
       "name": "when-creating-worktree",
@@ -232,20 +281,6 @@
       "phase": "completed",
       "taskIndex": 7,
       "totalTasks": 7
-    },
-    {
-      "name": "ralph-quality-improvements",
-      "path": "./specs/ralph-quality-improvements",
-      "phase": "completed",
-      "taskIndex": 27,
-      "totalTasks": 27
-    },
-    {
-      "name": "agent-chat-protocol",
-      "path": "./specs/agent-chat-protocol",
-      "phase": "execution",
-      "taskIndex": 51,
-      "totalTasks": 51
     }
   ]
 }

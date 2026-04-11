@@ -1,7 +1,7 @@
 ---
 name: spec-workflow
 description: This skill should be used when the user asks to "build a feature", "create a spec", "start spec-driven development", "run research phase", "generate requirements", "create design", "plan tasks", "implement spec", "check spec status", "triage a feature", "create an epic", "decompose a large feature", or needs guidance on spec-driven development workflow, phase ordering, or epic orchestration.
-version: 0.3.2
+version: 0.2.0
 ---
 
 # Spec Workflow
