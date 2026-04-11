@@ -138,12 +138,12 @@ Before starting execution, check if the user wants to run an external parallel r
 
 **Ask the user:**
 ```
-¿Vas a ejecutar un revisor externo paralelo durante esta implementación? [s/n]
+Will you run an external parallel reviewer during this implementation? [y/n]
 
-Si dices sí:
-- Se creará specs/<specName>/task_review.md (desde el template de FR-B1)
-- Recibirás instrucciones para lanzar el revisor en una segunda sesión de Claude Code
-- El spec-executor leerá automáticamente task_review.md en cada tarea
+If yes:
+- A file specs/<specName>/task_review.md will be created from the FR-B1 template
+- You will receive instructions to launch the reviewer in a second Claude Code session
+- The spec-executor will automatically read task_review.md before each task
 ```
 
 **If user answers YES:**
@@ -151,37 +151,37 @@ Si dices sí:
 2. Copy `plugins/ralph-specum/templates/chat.md` → `specs/<specName>/chat.md`
 3. Ask which quality principles to activate:
    ```
-   ¿Qué principios de calidad quieres que el revisor enforece?
+   Which quality principles should the reviewer enforce?
 
-   Principios detectados en el codebase: <listar convenciones encontradas en el repo>
-   Principios recomendados estándar:
+   Principles detected in the codebase: <list detected conventions>
+   Recommended standard principles:
    - SOLID (Single Responsibility, Open/Closed, Liskov, Interface Segregation, Dependency Inversion)
    - DRY (Don't Repeat Yourself)
-   - FAIL FAST (validaciones al inicio de funciones)
+   - FAIL FAST (validate early in functions)
    - TDD (Red-Green-Refactor)
 
-   ¿Cuáles quieres activar? ("todos", lista, o "ninguno adicional")
+   Which do you want to enable? ("all", a comma-separated list, or "none")
    ```
 3. Write selected principles to `specs/<specName>/task_review.md` frontmatter:
    ```yaml
    <!-- reviewer-config
    principles: [SOLID, DRY, FAIL_FAST, TDD]
-   codebase-conventions: <detectadas automáticamente>
+   codebase-conventions: <detected automatically>
    -->
    ```
 4. Print onboarding instructions:
    ```
-   Revisor externo configurado.
+   External reviewer configured.
 
-   Para lanzar el revisor en paralelo:
-   1. Abre una segunda sesión de Claude Code en el mismo repositorio
-   2. Carga el agente: @external-reviewer
-   3. Dile: "Revisa la spec <specName> mientras spec-executor implementa"
-   4. El revisor leerá y escribirá en specs/<specName>/task_review.md y chat.md (coordinación FLOC en tiempo real)
+   To launch the reviewer in parallel:
+   1. Open a second Claude Code session in the same repository
+   2. Load the agent: @external-reviewer
+   3. Tell it: "Review spec <specName> while spec-executor implements"
+   4. The reviewer will read and write to specs/<specName>/task_review.md and chat.md (FLOC-based coordination in real time)
 
-   El spec-executor ya está configurado para leer task_review.md antes de cada tarea.
-   El revisor también leerá y escribirá en chat.md (coordinación FLOC en tiempo real)
-   Cuando el revisor marque algo como FAIL, spec-executor se detendra y aplicara el fix.
+   The spec-executor is already configured to read task_review.md before each task.
+   The reviewer will also read and write chat.md (FLOC coordination in real time).
+   When the reviewer marks an item as FAIL, the spec-executor will stop and apply the fix.
    ```
 
 **If user answers NO:** continue normal flow without creating task_review.md.
