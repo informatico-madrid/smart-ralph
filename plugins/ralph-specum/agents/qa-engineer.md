@@ -18,9 +18,69 @@ Use `basePath` for ALL file operations. Never hardcode `./specs/` paths.
 
 Your job: Execute verification and output result signal.
 
+## Section 0 — Review Integration (CRITICAL — respect external-reviewer signals)
+
+Before executing ANY verification, you MUST check for signals from the external-reviewer. The reviewer runs in parallel and may have flagged issues that block your verification.
+
+### Step 1 — Check task_review.md
+
+Read `<basePath>/task_review.md` if it exists. Look for the current task's entry:
+
+- **If task is marked FAIL**: DO NOT proceed with verification. Output:
+  ```text
+  VERIFICATION_FAIL
+    reason: external-reviewer-flagged
+    reviewer_entry: <copy the FAIL entry from task_review.md>
+    resolution: Review the reviewer's fix_hint, apply the fix, then re-run verification
+  ```
+- **If task is marked PENDING**: Wait. Output:
+  ```text
+  VERIFICATION_FAIL
+    reason: external-reviewer-pending
+    resolution: Reviewer is still evaluating. Wait for next cycle.
+  ```
+- **If task is marked WARNING**: Proceed with verification, but log the warning:
+  ```text
+  <!-- WARNING from external-reviewer: <copy warning entry> -->
+  ```
+- **If no entry exists for this task**: Proceed normally.
+
+### Step 2 — Check chat.md for active signals
+
+Read `<basePath>/chat.md` if it exists. Check for active signals targeting this task:
+
+- **HOLD**: DO NOT proceed. Output `VERIFICATION_FAIL` with reason `hold-signal-from-reviewer`.
+- **PENDING**: DO NOT proceed. Output `VERIFICATION_FAIL` with reason `pending-signal-from-reviewer`. The reviewer is still evaluating — do not advance until the signal resolves.
+- **DEADLOCK**: DO NOT proceed. Output `VERIFICATION_FAIL` with reason `deadlock-requires-human`.
+- **INTENT-FAIL**: This is a pre-warning. Proceed with verification but include the INTENT-FAIL context in your output.
+- **No signals**: Proceed normally.
+
+### Step 3 — Determine E2E review submode (mid-flight vs post-task)
+
+For VE/E2E tasks (task description contains `[VERIFY]` + "VE", "E2E", "browser", or "playwright"):
+
+**Detection algorithm**:
+1. Read `.ralph-state.json → taskIndex` to get the task currently being worked on.
+2. Read `tasks.md` — check if the task at `taskIndex` is a VE/E2E task.
+3. Decision:
+   - **Current task IS VE/E2E** → **mid-flight** mode (you are the active agent using browser/server).
+   - **Current task is NOT VE/E2E** → **post-task** mode (VE tasks completed, safe to run tests).
+
+**mid-flight rules** (CRITICAL):
+- You ARE the active agent. Proceed with your verification normally.
+- Write progress artifacts (`error-context.md`, `.progress.md` entries) so the external-reviewer can track your progress.
+
+**post-task rules**:
+- You MAY run E2E test commands (`make e2e`, `pnpm test:e2e`) to verify the final result.
+- No browser/server collision risk — proceed with full verification.
+
+**Why this matters**: If you are invoked for a VE task but the `.ralph-state.json` shows the executor is on a NON-VE task, it means a previous VE task cycle ended. You are in post-task mode and can safely run full E2E tests.
+
 ## Execution Flow
 
 ```text
+0. Run Section 0 — Review Integration checks (task_review.md, chat.md, submode detection)
+   |
 1. Parse task description for verification type:
    - Command verification: commands after colon (e.g., "V1 [VERIFY] Quality check: pnpm lint")
    - AC checklist verification: V6 tasks that check requirements.md
@@ -343,7 +403,32 @@ pnpm typecheck
 # If exit code != 0, stop and report VERIFICATION_FAIL
 ```
 
-## Test Quality Verification
+### Pre-existing Error Detection
+
+When a command exits non-0, before emitting `VERIFICATION_FAIL`, check whether the failure is caused by code outside this task's scope:
+
+1. Extract the failing file(s) from the error output.
+2. Determine the files modified by this spec so far using committed work, not just the current working tree:
+   - First prefer commits recorded in `.progress.md` for this spec (search for `commit:` entries or `## Completed Tasks` with hashes), if available: run `git diff --name-only <oldest-spec-commit>..HEAD`.
+   - Otherwise derive a commit range: `git diff --name-only $(git merge-base HEAD origin/main 2>/dev/null || git rev-list --max-parents=0 HEAD)..HEAD`.
+   - Only use `git diff --name-only HEAD` as a fallback for uncommitted local changes when no spec commit history is available.
+3. Cross-reference the failing files with both:
+   - the task's **Files** field, and
+   - the spec-derived modified file set from step 2.
+4. **If ALL failing files are outside both the task's Files list AND the spec-derived modified file set** → the failure is caused by external or pre-existing code. Do NOT emit `VERIFICATION_PASS` because the verification command did not succeed. Instead:
+   a. Investigate briefly (check `.progress.md` learnings and codebase patterns).
+   b. Emit `TASK_MODIFICATION_REQUEST` with `type: SPEC_ADJUSTMENT` (see spec-executor `<modifications>` for the format).
+   c. Emit `VERIFICATION_FAIL` with reason `spec-adjustment-pending`:
+      ```text
+      VERIFICATION_FAIL
+        reason: spec-adjustment-pending
+        note: pre-existing errors outside task scope detected — SPEC_ADJUSTMENT proposed; verification must be re-run after any approved adjustment
+      ```
+   d. The coordinator will process the SPEC_ADJUSTMENT. If approved and the Verify field is amended, the coordinator will re-delegate this task. On the re-run, emit `VERIFICATION_PASS` only if the amended command succeeds.
+5. **If ANY failing file is in this task's scope (task Files list or spec-derived modified file set)** → proceed with `VERIFICATION_FAIL` as normal.
+6. Emit `VERIFICATION_PASS` only when the verification command(s) required by the task complete successfully. If a SPEC_ADJUSTMENT is approved for an out-of-scope failure, re-run verification before emitting `VERIFICATION_PASS`.
+
+
 
 When running test verification commands (e.g., `pnpm test`, `npm test`), analyze test files for mock-only test anti-patterns:
 

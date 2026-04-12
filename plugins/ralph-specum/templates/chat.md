@@ -8,27 +8,40 @@
 | ACK | Acknowledged, understood |
 | CONTINUE | Work in progress, more to come |
 | HOLD | Paused, waiting for input or resource |
+| PENDING | Still evaluating; blocking — do not advance until resolved |
 | STILL | Still alive/active, no progress but not dead |
 | ALIVE | Initial check-in or heartbeat |
 | CLOSE | Conversation closing |
 | URGENT | Needs immediate attention |
 | DEADLOCK | Blocked, cannot proceed |
 | INTENT-FAIL | Could not fulfill stated intent |
+| SPEC-ADJUSTMENT | Spec criterion cannot be met cleanly; proposing minimal Verify/Done-when amendment |
+| SPEC-DEFICIENCY | Spec criterion fundamentally broken; human decision required |
 
 ## Message Format
 
-### [<writer> → <addressee>] <HH:MM:SS> | <task-ID> | <SIGNAL>
+### Header
 
-Example: `[agent-1 → agent-2] 14:32:05 | task-3.2 | OVER`
+Each message begins with a header line containing a timestamp and the writer/addressee. The signal itself is placed in the message body as `**Signal**: <SIGNAL>`.
 
-## Example Messages
+Header format:
+
+### [YYYY-MM-DD HH:MM:SS] <writer> → <addressee>
+
+Example message body (signal in body):
 
 ```text
-[spec-executor → coordinator] 09:00:00 | task-1.1 | ALIVE
-[coordinator → spec-executor] 09:00:01 | task-1.1 | ACK
-[spec-executor → coordinator] 09:00:05 | task-1.1 | CONTINUE
-[spec-executor → coordinator] 09:01:30 | task-1.1 | OVER
-[coordinator → spec-executor] 09:01:31 | task-1.2 | OVER
+### [2026-04-12 09:00:00] spec-executor → coordinator
+**Task**: task-1.1
+**Signal**: ALIVE
+
+### [2026-04-12 09:00:01] coordinator → spec-executor
+**Task**: task-1.1
+**Signal**: ACK
+
+### [2026-04-12 09:01:30] spec-executor → coordinator
+**Task**: task-1.1
+**Signal**: OVER
 ```
 
 <!-- Messages accumulate here. Append only. Do not edit or delete. -->
