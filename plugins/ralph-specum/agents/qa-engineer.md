@@ -407,15 +407,25 @@ pnpm typecheck
 When a command exits non-0, before emitting `VERIFICATION_FAIL`, check whether the failure is caused by code outside this task's scope:
 
 1. Extract the failing file(s) from the error output.
-2. Run `git diff --name-only HEAD` to get files modified by this spec so far.
-3. Cross-reference with the task's **Files** field.
-4. **If ALL failing files are outside both the task's Files list AND git diff** → the failure is caused by external or pre-existing code. Do NOT emit `VERIFICATION_FAIL`.
-   Instead, investigate briefly (check `.progress.md` learnings and codebase patterns), then emit `TASK_MODIFICATION_REQUEST` with `type: SPEC_ADJUSTMENT` (see spec-executor `<modifications>` for the format), then emit `VERIFICATION_PASS` with a note:
-   ```text
-   VERIFICATION_PASS
-     note: pre-existing errors outside task scope detected — SPEC_ADJUSTMENT proposed
-   ```
-5. **If ANY failing file is in this task's scope** → proceed with `VERIFICATION_FAIL` as normal.
+2. Determine the files modified by this spec so far using committed work, not just the current working tree:
+   - First prefer commits recorded in `.progress.md` for this spec (search for `commit:` entries or `## Completed Tasks` with hashes), if available: run `git diff --name-only <oldest-spec-commit>..HEAD`.
+   - Otherwise derive a commit range: `git diff --name-only $(git merge-base HEAD origin/main 2>/dev/null || git rev-list --max-parents=0 HEAD)..HEAD`.
+   - Only use `git diff --name-only HEAD` as a fallback for uncommitted local changes when no spec commit history is available.
+3. Cross-reference the failing files with both:
+   - the task's **Files** field, and
+   - the spec-derived modified file set from step 2.
+4. **If ALL failing files are outside both the task's Files list AND the spec-derived modified file set** → the failure is caused by external or pre-existing code. Do NOT emit `VERIFICATION_PASS` because the verification command did not succeed. Instead:
+   a. Investigate briefly (check `.progress.md` learnings and codebase patterns).
+   b. Emit `TASK_MODIFICATION_REQUEST` with `type: SPEC_ADJUSTMENT` (see spec-executor `<modifications>` for the format).
+   c. Emit `VERIFICATION_FAIL` with reason `spec-adjustment-pending`:
+      ```text
+      VERIFICATION_FAIL
+        reason: spec-adjustment-pending
+        note: pre-existing errors outside task scope detected — SPEC_ADJUSTMENT proposed; verification must be re-run after any approved adjustment
+      ```
+   d. The coordinator will process the SPEC_ADJUSTMENT. If approved and the Verify field is amended, the coordinator will re-delegate this task. On the re-run, emit `VERIFICATION_PASS` only if the amended command succeeds.
+5. **If ANY failing file is in this task's scope (task Files list or spec-derived modified file set)** → proceed with `VERIFICATION_FAIL` as normal.
+6. Emit `VERIFICATION_PASS` only when the verification command(s) required by the task complete successfully. If a SPEC_ADJUSTMENT is approved for an out-of-scope failure, re-run verification before emitting `VERIFICATION_PASS`.
 
 
 

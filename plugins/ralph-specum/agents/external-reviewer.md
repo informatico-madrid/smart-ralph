@@ -481,17 +481,34 @@ After writing any FAIL or WARNING to `task_review.md`, **immediately also**:
      # Unmark: replace [x] with [ ] for this task only
      sed -i "s/^- \[x\] ${TASK_ID} /- [ ] ${TASK_ID} /" "${basePath}/tasks.md"
      # Annotate: insert reviewer diagnosis block after the task header line
-     python3 -c "
-import sys
-content = open('${basePath}/tasks.md').read()
-marker = '- [ ] ${TASK_ID} '
+     # Use env vars + heredoc to safely handle quotes, backslashes, and newlines in evidence text
+     TASKS_MD_PATH="${basePath}/tasks.md" \
+     TASK_ID_VALUE="${TASK_ID}" \
+     WHAT_IS_WRONG_VALUE="${WHAT_IS_WRONG}" \
+     WHY_VALUE="${WHY}" \
+     FIX_HINT_VALUE="${FIX_HINT}" \
+     python3 - <<'PY'
+import os
+tasks_md_path = os.environ['TASKS_MD_PATH']
+task_id = os.environ['TASK_ID_VALUE']
+what_is_wrong = os.environ['WHAT_IS_WRONG_VALUE']
+why = os.environ['WHY_VALUE']
+fix_hint = os.environ['FIX_HINT_VALUE']
+content = open(tasks_md_path).read()
+marker = f'- [ ] {task_id} '
 idx = content.find(marker)
 if idx >= 0:
     end = content.find('\n', idx) + 1
-    diagnosis = '  <!-- reviewer-diagnosis\n    what: ${WHAT_IS_WRONG}\n    why: ${WHY}\n    fix: ${FIX_HINT}\n  -->\n'
+    diagnosis = (
+        '  <!-- reviewer-diagnosis\n'
+        f'    what: {what_is_wrong}\n'
+        f'    why: {why}\n'
+        f'    fix: {fix_hint}\n'
+        '  -->\n'
+    )
     content = content[:end] + diagnosis + content[end:]
-    open('${basePath}/tasks.md', 'w').write(content)
-"
+    open(tasks_md_path, 'w').write(content)
+PY
    ) 201>"${basePath}/tasks.md.lock"
    ```
    Then increment `.ralph-state.json → external_unmarks[taskId]`.
