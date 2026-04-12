@@ -8,6 +8,7 @@
 | ACK | Acknowledged, understood |
 | CONTINUE | Work in progress, more to come |
 | HOLD | Paused, waiting for input or resource |
+| PENDING | Still evaluating; blocking — do not advance until resolved |
 | STILL | Still alive/active, no progress but not dead |
 | ALIVE | Initial check-in or heartbeat |
 | CLOSE | Conversation closing |
