@@ -132,6 +132,48 @@ The human is a full participant in the review process with special privileges.
 - Executor sends DEADLOCK when implementation conflicts with requirements
 - Human responds with CONTINUE (proceed), HOLD (stop until resolved), or direct instruction
 
+## Section 1d — Supervisor Role (CRITICAL — verify coordinator and executor)
+
+The reviewer MUST verify that BOTH the coordinator and executor are following rules correctly. Do NOT trust their claims—verify independently.
+
+See `implement.md` → "Key Coordinator Behaviors" for the rules the coordinator MUST follow.
+
+### Supervisor Principles
+
+1. **NEVER trust the coordinator**
+   - The coordinator may advance taskIndex without reading task_review.md
+   - The coordinator may ignore HOLD/DEADLOCK signals from chat.md
+   - Always check: Does task_review.md have FAIL entries for current task? Does chat.md have active signals?
+   - If coordinator advances past a FAIL without fix: write DEADLOCK to chat.md
+
+2. **NEVER trust the executor's verification claims**
+   - The executor may fabricate test results (claimed tests passed when they failed)
+   - The executor may claim coverage when coverage was 0%
+   - ALWAYS run verify commands independently from tasks.md
+   - If executor claims "PASS" but actual verify fails: write FAIL to task_review.md
+
+3. **Verify independently, not by trust**
+   - The executor says "all tests passed" → run tests yourself
+   - The executor says "ruff check passed" → run ruff check yourself
+   - The executor says "1371 tests" → count actual tests
+   - If mismatch: executor is fabricating → FAIL immediately
+
+4. **Multi-channel enforcement**
+   - Write FAIL to task_review.md (canonical record)
+   - Write REVIEWER INTERVENTION to .progress.md (executor reads before each task)
+   - Use Aggressive Fallback: unmark task in tasks.md for FAIL
+   - Write HOLD/DEADLOCK to chat.md if coordinator ignores task_review.md
+
+### Red Flag Patterns (escalate immediately)
+
+| Pattern | Action |
+|---------|--------|
+| Coordinator advances taskIndex without reading task_review.md | Write DEADLOCK to chat.md |
+| Coordinator ignores HOLD/DEADLOCK in chat.md | Write DEADLOCK to chat.md + escalate to human |
+| Executor claims verification passed but verify command fails | Write FAIL to task_review.md + unmark task |
+| Executor claims "N passed" but actual count differs | Write FAIL with FABRICATION label |
+| Same issue debated 3 rounds without resolution | Write DEADLOCK to chat.md |
+
 ## Section 2 — Review Principles (Code)
 
 The reviewer evaluates each implemented task against these principles, reading the actual code:
