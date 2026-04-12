@@ -18,9 +18,68 @@ Use `basePath` for ALL file operations. Never hardcode `./specs/` paths.
 
 Your job: Execute verification and output result signal.
 
+## Section 0 — Review Integration (CRITICAL — respect external-reviewer signals)
+
+Before executing ANY verification, you MUST check for signals from the external-reviewer. The reviewer runs in parallel and may have flagged issues that block your verification.
+
+### Step 1 — Check task_review.md
+
+Read `<basePath>/task_review.md` if it exists. Look for the current task's entry:
+
+- **If task is marked FAIL**: DO NOT proceed with verification. Output:
+  ```text
+  VERIFICATION_FAIL
+    reason: external-reviewer-flagged
+    reviewer_entry: <copy the FAIL entry from task_review.md>
+    resolution: Review the reviewer's fix_hint, apply the fix, then re-run verification
+  ```
+- **If task is marked PENDING**: Wait. Output:
+  ```text
+  VERIFICATION_FAIL
+    reason: external-reviewer-pending
+    resolution: Reviewer is still evaluating. Wait for next cycle.
+  ```
+- **If task is marked WARNING**: Proceed with verification, but log the warning:
+  ```text
+  <!-- WARNING from external-reviewer: <copy warning entry> -->
+  ```
+- **If no entry exists for this task**: Proceed normally.
+
+### Step 2 — Check chat.md for active signals
+
+Read `<basePath>/chat.md` if it exists. Check for active signals targeting this task:
+
+- **HOLD**: DO NOT proceed. Output `VERIFICATION_FAIL` with reason `hold-signal-from-reviewer`.
+- **DEADLOCK**: DO NOT proceed. Output `VERIFICATION_FAIL` with reason `deadlock-requires-human`.
+- **INTENT-FAIL**: This is a pre-warning. Proceed with verification but include the INTENT-FAIL context in your output.
+- **No signals**: Proceed normally.
+
+### Step 3 — Determine E2E review submode (mid-flight vs post-task)
+
+For VE/E2E tasks (task description contains `[VERIFY]` + "VE", "E2E", "browser", or "playwright"):
+
+**Detection algorithm**:
+1. Read `.ralph-state.json → taskIndex` to get the task currently being worked on.
+2. Read `tasks.md` — check if the task at `taskIndex` is a VE/E2E task.
+3. Decision:
+   - **Current task IS VE/E2E** → **mid-flight** mode (you are the active agent using browser/server).
+   - **Current task is NOT VE/E2E** → **post-task** mode (VE tasks completed, safe to run tests).
+
+**mid-flight rules** (CRITICAL):
+- You ARE the active agent. Proceed with your verification normally.
+- Write progress artifacts (`error-context.md`, `.progress.md` entries) so the external-reviewer can track your progress.
+
+**post-task rules**:
+- You MAY run E2E test commands (`make e2e`, `pnpm test:e2e`) to verify the final result.
+- No browser/server collision risk — proceed with full verification.
+
+**Why this matters**: If you are invoked for a VE task but the `.ralph-state.json` shows the executor is on a NON-VE task, it means a previous VE task cycle ended. You are in post-task mode and can safely run full E2E tests.
+
 ## Execution Flow
 
 ```text
+0. Run Section 0 — Review Integration checks (task_review.md, chat.md, submode detection)
+   |
 1. Parse task description for verification type:
    - Command verification: commands after colon (e.g., "V1 [VERIFY] Quality check: pnpm lint")
    - AC checklist verification: V6 tasks that check requirements.md
