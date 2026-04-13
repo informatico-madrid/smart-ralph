@@ -32,7 +32,7 @@ Surgical edits to 4 files. Each task = one atomic change.
 
 ### Schema Changes (spec.schema.json)
 
-- [ ] 1.1 Add nativeTaskMap property to schema
+- [x] 1.1 Add nativeTaskMap property to schema
   - **Do**: Add `"nativeTaskMap"` object property to `definitions.state.properties` after `granularity` at line 193. Property: type object, description "Maps taskIndex to native task IDs for external sync", default {}, additionalProperties type string.
   - **Files**: plugins/ralph-specum/schemas/spec.schema.json
   - **Done when**: `jq '.definitions.state.properties | has("nativeTaskMap")' plugins/ralph-specum/schemas/spec.schema.json` returns `true`
@@ -40,7 +40,7 @@ Surgical edits to 4 files. Each task = one atomic change.
   - **Commit**: `feat(schema): add nativeTaskMap property to state definition`
   - _Requirements: FR-10, AC-4.1_
 
-- [ ] 1.2 Add nativeSyncEnabled property to schema
+- [x] 1.2 Add nativeSyncEnabled property to schema
   - **Do**: Add `"nativeSyncEnabled"` boolean property after `nativeTaskMap`. Property: type boolean, default true, description "Whether native task sync is active".
   - **Files**: plugins/ralph-specum/schemas/spec.schema.json
   - **Done when**: `jq '.definitions.state.properties | has("nativeSyncEnabled")' plugins/ralph-specum/schemas/spec.schema.json` returns `true`
@@ -48,7 +48,19 @@ Surgical edits to 4 files. Each task = one atomic change.
   - **Commit**: `feat(schema): add nativeSyncEnabled property to state definition`
   - _Requirements: FR-10, AC-4.2_
 
-- [ ] 1.3 Add nativeSyncFailureCount property to schema
+- [x] 1.3 Add nativeSyncFailureCount property to schema
+- [x] 1.4 Add chat.executor.lastReadLine nested property to schema
+- [x] 1.6 Update intro line 5: "Three" to "Five"
+- [x] 1.7 Add Layer 0 (EXECUTOR_START) section after intro
+- [x] 1.8 Add Layer 3 (Anti-fabrication) section before current Layer 3
+- [x] 1.9 Rename Layer 3 to Layer 4 (Artifact Review)
+- [x] 1.10 Update "All 3 layers" to "All 5 layers" in Verification Summary
+- [x] 1.11 Update "3 verification layers" to "5 verification layers" at bottom
+- [x] 1.17 Update "3 layers" to "5 layers" at line 211
+- [x] 1.18 Update "all 3 verification layers" to "all 5 verification layers" at line 239
+- [x] 1.19 Add mechanical HOLD grep check before line 225
+- [x] 1.20 Add state integrity check before coordinator prompt output
+- [x] 1.21 Add CI snapshot separation rule after anti-fabrication bullet
   - **Do**: Add `"nativeSyncFailureCount"` integer property after `nativeSyncEnabled`. Property: type integer, minimum 0, default 0, description "Consecutive native sync failures (disables at 3)".
   - **Files**: plugins/ralph-specum/schemas/spec.schema.json
   - **Done when**: `jq '.definitions.state.properties | has("nativeSyncFailureCount")' plugins/ralph-specum/schemas/spec.schema.json` returns `true`
@@ -81,7 +93,7 @@ Surgical edits to 4 files. Each task = one atomic change.
   - _Requirements: FR-1, AC-1.2_
 
 - [ ] 1.7 Add Layer 0 (EXECUTOR_START) section after intro
-  - **Do**: Insert new `## Layer 0: EXECUTOR_START Signal (MANDATORY -- blocks all other layers)` section after line 6 (after `> Used by: implement.md` and the intro paragraph). Content: EXECUTOR_START verification rules, hard gate logic, ESCALATE on absence.
+  - **Do**: Insert new `## Layer 0: EXECUTOR_START Signal (MANDATORY -- blocks all other layers)` section after line 6 (after `> Used by: implement.md` and the intro paragraph). Content: EXECUTOR_START verification rules, hard gate logic, ESCALATE on absence. **IMPORTANT**: Layer 0 must be self-contained — do NOT reference coordinator-pattern.md. Include escalation instructions directly (log "EXECUTOR_START absent for task $taskIndex" to .progress.md, stop iteration).
   - **Files**: plugins/ralph-specum/references/verification-layers.md
   - **Done when**: `grep -c "Layer 0: EXECUTOR_START" plugins/ralph-specum/references/verification-layers.md` returns >= 1
   - **Verify**: `grep -c "Layer 0: EXECUTOR_START" plugins/ralph-specum/references/verification-layers.md`
@@ -89,7 +101,7 @@ Surgical edits to 4 files. Each task = one atomic change.
   - _Requirements: FR-1, AC-1.1_
 
 - [ ] 1.8 Add Layer 3 (Anti-fabrication) section before current Layer 3
-  - **Do**: Insert new `## Layer 3: Anti-fabrication (Verification Claim Integrity)` section before the current Layer 3. Content: independent verify command execution, fabrication detection, CI snapshot separation.
+  - **Do**: Insert new `## Layer 3: Anti-fabrication (Verification Claim Integrity)` section before the current Layer 3. Content: independent verify command execution, fabrication detection, CI snapshot separation with generic wording (no hardcoded ruff/mypy). CI command discovery deferred to Spec 4.
   - **Files**: plugins/ralph-specum/references/verification-layers.md
   - **Done when**: `grep -c "Layer 3: Anti-fabrication" plugins/ralph-specum/references/verification-layers.md` returns >= 1
   - **Verify**: `grep -c "Layer 3: Anti-fabrication" plugins/ralph-specum/references/verification-layers.md`
@@ -177,9 +189,9 @@ Surgical edits to 4 files. Each task = one atomic change.
   - _Requirements: FR-2, AC-1.3_
 
 - [ ] 1.19 Add mechanical HOLD grep check before line 225
-  - **Do**: Insert new bullet before "MANDATORY: Read chat.md BEFORE delegating" (~line 225). Content: grep-based HOLD/PENDING/URGENT check with exit code logic, resolved signal tracking, log to .progress.md.
+  - **Do**: Insert new bullet before "MANDATORY: Read chat.md BEFORE delegating" (~line 225). Content: grep-based HOLD/PENDING/URGENT check with exact line matching, resolved signal tracking ([RESOLVED] marker), log to .progress.md.
   - **Files**: plugins/ralph-specum/commands/implement.md
-  - **Done when**: `grep -c '\[HOLD\].*\[PENDING\].*\[URGENT\]' plugins/ralph-specum/commands/implement.md` returns >= 1 AND `grep -c "COORDINATOR BLOCKED" plugins/ralph-specum/commands/implement.md` returns >= 1
+  - **Done when**: `grep -c "\^\\\[HOLD\\\]\$\|\^\\\[PENDING\\\]\$\|\^\\\[URGENT\\\]\$" plugins/ralph-specum/commands/implement.md` returns >= 1 AND `grep -c "COORDINATOR BLOCKED" plugins/ralph-specum/commands/implement.md` returns >= 1
   - **Verify**: `grep -c "COORDINATOR BLOCKED" plugins/ralph-specum/commands/implement.md | awk '{if($1>=1) print "PASS"; else print "FAIL"}'`
   - **Commit**: `feat(im): add mechanical HOLD grep check before delegation`
   - _Requirements: FR-4, FR-5, AC-2.1, AC-2.2_
@@ -193,7 +205,7 @@ Surgical edits to 4 files. Each task = one atomic change.
   - _Requirements: FR-7, FR-8, FR-9, AC-3.1, AC-3.2, AC-3.3_
 
 - [ ] 1.21 Add CI snapshot separation rule after anti-fabrication bullet
-  - **Do**: Insert new bullet after the "CRITICAL: Verify independently, never trust executor" section (~line 231). Content: task Verify and global CI reported separately, both must pass, "TASK VERIFY PASS but GLOBAL CI FAIL" log rule.
+  - **Do**: Insert new bullet after the "CRITICAL: Verify independently, never trust executor" section (~line 231). Content: task Verify and global CI reported separately, both must pass, "TASK VERIFY PASS but GLOBAL CI FAIL" log rule. Use generic wording — no hardcoded ruff/mypy commands. CI command discovery is deferred to Spec 4 (loop-safety-infra).
   - **Files**: plugins/ralph-specum/commands/implement.md
   - **Done when**: `grep -c "GLOBAL CI" plugins/ralph-specum/commands/implement.md` returns >= 1
   - **Verify**: `grep -c "GLOBAL CI" plugins/ralph-specum/commands/implement.md | awk '{if($1>=1) print "PASS"; else print "FAIL"}'`
@@ -216,20 +228,20 @@ Surgical edits to 4 files. Each task = one atomic change.
 
 Cross-reference consistency cleanup between files.
 
-- [ ] 2.1 Verify VL Layer 0 content matches CP Task Delegation Layer 0 intent
-  - **Do**: Read both Layer 0 sections. Ensure VL Layer 0 has same hard gate / ESCALATE rules as CP. Add cross-reference note in VL: "See coordinator-pattern.md Task Delegation section for delegation-specific ESCALATE instructions."
+- [ ] 2.1 Verify VL Layer 0 is self-contained (no circular CP reference)
+  - **Do**: Read VL Layer 0 section. Ensure it does NOT reference coordinator-pattern.md. ESCALATE instructions must be inline (log to .progress.md, stop iteration). CP keeps its own Layer 0 in Task Delegation section for delegation-specific context, but VL is the canonical self-contained source.
   - **Files**: plugins/ralph-specum/references/verification-layers.md
-  - **Done when**: VL Layer 0 references coordinator-pattern.md for delegation context
-  - **Verify**: `grep "coordinator-pattern.md.*Task Delegation" plugins/ralph-specum/references/verification-layers.md | head -1`
-  - **Commit**: `refactor(vl): add CP cross-reference to Layer 0`
+  - **Done when**: `grep -c "coordinator-pattern.md" plugins/ralph-specum/references/verification-layers.md` returns 0 in Layer 0 section
+  - **Verify**: `grep -A20 "Layer 0: EXECUTOR_START" plugins/ralph-specum/references/verification-layers.md | grep -c "coordinator-pattern" | awk '{if($1==0) print "PASS: no circular ref"; else print "FAIL: circular ref found"}'`
+  - **Commit**: `refactor(vl): ensure Layer 0 is self-contained` (only if changes needed)
   - _Requirements: FR-1_
 
-- [ ] 2.2 Verify VL Layer 3 content matches CP Anti-fabrication section intent
-  - **Do**: Read both anti-fabrication sections. Ensure VL Layer 3 has the CI snapshot separation content (task Verify vs global CI). Align wording with CP.
+- [ ] 2.2 Verify VL Layer 3 has CI separation with generic wording (no hardcoded commands)
+  - **Do**: Read VL Layer 3. Ensure it has CI snapshot separation with generic wording ("project-wide linting, type-checking") — NOT hardcoded ruff/mypy. Verify note about Spec 4 deferral is present.
   - **Files**: plugins/ralph-specum/references/verification-layers.md
-  - **Done when**: VL Layer 3 contains "GLOBAL CI" separation rule
-  - **Verify**: `grep -c "GLOBAL CI" plugins/ralph-specum/references/verification-layers.md | awk '{if($1>=1) print "PASS"; else print "FAIL"}'`
-  - **Commit**: `refactor(vl): align Layer 3 with CP anti-fabrication content`
+  - **Done when**: VL Layer 3 contains "GLOBAL CI" separation rule AND no hardcoded "ruff" or "mypy"
+  - **Verify**: `grep -c "GLOBAL CI" plugins/ralph-specum/references/verification-layers.md | awk '{if($1>=1) print "PASS: CI rule present"; else print "FAIL"}'` && `grep -cE "ruff|mypy" plugins/ralph-specum/references/verification-layers.md | awk '{if($1==0) print "PASS: no hardcoded CI commands"; else print "FAIL: "$1" hardcoded refs found"}'`
+  - **Commit**: `refactor(vl): ensure Layer 3 uses generic CI wording`
   - _Requirements: FR-13_
 
 - [ ] 2.3 Verify CP reference block lists correct layer descriptions
@@ -240,10 +252,10 @@ Cross-reference consistency cleanup between files.
   - **Commit**: `refactor(cp): verify reference block consistency` (only if changes needed)
 
 - [ ] 2.4 Verify implement.md HOLD check text matches AC-2.1 exact grep pattern
-  - **Do**: Read the HOLD check inserted in task 1.19. Verify the grep pattern is exactly `grep -c '\[HOLD\]\|\[PENDING\]\|\[URGENT\]' "$SPEC_PATH/chat.md"` and the blocking logic matches AC-2.1/AC-2.2.
+  - **Do**: Read the HOLD check inserted in task 1.19. Verify the grep pattern is exactly `grep -c "^\[HOLD\]$|^\[PENDING\]$|^\[URGENT\]$" "$SPEC_PATH/chat.md"` (exact line matching, anchors required) and the blocking logic matches AC-2.1/AC-2.2.
   - **Files**: plugins/ralph-specum/commands/implement.md
-  - **Done when**: HOLD grep pattern exactly matches AC-2.1 spec
-  - **Verify**: `grep -c '\\[HOLD\\].*\\[PENDING\\].*\\[URGENT\\].*chat.md' plugins/ralph-specum/commands/implement.md | awk '{if($1>=1) print "PASS"; else print "FAIL"}'`
+  - **Done when**: HOLD grep pattern exactly matches AC-2.1 spec (anchors + dollar signs)
+  - **Verify**: `grep -c '\^.*HOLD.*\^.*PENDING.*\^.*URGENT' plugins/ralph-specum/commands/implement.md | awk '{if($1>=1) print "PASS"; else print "FAIL"}'`
   - **Commit**: `refactor(im): verify HOLD grep pattern alignment` (only if changes needed)
 
 - [ ] 2.5 Verify implement.md state integrity check matches AC-3.1/3.2/3.3 logic
@@ -299,9 +311,9 @@ Systematic verification of every acceptance criterion via grep/jq.
 ### US-2: Mechanical HOLD Signal Detection
 
 - [ ] 3.5 Verify AC-2.1: HOLD grep check in IM
-  - **Do**: Grep implement.md for HOLD/PENDING/URGENT grep pattern
-  - **Verify**: `grep -c '\\[HOLD\\].*\\[PENDING\\].*\\[URGENT\\]' plugins/ralph-specum/commands/implement.md | awk '{if($1>=1) print "PASS: HOLD grep check present"; else print "FAIL"}'`
-  - **Done when**: HOLD grep pattern found in implement.md
+  - **Do**: Grep implement.md for HOLD/PENDING/URGENT with exact line matching (anchors)
+  - **Verify**: `grep -c '\^.*HOLD.*\$.*\^.*PENDING.*\$.*\^.*URGENT' plugins/ralph-specum/commands/implement.md | awk '{if($1>=1) print "PASS: HOLD grep check present with anchors"; else print "FAIL"}'`
+  - **Done when**: Anchored HOLD/PENDING/URGENT grep pattern found in implement.md
   - **Commit**: None (verification only)
 
 - [ ] 3.6 Verify AC-2.2: HOLD block logs to .progress.md
@@ -340,10 +352,10 @@ Systematic verification of every acceptance criterion via grep/jq.
   - **Done when**: GLOBAL CI separation rule present
   - **Commit**: None (verification only)
 
-- [ ] 3.11 Verify AC-5.2/5.3: Anti-fabrication runs both, no-advance rule
-  - **Do**: Verify VL Layer 3 contains CI separation and implement.md has no-advance rule
-  - **Verify**: `grep -c "TASK VERIFY PASS but GLOBAL CI FAIL" plugins/ralph-specum/commands/implement.md | awk '{if($1>=1) print "PASS: AC-5.3 no-advance rule"; else print "FAIL"}'` && `grep -c "GLOBAL CI" plugins/ralph-specum/references/verification-layers.md | awk '{if($1>=1) print "PASS: AC-5.2 in VL"; else print "FAIL"}'`
-  - **Done when**: Both rules present
+- [ ] 3.11 Verify AC-5.2/5.3: Anti-fabrication runs both, no-advance rule (generic wording)
+  - **Do**: Verify VL Layer 3 has CI separation with generic wording (no ruff/mypy) and implement.md has no-advance rule
+  - **Verify**: `grep -c "TASK VERIFY PASS but GLOBAL CI FAIL" plugins/ralph-specum/commands/implement.md | awk '{if($1>=1) print "PASS: AC-5.3 no-advance rule"; else print "FAIL"}'` && `grep -c "GLOBAL CI" plugins/ralph-specum/references/verification-layers.md | awk '{if($1>=1) print "PASS: AC-5.2 in VL"; else print "FAIL"}'` && `grep -cE "ruff|mypy" plugins/ralph-specum/references/verification-layers.md | awk '{if($1==0) print "PASS: generic wording only"; else print "FAIL: hardcoded CI commands"}'`
+  - **Done when**: Both rules present, no hardcoded CI commands
   - **Commit**: None (verification only)
 
 - [ ] 3.12 [VERIFY] Quality checkpoint: run ALL requirements.md Success Criteria
@@ -432,7 +444,8 @@ Systematic verification of every acceptance criterion via grep/jq.
 ## Notes
 
 - **POC shortcuts**: None -- all changes are surgical edits, no shortcuts needed
-- **Production TODOs**: None -- spec is complete as-is
+- **Production TODOs**: CI command discovery (which global CI commands to run per project type) deferred to Spec 4 (loop-safety-infra). This spec only adds the conceptual separation rule.
+- **Design decision**: VL Layer 0 is self-contained (no circular reference to CP). CP keeps its own Layer 0 in Task Delegation section for delegation-specific context.
 - **Out of scope (noted for future)**:
   - stop-watcher.sh:636 says "3 layers" -- Spec 2 or 4
   - failure-recovery.md:429 says "3 verification layers" -- Spec 2
