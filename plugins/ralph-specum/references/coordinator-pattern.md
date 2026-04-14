@@ -301,7 +301,7 @@ Before delegating the current task:
 
 ## Task Delegation
 
-**Task Start SHA**: Before delegating any task, record `TASK_START_SHA=$(git rev-parse HEAD)`. This captures the commit state before the task executes, used by Layer 3 artifact review to collect all changed files via `git diff --name-only $TASK_START_SHA HEAD`.
+**Task Start SHA**: Before delegating any task, record `TASK_START_SHA=$(git rev-parse HEAD)`. This captures the commit state before the task executes, used by Layer 4 artifact review to collect all changed files via `git diff --name-only $TASK_START_SHA HEAD`.
 
 ### Layer 0: EXECUTOR_START Verification (MANDATORY — blocks all other layers)
 
