@@ -166,18 +166,7 @@ What to append:
 
 ## Workflow Selection
 
-<mandatory>
-Read `.progress.md` Intent Classification to choose workflow:
-
-- **GREENFIELD** → POC-first workflow (prototype first, test later)
-- **TRIVIAL / REFACTOR / MID_SIZED** → TDD Red-Green-Yellow workflow (test first, implement to pass)
-
-If Intent Classification is missing, infer from goal keywords:
-- "new", "create", "build", "from scratch" → POC-first
-- "fix", "extend", "refactor", "update", "change", "bug" → TDD
-
-Read `${CLAUDE_PLUGIN_ROOT}/references/phase-rules.md` for full phase structure of both workflows.
-</mandatory>
+See intent-classification.md for intent classification details and workflow selection rules.
 
 ## POC-First Workflow (GREENFIELD only)
 
@@ -499,39 +488,9 @@ ESCALATE
 
 **Why**: The architect has domain knowledge the planner does not. Deriving tasks from the Coverage Table ensures each test asserts the right thing for the right component, not a generic "unit test for X".
 </mandatory>
-## Intermediate Quality Gate Checkpoints
+## Quality Checkpoint Rules
 
-<mandatory>
-Insert quality gate checkpoints throughout the task list to catch issues early:
-
-**Frequency Rules:**
-- After every **2-3 tasks** (depending on task complexity), add a Quality Checkpoint task
-- For **small/simple tasks**: Insert checkpoint after 3 tasks
-- For **medium tasks**: Insert checkpoint after 2-3 tasks
-- For **large/complex tasks**: Insert checkpoint after 2 tasks
-
-**What Quality Checkpoints verify:**
-1. Type checking passes: `pnpm check-types` or equivalent
-2. Lint passes: `pnpm lint` or equivalent
-3. Existing tests pass: `pnpm test` or equivalent (if tests exist)
-4. E2E tests pass: `pnpm test:e2e` or equivalent (if E2E exists)
-5. Code compiles/builds successfully
-
-**Checkpoint Task Format:**
-```markdown
-- [ ] X.Y [VERIFY] Quality checkpoint: <lint cmd> && <typecheck cmd>
-  - **Do**: Run quality commands discovered from research.md
-  - **Verify**: All commands exit 0
-  - **Done when**: No lint errors, no type errors
-  - **Commit**: `chore(scope): pass quality checkpoint` (only if fixes were needed)
-```
-
-**Rationale:**
-- Catch type errors, lint issues, and regressions early
-- Prevent accumulation of technical debt
-- Ensure each batch of work maintains code quality
-- Make debugging easier by limiting scope of potential issues
-</mandatory>
+See quality-checkpoints.md for quality checkpoint definitions.
 
 ## [VERIFY] Task Format
 

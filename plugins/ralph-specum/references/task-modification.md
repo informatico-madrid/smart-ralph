@@ -4,15 +4,8 @@ Task modification operations (SPLIT/PREREQ/FOLLOWUP/ADJUST).
 
 Loaded for: SPLIT, PREREQ, FOLLOWUP, ADJUST tasks.
 
-## Native Task Sync - Completion
-
-Before outputting ALL_TASKS_COMPLETE:
-
-1. If `nativeSyncEnabled` is `false` or `nativeTaskMap` is missing: skip
-2. Iterate all entries in `nativeTaskMap`
-3. For any task not already `"completed"`: `TaskUpdate(taskId: nativeTaskMap[index], status: "completed")`
-4. If any TaskUpdate fails: log warning, continue
-5. Log "Native task sync finalized: N tasks synced" to .progress.md
+**Native Task Sync** (completion, modification operations):
+See coordinator-core.md 'Native Task Sync - After Completion' section.
 
 Before outputting:
 1. Verify all tasks marked [x] in tasks.md

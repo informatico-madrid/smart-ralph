@@ -49,10 +49,10 @@ protects the coordinator-reads-while-reviewer-writes scenario.
 producing a malformed message in chat.md.
 
 **Mitigation**: ALL writes to chat.md use `flock -e 200` on `chat.md.lock`.
-Both coordinator and reviewer use this pattern. See coordinator-pattern.md Chat Protocol
+Both coordinator and reviewer use this pattern. See coordinator-core.md Chat Protocol
 and external-reviewer.md Section 7.
 
-**Fixed in**: coordinator-pattern.md (Chat Protocol), external-reviewer.md v0.2.0 (Section 7)
+**Fixed in**: coordinator-core.md (Chat Protocol), external-reviewer.md v0.2.0 (Section 7)
 
 ### ✅ .ralph-state.json — LOW RISK (ownership-partitioned)
 

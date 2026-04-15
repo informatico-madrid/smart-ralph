@@ -3,7 +3,7 @@
 Auto-generated summary of all specs across configured directories.
 See [index-state.json](./index-state.json) for machine-readable data.
 
-**Last updated:** 2026-04-15T12:36:44Z
+**Last updated:** 2026-04-15T19:24:54Z
 
 ## Directories (1)
 
@@ -52,7 +52,7 @@ See [index-state.json](./index-state.json) for machine-readable data.
 | codex-plugin-sync | ./specs | completed | done |
 | remove-codex-prefix | ./specs | tasks | 2/16 tasks |
 | engine-state-hardening | ./specs | completed | done |
-| prompt-diet-refactor | ./specs | execution | 4/59 tasks |
+| prompt-diet-refactor | ./specs | execution | 3.1/59 tasks |
 
 ---
 

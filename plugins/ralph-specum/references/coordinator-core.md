@@ -362,4 +362,190 @@ BEFORE entering the Chat Protocol and BEFORE delegating any task, the coordinato
 |----------|----------------------|
 | **Current task marked WARNING** | Note in `.progress.md` but may proceed. Do NOT block. |
 | **Previous task has WARNING** | Log to `.progress.md`: `"WARNING on task N noted but not blocking"`. Proceed. |
+
+---
+
+## Native Task Sync - Overview
+
+Bidirectional sync between tasks.md and Claude Code's native task system via `.ralph-state.json`.
+
+## Native Task Sync - Before Delegation
+
+### graceful degradation pattern
+
+For all operations:
+
+```
+On success: reset nativeSyncFailureCount to 0
+On failure: increment nativeSyncFailureCount
+If count >= 3: set nativeSyncEnabled = false, log warning
+```
+
+This prevents cascading failures when native task sync is unavailable or broken.
+
+### Before Delegation
+
+Run BEFORE delegating any task (sequential, parallel, or [VERIFY]):
+
+**1. Skip checks** (if sync disabled or no nativeTaskMap):
+
+```bash
+# Skip if sync is disabled
+if [ "$(jq -r '.nativeSyncEnabled // false' "$SPEC_PATH/.ralph-state.json")" = "false" ]; then
+    echo "Native sync disabled, skipping"
+    exit 0
+fi
+
+# Skip if nativeTaskMap is missing
+if ! jq -e '.nativeTaskMap' "$SPEC_PATH/.ralph-state.json" >/dev/null 2>&1; then
+    echo "nativeTaskMap not found, skipping"
+    exit 0
+fi
+```
+
+**2. Pre-delegation update** (set native task to in_progress):
+
+```bash
+# Look up native task ID for current taskIndex
+nativeTaskId=$(jq -r ".nativeTaskMap[$taskIndex] // \"\"" "$SPEC_PATH/.ralph-state.json")
+
+if [ -n "$nativeTaskId" ]; then
+    # Format activeForm per FR-12
+    activeForm="Executing $taskIndex $TASK_TITLE"
+
+    # Update native task status to in_progress
+    TaskUpdate taskId="$nativeTaskId" status="in_progress" activeForm="$activeForm" 2>/dev/null || \
+    { echo "Warning: TaskUpdate failed for $nativeTaskId"; nativeSyncFailureCount=$((nativeSyncFailureCount + 1)); }
+
+    # Verify degradation counter threshold
+    if [ "$nativeSyncFailureCount" -ge 3 ]; then
+        echo "Warning: Sync failures >= 3, disabling native sync"
+        jq '.nativeSyncEnabled = false' "$SPEC_PATH/.ralph-state.json" > /tmp/state.json && \
+        mv /tmp/state.json "$SPEC_PATH/.ralph-state.json"
+    fi
+fi
+```
+
+**3. Bidirectional check** (reconcile tasks.md with native state):
+
+```bash
+# Scan tasks.md for completed tasks and update native tasks
+completedTasks=$(grep -oE '\- \[x\] [0-9]+\.[0-9]+' "$SPEC_PATH/tasks.md" | awk '{print $3}')
+
+for task_id in $completedTasks; do
+    native_id=$(jq -r ".nativeTaskMap[\"$task_id\"] // \"\"" "$SPEC_PATH/.ralph-state.json")
+    if [ -n "$native_id" ]; then
+        native_status=$(GetNativeTaskStatus "$native_id")
+        if [ "$native_status" != "completed" ]; then
+            TaskUpdate taskId="$native_id" status="completed" 2>/dev/null || \
+            { echo "Warning: TaskUpdate failed for $native_id"; }
+        fi
+    fi
+done
+```
+
+**4. Parallel group handling** (when [P] tasks start):
+
+```bash
+for task_id in "${parallelGroup[taskIndices[@]}]"; do
+    native_id=$(jq -r ".nativeTaskMap[\"$task_id\"] // \"\"" "$SPEC_PATH/.ralph-state.json")
+    if [ -n "$native_id" ]; then
+        activeForm="Executing [P] $task_id $TASK_TITLE"
+        # ALL TaskUpdate calls in ONE message (parallel tool calls)
+        TaskUpdate taskId="$native_id" status="in_progress" activeForm="$activeForm"
+    fi
+done
+```
+
+### After Completion
+
+Run after task completes (success or failure):
+
+**1. Success path** (advance to completion):
+
+```bash
+# Sync all native tasks to completed before ALL_TASKS_COMPLETE
+if [ "$(jq -r '.nativeSyncEnabled // false' "$SPEC_PATH/.ralph-state.json")" = "false" ]; then
+    exit 0
+fi
+
+synced_count=0
+
+for task_id in $(jq -r '.nativeTaskMap | keys[]' "$SPEC_PATH/.ralph-state.json"); do
+    native_id=$(jq -r ".nativeTaskMap[\"$task_id\"] // \"\"" "$SPEC_PATH/.ralph-state.json")
+    if [ -n "$native_id" ]; then
+        native_status=$(GetNativeTaskStatus "$native_id")
+        if [ "$native_status" != "completed" ]; then
+            TaskUpdate taskId="$native_id" status="completed" 2>/dev/null && \
+            synced_count=$((synced_count + 1))
+        fi
+    fi
+done
+
+echo "Native task sync finalized: $synced_count tasks synced" >> "$SPEC_PATH/.progress.md"
+```
+
+**2. Failure path** (reset native task to todo):
+
+```bash
+if [ "$(jq -r '.nativeSyncEnabled // false' "$SPEC_PATH/.ralph-state.json")" = "false" ]; then
+    exit 0
+fi
+
+native_id=$(jq -r ".nativeTaskMap[\"$taskIndex\"] // \"\"" "$SPEC_PATH/.ralph-state.json")
+
+if [ -n "$native_id" ]; then
+    TaskUpdate taskId="$native_id" status="todo" 2>/dev/null || \
+    {
+        echo "Warning: TaskUpdate failed for $native_id"
+        nativeSyncFailureCount=$((nativeSyncFailureCount + 1))
+        if [ "$nativeSyncFailureCount" -ge 3 ]; then
+            echo "Warning: Sync failures >= 3, disabling native sync"
+            jq '.nativeSyncEnabled = false' "$SPEC_PATH/.ralph-state.json" > /tmp/state.json && \
+            mv /tmp/state.json "$SPEC_PATH/.ralph-state.json"
+        fi
+    }
+fi
+```
+
+**3. Modification path** (TASK_MODIFICATION_REQUEST):
+
+**SPLIT_TASK**:
+
+```bash
+original_id=$(jq -r ".nativeTaskMap[\"$originalTaskId\"] // \"\"" "$SPEC_PATH/.ralph-state.json")
+if [ -n "$original_id" ]; then
+    TaskUpdate taskId="$original_id" status="completed"
+fi
+
+for new_task_id in "${newTaskIds[@]}"; do
+    new_native_id=$(TaskCreate subject="$newTaskTitle" description="$newTaskDescription" activeForm="$newTaskActiveForm")
+    jq --arg key "$new_task_id" --arg val "$new_native_id" \
+       '.nativeTaskMap[$key] = $val' "$SPEC_PATH/.ralph-state.json" > /tmp/state.json && \
+       mv /tmp/state.json "$SPEC_PATH/.ralph-state.json"
+done
+```
+
+**ADD_PREREQUISITE**:
+
+```bash
+prereq_native_id=$(TaskCreate subject="$prereqTitle" description="$prereqDescription" activeForm="$prereqActiveForm")
+jq --arg key "$prereqTaskId" --arg val "$prereq_native_id" \
+   '.nativeTaskMap[$key] = $val' "$SPEC_PATH/.ralph-state.json" > /tmp/state.json && \
+   mv /tmp/state.json "$SPEC_PATH/.ralph-state.json"
+
+original_id=$(jq -r ".nativeTaskMap[\"$originalTaskId\"] // \"\"" "$SPEC_PATH/.ralph-state.json")
+if [ -n "$original_id" ]; then
+    TaskUpdate taskId="$original_id" addBlockedBy="$prereq_native_id"
+fi
+```
+
+**ADD_FOLLOWUP**:
+
+```bash
+followup_native_id=$(TaskCreate subject="$followupTitle" description="$followupDescription" activeForm="$followupActiveForm")
+jq --arg key "$followupTaskId" --arg val "$followup_native_id" \
+   '.nativeTaskMap[$key] = $val' "$SPEC_PATH/.ralph-state.json" > /tmp/state.json && \
+   mv /tmp/state.json "$SPEC_PATH/.ralph-state.json"
+```
 </mandatory>

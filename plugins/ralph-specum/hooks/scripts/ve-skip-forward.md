@@ -1,4 +1,4 @@
-# VE-Cleanup Skip-Forward Logic
+# VE-cleanup Skip-Forward Logic
 
 Pseudocode for VE (Verification Error) cleanup when verification fails.
 

@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "updated": "2026-04-15T12:36:44Z",
+  "updated": "2026-04-15T19:24:54Z",
   "directories": [
     {
       "path": "./specs",
@@ -272,7 +272,7 @@
       "name": "prompt-diet-refactor",
       "path": "./specs/prompt-diet-refactor",
       "phase": "execution",
-      "taskIndex": 4,
+      "taskIndex": 3.1,
       "totalTasks": 59
     }
   ]

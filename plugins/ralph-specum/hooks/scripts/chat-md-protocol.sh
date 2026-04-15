@@ -1,7 +1,7 @@
 #!/bin/bash
 # chat-md-protocol.sh
 # Atomic append with flock to prevent concurrent write corruption to chat.md
-# Reference: plugins/ralph-specum/references/coordinator-pattern.md lines 199-249
+# Reference: plugins/ralph-specum/hooks/scripts/native-sync-pattern.md
 # Used by: coordinator-core.md, all coordinator modules
 
 # Atomic append for OVER response (when reviewer asks a question)

@@ -112,6 +112,25 @@ plugins/ralph-specum/
 2. **Execution Loop**: During execution (`/ralph-specum:implement`), the stop-hook reads `.ralph-state.json`, delegates tasks to spec-executor via Task tool, and outputs `ALL_TASKS_COMPLETE` when done. The loop is self-contained (no external plugin required).
 3. **Fresh Context**: Each task runs in isolation via Task tool. Progress persists in `.progress.md` and task checkmarks in `tasks.md`
 
+### Coordinator Reference Loading
+
+The coordinator uses modular reference loading to reduce token consumption:
+
+**Always loaded:**
+- `coordinator-core.md` - Role definition, FSM, signal protocol, basic delegation
+
+**On-demand modules (loaded based on task type):**
+- `ve-verification-contract.md` - VE task delegation (for VERIFY tasks)
+- `task-modification.md` - SPLIT/PREREQ/FOLLOWUP operations
+- `pr-lifecycle.md` - PR management and CI monitoring
+- `git-strategy.md` - Commit and push strategy
+
+**Additional context loaded as needed:**
+- `failure-recovery.md` - Iterative recovery for failed tasks
+- `phase-rules.md` - Phase-specific behavior rules
+
+**Benefit:** Token consumption reduced from ~15,000 tokens (monolithic coordinator-pattern.md) to ~5,000 tokens per task (coordinator-core.md + on-demand module).
+
 ### State Files
 
 - `./specs/.current-spec` - Active spec name

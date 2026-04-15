@@ -122,7 +122,7 @@ or Phase 3 (Testing) tasks MUST include a Delegation Contract with:
 3. **Required Skills** — exact file paths to skill files the subagent must load
 4. **Success Criteria** — Done when + Verify, plus any additional constraints
 
-See `references/coordinator-pattern.md → Task Delegation → Sequential Execution` for the full contract template.
+See `references/coordinator-core.md → Task Delegation → Sequential Execution` for the full contract template.
 
 **Why**: Subagents execute in fresh context with no memory of prior decisions. Without the contract, they repeat diagnosed anti-patterns (e.g., using `page.goto()` for internal routes, hardcoding selectors, reusing consumed OAuth tokens). The contract is the mechanism to transfer accumulated knowledge from the coordinator to the executor.
 

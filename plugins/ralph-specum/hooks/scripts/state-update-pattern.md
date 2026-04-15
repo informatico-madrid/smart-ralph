@@ -2,7 +2,7 @@
 
 jq state merge patterns for updating .ralph-state.json atomically.
 
-Reference: plugins/ralph-specum/references/coordinator-pattern.md line 642
+Reference: plugins/ralph-specum/hooks/scripts/state-update-pattern.md
 
 ---
 

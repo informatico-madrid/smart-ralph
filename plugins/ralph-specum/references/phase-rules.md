@@ -2,31 +2,15 @@
 
 > Used by: implement.md, task-planner agent
 
-All specs follow one of three workflows based on intent classification:
-- **GREENFIELD** intent → POC-first workflow (5 phases)
-- **Non-greenfield** intent (TRIVIAL, REFACTOR, MID_SIZED) → TDD Red-Green-Yellow workflow (4 phases)
-- **BUG_FIX** intent → Bug TDD workflow (Phase 0 + 4 phases)
-
-## Workflow Selection
-
-Read Intent Classification from `.progress.md`:
-
-```text
-## Intent Classification
-- Type: [TRIVIAL|REFACTOR|GREENFIELD|MID_SIZED|BUG_FIX]
-```
-
-| Intent | Workflow | Rationale |
-|--------|----------|-----------|
-| GREENFIELD | POC-first | New feature needs fast validation before investing in tests |
-| TRIVIAL | TDD | Fix/small change — existing code has (or should have) tests to build on |
-| REFACTOR | TDD | Restructuring existing code — tests guard against regressions |
-| MID_SIZED | TDD | Extending existing feature — tests define expected behavior first |
-| BUG_FIX | Bug TDD | Reproduce first, then TDD to lock in fix and prevent regression |
+See intent-classification.md for intent classification details and workflow selection rules.
 
 ---
 
 # POC-First Workflow (GREENFIELD)
+
+## VE Tasks (E2E Verification)
+
+See quality-checkpoints.md for VE task definitions.
 
 ## Phase 1: Make It Work (POC)
 
@@ -371,66 +355,7 @@ Full protocol details: `${CLAUDE_PLUGIN_ROOT}/skills/e2e/ui-map-init.skill.md �
 
 ## Quality Checkpoint Rules
 
-Insert quality gate checkpoints throughout the task list to catch issues early.
-
-### Frequency
-
-- After every **2-3 tasks** (depending on task complexity)
-- Small/simple tasks: insert checkpoint after 3 tasks
-- Medium tasks: insert checkpoint after 2-3 tasks
-- Large/complex tasks: insert checkpoint after 2 tasks
-
-### What Quality Checkpoints Verify
-
-1. Type checking passes: `pnpm check-types` or equivalent
-2. Lint passes: `pnpm lint` or equivalent
-3. Existing tests pass: `pnpm test` or equivalent (if tests exist)
-4. E2E tests pass: `pnpm test:e2e` or equivalent (if E2E exists)
-5. Code compiles/builds successfully
-
-### Checkpoint Format
-
-Standard [VERIFY] checkpoint (every 2-3 tasks):
-```markdown
-- [ ] V1 [VERIFY] Quality check: <discovered lint cmd> && <discovered typecheck cmd>
-  - **Do**: Run quality commands and verify all pass
-  - **Verify**: All commands exit 0
-  - **Done when**: No lint errors, no type errors
-  - **Commit**: `chore(scope): pass quality checkpoint` (if fixes needed)
-```
-
-Final verification sequence (last 3 tasks of spec):
-```markdown
-- [ ] V4 [VERIFY] Full local CI: <lint> && <typecheck> && <test> && <e2e> && <build>
-  - **Do**: Run complete local CI suite including E2E
-  - **Verify**: All commands pass
-  - **Done when**: Build succeeds, all tests pass, E2E green
-  - **Commit**: `chore(scope): pass local CI` (if fixes needed)
-
-- [ ] V5 [VERIFY] CI pipeline passes
-  - **Do**: Verify GitHub Actions/CI passes after push
-  - **Verify**: `gh pr checks` shows all green
-  - **Done when**: CI pipeline passes
-  - **Commit**: None
-
-- [ ] V6 [VERIFY] AC checklist
-  - **Do**: Read requirements.md, programmatically verify each AC-* is satisfied
-  - **Verify**: Grep codebase for AC implementation, run relevant test commands
-  - **Done when**: All acceptance criteria confirmed met via automated checks
-  - **Commit**: None
-```
-
-### [VERIFY] Task Delegation
-
-[VERIFY] tasks are special verification checkpoints:
-- Delegated to qa-engineer (not spec-executor)
-- Always sequential (break parallel groups)
-- VERIFICATION_PASS = treat as TASK_COMPLETE, mark [x], update .progress.md
-- VERIFICATION_FAIL = do NOT mark complete, increment taskIteration, retry or error if max reached
-
-### Discovery
-
-Read research.md for actual project commands. Do NOT assume `pnpm lint` or `npm test` exists. Use the commands discovered from the codebase.
+See quality-checkpoints.md for quality checkpoint definitions.
 
 ## POC Target Task Count
 

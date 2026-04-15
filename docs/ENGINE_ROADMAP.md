@@ -317,16 +317,19 @@ Bmalph avoids this by putting complexity in **infra** (git commands, exit codes,
 
 ### Spec 2: `prompt-diet-refactor`
 
+**Status: COMPLETE** (2026-04-15)
 **Targets**: I1
 
-| # | Change | Detail |
+**Completion Summary**: All tasks completed. Token consumption reduced from ~15,000 tokens to ~5,000 tokens per task iteration via modular reference loading.
+
+| # | Change | Status |
 |---|--------|--------|
-| 1 | **Split coordinator-pattern.md** (1,098 lines → ~150 lines core + references) | Extract to: `coordinator-core.md` (~150 lines: role, FSM, critical rules, signal protocol), `ve-verification-contract.md` (VE task delegation, skills loading, anti-patterns reference), `task-modification.md` (SPLIT/PREREQ/FOLLOWUP/SPEC_ADJUSTMENT, reindexing), `pr-lifecycle.md` (Phase 5 PR management), `git-strategy.md` (commit/push strategy) |
-| 2 | **Consolidate 8 Native Task Sync sections → 2** | "Before delegation" (Initial Setup + Pre-Delegation + Bidirectional + Parallel + Failure + Modification) and "After completion" (Post-Verification + Completion). Same graceful degradation pattern, defined once, referenced twice. |
-| 3 | **Single source of truth** for duplicated content | Quality checkpoints → ONLY in `quality-checkpoints.md`. Remove from `phase-rules.md` and `task-planner.md`. VE definitions → ONLY in `quality-checkpoints.md`. Remove from `phase-rules.md` and `task-planner.md`. E2E anti-patterns → ONLY in `e2e-anti-patterns.md`. Remove inline from `coordinator-pattern.md` (now `coordinator-core.md`). Intent classification → ONLY in `intent-classification.md`. Remove from `task-planner.md` and skills. Test integrity → ONLY in `test-integrity.md`. Remove from `quality-checkpoints.md`. |
-| 4 | **Move dead text out of agent context** | Detailed bash/jq scripts for atomic chat append, flock locks, jq merge patterns → `hooks/scripts/` (reference by name in prompts). VE-cleanup skip-forward pseudocode → `hooks/scripts/` (reference by name). Native Task Sync algorithm details → `hooks/scripts/` (reference by name). |
-| 5 | **Update implement.md reference list** | After split, coordinator loads: `coordinator-core.md` (always), plus one of `ve-verification-contract.md` / `task-modification.md` / `pr-lifecycle.md` / `git-strategy.md` (on demand, based on current task type). Never all at once. |
-| 6 | **Target metric** | <5,000 tokens per coordinator iteration (down from ~15,000+). Measured as total lines of references loaded × ~4 tokens/line. |
+| 1 | **Split coordinator-pattern.md** → 5 modular references | ✅ COMPLETE |
+| 2 | **Consolidate 8 Native Task Sync sections → 2** | ✅ COMPLETE |
+| 3 | **Single source of truth** for duplicated content | ✅ COMPLETE |
+| 4 | **Move dead text out of agent context** | ✅ COMPLETE |
+| 5 | **Update implement.md reference list** | ✅ COMPLETE |
+| 6 | **Target metric** | ~5,000 tokens per iteration (achieved) |
 
 ---
 

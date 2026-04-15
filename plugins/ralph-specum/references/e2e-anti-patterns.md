@@ -1,6 +1,6 @@
 # E2E Anti-Patterns — Canonical Reference
 
-> Used by: coordinator-pattern.md, task-planner.md, spec-executor.md, qa-engineer.md, mcp-playwright.skill.md, playwright-session.skill.md
+> Used by: coordinator-core.md, task-planner.md, spec-executor.md, qa-engineer.md, mcp-playwright.skill.md, playwright-session.skill.md
 
 This is the **single source of truth** for E2E anti-patterns. All other files
 reference this list. When adding a new anti-pattern, add it here first, then

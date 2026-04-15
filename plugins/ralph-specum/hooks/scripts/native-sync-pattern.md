@@ -2,7 +2,7 @@
 
 Native Task Sync patterns for bidirectional sync between tasks.md and Claude Code's native task system.
 
-Reference: plugins/ralph-specum/references/coordinator-pattern.md lines 756-908
+Reference: plugins/ralph-specum/references/coordinator-core.md "Native Task Sync" section
 
 ---
 

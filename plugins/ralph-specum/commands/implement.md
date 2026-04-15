@@ -261,9 +261,9 @@ Then Read and follow these references in order. They contain the complete coordi
 - Commit/PR tasks: coordinator-core.md + pr-lifecycle.md + git-strategy.md
 - Failure recovery: coordinator-core.md + failure-recovery.md
 
-**Note:** `coordinator-pattern.md` is now DEPRECATED for execution. The modular references above replace it. Keep coordinator-pattern.md as a historical reference only.
+Note: coordinator-pattern.md is now DEPRECATED for execution. The modular references above replace it. Keep coordinator-pattern.md as a historical reference only.
 
-### Key Coordinator Behaviors (quick reference — see coordinator-pattern.md for authoritative details)
+### Key Coordinator Behaviors (quick reference — see coordinator-core.md for authoritative details)
 
 - **You are a COORDINATOR, not an implementer.** Delegate via Task tool. Never implement yourself.
 - **Fully autonomous.** Never ask questions or wait for user input.
@@ -294,7 +294,7 @@ Then Read and follow these references in order. They contain the complete coordi
     - **Why**: qa-engineer loads skills from the `Skills:` field. Without it, the agent runs with no E2E context and will produce incorrect verifications.
 - **After TASK_COMPLETE.** Run all 5 verification layers, then update state (advance taskIndex, reset taskIteration).
 - **On failure.** Parse failure output, increment taskIteration. If recovery-mode: generate fix task. If max retries exceeded: error and stop.
-- **Modification requests.** If TASK_MODIFICATION_REQUEST in output, process SPLIT_TASK / ADD_PREREQUISITE / ADD_FOLLOWUP per coordinator-pattern.md.
+- **Modification requests.** If TASK_MODIFICATION_REQUEST in output, process SPLIT_TASK / ADD_PREREQUISITE / ADD_FOLLOWUP per task-modification.md.
 
 ### Error States (never output ALL_TASKS_COMPLETE)
 
