@@ -1,10 +1,10 @@
 {
   "version": "1.0",
-  "updated": "2026-04-14T05:56:33Z",
+  "updated": "2026-04-15T12:36:44Z",
   "directories": [
     {
       "path": "./specs",
-      "specsCount": 37,
+      "specsCount": 38,
       "isDefault": true
     }
   ],
@@ -236,7 +236,7 @@
     {
       "name": "ralph-quality-improvements",
       "path": "./specs/ralph-quality-improvements",
-      "phase": "completed",
+      "phase": "complete",
       "taskIndex": 27,
       "totalTasks": 27
     },
@@ -265,8 +265,15 @@
       "name": "engine-state-hardening",
       "path": "./specs/engine-state-hardening",
       "phase": "completed",
-      "taskIndex": 78,
-      "totalTasks": 78
+      "taskIndex": 70,
+      "totalTasks": 70
+    },
+    {
+      "name": "prompt-diet-refactor",
+      "path": "./specs/prompt-diet-refactor",
+      "phase": "execution",
+      "taskIndex": 4,
+      "totalTasks": 59
     }
   ]
 }

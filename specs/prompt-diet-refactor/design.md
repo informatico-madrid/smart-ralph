@@ -1,3 +1,9 @@
+---
+spec: prompt-diet-refactor
+phase: design
+created: 2026-04-15T19:50:00Z
+---
+
 # Design: prompt-diet-refactor
 
 ## Overview
@@ -200,8 +206,12 @@ interface TokenBudget {
   maxLines: 1200;
   coreLines: 150;
   maxModuleLines: 200;
-  otherRefsLines: 347;  // failure-recovery (272) + verification-layers (235) + commit-discipline (110) / 2
-  totalMax: 697;  // Well under 1200 target
+  // Remaining loaded files post-refactor (verification-layers absorbed into VE module):
+  failureRecoveryTrimmed: 272;   // failure-recovery.md trimmed 50%
+  commitDiscipline: 110;          // commit-discipline.md unchanged
+  phaseRulesAfterDedup: ~250;    // phase-rules.md after dedup removal
+  // Worst-case total: 150 + 200 + 272 + 110 + 250 = 982 (under 1200)
+  // If phase-rules dedup not done: 150 + 200 + 272 + 110 + 451 = 1183 (barely under)
 }
 ```
 

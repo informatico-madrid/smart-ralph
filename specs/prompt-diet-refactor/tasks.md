@@ -1,10 +1,16 @@
+---
+spec: prompt-diet-refactor
+phase: tasks
+created: 2026-04-15T19:50:00Z
+---
+
 # Tasks: prompt-diet-refactor
 
 ## Overview
 
-Total tasks: 52
+Total tasks: 47
 
-**Workflow**: POC-first (documentation refactor)
+**Workflow**: POC-first (file creation + structural refactor — no pre-existing test suite to drive TDD)
 1. Phase 1: Make It Work (POC) - Create modules, split content, update references
 2. Phase 2: Refactoring - Remove duplications, consolidate sections
 3. Phase 3: Testing - Mechanical + functional verification
@@ -33,7 +39,7 @@ Focus: Validate the modular structure works end-to-end. Create modules, split co
 
 ### Prerequisite: Verify engine-state-hardening Complete
 
-- [ ] 0.1 [VERIFY] Verify engine-state-hardening spec is complete and merged
+- [x] 0.1 [VERIFY] Verify engine-state-hardening spec is complete and merged
   - **Do**:
     1. Check git log for engine-state-hardening merge commit: `git log --oneline --all | grep "engine-state-hardening"`
     2. Verify PR #12 is merged: `gh pr view 12 --json state | jq -r '.state'`
@@ -335,72 +341,32 @@ Focus: Remove duplications, consolidate Native Task Sync sections, update all fi
 
 ### Remove Content Duplication
 
-- [ ] 2.4 [P] Remove quality checkpoints duplication from phase-rules.md
+- [ ] 2.4 Remove all content duplication from phase-rules.md
   - **Do**:
     1. Open `plugins/ralph-specum/references/phase-rules.md`
-    2. Find quality checkpoints content (duplicated from quality-checkpoints.md)
-    3. Remove duplicated content
-    4. Add reference: "See quality-checkpoints.md for quality checkpoint definitions"
+    2. Find and remove quality checkpoints content (duplicated from quality-checkpoints.md); add: "See quality-checkpoints.md for quality checkpoint definitions"
+    3. Find and remove VE definitions (VE0-VE3) duplicated from quality-checkpoints.md; add: "See quality-checkpoints.md for VE task definitions"
+    4. Find and remove intent classification content duplicated from intent-classification.md; add: "See intent-classification.md for intent classification details"
   - **Files**: plugins/ralph-specum/references/phase-rules.md
-  - **Done when**: phase-rules.md references quality-checkpoints.md instead of duplicating content
-  - **Verify**: `grep -q "See quality-checkpoints.md" plugins/ralph-specum/references/phase-rules.md && ! grep -q "Quality checkpoint" plugins/ralph-specum/references/phase-rules.md | head -1 && echo PASS`
-  - **Commit**: `refactor(phase-rules): remove quality checkpoints duplication`
-  - _Requirements: FR-4, AC-3.1_
+  - **Done when**: phase-rules.md references all 3 canonical files instead of duplicating their content
+  - **Verify**: `grep -q "See quality-checkpoints.md" plugins/ralph-specum/references/phase-rules.md && grep -q "VE task definitions" plugins/ralph-specum/references/phase-rules.md && grep -q "See intent-classification.md" plugins/ralph-specum/references/phase-rules.md && echo PASS`
+  - **Commit**: `refactor(phase-rules): remove all content duplication (QC, VE defs, IC)`
+  - _Requirements: FR-4, AC-3.1, AC-3.2, AC-3.4_
   - _Design: Single Source of Truth section_
 
-- [ ] 2.5 [P] Remove VE definitions duplication from phase-rules.md
-  - **Do**:
-    1. Open `plugins/ralph-specum/references/phase-rules.md`
-    2. Find VE definitions (VE0-VE3) duplicated from quality-checkpoints.md
-    3. Remove duplicated content
-    4. Add reference: "See quality-checkpoints.md for VE task definitions"
-  - **Files**: plugins/ralph-specum/references/phase-rules.md
-  - **Done when**: phase-rules.md references quality-checkpoints.md for VE definitions
-  - **Verify**: `grep -q "See quality-checkpoints.md for VE task definitions" plugins/ralph-specum/references/phase-rules.md && echo PASS`
-  - **Commit**: `refactor(phase-rules): remove VE definitions duplication`
-  - _Requirements: FR-4, AC-3.2_
-  - _Design: Single Source of Truth section_
-
-- [ ] 2.6 [P] Remove quality checkpoints duplication from task-planner.md
+- [ ] 2.5 [P] Remove quality checkpoints and intent classification duplication from task-planner.md
   - **Do**:
     1. Open `plugins/ralph-specum/agents/task-planner.md`
-    2. Find quality checkpoints content (duplicated from quality-checkpoints.md)
-    3. Remove duplicated content
-    4. Add reference: "See quality-checkpoints.md for quality checkpoint definitions"
+    2. Find and remove quality checkpoints content (duplicated from quality-checkpoints.md); add: "See quality-checkpoints.md for quality checkpoint definitions"
+    3. Find and remove intent classification content duplicated from intent-classification.md; add: "See intent-classification.md for intent classification details"
   - **Files**: plugins/ralph-specum/agents/task-planner.md
-  - **Done when**: task-planner.md references quality-checkpoints.md instead of duplicating content
-  - **Verify**: `grep -q "See quality-checkpoints.md" plugins/ralph-specum/agents/task-planner.md && echo PASS`
-  - **Commit**: `refactor(task-planner): remove quality checkpoints duplication`
-  - _Requirements: FR-4, AC-3.1_
+  - **Done when**: task-planner.md references both canonical files instead of duplicating content
+  - **Verify**: `grep -q "See quality-checkpoints.md" plugins/ralph-specum/agents/task-planner.md && grep -q "See intent-classification.md" plugins/ralph-specum/agents/task-planner.md && echo PASS`
+  - **Commit**: `refactor(task-planner): remove quality checkpoints and intent classification duplication`
+  - _Requirements: FR-4, AC-3.1, AC-3.4_
   - _Design: Single Source of Truth section_
 
-- [ ] 2.7 [P] Remove intent classification duplication from phase-rules.md
-  - **Do**:
-    1. Open `plugins/ralph-specum/references/phase-rules.md`
-    2. Find intent classification content duplicated from intent-classification.md
-    3. Remove duplicated content
-    4. Add reference: "See intent-classification.md for intent classification details"
-  - **Files**: plugins/ralph-specum/references/phase-rules.md
-  - **Done when**: phase-rules.md references intent-classification.md
-  - **Verify**: `grep -q "See intent-classification.md" plugins/ralph-specum/references/phase-rules.md && echo PASS`
-  - **Commit**: `refactor(phase-rules): remove intent classification duplication`
-  - _Requirements: FR-4, AC-3.4_
-  - _Design: Single Source of Truth section_
-
-- [ ] 2.8 [P] Remove intent classification duplication from task-planner.md
-  - **Do**:
-    1. Open `plugins/ralph-specum/agents/task-planner.md`
-    2. Find intent classification content duplicated from intent-classification.md
-    3. Remove duplicated content
-    4. Add reference: "See intent-classification.md for intent classification details"
-  - **Files**: plugins/ralph-specum/agents/task-planner.md
-  - **Done when**: task-planner.md references intent-classification.md
-  - **Verify**: `grep -q "See intent-classification.md" plugins/ralph-specum/agents/task-planner.md && echo PASS`
-  - **Commit**: `refactor(task-planner): remove intent classification duplication`
-  - _Requirements: FR-4, AC-3.4_
-  - _Design: Single Source of Truth section_
-
-- [ ] 2.9 [P] Remove test integrity duplication from quality-checkpoints.md
+- [ ] 2.6 [P] Remove test integrity duplication from quality-checkpoints.md
   - **Do**:
     1. Open `plugins/ralph-specum/references/quality-checkpoints.md`
     2. Find test integrity content that should be in test-integrity.md
@@ -413,7 +379,7 @@ Focus: Remove duplications, consolidate Native Task Sync sections, update all fi
   - _Requirements: FR-4, AC-3.5_
   - _Design: Single Source of Truth section_
 
-- [ ] 2.10 [VERIFY] Quality checkpoint: verify all duplications removed
+- [ ] 2.7 [VERIFY] Quality checkpoint: verify all duplications removed
   - **Do**:
     1. Verify phase-rules.md references canonical files
     2. Verify task-planner.md references canonical files
@@ -436,7 +402,7 @@ Focus: Remove duplications, consolidate Native Task Sync sections, update all fi
 
 ### Update File Path References
 
-- [ ] 2.11 [P] Update spec-executor.md to reference new modules
+- [ ] 2.8 [P] Update spec-executor.md to reference new modules
   - **Do**:
     1. Search `plugins/ralph-specum/agents/spec-executor.md` for "coordinator-pattern.md"
     2. Replace references with appropriate new module names based on context
@@ -449,7 +415,7 @@ Focus: Remove duplications, consolidate Native Task Sync sections, update all fi
   - **Commit**: `refactor(spec-executor): update file path references to new modules`
   - _Requirements: FR-8, AC-1.2_
 
-- [ ] 2.12 [P] Update stop-watcher.sh to reference new modules
+- [ ] 2.9 [P] Update stop-watcher.sh to reference new modules
   - **Do**:
     1. Search `plugins/ralph-specum/hooks/scripts/stop-watcher.sh` for "coordinator-pattern.md"
     2. Replace references with appropriate new module names based on context
@@ -459,7 +425,7 @@ Focus: Remove duplications, consolidate Native Task Sync sections, update all fi
   - **Commit**: `refactor(stop-watcher): update file path references to new modules`
   - _Requirements: FR-8, AC-1.2_
 
-- [ ] 2.13 [P] Grep all agent files for coordinator-pattern.md references
+- [ ] 2.10 [P] Grep all agent files for coordinator-pattern.md references
   - **Do**:
     1. Run: `grep -r "coordinator-pattern.md" plugins/ralph-specum/agents/`
     2. For each file found, update references to appropriate new modules
@@ -470,7 +436,7 @@ Focus: Remove duplications, consolidate Native Task Sync sections, update all fi
   - **Commit**: `refactor(agents): update remaining coordinator-pattern.md references`
   - _Requirements: FR-8, AC-1.2_
 
-- [ ] 2.14 [VERIFY] Quality checkpoint: verify all file path references updated
+- [ ] 2.11 [VERIFY] Quality checkpoint: verify all file path references updated
   - **Do**:
     1. Grep entire plugin for coordinator-pattern.md references
     2. Verify 0 results (except in this spec's documentation)
@@ -492,80 +458,25 @@ Focus: Mechanical verification (file checks, grep) + functional verification (fu
 
 ### Mechanical Verification Script
 
-- [ ] 3.1 Create verify-coordinator-diet.sh script structure
+- [ ] 3.1 Create verify-coordinator-diet.sh with all 3 check functions
   - **Do**:
-    1. Create `plugins/ralph-specum/hooks/scripts/verify-coordinator-diet.sh`
-    2. Add bash shebang: `#!/bin/bash`
-    3. Add script description: "Mechanical verification script for coordinator diet refactor"
-    4. Add usage comment
-    5. Make executable: `chmod +x plugins/ralph-specum/hooks/scripts/verify-coordinator-diet.sh`
+    1. Create `plugins/ralph-specum/hooks/scripts/verify-coordinator-diet.sh` with shebang `#!/bin/bash`
+    2. Add `check_file_exists()`: loops over all 5 new modules + 4 extracted scripts, prints PASS/FAIL per file, returns 1 if any missing
+    3. Add `check_references_updated()`: greps for "coordinator-pattern.md" in implement.md, spec-executor.md, stop-watcher.sh, returns 1 if found
+    4. Add `check_token_count()`: uses `wc -l` to sum coordinator-core.md + ve-verification-contract.md + failure-recovery.md + commit-discipline.md + phase-rules.md, returns 1 if total ≥ 1200
+    5. Add main block: calls all 3 functions, prints summary, exits 0 on pass / 1 on fail; `chmod +x` the script
   - **Files**: plugins/ralph-specum/hooks/scripts/verify-coordinator-diet.sh
-  - **Done when**: Script file exists and is executable
-  - **Verify**: `test -x plugins/ralph-specum/hooks/scripts/verify-coordinator-diet.sh && echo PASS`
-  - **Commit**: `test(verification): create mechanical verification script structure`
-  - _Requirements: FR-6, AC-5.1_
+  - **Done when**: Script exists, is executable, contains all 3 functions and a main block
+  - **Verify**: `test -x plugins/ralph-specum/hooks/scripts/verify-coordinator-diet.sh && grep -q "check_file_exists" plugins/ralph-specum/hooks/scripts/verify-coordinator-diet.sh && grep -q "check_references_updated" plugins/ralph-specum/hooks/scripts/verify-coordinator-diet.sh && grep -q "check_token_count" plugins/ralph-specum/hooks/scripts/verify-coordinator-diet.sh && echo PASS`
+  - **Commit**: `test(verification): create mechanical verification script`
+  - _Requirements: FR-6, AC-5.1-5.5_
   - _Design: Verification Script Interface section_
 
-- [ ] 3.2 Add check_file_exists() function to verify-coordinator-diet.sh
-  - **Do**:
-    1. Add function: `check_file_exists()`
-    2. Check all 5 new modules exist in references/
-    3. Check all 4 extracted scripts exist in hooks/scripts/
-    4. Print PASS/FAIL for each file
-    5. Return 1 if any file missing, 0 if all present
-  - **Files**: plugins/ralph-specum/hooks/scripts/verify-coordinator-diet.sh
-  - **Done when**: check_file_exists() function checks all 9 new files
-  - **Verify**: `plugins/ralph-specum/hooks/scripts/verify-coordinator-diet.sh 2>&1 | grep -q "check_file_exists" && echo PASS`
-  - **Commit**: `test(verification): add file existence checks`
-  - _Requirements: FR-6, AC-5.2_
-  - _Design: Verification Script Interface section_
-
-- [ ] 3.3 Add check_references_updated() function to verify-coordinator-diet.sh
-  - **Do**:
-    1. Add function: `check_references_updated()`
-    2. Grep for "coordinator-pattern.md" in implement.md, spec-executor.md, stop-watcher.sh
-    3. Return 1 if any old references found, 0 if none
-    4. Print list of files with old references if any found
-  - **Files**: plugins/ralph-specum/hooks/scripts/verify-coordinator-diet.sh
-  - **Done when**: check_references_updated() function greps for old references
-  - **Verify**: `plugins/ralph-specum/hooks/scripts/verify-coordinator-diet.sh 2>&1 | grep -q "check_references_updated" && echo PASS`
-  - **Commit**: `test(verification): add reference update checks`
-  - _Requirements: FR-6, AC-5.3_
-  - _Design: Verification Script Interface section_
-
-- [ ] 3.4 Add check_token_count() function to verify-coordinator-diet.sh
-  - **Do**:
-    1. Add function: `check_token_count()`
-    2. Calculate worst-case token load: coordinator-core.md + largest on-demand module
-    3. Use wc -l to count lines
-    4. Return 1 if >=1200 lines, 0 if <1200
-    5. Print actual line count and pass/fail status
-  - **Files**: plugins/ralph-specum/hooks/scripts/verify-coordinator-diet.sh
-  - **Done when**: check_token_count() function verifies line count <1200
-  - **Verify**: `plugins/ralph-specum/hooks/scripts/verify-coordinator-diet.sh 2>&1 | grep -q "check_token_count" && echo PASS`
-  - **Commit**: `test(verification): add token count checks`
-  - _Requirements: FR-6, AC-5.4_
-  - _Design: Verification Script Interface section_
-
-- [ ] 3.5 Add main script execution to verify-coordinator-diet.sh
-  - **Do**:
-    1. Add main execution block
-    2. Call check_file_exists(), check_references_updated(), check_token_count()
-    3. Print summary report
-    4. Exit 0 if all checks pass, 1 if any fail
-  - **Files**: plugins/ralph-specum/hooks/scripts/verify-coordinator-diet.sh
-  - **Done when**: Script runs all checks and exits with correct code
-  - **Verify**: `plugins/ralph-specum/hooks/scripts/verify-coordinator-diet.sh && echo "All checks passed: PASS"`
-  - **Commit**: `test(verification): complete mechanical verification script`
-  - _Requirements: FR-6, AC-5.5_
-  - _Design: Verification Script Interface section_
-
-- [ ] 3.6 [VERIFY] Quality checkpoint: run mechanical verification
+- [ ] 3.2 [VERIFY] Quality checkpoint: run mechanical verification
   - **Do**:
     1. Run verify-coordinator-diet.sh
     2. Verify all 3 check functions pass
     3. Verify script exits with code 0
-    4. Review summary report
   - **Verify**: All mechanical checks pass:
     ```bash
     plugins/ralph-specum/hooks/scripts/verify-coordinator-diet.sh && \
@@ -577,7 +488,7 @@ Focus: Mechanical verification (file checks, grep) + functional verification (fu
 
 ### Functional Verification
 
-- [ ] 3.7 Create test spec for functional verification
+- [ ] 3.3 Create test spec for functional verification
   - **Do**:
     1. Create test spec at `/mnt/bunker_data/ai/smart-ralph/specs/test-coordinator-diet/`
     2. Create requirements.md for simple feature (e.g., "create hello.txt file")
@@ -591,20 +502,20 @@ Focus: Mechanical verification (file checks, grep) + functional verification (fu
   - _Requirements: FR-7, AC-6.1_
   - _Design: Test Strategy section_
 
-- [ ] 3.8 Run test spec execution with refactored coordinator
+- [ ] 3.4 Run test spec execution with refactored coordinator
   - **Do**:
     1. Start Ralph execution: `/ralph-specum:implement`
     2. Monitor execution via .progress.md in test spec directory
     3. Wait for completion or errors
     4. Check tasks.md for completed tasks [x]
   - **Files**: /mnt/bunker_data/ai/smart-ralph/specs/test-coordinator-diet/tasks.md, .progress.md
-  - **Done when**: Test spec executes to completion (ALL_TASKS_COMPLETE) or stops with clear error
+  - **Done when**: Test spec executes to completion with ALL_TASKS_COMPLETE
   - **Verify**: `grep -q "ALL_TASKS_COMPLETE" /mnt/bunker_data/ai/smart-ralph/specs/test-coordinator-diet/.progress.md 2>/dev/null && echo "Functional test: PASS"`
   - **Commit**: None (test execution, not implementation)
   - _Requirements: FR-7, AC-6.1-6.6_
   - _Design: Test Strategy section_
 
-- [ ] 3.9 [VERIFY] Verify functional test results
+- [ ] 3.5 [VERIFY] Verify functional test results
   - **Do**:
     1. Check .progress.md for execution errors
     2. Verify all tasks marked [x] in tasks.md
@@ -626,7 +537,7 @@ Focus: Mechanical verification (file checks, grep) + functional verification (fu
   - **Commit**: `chore(verification): verify functional test results successful` (only if fixes needed)
   - _Requirements: FR-7, AC-6.1-6.6_
 
-- [ ] 3.10 [VERIFY] Quality checkpoint: verify all tests pass
+- [ ] 3.6 [VERIFY] Quality checkpoint: verify all tests pass
   - **Do**:
     1. Run mechanical verification: `plugins/ralph-specum/hooks/scripts/verify-coordinator-diet.sh`
     2. Verify functional test completed successfully
@@ -729,24 +640,28 @@ Focus: Delete coordinator-pattern.md, final verification, documentation, cleanup
 
 - [ ] 4.6 V2 [VERIFY] Token count verification
   - **Do**:
-    1. Calculate worst-case token load
+    1. Calculate worst-case token load (core + largest on-demand module + all non-coordinator reference files still loaded)
     2. Verify <1,200 lines target met
     3. Document actual reduction percentage
   - **Verify**: Token budget met:
     ```bash
-    TOTAL=$(wc -l plugins/ralph-specum/references/coordinator-core.md \
-                  plugins/ralph-specum/references/ve-verification-contract.md | \
-                awk '{sum+=$1} END {print sum}') && \
+    TOTAL=$(wc -l \
+      plugins/ralph-specum/references/coordinator-core.md \
+      plugins/ralph-specum/references/ve-verification-contract.md \
+      plugins/ralph-specum/references/failure-recovery.md \
+      plugins/ralph-specum/references/commit-discipline.md \
+      plugins/ralph-specum/references/phase-rules.md \
+      2>/dev/null | awk '/total/{print $1}') && \
     test "$TOTAL" -lt 1200 && \
     echo "Token count: $TOTAL lines (target: <1200) PASS"
     ```
-  - **Done when**: Token count <1,200 lines, reduction documented
+  - **Done when**: Worst-case load <1,200 lines across all files loaded per coordinator iteration
   - **Commit**: None (verification only)
   - _Requirements: NFR-1, AC-1.3_
 
 - [ ] 4.7 V3 [VERIFY] Behavioral compatibility verification
   - **Do**:
-    1. Review functional test results from task 3.9
+    1. Review functional test results from task 3.5
     2. Verify zero behavior changes
     3. Verify all coordinator operations work (delegation, state updates, commits)
   - **Verify**: Behavioral compatibility confirmed:

@@ -1,3 +1,9 @@
+---
+spec: prompt-diet-refactor
+phase: requirements
+created: 2026-04-15T19:50:00Z
+---
+
 # Requirements: prompt-diet-refactor
 
 ## Goal
@@ -120,7 +126,7 @@ Reduce coordinator token consumption from ~15,000 tokens (2,363 lines) to <5,000
 - **Graceful degradation pattern**: Error handling that disables sync after 3 consecutive failures (nativeSyncEnabled = false)
 - **Mechanical verification**: File existence and reference checking (no code execution)
 - **Functional verification**: Full spec execution to validate behavior (code execution)
-- **Token budget**: Conservative 30% reduction target (~1,650 lines, down from 2,363)
+- **Token budget**: Target <1,200 lines loaded per coordinator iteration (48% reduction from 2,363)
 
 ## Out of Scope
 
