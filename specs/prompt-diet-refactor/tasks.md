@@ -163,7 +163,7 @@ Focus: Validate the modular structure works end-to-end. Create modules, split co
   - _Requirements: FR-5, AC-4.2_
   - _Design: Script extraction section_
 
-- [x] 1.9 [P] Extract ve-skip-forward.md to hooks/scripts/
+- [ ] 1.9 [P] Extract ve-skip-forward.md to hooks/scripts/
   - **Do**:
     1. Create `plugins/ralph-specum/hooks/scripts/ve-skip-forward.md`
     2. Copy VE-cleanup pseudocode from quality-checkpoints.md
@@ -209,7 +209,7 @@ Focus: Validate the modular structure works end-to-end. Create modules, split co
 
 ### Update implement.md
 
-- [ ] 1.12 Update implement.md Step 1 to load modular references
+- [x] 1.12 Update implement.md Step 1 to load modular references
   - **Do**:
     1. Open `plugins/ralph-specum/commands/implement.md`
     2. Find Step 1 reference loading section (lines 228-240)
@@ -227,7 +227,7 @@ Focus: Validate the modular structure works end-to-end. Create modules, split co
   - _Requirements: FR-2, AC-1.2_
   - _Design: Module Loading Strategy section_
 
-- [ ] 1.13 [VERIFY] Quality checkpoint: verify implement.md updated
+- [x] 1.13 [VERIFY] Quality checkpoint: verify implement.md updated
   - **Do**:
     1. Verify implement.md references coordinator-core.md (not coordinator-pattern.md)
     2. Verify task type mapping logic is present
@@ -248,7 +248,7 @@ Focus: Validate the modular structure works end-to-end. Create modules, split co
 
 ### Token Count Verification
 
-- [ ] 1.14 Calculate token count for loaded references
+- [x] 1.14 Calculate token count for loaded references
   - **Do**:
     1. Run wc -l on all 5 modules: `wc -l plugins/ralph-specum/references/coordinator-*.md plugins/ralph-specum/references/ve-verification-contract.md plugins/ralph-specum/references/task-modification.md plugins/ralph-specum/references/pr-lifecycle.md plugins/ralph-specum/references/git-strategy.md`
     2. Calculate worst-case load: coordinator-core.md (150) + max module (200) + other refs (347) = 697 lines
@@ -259,7 +259,7 @@ Focus: Validate the modular structure works end-to-end. Create modules, split co
   - **Commit**: None
   - _Requirements: FR-1, AC-1.3, NFR-1_
 
-- [ ] 1.15 [VERIFY] POC Checkpoint: verify modular structure works
+- [x] 1.15 [VERIFY] POC Checkpoint: verify modular structure works
   - **Do**:
     1. Verify all 5 modules exist and have content
     2. Verify implement.md loads coordinator-core.md + conditional modules

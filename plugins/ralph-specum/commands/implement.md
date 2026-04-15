@@ -225,20 +225,43 @@ You are the execution COORDINATOR for spec: $spec
 
 Then Read and follow these references in order. They contain the complete coordinator logic:
 
-1. **Core delegation pattern**: Read `${CLAUDE_PLUGIN_ROOT}/references/coordinator-pattern.md` and follow it.
-   This covers: role definition, integrity rules, reading state, checking completion, parsing tasks, parallel group detection, task delegation (sequential, parallel, [VERIFY] tasks), modification request handling, verification layers, state updates, progress merge, completion signal, and PR lifecycle loop.
+**Always load (required for all tasks):**
 
-2. **Failure handling**: Read `${CLAUDE_PLUGIN_ROOT}/references/failure-recovery.md` and follow it.
-   This covers: parsing failure output, fix task generation, fix task limits and depth checks, iterative recovery orchestrator, fix task insertion into tasks.md, fixTaskMap state tracking, and progress logging for fix chains.
+1. **Core delegation pattern**: Read `${CLAUDE_PLUGIN_ROOT}/references/coordinator-core.md` and follow it.
+   This covers: role definition, FSM states, signal protocol (CONTINUE/HOLD/PENDING/DEADLOCK), integrity rules, state reading/writing, completion checking, task parsing, parallel group detection, task delegation (sequential, parallel, [VERIFY]), modification request handling, verification layers, state updates, progress merge, completion signal, and PR lifecycle basics.
 
-3. **Verification after each task**: Read `${CLAUDE_PLUGIN_ROOT}/references/verification-layers.md` and follow it.
-   This covers: 5 layers (EXECUTOR_START, contradiction detection, TASK_COMPLETE signal, anti-fabrication, periodic artifact review via spec-reviewer). All must pass before advancing.
+**Load on-demand based on task type:**
 
-4. **Phase-specific behavior**: Read `${CLAUDE_PLUGIN_ROOT}/references/phase-rules.md` and follow it.
-   This covers: POC-first workflow (Phase 1-4), phase distribution, quality checkpoints, and phase-specific constraints.
+2. **VE/E2E Verification tasks** (tasks with `[VERIFY]` tag containing "VE", "E2E", "browser", "playwright"):
+   Read `${CLAUDE_PLUGIN_ROOT}/references/ve-verification-contract.md`.
+   This covers: VE task delegation rules (VE0-VE3), Skills loading for verification layers, Native Task Sync pre-delegation logic.
 
-5. **Commit conventions**: Read `${CLAUDE_PLUGIN_ROOT}/references/commit-discipline.md` and follow it.
-   This covers: one commit per task, commit message format, spec file staging, and when to commit.
+3. **TASK_MODIFICATION_REQUEST** (when executor requests SPLIT/PREREQ/FOLLOWUP/ADJUST):
+   Read `${CLAUDE_PLUGIN_ROOT}/references/task-modification.md`.
+   This covers: modification operation handling, task tree restructuring, state map updates.
+
+4. **PR_COMMIT / Commit tasks** (tasks involving git commits, PRs, branches):
+   Read `${CLAUDE_PLUGIN_ROOT}/references/pr-lifecycle.md` AND `${CLAUDE_PLUGIN_ROOT}/references/git-strategy.md`.
+   - pr-lifecycle: PR management, CI monitoring, completion checklist, git operations.
+   - git-strategy: commit format, branch naming, push strategy, final cleanup.
+
+5. **Failure recovery** (when task fails and recovery-mode is enabled):
+   Read `${CLAUDE_PLUGIN_ROOT}/references/failure-recovery.md`.
+   This covers: parsing failure output, fix task generation, fix task limits and depth checks, iterative recovery orchestrator, fix task insertion into tasks.md, fixTaskMap state tracking, progress logging for fix chains.
+
+6. **Phase-aware execution** (all tasks need phase context):
+   Read `${CLAUDE_PLUGIN_ROOT}/references/phase-rules.md`.
+   This covers: POC-first workflow (Phase 1-4), phase distribution, quality checkpoints, phase-specific constraints.
+
+**Modular loading pattern:**
+
+- Phase 1-4 implementation tasks: coordinator-core.md + phase-rules.md (+ on-demand modules)
+- [VERIFY] tasks: coordinator-core.md + ve-verification-contract.md + phase-rules.md
+- Modification requests: coordinator-core.md + task-modification.md
+- Commit/PR tasks: coordinator-core.md + pr-lifecycle.md + git-strategy.md
+- Failure recovery: coordinator-core.md + failure-recovery.md
+
+**Note:** `coordinator-pattern.md` is now DEPRECATED for execution. The modular references above replace it. Keep coordinator-pattern.md as a historical reference only.
 
 ### Key Coordinator Behaviors (quick reference — see coordinator-pattern.md for authoritative details)
 
