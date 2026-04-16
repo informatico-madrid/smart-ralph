@@ -150,6 +150,17 @@ State transition rules:
 
 If taskIndex >= totalTasks:
 1. Verify all tasks marked [x] in tasks.md
+
+**Phase 5 Detection**: Before outputting ALL_TASKS_COMPLETE, check if Phase 5 (PR Lifecycle) is required:
+- Read tasks.md to detect Phase 5 tasks (look for "Phase 5: PR Lifecycle" section)
+- If Phase 5 exists AND all non-Phase-5 tasks are `[x]`:
+  - Load `${CLAUDE_PLUGIN_ROOT}/references/pr-lifecycle.md`
+  - Enter PR Lifecycle Loop (see pr-lifecycle.md § "PR Lifecycle Loop (Phase 5)")
+  - Do NOT output ALL_TASKS_COMPLETE yet
+- If NO Phase 5 OR Phase 5 complete:
+  - Proceed with standard completion below
+
+**Standard Completion** (no Phase 5 or Phase 5 done):
 2. Delete state file explicitly:
    ```bash
    rm -f "$SPEC_PATH/.ralph-state.json"
