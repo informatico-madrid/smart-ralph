@@ -52,7 +52,7 @@ Focus: Validate the modular structure works end-to-end. Create modules, split co
 
 ### Module Creation
 
-- [ ] 1.1 [P] Create coordinator-core.md with role, FSM, and signal protocol
+- [x] 1.1 [P] Create coordinator-core.md with role, FSM, and signal protocol
   - **Do**:
     1. Create `plugins/ralph-specum/references/coordinator-core.md`
     2. Copy from coordinator-pattern.md: lines 5-47 (role, integrity rules, FSM), lines 78-177 (completion check, parse task, chat protocol), signal protocol section
