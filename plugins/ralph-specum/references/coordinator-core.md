@@ -688,3 +688,71 @@ Expected first signal:
 > TASK_COMPLETE is a strong signal that the coordinator implemented the task
 > itself. This MUST be treated as an invocation failure, not a success.
 > Layer 1 contradiction check does NOT catch this — Layer 0 does.
+
+## Sequential Delegation Template
+
+When `parallelGroup.isParallel = false` and task has no `[VERIFY]` marker, delegate ONE task to spec-executor via Task tool.
+
+**Delegation Contract**:
+
+```text
+Task: Execute task $taskIndex for spec $spec
+
+Spec: $spec
+Path: $SPEC_PATH/
+Task index: $taskIndex
+
+Context from .progress.md:
+[Include relevant context]
+
+Current task from tasks.md:
+[Include full task block]
+
+## Delegation Contract
+
+### Design Decisions (from design.md)
+[Extract relevant design decisions for THIS task — architectural constraints,
+ technology choices, patterns chosen and patterns rejected]
+
+### Anti-Patterns (DO NOT)
+[List specific anti-patterns from design.md or .progress.md that apply to this task.
+ For E2E/VE tasks, ALWAYS include the full Navigation and Selector sections from
+ `${CLAUDE_PLUGIN_ROOT}/references/e2e-anti-patterns.md` — do NOT summarize, paste the rules.
+ Plus any project-specific anti-patterns from .progress.md Learnings.
+ Critical: if the task type is VE or [VERIFY], paste this verbatim:
+   "NEVER use page.goto() for internal app routes — navigate via UI elements.
+    If you land on 404/login/unexpected page: do NOT assume element is missing.
+    Run Unexpected Page Recovery from playwright-session.skill.md instead."]
+
+### Required Skills (for VE and [VERIFY] tasks — MANDATORY)
+[When this task is a VE task or has [VERIFY] marker, list the skills the spec-executor
+ must load in order BEFORE writing any browser code:
+ - `${CLAUDE_PLUGIN_ROOT}/skills/e2e/playwright-env.skill.md`
+ - `${CLAUDE_PLUGIN_ROOT}/skills/e2e/mcp-playwright.skill.md`
+ - `${CLAUDE_PLUGIN_ROOT}/skills/e2e/playwright-session.skill.md`
+ - Any platform-specific skills listed in this task's `Skills:` metadata
+   (written there by the task-planner based on research.md discovery)
+
+For non-VE/non-[VERIFY] tasks, omit this section.]
+
+### Success Criteria
+[Copy the Done when + Verify sections from the task, plus any additional
+ constraints from design.md Test Strategy]
+
+Instructions:
+1. Read Do section and execute exactly
+2. Only modify Files listed
+3. Verify completion with Verify command
+4. Commit with task's Commit message
+5. Update .progress.md with completion and learnings
+6. Mark task [x] in tasks.md
+7. Output TASK_COMPLETE when done
+```
+
+**Delegation Contract Rules:**
+- The contract is MANDATORY for VE tasks, [VERIFY] tasks, and any Phase 3 (Testing) task.
+- For Phase 1-2 implementation tasks, the contract is optional but recommended when design.md contains relevant constraints.
+- Extract anti-patterns from: design.md Test Strategy, .progress.md Learnings (especially failures from prior tasks), and the task's own context.
+- Never delegate a VE task without listing the required skill paths — the subagent cannot discover skills it was not told about.
+
+Wait for spec-executor to complete. It will output TASK_COMPLETE on success.
