@@ -258,7 +258,7 @@ Then Read and follow these references in order. They contain the complete coordi
 - Phase 1-4 implementation tasks: coordinator-core.md + phase-rules.md (+ on-demand modules)
 - [VERIFY] tasks: coordinator-core.md + ve-verification-contract.md + phase-rules.md
 - Modification requests: coordinator-core.md + task-modification.md
-- Commit/PR tasks: coordinator-core.md + pr-lifecycle.md + git-strategy.md
+- Commit/PR tasks: coordinator-core.md + pr-lifecycle.md + git-strategy.md + commit-discipline.md
 - Failure recovery: coordinator-core.md + failure-recovery.md
 
 Note: coordinator-pattern.md is now DEPRECATED for execution. The modular references above replace it. Keep coordinator-pattern.md as a historical reference only.
