@@ -1165,7 +1165,7 @@ git show c20e962f:plugins/ralph-specum/references/coordinator-pattern.md | sed -
 
 ### 7.3 — Restore PR Lifecycle Loop in pr-lifecycle.md [ALTO]
 
-- [ ] 7.3 Restore PR Lifecycle Loop (Steps 1-5 + Timeout Protection) in pr-lifecycle.md
+- [x] 7.3 Restore PR Lifecycle Loop (Steps 1-5 + Timeout Protection) in pr-lifecycle.md
   - **Why**: The current `pr-lifecycle.md` has a Completion Checklist and Native Task Sync for completion, but is missing the entire Phase 5 operational loop. Without it, the coordinator doesn't know how to: create a PR via `gh pr create`, monitor CI status in a loop, parse and address review comments, run final validation with 5 criteria, or enforce timeout protection (48h max, 20 CI cycles). Phase 5 tasks in tasks.md describe WHAT to do, but the PR Lifecycle Loop is the meta-loop that the coordinator runs ABOVE individual Phase 5 tasks for autonomous CI monitoring and review resolution.
   - **Do**:
     1. Extract the PR Lifecycle Loop from the original: `git show c20e962f:plugins/ralph-specum/references/coordinator-pattern.md | sed -n '909,1023p'`
@@ -1213,7 +1213,7 @@ git show c20e962f:plugins/ralph-specum/references/coordinator-pattern.md | sed -
 
 ### 7.4 — Add commit-discipline.md reference to implement.md [MEDIO]
 
-- [ ] 7.4 Add commit-discipline.md to implement.md reference loading
+- [x] 7.4 Add commit-discipline.md to implement.md reference loading
   - **Why**: `commit-discipline.md` (110 lines) exists and contains commit format rules, branch naming rules, and "NEVER push to default branch" rules. But `implement.md` doesn't load it — the "Always load" section only loads `coordinator-core.md`, and the on-demand sections don't mention `commit-discipline.md`. This means the coordinator doesn't see commit format rules when delegating tasks, which can lead to inconsistent commit messages. The file exists and has good content; it just needs to be referenced.
   - **Do**:
     1. Open `plugins/ralph-specum/commands/implement.md`
@@ -1239,7 +1239,7 @@ git show c20e962f:plugins/ralph-specum/references/coordinator-pattern.md | sed -
 
 ### 7.5 — Restore Git Push Strategy in git-strategy.md + Fix broken reference [MEDIO]
 
-- [ ] 7.5 Restore Git Push Strategy content in git-strategy.md and fix stop-watcher.sh broken reference
+- [x] 7.5 Restore Git Push Strategy content in git-strategy.md and fix stop-watcher.sh broken reference
   - **Why**: `git-strategy.md` is currently a 17-line empty shell with only a title and two `> Reference` links. It's supposed to contain the Git Push Strategy — the rules for WHEN to push (batch pushes per phase, every 5 commits, before PR) vs when NOT to push (after every individual commit). Additionally, `stop-watcher.sh` line 637 references `git-strategy.md § 'Git Push Strategy'` which is a BROKEN REFERENCE because that section doesn't exist in the file. This is both a content gap and a broken reference bug.
   - **Do**:
     1. Extract the Git Push Strategy section from the original: `git show c20e962f:plugins/ralph-specum/references/coordinator-pattern.md | sed -n '670,700p'`
@@ -1276,7 +1276,7 @@ git show c20e962f:plugins/ralph-specum/references/coordinator-pattern.md | sed -
 
 ### 7.6 — Add Parallel Group Detection builder to coordinator-core.md [BAJO]
 
-- [ ] 7.6 Add explicit Parallel Group Detection builder to coordinator-core.md
+- [x] 7.6 Add explicit Parallel Group Detection builder to coordinator-core.md
   - **Why**: coordinator-core.md references `parallelGroup.taskIndices` in Native Task Sync sections and the FSM defines `PARALLEL_CHECK` → `IS_PARALLEL` / `IS_SEQUENTIAL` states, but there's no documentation of HOW to build the `parallelGroup` object. The coordinator needs to: detect `[P]` markers, scan consecutive [P] tasks, and build a JSON structure with startIndex/endIndex/taskIndices/isParallel. This is inferrable from context but leaving it undocumented risks the coordinator building the wrong structure (e.g., treating non-adjacent [P] tasks as one group, or failing to build the JSON schema that downstream sections expect).
   - **Do**:
     1. Extract the Parallel Group Detection section from the original: `git show c20e962f:plugins/ralph-specum/references/coordinator-pattern.md | sed -n '270,300p'`
@@ -1312,7 +1312,7 @@ git show c20e962f:plugins/ralph-specum/references/coordinator-pattern.md | sed -
 
 ### Quality Gate
 
-- [ ] 7.7 [VERIFY] Validate all Phase 7 restorations are coherent and complete
+- [x] 7.7 [VERIFY] Validate all Phase 7 restorations are coherent and complete
   - **Do**:
     1. Extract full `coordinator-pattern.md` from commit `c20e962f`: `git show c20e962f:plugins/ralph-specum/references/coordinator-pattern.md > /tmp/coordinator-pattern-original.md`
     2. For each restored feature, verify the content exists in the correct module file:
