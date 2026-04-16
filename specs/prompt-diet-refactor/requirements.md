@@ -108,7 +108,7 @@ Reduce coordinator token consumption from ~15,000 tokens (2,363 lines) to <5,000
 
 | ID | Requirement | Metric | Target |
 |----|-------------|--------|--------|
-| NFR-1 | Token consumption | Lines of references loaded per iteration | <1,200 lines |
+| NFR-1 | Token consumption | Lines of references loaded per iteration | <1,400 lines (adjusted from <1,200 after Phase 7 feature restoration) |
 | NFR-2 | Backward compatibility | Behavioral changes | 0 (100% compatible) |
 | NFR-3 | Refactoring risk | Code complexity | LOW (pure reorganization) |
 | NFR-4 | File organization | Modularity | 5 focused modules vs 1 monolithic file |
@@ -274,3 +274,11 @@ Comparison against commit `c20e962f` (pre-spec state) revealed the following los
 | FR-18 | Restore VE-cleanup skip-forward logic | MEDIUM | ve-verification-contract.md references ve-skip-forward.md correctly |
 | FR-19 | Fix --argjson for all numeric state fields | HIGH | state-update-pattern.md uses --argjson for taskIndex, taskIteration, globalIteration |
 | FR-20 | Fix chat-md-protocol.sh dotted task ID crash | HIGH | announce_task_complete handles dotted IDs without arithmetic expansion |
+| FR-21 | Restore Sequential Delegation Template | CRITICAL | coordinator-core.md contains delegation prompt template with Delegation Contract (Design Decisions, Anti-Patterns, Required Skills, Success Criteria) |
+| FR-22 | Restore Parallel Execution Steps 1-8 | HIGH | coordinator-core.md contains 8-step Team API protocol (TeamDelete→TeamCreate→TaskCreate→Spawn→Wait→Shutdown→Collect→Cleanup) |
+| FR-23 | Restore After Delegation decision tree | HIGH | coordinator-core.md contains Fix Task Bypass, MODIFICATION, COMPLETE, and no-signal paths |
+| FR-24 | Restore Progress Merge (Parallel) | HIGH | coordinator-core.md contains temp file merge + Partial Parallel Batch Failure handling |
+| FR-25 | Restore PR Lifecycle Loop (Phase 5) | HIGH | pr-lifecycle.md contains 5-step loop (Create PR→CI Monitor→Review Check→Validate→Complete) with timeout protection |
+| FR-26 | Add commit-discipline.md to implement.md | MEDIUM | implement.md "Always load" section includes commit-discipline.md |
+| FR-27 | Restore Git Push Strategy | MEDIUM | git-strategy.md contains `## Git Push Strategy` with when-to-push/when-NOT-to-push rules and implementation algorithm |
+| FR-28 | Add Parallel Group Detection builder | LOW | coordinator-core.md contains `## Parallel Group Detection` with JSON structure and detection rules |

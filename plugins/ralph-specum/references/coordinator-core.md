@@ -194,6 +194,35 @@ Detect markers in task description:
 - [VERIFY] = verification task (delegate to qa-engineer)
 - No marker = sequential task
 
+## Parallel Group Detection
+
+If current task has [P] marker, scan for consecutive [P] tasks starting from taskIndex.
+
+Build parallelGroup structure:
+```json
+{
+  "startIndex": "<first [P] task index>",
+  "endIndex": "<last consecutive [P] task index>",
+  "taskIndices": ["startIndex", "startIndex+1", "...", "endIndex"],
+  "isParallel": true
+}
+```
+
+Rules:
+- Adjacent [P] tasks form a single parallel batch
+- Non-[P] task breaks the sequence
+- Single [P] task treated as sequential (no parallelism benefit)
+
+If no [P] marker on current task, set:
+```json
+{
+  "startIndex": "<taskIndex>",
+  "endIndex": "<taskIndex>",
+  "taskIndices": ["taskIndex"],
+  "isParallel": false
+}
+```
+
 ## Signal Protocol
 
 ### Chat Signal Summary
