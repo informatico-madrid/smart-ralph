@@ -439,3 +439,29 @@ Based on codebase analysis:
 | Content duplication | ~130 lines across 5 categories | 0 lines | Manual review + grep for duplicated phrases |
 | Broken references | 0 (baseline) | 0 (maintained) | `verify-coordinator-diet.sh` exit code |
 | Behavioral changes | N/A | 0 | Functional verification test completion |
+
+---
+
+## Post-Merge Corrections (2026-04-16)
+
+### Design Deviations Found
+
+The implementation deviated from the design in the following ways:
+
+1. **coordinator-core.md exceeded 150-line target** — Grew to ~530 lines during Phase 2 refactoring, well beyond the 150-line design target. The Native Task Sync sections were consolidated but the bidirectional check and parallel group algorithms were replaced with references instead of being kept inline.
+
+2. **git-strategy.md became a reference-only file** — Instead of containing commit/push strategy content, it was reduced to just references to other files. The PR lifecycle and native sync content that was in scope for COMMIT tasks was moved out entirely.
+
+3. **Native Task Sync Initial Setup was lost** — The design specified consolidating 8 sections into 2, but the Initial Setup section (stale ID detection, TaskCreate loop) was dropped entirely during implementation.
+
+4. **Bidirectional check and parallel group became reference-only** — Instead of keeping the algorithms inline (as pseudocode), they were replaced with references to `native-sync-pattern.md`. This saves tokens but the coordinator cannot execute referenced scripts — it can only read them as guidance.
+
+### Restoration Strategy
+
+For Phase 6 corrections, the approach is:
+
+1. **Restore Initial Setup** — Add back to coordinator-core.md as inline content (this is critical for session start)
+2. **Restore algorithms as pseudocode** — Use tool-level notation (`TaskGet`, `TaskUpdate`) instead of invalid bash (`GetNativeTaskStatus`). This keeps the coordinator guided without pretending the code is executable.
+3. **Keep reference pattern for detailed scripts** — `native-sync-pattern.md` retains the full bash examples; coordinator-core.md has the high-level pseudocode.
+4. **Restore modification native sync** — Add to `task-modification.md` since that's the module loaded for modification operations.
+5. **Restore completion native sync** — Add to `pr-lifecycle.md` since that's the module loaded for PR/completion tasks.

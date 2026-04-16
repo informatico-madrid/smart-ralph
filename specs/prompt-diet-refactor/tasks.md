@@ -833,6 +833,7 @@ Focus: Autonomous CI monitoring, review resolution, final validation until ALL c
 - **Production TODOs**: None — all refactoring completed in Phase 1-2
 - **Token reduction achieved**: 2,363 lines → <1,200 lines (49% reduction, well under 1,200 target)
 - **Behavioral changes**: Zero — all coordinator operations work identically after refactor
+- **Post-merge corrections**: 9 PR review fixes + 12 critical functionality losses identified (2026-04-16)
 
 ## Dependencies
 
@@ -841,3 +842,190 @@ Phase 1 (POC) → Phase 2 (Refactor) → Phase 3 (Testing) → Phase 4 (Quality)
 ```
 
 **Critical dependency**: engine-state-hardening spec must complete before this spec to avoid merge conflicts on coordinator-pattern.md. Verified in task 0.1.
+
+---
+
+## Phase 6: Post-Merge Corrections (2026-04-16)
+
+Critical functionality losses identified by comparing against commit `c20e962f` (pre-spec state). PR review fixes already applied. These tasks restore lost Native Task Sync capabilities and fix bugs.
+
+### Reference: How to Extract Original Content
+
+The original `coordinator-pattern.md` no longer exists in the working tree. It was deleted by this spec. To extract content for restoration, use:
+
+```bash
+# View the entire original file (1023 lines):
+git show c20e962f:plugins/ralph-specum/references/coordinator-pattern.md
+
+# Extract specific line ranges (VERIFIED line numbers from commit c20e962f):
+git show c20e962f:plugins/ralph-specum/references/coordinator-pattern.md | sed -n '48,77p'   # Native Task Sync - Initial Setup
+git show c20e962f:plugins/ralph-specum/references/coordinator-pattern.md | sed -n '281,290p' # Native Task Sync - Bidirectional Check
+git show c20e962f:plugins/ralph-specum/references/coordinator-pattern.md | sed -n '291,305p' # Native Task Sync - Pre-Delegation
+git show c20e962f:plugins/ralph-specum/references/coordinator-pattern.md | sed -n '306,345p' # Layer 0: EXECUTOR_START Verification
+git show c20e962f:plugins/ralph-specum/references/coordinator-pattern.md | sed -n '514,568p' # Native Task Sync - Parallel
+git show c20e962f:plugins/ralph-specum/references/coordinator-pattern.md | sed -n '569,614p' # Native Task Sync - Failure
+git show c20e962f:plugins/ralph-specum/references/coordinator-pattern.md | sed -n '615,626p' # 5-Layer Verification summary
+git show c20e962f:plugins/ralph-specum/references/coordinator-pattern.md | sed -n '627,755p' # Native Task Sync - Post-Verification
+git show c20e962f:plugins/ralph-specum/references/coordinator-pattern.md | sed -n '756,908p' # Native Task Sync - Completion
+git show c20e962f:plugins/ralph-specum/references/coordinator-pattern.md | sed -n '909,1023p' # Native Task Sync - Modification
+
+# Save to temp file for easy diffing:
+git show c20e962f:plugins/ralph-specum/references/coordinator-pattern.md > /tmp/coordinator-pattern-original.md
+```
+
+**Tip**: Search by section headers to verify boundaries: `git show c20e962f:plugins/ralph-specum/references/coordinator-pattern.md | grep -n "## Native Task Sync"`
+
+### PR Review Fixes (Already Applied)
+
+- [x] 6.0 PR-1: Remove duplicated Modification Request Handler from pr-lifecycle.md
+  - Replaced with reference to task-modification.md
+  - **Commit**: Already applied
+
+- [x] 6.0b PR-3: Delete verify-coordinator-diet.sh (one-time verification tool)
+  - Script served its purpose, no longer needed
+  - **Commit**: Already applied
+
+- [x] 6.0c PR-4: Remove out-of-scope content from git-strategy.md
+  - Replaced Native Task Sync and PR Lifecycle sections with references
+  - **Commit**: Already applied
+
+- [x] 6.0d PR-6: Replace invalid bash snippets in coordinator-core.md with references
+  - GetNativeTaskStatus and broken array syntax replaced with references to native-sync-pattern.md
+  - **Commit**: Already applied
+
+- [x] 6.0e PR-7: Align [VERIFY] module-loading condition in implement.md
+  - Changed from VE/E2E keyword filter to ALL [VERIFY] tasks
+  - **Commit**: Already applied
+
+- [x] 6.0f PR-8: Fix arithmetic crash with dotted task IDs in chat-md-protocol.sh
+  - Replaced `$((task_index + 1))` with static text
+  - **Commit**: Already applied
+
+- [x] 6.0g PR-9: Fix --arg to --argjson for numeric fields in state-update-pattern.md
+  - Changed taskIndex, taskIteration, globalIteration to use --argjson
+  - **Commit**: Already applied
+
+### Critical Native Task Sync Restoration
+
+- [ ] 6.1 Restore Native Task Sync Initial Setup in coordinator-core.md
+  - **Do**:
+    1. Extract "Native Task Sync - Initial Setup" section from commit `c20e962f:plugins/ralph-specum/references/coordinator-pattern.md` (lines ~398-440)
+    2. Add to `coordinator-core.md` after "Native Task Sync - Overview" section
+    3. Include: stale ID detection (`TaskGet` validation), TaskCreate loop for all tasks, FR-11/FR-12 formatting, graceful degradation on failure
+    4. Verify content matches original behavioral contract
+  - **Files**: plugins/ralph-specum/references/coordinator-core.md
+  - **Done when**: coordinator-core.md contains Initial Setup with stale ID detection and TaskCreate loop
+  - **Verify**: `grep -q "stale ID detection\|Stale ID detection" plugins/ralph-specum/references/coordinator-core.md && grep -q "TaskCreate" plugins/ralph-specum/references/coordinator-core.md && echo PASS`
+  - **Commit**: `fix(coordinator): restore Native Task Sync Initial Setup with stale ID detection`
+  - _Requirements: FR-9, LOSS-1_
+
+- [ ] 6.2 Restore Bidirectional Check algorithm in coordinator-core.md
+  - **Do**:
+    1. Extract bidirectional check algorithm from commit `c20e962f` coordinator-pattern.md (lines ~429-444)
+    2. Replace the current reference-only placeholder in coordinator-core.md with the actual algorithm
+    3. Keep as tool-level pseudocode (not executable bash) — use `TaskGet(taskId)` notation instead of `GetNativeTaskStatus`
+    4. Verify all operations from original are present
+  - **Files**: plugins/ralph-specum/references/coordinator-core.md
+  - **Done when**: Bidirectional check algorithm present with TaskGet pseudocode
+  - **Verify**: `grep -q "Bidirectional check\|reconcile tasks.md" plugins/ralph-specum/references/coordinator-core.md && echo PASS`
+  - **Commit**: `fix(coordinator): restore bidirectional check algorithm`
+  - _Requirements: FR-10, LOSS-2_
+
+- [ ] 6.3 Restore Parallel Group native sync in coordinator-core.md
+  - **Do**:
+    1. Extract parallel group handling from commit `c20e962f` coordinator-pattern.md (lines ~447-457)
+    2. Replace the current reference-only placeholder with the actual algorithm
+    3. Use tool-level pseudocode notation (TaskUpdate with parallel tool calls)
+    4. Verify all operations from original are present
+  - **Files**: plugins/ralph-specum/references/coordinator-core.md
+  - **Done when**: Parallel group handling algorithm present with TaskUpdate pseudocode
+  - **Verify**: `grep -q "Parallel group handling\|parallelGroup" plugins/ralph-specum/references/coordinator-core.md && echo PASS`
+  - **Commit**: `fix(coordinator): restore parallel group native sync`
+  - _Requirements: FR-11, LOSS-3_
+
+- [ ] 6.4 Restore Pre-delegation native update in coordinator-core.md
+  - **Do**:
+    1. Verify the pre-delegation update section in coordinator-core.md already exists (lines ~406-426)
+    2. If missing, extract from commit `c20e962f` coordinator-pattern.md
+    3. Ensure TaskUpdate with activeForm and graceful degradation are present
+    4. Verify FR-12 activeForm formatting is correct
+  - **Files**: plugins/ralph-specum/references/coordinator-core.md
+  - **Done when**: Pre-delegation update with activeForm and degradation counter present
+  - **Verify**: `grep -q "activeForm\|in_progress" plugins/ralph-specum/references/coordinator-core.md && echo PASS`
+  - **Commit**: `fix(coordinator): restore pre-delegation native update` (if changes needed)
+  - _Requirements: FR-12, LOSS-4_
+
+- [ ] 6.5 Restore Post-verification and Failure path native sync in coordinator-core.md
+  - **Do**:
+    1. Verify post-verification success path exists (sync to completed after VERIFY layers)
+    2. Verify failure path exists (reset to todo on task failure)
+    3. If missing, extract from commit `c20e962f` coordinator-pattern.md (lines ~460-486)
+    4. Ensure graceful degradation pattern is present in both paths
+  - **Files**: plugins/ralph-specum/references/coordinator-core.md
+  - **Done when**: Both success and failure native sync paths present with degradation
+  - **Verify**: `grep -q "Failure path\|reset.*todo" plugins/ralph-specum/references/coordinator-core.md && echo PASS`
+  - **Commit**: `fix(coordinator): restore post-verification and failure native sync` (if changes needed)
+  - _Requirements: FR-13, FR-14, LOSS-5, LOSS-6_
+
+- [ ] 6.6 Restore Modification path native sync in task-modification.md
+  - **Do**:
+    1. Extract modification path native sync from commit `c20e962f` coordinator-pattern.md (lines ~511-527)
+    2. Add SPLIT_TASK, ADD_PREREQUISITE, ADD_FOLLOWUP native sync sections to task-modification.md
+    3. Include TaskCreate for new tasks, TaskUpdate for original task, nativeTaskMap updates
+    4. Verify all three modification types have native sync logic
+  - **Files**: plugins/ralph-specum/references/task-modification.md
+  - **Done when**: All three modification types have native sync with TaskCreate/TaskUpdate
+  - **Verify**: `grep -c "TaskCreate\|TaskUpdate" plugins/ralph-specum/references/task-modification.md | xargs -I {} test {} -ge 3 && echo PASS`
+  - **Commit**: `fix(coordinator): restore modification path native sync in task-modification.md`
+  - _Requirements: FR-15, LOSS-7_
+
+- [ ] 6.7 Restore Completion path native sync in pr-lifecycle.md
+  - **Do**:
+    1. Extract completion path native sync from commit `c20e962f` coordinator-pattern.md
+    2. Add to pr-lifecycle.md "Native Task Sync - Completion" section
+    3. Include: iterate all nativeTaskMap entries, TaskUpdate to completed, log sync count
+    4. Verify the completion sync runs before ALL_TASKS_COMPLETE
+  - **Files**: plugins/ralph-specum/references/pr-lifecycle.md
+  - **Done when**: Completion sync with iterate-all-and-complete logic present
+  - **Verify**: `grep -q "Native Task Sync - Completion\|nativeTaskMap.*completed" plugins/ralph-specum/references/pr-lifecycle.md && echo PASS`
+  - **Commit**: `fix(coordinator): restore completion path native sync in pr-lifecycle.md`
+  - _Requirements: FR-16, LOSS-8_
+
+### Verification Layer Restoration
+
+- [ ] 6.8 Restore 5-Layer Verification details in coordinator-core.md
+  - **Do**:
+    1. Extract 5-layer verification section from commit `c20e962f` coordinator-pattern.md
+    2. Verify all 5 layers are documented: Layer 0 (EXECUTOR_START), Layer 1 (Contradiction), Layer 2 (Signal), Layer 3 (Anti-fabrication), Layer 4 (Artifact review)
+    3. Ensure Layer 3 anti-fabrication rule is explicit: "NEVER trust pasted output, ALWAYS run verify command independently"
+    4. Add to coordinator-core.md if missing
+  - **Files**: plugins/ralph-specum/references/coordinator-core.md
+  - **Done when**: All 5 verification layers documented with Layer 0 and Layer 3 explicit
+  - **Verify**: `grep -q "Layer 0\|EXECUTOR_START" plugins/ralph-specum/references/coordinator-core.md && grep -q "anti-fabrication\|NEVER trust" plugins/ralph-specum/references/coordinator-core.md && echo PASS`
+  - **Commit**: `fix(coordinator): restore 5-layer verification details`
+  - _Requirements: FR-17, LOSS-9_
+
+### Quality Gate
+
+- [ ] 6.9 [VERIFY] Validate all restored functionality against commit c20e962f
+  - **Do**:
+    1. Extract full coordinator-pattern.md from commit `c20e962f`
+    2. For each LOSS-1 through LOSS-12, verify the capability exists in the new modular files
+    3. Run `grep` checks for each restored section
+    4. Compare line counts: ensure new modules collectively cover all original capabilities
+    5. Verify no new duplications introduced
+  - **Files**: All reference files in plugins/ralph-specum/references/
+  - **Done when**: All 12 LOSS items verified as restored, no duplications found
+  - **Verify**:
+    ```bash
+    # Check all LOSS items are addressed
+    grep -q "stale ID" plugins/ralph-specum/references/coordinator-core.md && \
+    grep -q "Bidirectional" plugins/ralph-specum/references/coordinator-core.md && \
+    grep -q "parallel.*group\|Parallel group" plugins/ralph-specum/references/coordinator-core.md && \
+    grep -q "TaskCreate" plugins/ralph-specum/references/coordinator-core.md && \
+    grep -q "TaskCreate\|TaskUpdate" plugins/ralph-specum/references/task-modification.md && \
+    grep -q "Native Task Sync - Completion" plugins/ralph-specum/references/pr-lifecycle.md && \
+    echo "ALL_LOSS_ITEMS_VERIFIED: PASS"
+    ```
+  - **Commit**: None
+  - _Requirements: FR-9 through FR-18_
