@@ -756,3 +756,35 @@ Instructions:
 - Never delegate a VE task without listing the required skill paths — the subagent cannot discover skills it was not told about.
 
 Wait for spec-executor to complete. It will output TASK_COMPLETE on success.
+
+## Parallel Execution Algorithm (Steps 1-8)
+
+When `parallelGroup.isParallel = true` (adjacent [P] tasks), use team lifecycle protocol:
+
+**Step 1: Clean Up Stale Team (MANDATORY FIRST ACTION)**
+Call `TeamDelete()` before anything else. This releases whatever team the session is currently leading (could be from any prior phase). Errors mean no team was active -- harmless, proceed.
+
+**Step 2: Create Team**
+`TeamCreate(team_name: "exec-$spec", description: "Parallel execution batch")`
+
+**Fallback**: If TeamCreate fails with "already leading" error, call `TeamDelete()` and retry `TeamCreate` once. If still fails, fall back to direct `Task(subagent_type: spec-executor)` calls in one message (skip Steps 3, 6, 7).
+
+**Step 3: Create Tasks**
+For each taskIndex in parallelGroup.taskIndices:
+`TaskCreate(subject: "Execute task $taskIndex", description: "Task $taskIndex for $spec. progressFile: .progress-task-$taskIndex.md", activeForm: "Executing task $taskIndex")`
+
+**Step 4: Spawn Teammates**
+ALL Task calls in ONE message for true parallelism:
+`Task(subagent_type: spec-executor, team_name: "exec-$spec", name: "executor-$taskIndex", prompt: "Execute task $taskIndex for spec $spec\nprogressFile: .progress-task-$taskIndex.md\n[full task block and context]")`
+
+**Step 5: Wait for Completion**
+Wait for automatic teammate idle notifications. Use TaskList ONCE to verify all tasks complete. Do NOT poll TaskList in a loop. After spawning teammates, wait for their messages -- they will notify you when done.
+
+**Step 6: Shutdown Teammates**
+`SendMessage(type: "shutdown_request", recipient: "executor-$taskIndex", content: "Execution complete, shutting down")` for each teammate.
+
+**Step 7: Collect Results**
+Proceed to Progress Merge and State Update.
+
+**Step 8: Clean Up Team**
+`TeamDelete()`. If fails, cleaned up on next invocation via Step 1.
