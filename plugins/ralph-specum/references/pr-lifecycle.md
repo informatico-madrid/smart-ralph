@@ -201,16 +201,4 @@ When all Step 4 criteria met:
 
 When spec-executor outputs `TASK_MODIFICATION_REQUEST`, parse and process the modification before continuing.
 
-> **Reference**: See `${CLAUDE_PLUGIN_ROOT}/references/task-modification.md` for full modification operation handling (SPLIT/PREREQ/FOLLOWUP/ADJUST), task tree restructuring, and state map updates.
-
-**Native Task Sync - Modification**:
-
-When TASK_MODIFICATION_REQUEST is processed and new tasks are inserted into tasks.md:
-
-1. If `nativeSyncEnabled` is `false` or `nativeTaskMap` is missing: skip
-2. For SPLIT_TASK:
-   - `TaskUpdate` original task status: `"completed"`
-   - For each new split task: `TaskCreate(subject: "<FR-11 format>", description, activeForm: "<FR-12 format>")`, add returned ID to `nativeTaskMap`
-3. For ADD_PREREQUISITE:
-   - `TaskCreate(subject: "<FR-11 format>", description, activeForm: "<FR-12 format>")` for prerequisite, add returned ID to `nativeTaskMap`
-   - `TaskUpdate` original task with `addBlockedBy: [prerequisite task ID]`
+> **Reference**: See `${CLAUDE_PLUGIN_ROOT}/references/task-modification.md` for full modification operation handling (SPLIT/PREREQ/FOLLOWUP/ADJUST), task tree restructuring, state map updates, and Native Task Sync for modifications.

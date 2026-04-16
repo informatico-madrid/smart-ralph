@@ -1219,7 +1219,7 @@ git show c20e962f:plugins/ralph-specum/references/coordinator-pattern.md | sed -
     1. Open `plugins/ralph-specum/commands/implement.md`
     2. Find the "**Always load (required for all tasks):**" section (around line 228)
     3. After item 1 (`coordinator-core.md`), add a new item 2:
-       ```
+       ```text
        2. **Commit discipline**: Read `${CLAUDE_PLUGIN_ROOT}/references/commit-discipline.md`.
           This covers: commit message format, branch naming rules, push-to-main prohibition.
        ```

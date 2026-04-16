@@ -533,7 +533,7 @@ Run after task completes (success or failure):
 
 **1. Success path** (advance to completion):
 
-```bash
+```pseudocode
 # Sync all native tasks to completed before ALL_TASKS_COMPLETE
 if [ "$(jq -r '.nativeSyncEnabled // false' "$SPEC_PATH/.ralph-state.json")" = "false" ]; then
     exit 0
@@ -557,7 +557,7 @@ echo "Native task sync finalized: $synced_count tasks synced" >> "$SPEC_PATH/.pr
 
 **2. Failure path** (reset native task to todo):
 
-```bash
+```pseudocode
 if [ "$(jq -r '.nativeSyncEnabled // false' "$SPEC_PATH/.ralph-state.json")" = "false" ]; then
     exit 0
 fi
@@ -770,10 +770,11 @@ Instructions:
 ```
 
 **Delegation Contract Rules:**
-- The contract is MANDATORY for VE tasks, [VERIFY] tasks, and any Phase 3 (Testing) task.
+- The Sequential Delegation Template applies ONLY when `parallelGroup.isParallel = false` AND task has NO `[VERIFY]` marker.
+- VE tasks and [VERIFY] tasks MUST use `${CLAUDE_PLUGIN_ROOT}/references/ve-verification-contract.md` — NOT this template.
+- Never delegate a VE task without listing the required skill paths — the subagent cannot discover skills it was not told about.
 - For Phase 1-2 implementation tasks, the contract is optional but recommended when design.md contains relevant constraints.
 - Extract anti-patterns from: design.md Test Strategy, .progress.md Learnings (especially failures from prior tasks), and the task's own context.
-- Never delegate a VE task without listing the required skill paths — the subagent cannot discover skills it was not told about.
 
 Wait for spec-executor to complete. It will output TASK_COMPLETE on success.
 

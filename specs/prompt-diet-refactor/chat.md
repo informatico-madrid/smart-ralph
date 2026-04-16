@@ -2390,3 +2390,35 @@ Comparación exhaustiva del commit de referencia `c20e962f` (coordinator-pattern
 - ✅ Las simplificaciones son intencionales y coherentes con el objetivo de reducción de tokens
 - ✅ No se requiere acción adicional
 - ✅ La spec está completa y lista para merge
+
+---
+
+## PR Review Comments Analysis (2026-04-16 11:30 UTC)
+
+### Comment 1: tasks.md line 1222-1225 - MD040 missing language identifier
+- **Status**: ✅ PROBLEMA REAL - APLICADO
+- **Analysis**: Bloque de código ``` sin identificador de lenguaje activa markdownlint MD040
+- **Fix**: Cambiado ``` a ```text en líneas 1222 y 1225
+
+### Comment 2: implement.md - commit-discipline.md not in Always Load
+- **Status**: ✅ PROBLEMA REAL - APLICADO
+- **Analysis**: task 7.4 se marcó como completada pero commit-discipline.md estaba en on-demand (línea 244), no en Always load como pedía la spec
+- **Fix**: 
+  - Agregado commit-discipline.md como item 2 en Always load (línea 233)
+  - Renumerados items on-demand 2-6 → 3-7
+  - Actualizada sección Modular loading pattern
+
+### Comment 3: coordinator-core.md line 536-556 - ```bash should be ```pseudocode
+- **Status**: ✅ PROBLEMA REAL - APLICADO
+- **Analysis**: Bloque usa pseudo-tool calls (GetNativeTaskStatus, TaskUpdate) que NO son comandos bash reales
+- **Fix**: Cambiado ```bash a ```pseudocode en ambas instancias (líneas 536 y 560)
+
+### Comment 4: coordinator-core.md lines 401-529 - Overlapping native sync guidance
+- **Status**: ⚠️ NITPICK - NO APLICADO (no crítico)
+- **Analysis**: Múltiples secciones de Native Task Sync en coordinator-core.md (Overview, Initial Setup, Bidirectional Check, Parallel, Pre-Delegation) son redundantes pero no causan bugs funcionales
+- **Decision**: Requiere reestructuración significativa. Clasificado como mejora de documentación, no bug.
+
+### Comment 5: pr-lifecycle.md lines 200-216 - Duplicate Native Task Sync - Modification
+- **Status**: ✅ PROBLEMA REAL - APLICADO
+- **Analysis**: La subsección en pr-lifecycle.md es duplicada E incompleta comparada con task-modification.md (falta ADD_FOLLOWUP y re-indexing)
+- **Fix**: Eliminada subsección duplicada, actualizada referencia para incluir Native Task Sync
