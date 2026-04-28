@@ -8,6 +8,9 @@ Spec-driven development with smart compaction. A Claude Code plugin that combine
 - **Smart Compaction**: Strategic context management between phases and tasks
 - **Persistent Progress**: Learnings and state survive compaction via progress file
 - **Two Modes**: Interactive (pause per phase) or fully autonomous
+- **BMAD Bridge**: Import BMAD planning artifacts (PRD, epics, architecture) into smart-ralph specs via `/ralph-bmad:import`
+- **Loop Safety**: Pre-loop git checkpoint, circuit breaker, per-task metrics, and read-only detection
+- **Role Boundaries**: Mechanical enforcement of file access rules per agent role
 
 ## Installation
 
