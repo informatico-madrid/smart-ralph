@@ -1,10 +1,10 @@
 {
   "version": "1.0",
-  "updated": "2026-04-14T05:56:33Z",
+  "updated": "2026-04-28T05:07:29Z",
   "directories": [
     {
       "path": "./specs",
-      "specsCount": 37,
+      "specsCount": 48,
       "isDefault": true
     }
   ],
@@ -236,7 +236,7 @@
     {
       "name": "ralph-quality-improvements",
       "path": "./specs/ralph-quality-improvements",
-      "phase": "completed",
+      "phase": "complete",
       "taskIndex": 27,
       "totalTasks": 27
     },
@@ -265,8 +265,71 @@
       "name": "engine-state-hardening",
       "path": "./specs/engine-state-hardening",
       "phase": "completed",
-      "taskIndex": 78,
-      "totalTasks": 78
+      "taskIndex": 70,
+      "totalTasks": 70
+    },
+    {
+      "name": "prompt-diet-refactor",
+      "path": "./specs/prompt-diet-refactor",
+      "phase": "execution",
+      "taskIndex": 58,
+      "totalTasks": 68
+    },
+    {
+      "name": "test-coordinator-diet",
+      "path": "./specs/test-coordinator-diet",
+      "phase": "new"
+    },
+    {
+      "name": "_epics",
+      "path": "./specs/_epics",
+      "phase": "new"
+    },
+    {
+      "name": "role-boundaries",
+      "path": "./specs/role-boundaries",
+      "phase": "completed",
+      "taskIndex": 45,
+      "totalTasks": 45
+    },
+    {
+      "name": "loop-safety-infra",
+      "path": "./specs/loop-safety-infra",
+      "phase": "completed",
+      "taskIndex": 68,
+      "totalTasks": 68
+    },
+    {
+      "name": "bmad-bridge-plugin",
+      "path": "./specs/bmad-bridge-plugin",
+      "phase": "completed",
+      "taskIndex": 62,
+      "totalTasks": 62
+    },
+    {
+      "name": "collaboration-resolution",
+      "path": "./specs/collaboration-resolution",
+      "phase": "new"
+    },
+    {
+      "name": "pair-debug-auto-trigger",
+      "path": "./specs/pair-debug-auto-trigger",
+      "phase": "new"
+    },
+    {
+      "name": "existing-test-spec-1116112",
+      "path": "./specs/existing-test-spec-1116112",
+      "phase": "new"
+    },
+    {
+      "name": "existing-test-spec-1121058",
+      "path": "./specs/existing-test-spec-1121058",
+      "phase": "new"
+    },
+    {
+      "name": "bmad-nfr-test",
+      "path": "./specs/bmad-nfr-test",
+      "phase": "new"
     }
   ]
 }

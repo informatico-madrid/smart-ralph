@@ -491,6 +491,106 @@ if [ "$PHASE" = "execution" ]; then
     echo "[ralph-specum] Session stopped during spec: $SPEC_NAME | Task: $((TASK_INDEX + 1))/$TOTAL_TASKS | Attempt: $TASK_ITERATION" >&2
 fi
 
+# --- Role Boundaries: Field-Level Validation ---
+# Validates state file fields against a baseline to detect role boundary violations.
+# Phase 1 limitation: agent identity reported as "unknown" — we only flag
+# agent-owned fields (owner != "coordinator") regardless of who changed them.
+
+# Resolve baseline file path
+BASELINE_FILE="$CWD/$SPEC_PATH/references/.ralph-field-baseline.json"
+
+# Graceful degradation: if no baseline exists, skip validation
+if [ ! -f "$BASELINE_FILE" ]; then
+    echo "[ralph-specum] BASELINE_MISSING no baseline at $BASELINE_FILE; skipping field validation" >&2
+    VALIDATION_SKIPPED=1
+else
+    # Validate baseline is valid JSON before proceeding
+    if ! jq empty "$BASELINE_FILE" 2>/dev/null; then
+        echo "[ralph-specum] BASELINE_CORRUPT invalid JSON in baseline at $BASELINE_FILE; skipping field validation" >&2
+        VALIDATION_SKIPPED=1
+    else
+        VALIDATION_SKIPPED=0
+    fi
+fi
+
+# Read state file with retry loop to mitigate jq+mv race condition
+# (3 attempts with 1s delay between retries)
+STATE_CONTENT=""
+if [ $VALIDATION_SKIPPED -eq 0 ]; then
+    RETRY_COUNT=0
+    while [ $RETRY_COUNT -lt 3 ]; do
+        if STATE_CONTENT=$(cat "$STATE_FILE" 2>/dev/null) && echo "$STATE_CONTENT" | jq empty 2>/dev/null; then
+            break
+        fi
+        RETRY_COUNT=$((RETRY_COUNT + 1))
+        if [ $RETRY_COUNT -lt 3 ]; then sleep 1; fi
+    done
+
+    if [ -z "$STATE_CONTENT" ]; then
+        echo "[ralph-specum] BASELINE_RETRY_EXHAUSTED unable to read state file after 3 retries; skipping validation" >&2
+        VALIDATION_SKIPPED=1
+    fi
+fi
+
+# Perform field-level validation if baseline is available and valid
+if [ $VALIDATION_SKIPPED -eq 0 ]; then
+    (
+        exec 202>"${BASELINE_FILE}.lock"
+        flock -x 202 || exit 0
+
+        # Iterate over each field defined in the baseline (flat JSON format)
+        # Flat format: {"field": "string" | ["array"]} — values are owners directly
+        FIELDS=$(jq -r 'keys[]' "$BASELINE_FILE" 2>/dev/null)
+
+        for FIELD in $FIELDS; do
+            # Extract baseline owner — value itself is the owner (string or array)
+            BASELINE_OWNER=$(jq -r --arg f "$FIELD" '.[$f] // "unknown"' "$BASELINE_FILE" 2>/dev/null)
+            # Derive baseline type from the actual baseline value (string | array)
+            BASELINE_TYPE=$(jq -r --arg f "$FIELD" '.[$f] | type' "$BASELINE_FILE" 2>/dev/null)
+            BASELINE_DEFAULT=""
+
+            # Resolve the jq path for this field from state
+            # Strip leading dot if present to avoid double-dot paths
+            CLEAN_FIELD="${FIELD#.}"
+
+            # Check if field exists in state file using getpath for nested path resolution
+            if ! echo "$STATE_CONTENT" | jq --arg f "$CLEAN_FIELD" 'getpath(($f | split("."))) != null' 2>/dev/null | grep -q true; then
+                echo "[ralph-specum] BASELINE_SKIP missing in state: $FIELD (owner=$BASELINE_OWNER)" >&2
+                continue
+            fi
+
+            # Extract current state value type
+            FIELD_VALUE_TYPE=$(echo "$STATE_CONTENT" | jq -r --arg f "$CLEAN_FIELD" 'getpath(($f | split("."))) | type' 2>/dev/null)
+
+            # Type mismatch: baseline owner is a simple type (string=owner name)
+            # but state value is structured (object/array) — baseline stores OWNER names,
+            # not data values, so we skip validation for such fields.
+            # Baseline arrays (multi-owner fields) fall through to coordinator check.
+            case "$BASELINE_TYPE" in
+                string|number|boolean)
+                    if [ "$FIELD_VALUE_TYPE" = "object" ] || [ "$FIELD_VALUE_TYPE" = "array" ]; then
+                        echo "[ralph-specum] BASELINE_SKIP type-mismatch: $FIELD (baseline=$BASELINE_TYPE, state=$FIELD_VALUE_TYPE)" >&2
+                        continue
+                    fi
+                    ;;
+            esac
+
+            # Skip coordinator-owned fields — coordinator legitimately writes these
+            case "$BASELINE_OWNER" in
+                *coordinator*)
+                    echo "[ralph-specum] BASELINE_SKIP coordinator-owned: $FIELD (owner=$BASELINE_OWNER)" >&2
+                    continue
+                    ;;
+            esac
+
+            # Agent-owned-only field changed or present — report boundary violation
+            # In Phase 1, we report agent identity as "unknown"
+            echo "[ralph-specum] BOUNDARY_VIOLATION field=$FIELD owner=$BASELINE_OWNER severity=HIGH agent=unknown" >&2
+        done
+    ) 202>"${BASELINE_FILE}.lock"
+fi
+# --- End Role Boundaries Validation ---
+
 # Execution completion verification: cross-check state AND tasks.md
 if [ "$PHASE" = "execution" ] && [ "$TASK_INDEX" -ge "$TOTAL_TASKS" ] && [ "$TOTAL_TASKS" -gt 0 ]; then
     TASKS_FILE="$CWD/$SPEC_PATH/tasks.md"
@@ -663,3 +763,249 @@ find "$CWD/$SPEC_PATH" -name ".progress-task-*.md" -mmin +60 -delete 2>/dev/null
 # Use /ralph-specum:cancel to explicitly stop execution and cleanup state
 
 exit 0
+
+
+# Filesystem Health Check
+check_filesystem_heartbeat() {
+  local spec_dir="$1"
+  local state_file="$2"
+  local timestamp=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+
+  # Write heartbeat file
+  echo "heartbeat: $timestamp" > "$spec_dir/.ralph-heartbeat"
+
+  # Read it back and verify content
+  local content
+  content=$(cat "$spec_dir/.ralph-heartbeat")
+  if echo "$content" | grep -q "^heartbeat:"; then
+    # Success — reset failure tracking AND set filesystemHealthy=true
+    local tmp="${state_file}.tmp"
+    jq \
+      --arg now "$timestamp" \
+      '.filesystemHealthy = true | .filesystemHealthFailures = 0 | .lastFilesystemCheck = $now' \
+      "$state_file" > "$tmp" && mv "$tmp" "$state_file"
+    echo "[ralph-specum] Filesystem heartbeat OK" >&2
+    # SR-018: Cleanup heartbeat file on success (avoid stale file)
+    rm -f "$spec_dir/.ralph-heartbeat"
+    return 0
+  fi
+
+  # Failure — increment counter in state AND set filesystemHealthy=false
+  local failures
+  failures=$(jq -r '.filesystemHealthFailures // 0' "$state_file" 2>/dev/null || echo "0")
+  failures=$((failures + 1))
+  local tmp="${state_file}.tmp"
+  jq --argjson f "$failures" --arg now "$timestamp" \
+    '.filesystemHealthFailures = $f | .lastFilesystemCheck = $now | .filesystemHealthy = false' \
+    "$state_file" > "$tmp" && mv "$tmp" "$state_file"
+
+  echo "[ralph-specum] Filesystem heartbeat FAILED (attempt $failures)" >&2
+
+  if [ "$failures" -eq 1 ]; then
+    # 1st failure: warn, log to .progress.md (SR-008), continue
+    echo "[$(date -u +%Y-%m-%dT%H:%M:%SZ)] WARN: Filesystem heartbeat failed (1/$failures). Filesystem may be read-only." >> "$spec_dir/.progress.md" 2>/dev/null || true
+    return 0
+  elif [ "$failures" -eq 2 ]; then
+    # 2nd failure: escalate, log to .progress.md, block
+    echo "[$(date -u +%Y-%m-%dT%H:%M:%SZ)] ERROR: Filesystem heartbeat failed (2/2). Filesystem is likely read-only." >> "$spec_dir/.progress.md" 2>/dev/null || true
+    local recovery_instructions='
+## Recovery
+1. Check filesystem: mount | grep "$(df "$spec_dir" | tail -1 | awk \"{print \\$1}\")"
+2. If read-only: remount rw: sudo mount -o remount,rw /path/to/mount
+3. Or resume with /ralph-specum:cancel and re-run in a writable environment'
+    printf '{"decision":"block","reason":"Filesystem heartbeat failed 2nd time — filesystem may be degraded","filesystemHealthFailures":%d,"spec":"%s","recoveryInstructions":"%s"}\n' "$failures" "$SPEC_NAME" "$(echo "$recovery_instructions" | tr '\n' ' ' | sed 's/  */ /g')"
+    exit 0
+  else
+    # 3rd+ failure: full block and exit
+    printf '{"decision":"block","reason":"Filesystem heartbeat failed %d consecutive times — full filesystem block","filesystemHealthFailures":%d,"spec":"%s"}\n' "$failures" "$failures" "$SPEC_NAME"
+    exit 0
+  fi
+}
+
+
+# Circuit Breaker Check
+check_circuit_breaker() {
+  local state_file="$1"
+  local spec_name="$2"
+
+  # Read circuitBreaker state (default: closed)
+  local cb_state=$(jq -r '.circuitBreaker.state // "closed"' "$state_file")
+
+  # If already open, block
+  if [ "$cb_state" = "open" ]; then
+    printf '{"decision":"block","reason":"Circuit breaker OPEN — manual reset required","spec":"%s"}\n' "$spec_name"
+    exit 0
+  fi
+
+  # Read failure counts
+  local max_failures=$(jq -r '.circuitBreaker.maxConsecutiveFailures // 5' "$state_file")
+  local consec_failures=$(jq -r '.circuitBreaker.consecutiveFailures // 0' "$state_file")
+  local max_session=$(jq -r '.circuitBreaker.maxSessionSeconds // 172800' "$state_file")
+  local session_start=$(jq -r '.circuitBreaker.sessionStartTime // ""' "$state_file")
+
+  # Check consecutive failures
+  # NOTE: State write is intentionally REMOVED here (SR-005: single-writer principle).
+  # The coordinator (implement.md) owns state writes. stop-watcher.sh only BLOCKS.
+  if [ "$consec_failures" -ge "$max_failures" ] 2>/dev/null; then
+    printf '{"decision":"block","reason":"Consecutive failures exceeded","consecutiveFailures":%d,"maxConsecutiveFailures":%d,"spec":"%s"}\n' "$consec_failures" "$max_failures" "$spec_name"
+    exit 0
+  fi
+
+  # Check session timeout
+  # SR-016: sessionStartTime is now ISO 8601 string (not epoch integer)
+  if [ -n "$session_start" ]; then
+    local start_epoch=$(date -u -d "$session_start" +%s 2>/dev/null || echo 0)
+    local now_epoch=$(date -u +%s)
+    local session_elapsed=$((now_epoch - start_epoch))
+    if [ "$session_elapsed" -ge "$max_session" ] 2>/dev/null; then
+      printf '{"decision":"block","reason":"Session timeout exceeded","sessionElapsedSeconds":%d,"maxSessionSeconds":%d,"spec":"%s"}\n' "$session_elapsed" "$max_session" "$spec_name"
+      exit 0
+    fi
+  fi
+}
+
+
+# CI Command Discovery
+discover_ci_commands() {
+  local spec_dir="$1"
+  local tmpfile
+  tmpfile=$(mktemp)
+
+  # Scan .github/workflows/*.yml for "- run:" command lines
+  if [ -d "$spec_dir/.github/workflows" ]; then
+    for wf in "$spec_dir/.github/workflows"/*.yml; do
+      [ -f "$wf" ] || continue
+      # Extract content after "- run:" from each workflow file
+      { grep -E '^\s+-\s+run:' "$wf" 2>/dev/null \
+          | sed -E 's/^[[:space:]]*-[[:space:]]+run:[[:space:]]*//' \
+          | while IFS= read -r line; do
+              [ -z "$line" ] && continue
+              # Skip YAML block scalar indicators and comments
+              case "$line" in
+                \#*|"|"*) continue ;;
+              esac
+              line=$(echo "$line" | sed 's/[[:space:]]*$//')
+              [ -z "$line" ] && continue
+              echo "$line"
+            done; } >> "$tmpfile"
+    done
+  fi
+
+  # Scan tests/*.bats for test commands
+  if [ -d "$spec_dir/tests" ]; then
+    for bats_file in "$spec_dir/tests"/*.bats; do
+      [ -f "$bats_file" ] || continue
+      # Extract test runner invocations (e.g., "bats tests/", "test/unit.sh")
+      grep -E '^\s*(bats|test|./tests/)' "$bats_file" 2>/dev/null \
+        | grep -v '^\s*#' \
+        | grep -v '^\s*local ' \
+        | head -5 \
+        | sed 's/^[[:space:]]*//' \
+        | sed 's/[[:space:]]*$//' \
+        | grep -v '^$' \
+        >> "$tmpfile"
+    done
+  fi
+
+  # Deduplicate and return as JSON array
+  if [ -s "$tmpfile" ]; then
+    jq -R -n '[inputs | select(length > 0)] | unique' < "$tmpfile"
+  else
+    echo '[]'
+  fi
+
+  rm -f "$tmpfile"
+}
+
+# CI drift snapshot check
+check_ci_drift() {
+  local state_file="$1"
+
+  # Read ciCommands array from state file (default: empty)
+  local ci_commands
+  ci_commands=$(jq -r '.ciCommands // [] | .[]' "$state_file" 2>/dev/null || true)
+  if [ -z "$ci_commands" ]; then
+    printf '{"drift":false,"commands":[],"baseline":{},"current":{},"spec":"%s"}\n' "$(basename "$(dirname "$state_file")")"
+    return 0
+  fi
+
+  # Resolve baseline file path
+  local spec_dir
+  spec_dir=$(dirname "$state_file")
+  local baseline_file="$spec_dir/.ci-ci-drift-baseline.json"
+
+  # Run each CI command and record pass/fail
+  local current_results=""
+  local cmd_count=0
+  while IFS= read -r cmd; do
+    [ -z "$cmd" ] && continue
+    cmd_count=$((cmd_count + 1))
+    local cmd_hash
+    cmd_hash=$(echo "$cmd" | jq -R -s 'sha256sum | split(" ")[0]')
+    local start_time
+    start_time=$(date +%s%N 2>/dev/null || date +%s)
+    set +e
+    # SR-010: Replace eval with bash -c to avoid injection risk
+    bash -c "$cmd" > /dev/null 2>&1
+    local exit_code=$?
+    set -e
+    local end_time
+    end_time=$(date +%s%N 2>/dev/null || date +%s)
+    local status="pass"
+    if [ "$exit_code" -ne 0 ]; then
+      status="fail"
+    fi
+    if [ -n "$current_results" ]; then
+      current_results="$current_results,"
+    fi
+    current_results="${current_results}\"${cmd_hash}\":\"${status}\""
+  done <<< "$ci_commands"
+
+  # Read baseline if it exists
+  local baseline_json="{}"
+  if [ -f "$baseline_file" ]; then
+    baseline_json=$(cat "$baseline_file")
+  fi
+
+  # Compare against baseline and compute drift
+  # SR-011: Use jq --arg instead of string concatenation for JSON safety
+  local drift=false
+  local drifted_json="{}"
+  for cmd_hash in $(echo "{${current_results}}" | jq -r 'keys[]' 2>/dev/null); do
+    local baseline_status
+    baseline_status=$(echo "$baseline_json" | jq -r --arg h "$cmd_hash" '.[$h] // "unknown"' 2>/dev/null)
+    local current_status
+    current_status=$(echo "{${current_results}}" | jq -r --arg h "$cmd_hash" '.[$h]' 2>/dev/null)
+    if [ "$baseline_status" != "unknown" ] && [ "$baseline_status" != "$current_status" ]; then
+      drift=true
+      # Use jq --arg for safe JSON string escaping (SR-011)
+      drifted_json=$(echo "$drifted_json" | jq \
+        --arg h "$cmd_hash" \
+        --arg bs "$baseline_status" \
+        --arg cs "$current_status" \
+        '. + {($h): {"baseline": $bs, "current": $cs}}')
+    fi
+  done
+
+  # Persist baseline for next comparison
+  printf '{%s}' "$current_results" > "$baseline_file" 2>/dev/null || true
+
+  # Return drift result as JSON
+  local spec_name
+  spec_name=$(basename "$(dirname "$state_file")")
+  jq -n \
+    --argjson drift "$drift" \
+    --argjson commands "$(echo "[$ci_commands]" | jq -R -s 'split("\n") | map(select(length > 0))')" \
+    --argjson baseline "$baseline_json" \
+    --argjson current "{${current_results}}" \
+    --argjson drifted "$drifted_json" \
+    --arg spec "$spec_name" \
+    '{
+      drift: $drift,
+      commands: $commands,
+      baseline: $baseline,
+      current: $current,
+      drifted: $drifted,
+      spec: $spec
+    }'
+}

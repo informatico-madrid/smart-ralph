@@ -119,10 +119,67 @@ jq --argjson taskIndex <first_incomplete> \
      awaitingApproval: false,
      nativeTaskMap: {},
      nativeSyncEnabled: true,
-     nativeSyncFailureCount: 0
+     nativeSyncFailureCount: 0,
+     circuitBreaker: {
+       state: "closed",
+       consecutiveFailures: 0,
+       sessionStartTime: "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+       maxConsecutiveFailures: 5,
+       maxSessionSeconds: 172800
+     }
    }
    ' "$SPEC_PATH/.ralph-state.json" > "$SPEC_PATH/.ralph-state.json.tmp" && \
    mv "$SPEC_PATH/.ralph-state.json.tmp" "$SPEC_PATH/.ralph-state.json"
+```
+
+### Create metrics file
+
+Ensure the metrics log file exists at execution start for FR-004 compliance.
+
+```bash
+touch "$SPEC_PATH/.metrics.jsonl"
+```
+
+### Create Git Checkpoint (before task loop)
+
+Source the checkpoint infrastructure and create a pre-execution git snapshot.
+This provides a rollback point if execution fails partway through.
+
+```bash
+# Source checkpoint infrastructure
+source "$CLAUDE_PLUGIN_ROOT/hooks/scripts/checkpoint.sh"
+
+# Determine repo root from spec path
+STATE_FILE="$SPEC_PATH/.ralph-state.json"
+GIT_ROOT="$(cd "$(dirname "$STATE_FILE")" && pwd)"
+
+# Extract spec name from state file (set by earlier phases)
+SPEC_NAME="$(jq -r '.name // "unknown"' "$STATE_FILE" 2>/dev/null || echo "unknown")"
+
+# Create checkpoint — blocks execution if it fails
+if ! checkpoint-create "$SPEC_NAME" "$TOTAL" "$STATE_FILE"; then
+  echo "[ralph-specum] ERROR: checkpoint creation failed. Aborting execution."
+  exit 1
+fi
+```
+
+### Discover CI Commands (FR-008)
+
+Source the CI discovery function and capture baseline commands at execution start.
+This establishes the `ciCommands` baseline for later drift detection.
+
+```bash
+# Source CI discovery from checkpoint infrastructure (SR-015: use dedicated CI script)
+source "$CLAUDE_PLUGIN_ROOT/hooks/scripts/discover-ci.sh"
+
+# Extract spec name from state file (set by earlier phases)
+SPEC_NAME="$(jq -r '.name // "unknown"' "$STATE_FILE" 2>/dev/null || echo "unknown")"
+
+# Discover CI commands and store in state
+# SR-012: pass repo root (not spec path) for correct workflow discovery
+REPO_ROOT="$(git -C "$STATE_FILE" rev-parse --show-toplevel 2>/dev/null || dirname "$STATE_FILE")"
+ci_cmds=$(discover_ci_commands "$REPO_ROOT")
+jq --argjson cmds "$ci_cmds" '.ciCommands = $cmds' "$STATE_FILE" > "${STATE_FILE}.tmp" && mv "${STATE_FILE}.tmp" "$STATE_FILE"
 ```
 
 **Preserved fields** (set by earlier phases, must NOT be removed):
@@ -270,6 +327,55 @@ Then Read and follow these references in order. They contain the complete coordi
       Generate a fix task to populate the Skills: field, then re-run this task. If unable to generate the fix task, halt with error.
     - **Why**: qa-engineer loads skills from the `Skills:` field. Without it, the agent runs with no E2E context and will produce incorrect verifications.
 - **After TASK_COMPLETE.** Run all 5 verification layers, then update state (advance taskIndex, reset taskIteration).
+- **After TASK_COMPLETE — write metrics.** Record per-task metric before advancing state:
+  ```bash
+  # Source write-metric infrastructure
+  source "$CLAUDE_PLUGIN_ROOT/hooks/scripts/write-metric.sh"
+
+  # Determine actual verify exit code (coordinator runs verify independently)
+  VERIFY_EXIT=0  # default if verify not yet run this iteration
+
+  # Extract task title and id from the delegated task block
+  TASK_TITLE="$(sed -n "/^## Task $CURRENT_INDEX:/,/^-/p" "$SPEC_PATH/tasks.md" | head -1 | sed 's/^## Task [0-9]*: //')"
+  TASK_TYPE="$(grep '^\- \[.\] [0-9]' "$SPEC_PATH/tasks.md" | sed -n "${CURRENT_INDEX}p" | grep -oiP '\[(implementation|test|refactor|quality)\]' | tr -d '[]' || echo 'implementation')"
+  TASK_ID="$(jq -r '.taskIndex' "$STATE_FILE")"
+
+  # Get commit SHA from last git commit
+  COMMIT_SHA="$(git log -1 --format='%H' 2>/dev/null || echo '00000000')"
+
+  # Get current task iteration from state
+  TASK_ITERATION="$(jq '.taskIteration // 1' "$STATE_FILE")"
+  TASK_ITERATION=$((TASK_ITERATION - 1))
+
+  # Call write_metric — use status from verification outcome
+  if ! write_metric "$SPEC_PATH" "$WRITE_METRIC_STATUS" "$TASK_ID" "$TASK_ITERATION" "$VERIFY_EXIT" "$TASK_TITLE" "$TASK_TYPE" "$TASK_ID" "$COMMIT_SHA"; then
+    echo "[ralph-specum] WARN: write_metric failed (non-fatal)" >&2
+  fi
+  ```
+  Set `$WRITE_METRIC_STATUS` to `pass` if verify command exited 0, `fail` if non-0.
+- **After TASK_COMPLETE — circuit breaker state.** Update circuit breaker in state file based on task outcome:
+  - **Task pass** (verify command exits 0): reset `consecutiveFailures` to 0
+    ```bash
+    jq '.circuitBreaker.consecutiveFailures = 0' "$STATE_FILE" > "$STATE_FILE.tmp" && mv "$STATE_FILE.tmp" "$STATE_FILE"
+    ```
+  - **Task fail** (verify command exits non-0): increment `consecutiveFailures` by 1
+    ```bash
+    jq --argjson cb '{consecutiveFailures: (.circuitBreaker.consecutiveFailures // 0) + 1}' '.circuitBreaker |= . + $cb' "$STATE_FILE" > "$STATE_FILE.tmp" && mv "$STATE_FILE.tmp" "$STATE_FILE"
+    ```
+  - **Circuit breaker trip check** (after increment, if consecutiveFailures >= maxConsecutiveFailures): set state to "open"
+    ```bash
+    CB_STATE=$(jq -r '.circuitBreaker.state // "closed"' "$STATE_FILE")
+    if [ "$CB_STATE" = "closed" ]; then
+      CF=$(jq '.circuitBreaker.consecutiveFailures // 0' "$STATE_FILE")
+      MAX_CF=$(jq '.circuitBreaker.maxConsecutiveFailures // 5' "$STATE_FILE")
+      if [ "$CF" -ge "$MAX_CF" ]; then
+        jq --arg ts "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+           --arg reason "Task failure threshold reached: $CF consecutive failures (max: $MAX_CF)" \
+           '.circuitBreaker.state = "open" | .circuitBreaker.openedAt = $ts | .circuitBreaker.trippedReason = $reason' \
+           "$STATE_FILE" > "$STATE_FILE.tmp" && mv "$STATE_FILE.tmp" "$STATE_FILE"
+      fi
+    fi
+    ```
 - **On failure.** Parse failure output, increment taskIteration. If recovery-mode: generate fix task. If max retries exceeded: error and stop.
 - **Modification requests.** If TASK_MODIFICATION_REQUEST in output, process SPLIT_TASK / ADD_PREREQUISITE / ADD_FOLLOWUP per coordinator-pattern.md.
 

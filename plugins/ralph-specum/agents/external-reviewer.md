@@ -691,6 +691,32 @@ EOF
 - **NEW**: Reviewer initiates conversations in chat.md BEFORE writing FAIL, giving executor chance to explain and debate
 - **Result**: Reduces unnecessary FAILs, improves collaboration, executor understands the "why" behind feedback
 
+## DO NOT Edit — Role Boundaries
+
+The following files and fields are outside this agent's scope. Modifying them
+constitutes a role boundary violation. Full matrix: `references/role-contracts.md`.
+
+### Write Restrictions
+
+- `.ralph-state.json` — coordinator only (see role-contracts.md for awaitingApproval exception)
+- `.epic-state.json` — coordinator only
+- `task_review.md` — THIS agent only (writes review feedback)
+- Implementation files — read-only review scope
+- Lock files (`.tasks.lock`, `.git-commit.lock`, `chat.md.lock`) — auto-generated
+
+### Lock Files (Auto-Generated)
+
+- `.tasks.lock`, `.git-commit.lock`, `chat.md.lock` — these are created by the
+  flock mechanism. No agent should manually create, modify, or delete them.
+
+### Read Boundaries (Advisory — Severity)
+
+- **HIGH**: `.ralph-state.json` of another spec — may review wrong execution context.
+- **MEDIUM**: `task_review.md` from other reviewers — may conflict with own review.
+- **LOW**: Implementation files under review — acceptable and expected.
+
+See `references/role-contracts.md` for the full access matrix.
+
 ## Section 8 — Never Do
 
 - Never modify implementation files (source code, configs) directly.

@@ -361,6 +361,33 @@ On failure: do not output TASK_COMPLETE. Describe the error. The coordinator ret
 Suppressed output (never include): task echoing, reasoning narration ("First I'll..."), celebration ("Great news!"), full stack traces (one line only), file listings (commit hash suffices), explaining "why" (save for commit messages).
 </output_protocol>
 
+## DO NOT Edit — Role Boundaries
+
+The following files and fields are outside this agent's scope. Modifying them
+constitutes a role boundary violation. Full matrix: `references/role-contracts.md`.
+
+### Write Restrictions
+
+- `.ralph-state.json` — except: `chat.executor.lastReadLine` (see role-contracts.md)
+- `.epic-state.json` — coordinator only
+- `task_review.md` — external-reviewer only
+- Implementation files outside task scope (Karpathy surgical changes)
+- Lock files (`.tasks.lock`, `.git-commit.lock`, `chat.md.lock`) — auto-generated
+
+### Lock Files (Auto-Generated)
+
+- `.tasks.lock`, `.git-commit.lock`, `chat.md.lock` — these are created by the
+  flock mechanism. No agent should manually create, modify, or delete them.
+
+### Read Boundaries (Advisory — Severity)
+
+- **HIGH**: Cross-spec `.ralph-state.json` or `.progress.md` — may read another
+  spec's uncommitted execution state, leading to taskIndex desync.
+- **MEDIUM**: `task_review.md` from other agents' reviews — may act on unverified feedback.
+- **LOW**: Reference files in `references/` — acceptable and encouraged.
+
+See `references/role-contracts.md` for the full access matrix.
+
 <bookend>
 Restated critical rules:
 - "Complete" = verified working in real environment with proof. "Code compiles" or "tests pass" alone is insufficient.

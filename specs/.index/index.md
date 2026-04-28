@@ -3,15 +3,15 @@
 Auto-generated summary of all specs across configured directories.
 See [index-state.json](./index-state.json) for machine-readable data.
 
-**Last updated:** 2026-04-14T05:56:33Z
+**Last updated:** 2026-04-28T05:07:29Z
 
 ## Directories (1)
 
 | Directory | Specs | Default |
 |-----------|-------|---------|
-| ./specs | 37 | Yes |
+| ./specs | 48 | Yes |
 
-## All Specs (37)
+## All Specs (48)
 
 | Spec | Directory | Phase | Status |
 |------|-----------|-------|--------|
@@ -47,11 +47,22 @@ See [index-state.json](./index-state.json) for machine-readable data.
 | token-efficient-executor | ./specs | completed | done |
 | update-index-on-complete | ./specs | completed | done |
 | when-creating-worktree | ./specs | completed | done |
-| ralph-quality-improvements | ./specs | completed | done |
+| ralph-quality-improvements | ./specs | complete |  |
 | agent-chat-protocol | ./specs | completed | done |
 | codex-plugin-sync | ./specs | completed | done |
 | remove-codex-prefix | ./specs | tasks | 2/16 tasks |
 | engine-state-hardening | ./specs | completed | done |
+| prompt-diet-refactor | ./specs | execution | 58/68 tasks |
+| test-coordinator-diet | ./specs | new |  |
+| _epics | ./specs | new |  |
+| role-boundaries | ./specs | completed | done |
+| loop-safety-infra | ./specs | completed | done |
+| bmad-bridge-plugin | ./specs | completed | done |
+| collaboration-resolution | ./specs | new |  |
+| pair-debug-auto-trigger | ./specs | new |  |
+| existing-test-spec-1116112 | ./specs | new |  |
+| existing-test-spec-1121058 | ./specs | new |  |
+| bmad-nfr-test | ./specs | new |  |
 
 ---
 
