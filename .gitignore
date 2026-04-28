@@ -2,6 +2,7 @@
 .ralph-state.json
 **/.progress.md
 specs/.current-spec
+specs/.current-epic
 
 # Lock files (parallel execution)
 **/.tasks.lock
@@ -9,6 +10,7 @@ specs/.current-spec
 
 # Active spec pointer (user-specific)
 specs/.current-spec
+specs/.current-epic
 
 # Speckit state files
 .specify/.current-feature
@@ -39,22 +41,12 @@ node_modules/
 .serena/
 .qwen/
 .mcp.json
+.claude/settings.json
+.gitignore
+.claude/settingsback.localback.jsonBACK
 .agents/
 .claude/
 .cursor/
 .gemini/
 .github/
 .roo/
-
-# BMAD framework
-_bmad/
-_bmad-output/
-
-# Local plans
-plans/
-
-# Epic runtime pointer
-specs/.current-epic
-
-# Temp files
-tmp.*
