@@ -39,3 +39,22 @@ node_modules/
 .serena/
 .qwen/
 .mcp.json
+.agents/
+.claude/
+.cursor/
+.gemini/
+.github/
+.roo/
+
+# BMAD framework
+_bmad/
+_bmad-output/
+
+# Local plans
+plans/
+
+# Epic runtime pointer
+specs/.current-epic
+
+# Temp files
+tmp.*
