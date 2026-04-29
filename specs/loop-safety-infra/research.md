@@ -478,7 +478,6 @@ The schema defines 25+ fields. This spec adds:
 ### 6.3 Non-Modifications
 
 - `plugins/ralph-specum/agents/spec-executor.md` — metrics writing is coordinator responsibility, executor does not write metrics
-- `plugins/ralph-specum/hooks/scripts/checkpoint.sh` — out of scope (created by this spec)
 - `plugins/ralph-specum/references/coordinator-pattern.md` — add CI logic in implement.md instead of modifying coordinator
 
 ## 7. Implementation Order
