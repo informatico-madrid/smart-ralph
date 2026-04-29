@@ -22,9 +22,9 @@ assert_fail() {
 
 # --- Test 1: All safety functions present ---
 echo "Test 1: All safety functions coexist in stop-watcher.sh"
-hb_count=$(grep -c 'check_filesystem_heartbeat' "$STOP_WATCHER" || echo 0)
-cb_count=$(grep -c 'check_circuit_breaker' "$STOP_WATCHER" || echo 0)
-ci_count=$(grep -c 'discover_ci_commands' "$STOP_WATCHER" || echo 0)
+hb_count=$(grep -c 'check_filesystem_heartbeat' "$STOP_WATCHER" || true)
+cb_count=$(grep -c 'check_circuit_breaker' "$STOP_WATCHER" || true)
+ci_count=$(grep -c 'discover_ci_commands' "$STOP_WATCHER" || true)
 [ "$hb_count" -gt 0 ] || { assert_fail "check_filesystem_heartbeat not found"; }
 [ "$cb_count" -gt 0 ] || { assert_fail "check_circuit_breaker not found"; }
 [ "$ci_count" -gt 0 ] || { assert_fail "discover_ci_commands not found"; }
@@ -32,9 +32,9 @@ assert_pass "All 3 safety functions present"
 
 # --- Test 2: Function names unique (no collision) ---
 echo "Test 2: Function names are unique"
-hb_defs=$(grep -c '^check_filesystem_heartbeat()' "$STOP_WATCHER" || echo 0)
-cb_defs=$(grep -c '^check_circuit_breaker()' "$STOP_WATCHER" || echo 0)
-ci_defs=$(grep -c '^discover_ci_commands()' "$STOP_WATCHER" || echo 0)
+hb_defs=$(grep -c '^check_filesystem_heartbeat()' "$STOP_WATCHER" || true)
+cb_defs=$(grep -c '^check_circuit_breaker()' "$STOP_WATCHER" || true)
+ci_defs=$(grep -c '^discover_ci_commands()' "$STOP_WATCHER" || true)
 [ "$hb_defs" -eq 1 ] || { assert_fail "check_filesystem_heartbeat defined $hb_defs times"; }
 [ "$cb_defs" -eq 1 ] || { assert_fail "check_circuit_breaker defined $cb_defs times"; }
 [ "$ci_defs" -eq 1 ] || { assert_fail "discover_ci_commands defined $ci_defs times"; }
@@ -69,8 +69,6 @@ cat > "$sf" <<'EOF'
   }
 }
 EOF
-# Create minimal spec structure
-echo '{}' > "$tmp/.ralph-state.json"
 # Mock input for stop-watcher
 mock_input='{"cwd":"'"$tmp"'","transcript_path":""}'
 # We can't run full stop-watcher without Claude Code infrastructure,

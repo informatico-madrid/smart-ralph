@@ -23,7 +23,7 @@ assert_fail() {
 
 # Extract check_filesystem_heartbeat function
 extract_heartbeat_func() {
-  sed -n '/^check_filesystem_heartbeat/,/^}/p' "$STOP_WATCHER"
+  sed -n '/^[[:space:]]*check_filesystem_heartbeat/,/^}/p' "$STOP_WATCHER"
 }
 
 # --- Test 1: Heartbeat performance < 10ms ---
