@@ -143,7 +143,7 @@ Focus: Fix duplicate argument parsing, missing variable assignment, and grep -c 
 
 Focus: Fix invalid regex, unchecked cd commands, and subshell exit code in hook scripts.
 
-- [ ] 3.1 [RED] Fix invalid regex [\s] in checkpoint.sh
+- [x] 3.1 [RED] Fix invalid regex [\s] in checkpoint.sh
   - **Do**: Replace `[\s]` with `[[:space:]]` in /proc/mounts grep (lines 53-54) and mount grep (line 59) in checkpoint.sh.
   - **Files**:
     - plugins/ralph-specum/hooks/scripts/checkpoint.sh
@@ -153,7 +153,7 @@ Focus: Fix invalid regex, unchecked cd commands, and subshell exit code in hook 
   - _Requirements: FR-009, AC-3.2_
   - _Design: Group 3_
 
-- [ ] 3.2 [RED] Fix unchecked cd commands in checkpoint.sh
+- [x] 3.2 [RED] Fix unchecked cd commands in checkpoint.sh
   - **Do**: Add error handling to `cd "$git_root"` on line 97 and line 247 in checkpoint.sh: `cd "$git_root" || { echo "[error] checkpoint-create: cannot cd to git_root"; return 1; }`
   - **Files**:
     - plugins/ralph-specum/hooks/scripts/checkpoint.sh
