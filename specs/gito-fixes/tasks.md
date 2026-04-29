@@ -760,7 +760,7 @@ Focus: Fix typos, corrupted tables, sentence fragments, and path harmonization.
   - _Requirements: AC-8.4_
   - _Design: Group 8_
 
-- [ ] 10.6 [RED] Harmonize paths in _bmad/custom/config.toml
+- [x] 10.6 [RED] Harmonize paths in _bmad/custom/config.toml
   - **Do**: Review and harmonize inconsistent paths in _bmad/custom/config.toml for consistency.
   - **Files**:
     - _bmad/custom/config.toml
