@@ -333,7 +333,7 @@ Focus: Append explicit DO NOT denylist sections to 4 execution agent files.
 
 - [x] 2.7 Add input sanitization for spec name
   - **Do**:
-    1. In `validate_inputs()`, add stricter validation: spec name must match `^[a-z](-?[a-z0-9]+)*$`
+    1. In `validate_inputs()`, add stricter validation: spec name must match `^[a-z][a-z0-9]*(-[a-z0-9]+)*$`
     2. Reject spec names with leading/trailing hyphens
     3. Reject names with consecutive hyphens
     4. Reject names with uppercase, special characters, or less than 2 chars
@@ -457,8 +457,8 @@ Focus: Cross-reference updates and final integration checks.
        - All 4 agent files have DO NOT sections referencing role-contracts.md
        - `bash -n plugins/ralph-specum/hooks/scripts/stop-watcher.sh`
        - `bash -n plugins/ralph-specum/hooks/scripts/load-spec-context.sh`
-       - `grep -c "202" plugins/ralph-specum/hooks/scripts/stop-watcher.sh` > 0
-       - `grep -c "BOUNDARY_VIOLATION" plugins/ralph-specum/hooks/scripts/stop-watcher.sh` > 0
+       - `grep -q "202" plugins/ralph-specum/hooks/scripts/stop-watcher.sh`
+       - `grep -q "BOUNDARY_VIOLATION" plugins/ralph-specum/hooks/scripts/stop-watcher.sh`
        - channel-map.md updated
     2. Check for FAIL conditions from Verification Contract:
        - Unauthorized field modification NOT halting execution (should be log-and-continue)
