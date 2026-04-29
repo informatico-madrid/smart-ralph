@@ -368,7 +368,7 @@ Focus: Fix jq `//` false handling, exit codes, heartbeat guard, contradictory do
   - _Requirements: AC-6.2_
   - _Design: Group 6_
 
-- [ ] 6.2 [RED] Fix exit 0 on fatal filesystem failure in research-read-only-detection.md
+- [x] 6.2 [RED] Fix exit 0 on fatal filesystem failure in research-read-only-detection.md
   - **Do**: Change `exit 0` to `exit 1` on fatal filesystem failure in research-read-only-detection.md.
   - **Files**:
     - specs/loop-safety-infra/research-read-only-detection.md
@@ -378,7 +378,7 @@ Focus: Fix jq `//` false handling, exit codes, heartbeat guard, contradictory do
   - _Requirements: AC-6.3_
   - _Design: Group 6_
 
-- [ ] 6.3 [RED] Remove heartbeat guard condition in research-read-only-detection.md
+- [x] 6.3 [RED] Remove heartbeat guard condition in research-read-only-detection.md
   - **Do**: Remove heartbeat guard condition so it runs every iteration in research-read-only-detection.md.
   - **Files**:
     - specs/loop-safety-infra/research-read-only-detection.md
@@ -402,7 +402,7 @@ Focus: Fix jq `//` false handling, exit codes, heartbeat guard, contradictory do
   - _Requirements: AC-6.5, AC-6.6, AC-6.7_
   - _Design: Group 6_
 
-- [ ] 6.5 [RED] Fix incorrect categorization in research.md
+- [x] 6.5 [RED] Fix incorrect categorization in research.md
   - **Do**: Fix incorrect categorization in Non-Modifications section in research.md.
   - **Files**:
     - specs/loop-safety-infra/research.md
@@ -412,7 +412,7 @@ Focus: Fix jq `//` false handling, exit codes, heartbeat guard, contradictory do
   - _Requirements: AC-6.8_
   - _Design: Group 6_
 
-- [ ] 6.6 [VERIFY] Quality Gate — Code Quality & bmad-party-mode Consensus
+- [x] 6.6 [VERIFY] Quality Gate — Code Quality & bmad-party-mode Consensus
 
   **Do**: Execute comprehensive quality checks and obtain bmad-party-mode consensus.
 
@@ -445,7 +445,7 @@ Focus: Fix jq `//` false handling, exit codes, heartbeat guard, contradictory do
 
 Focus: Fix awk regex, duplicate test entries, write targets, BMAD version, and contradictory status in bmad-bridge-plugin spec.
 
-- [ ] 7.1 [RED] Fix awk regex premature exit in bmad-bridge-plugin design.md
+- [x] 7.1 [RED] Fix awk regex premature exit in bmad-bridge-plugin design.md
   - **Do**: Fix awk regex `^##` to `^## [^#]` in design.md (line 103) — matches only ## not ###.
   - **Files**:
     - specs/bmad-bridge-plugin/design.md
@@ -455,7 +455,7 @@ Focus: Fix awk regex, duplicate test entries, write targets, BMAD version, and c
   - _Requirements: AC-6.10_
   - _Design: Group 6_
 
-- [ ] 7.2 [RED] Remove duplicate test strategy entries in bmad-bridge-plugin design.md
+- [x] 7.2 [RED] Remove duplicate test strategy entries in bmad-bridge-plugin design.md
   - **Do**: Remove duplicate test strategy entries in design.md (lines 222-223).
   - **Files**:
     - specs/bmad-bridge-plugin/design.md
@@ -465,7 +465,7 @@ Focus: Fix awk regex, duplicate test entries, write targets, BMAD version, and c
   - _Requirements: AC-6.11_
   - _Design: Group 6_
 
-- [ ] 7.3 [RED] Add missing write targets in bmad-bridge-plugin plan.md
+- [x] 7.3 [RED] Add missing write targets in bmad-bridge-plugin plan.md
   - **Do**: Add missing write targets for user stories and test scenarios in plan.md.
   - **Files**:
     - specs/bmad-bridge-plugin/plan.md
@@ -475,7 +475,7 @@ Focus: Fix awk regex, duplicate test entries, write targets, BMAD version, and c
   - _Requirements: AC-6.12_
   - _Design: Group 6_
 
-- [ ] 7.4 [RED] Harmonize BMAD version in bmad-bridge-plugin requirements.md
+- [x] 7.4 [RED] Harmonize BMAD version in bmad-bridge-plugin requirements.md
   - **Do**: Harmonize BMAD version references (v2.11.0 vs v6.4.0) in requirements.md to a single consistent version.
   - **Files**:
     - specs/bmad-bridge-plugin/requirements.md
@@ -485,7 +485,7 @@ Focus: Fix awk regex, duplicate test entries, write targets, BMAD version, and c
   - _Requirements: AC-6.8_
   - _Design: Group 6_
 
-- [ ] 7.5 [RED] Fix contradictory progress status in bmad-bridge-plugin .progress.md
+- [x] 7.5 [RED] Fix contradictory progress status in bmad-bridge-plugin .progress.md
   - **Do**: Replace contradictory `[x]` + `PENDING_COMMIT` status flags with actual git hashes or remove the conflicting flag entirely in .progress.md.
   - **Files**:
     - specs/bmad-bridge-plugin/.progress.md
@@ -495,7 +495,7 @@ Focus: Fix awk regex, duplicate test entries, write targets, BMAD version, and c
   - _Requirements: AC-8.2_
   - _Design: Group 6_
 
-- [ ] 7.6 [VERIFY] Quality Gate — Code Quality & bmad-party-mode Consensus
+- [x] 7.6 [VERIFY] Quality Gate — Code Quality & bmad-party-mode Consensus
 
   **Do**: Execute comprehensive quality checks and obtain bmad-party-mode consensus.
 
