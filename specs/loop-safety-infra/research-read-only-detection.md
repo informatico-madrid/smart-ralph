@@ -529,7 +529,7 @@ EOF
                 "systemMessage": "Ralph-specum: filesystem health check failed — verify disk space and permissions"
             }'
             rm -f "$HEARTBEAT_ERR"
-            exit 0
+            exit 1
         fi
 
         echo "[ralph-specum] WARNING: Filesystem health check failed ($FAIL_COUNT/3): $HB_ERR" >&2
