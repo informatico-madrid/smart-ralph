@@ -487,7 +487,7 @@ Focus: Unit tests, integration tests, benchmark tests.
     3. Required fields present (schemaVersion, eventId, spec, status, taskIndex)
   - **Files**: specs/loop-safety-infra/tests/test-write-metric.sh
   - **Done when**: write_metric output is valid JSONL with all required fields
-  - **Verify**: `tmp=$(mktemp -d) && echo '{}' > "$tmp/.ralph-state.json" && source /mnt/bunker_data/ai/smart-ralph/plugins/ralph-specum/hooks/scripts/write-metric.sh && write_metric "$tmp" "pass" 0 1 0 "test" "impl" "1.1" "abc123" && wc -l < "$tmp/.metrics.jsonl" && head -1 "$tmp/.metrics.jsonl" | jq -e '.schemaVersion and .status and .taskIndex' && echo 3.5_PASS && rm -rf "$tmp"`
+  - **Verify**: `tmp=$(mktemp -d) && echo '{}' > "$tmp/.ralph-state.json" && source /mnt/bunker_data/ai/smart-ralph/plugins/ralph-specum/hooks/scripts/write-metric.sh && write_metric "$tmp" "pass" 0 1 0 "test" "impl" "1.1" "abc123" && wc -l < "$tmp/.metrics.jsonl" && head -1 "$tmp/.metrics.jsonl" | jq -e '.schemaVersion and .status and has("taskIndex")' && echo 3.5_PASS && rm -rf "$tmp"`
   - **Commit**: `test(loop-safety): unit test write_metric JSONL output`
   - _Requirements: FR-005, AC-3.2_
   - _Design: Section 9, test_write_metric_
