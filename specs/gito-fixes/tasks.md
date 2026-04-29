@@ -24,7 +24,7 @@ Focus: Fix grep -c corruption, regex, basename, and eval bugs in import.sh.
   - _Requirements: FR-009, AC-3.2_
   - _Design: Group 1_
 
-- [ ] 1.3 [RED] Fix non-portable basename expansion in import.sh
+- [x] 1.3 [RED] Fix non-portable basename expansion in import.sh
   - **Do**: Replace `${f%.}` with `basename "$f"` where applicable in import.sh.
   - **Files**:
     - plugins/ralph-bmad-bridge/scripts/import.sh
