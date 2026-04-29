@@ -50,13 +50,13 @@ checkpoint-create() {
   fs_check_dir="$(cd "$git_root" && pwd)"
   local is_read_only=false
   if [ -f /proc/mounts ]; then
-    if grep -q "^.* ${fs_check_dir}.*ro[,\s]" /proc/mounts 2>/dev/null || \
-       grep -q "^.* / ${fs_check_dir%%/*}.*ro[,\s]" /proc/mounts 2>/dev/null; then
+    if grep -q "^.* ${fs_check_dir}.*ro[,[[:space:]]]" /proc/mounts 2>/dev/null || \
+       grep -q "^.* / ${fs_check_dir%%/*}.*ro[,[[:space:]]]" /proc/mounts 2>/dev/null; then
       is_read_only=true
     fi
   fi
   # Also check via mount command for systems without /proc/mounts
-  if [ "$is_read_only" = false ] && mount 2>/dev/null | grep -q " on ${fs_check_dir} .*ro[,\s]"; then
+  if [ "$is_read_only" = false ] && mount 2>/dev/null | grep -q " on ${fs_check_dir} .*ro[,[[:space:]]]"; then
     is_read_only=true
   fi
   if [ "$is_read_only" = true ]; then
@@ -94,7 +94,7 @@ checkpoint-create() {
   fi
 
   # --- Create git commit with --no-verify ---
-  cd "$git_root"
+  cd "$git_root" || { echo "[error] checkpoint-create: cannot cd to git_root"; return 1; }
 
   if ! git add -A 2>/dev/null; then
     echo "[ralph-specum] ERROR: git add -A failed, aborting checkpoint"
@@ -244,7 +244,7 @@ checkpoint-rollback() {
     return 1
   fi
 
-  cd "$git_root"
+  cd "$git_root" || { echo "[error] checkpoint-rollback: cannot cd to git_root"; return 1; }
 
   # Verify SHA exists in the repo
   if ! git cat-file -e "$sha" 2>/dev/null; then
