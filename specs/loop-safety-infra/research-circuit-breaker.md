@@ -13,7 +13,7 @@ The circuit breaker is a resilience pattern that prevents repeated operations li
 
 **OPEN** (blocking)
 - All requests fail immediately without invoking the executor
-- Returns an error/excption instantly, preserving system resources
+- Returns an error/exception instantly, preserving system resources
 - A timer runs; when it expires, transitions to HALF_OPEN
 
 **HALF_OPEN** (probe)
