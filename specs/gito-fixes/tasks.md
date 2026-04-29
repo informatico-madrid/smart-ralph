@@ -4,7 +4,7 @@
 
 Focus: Fix grep -c corruption, regex, basename, and eval bugs in import.sh.
 
-- [ ] 1.1 [RED] Fix grep -c || echo 0 corruption in import.sh
+- [x] 1.1 [RED] Fix grep -c || echo 0 corruption in import.sh
   - **Do**: Replace all instances of `grep -c ... || echo 0` with `grep -c ... || true` in import.sh. Under `set -euo pipefail`, `grep -c` outputs "0" and exits 1 when no matches; `|| echo 0` appends another "0", producing "0\n0" which breaks arithmetic comparisons.
   - **Files**:
     - plugins/ralph-bmad-bridge/scripts/import.sh
