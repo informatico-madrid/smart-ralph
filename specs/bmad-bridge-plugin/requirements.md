@@ -128,7 +128,7 @@ Create a bash-based structural mapper plugin that converts BMAD markdown artifac
 
 | Term | Definition |
 |------|------------|
-| BMAD | bmalph — a BMAD Method agent framework (v2.11.0) that produces planning artifacts in `_bmad-output/` |
+| BMAD | bmalph — a BMAD Method agent framework (v6.4.0) that produces planning artifacts in `_bmad-output/` |
 | PRD | Product Requirements Document — BMAD artifact containing functional and non-functional requirements |
 | FR | Functional Requirement — a BMAD requirement in format `- FR#: [Actor] can [capability]` |
 | NFR | Non-Functional Requirement — performance, security, reliability constraint in a BMAD PRD |
@@ -161,7 +161,7 @@ Create a bash-based structural mapper plugin that converts BMAD markdown artifac
 
 ## Dependencies
 
-- BMAD v2.11.0+ output artifact format (as documented in research.md)
+- BMAD v6.4.0+ output artifact format (as documented in research.md)
 - `jq` must be available on the host system (for JSON/YAML processing in bash)
 - `bash` 4.0+ or POSIX-compatible shell
 - No shared files with any other spec in the engine-roadmap-epic

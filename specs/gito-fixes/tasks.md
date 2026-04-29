@@ -358,7 +358,7 @@ Focus: Fix inconsistent phase value, self-referential dependencies, and epic com
 
 Focus: Fix jq `//` false handling, exit codes, heartbeat guard, contradictory docs, and malformed JSON in loop-safety-infra research docs.
 
-- [ ] 6.1 [RED] Fix jq // operator false handling in research-read-only-detection.md
+- [x] 6.1 [RED] Fix jq // operator false handling in research-read-only-detection.md
   - **Do**: Replace `.filesystemHealthy // true` with explicit null check in research-read-only-detection.md.
   - **Files**:
     - specs/loop-safety-infra/research-read-only-detection.md

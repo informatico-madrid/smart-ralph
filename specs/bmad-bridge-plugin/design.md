@@ -99,7 +99,7 @@ exit $?
 **Parsing logic:**
 ```bash
 # Extract FR lines (state-machine: between ## heading and next ## heading)
-awk '/^## Functional Requirements$/{found=1; next} /^## /{if(found) exit; } found && /^- FR[0-9]+:/ { ... }' "$PRD_PATH"
+awk '/^## Functional Requirements$/{found=1; next} /^## [^#]/{if(found) exit; } found && /^- FR[0-9]+:/ { ... }' "$PRD_PATH"
 ```
 
 ### 4. Epics Parser
