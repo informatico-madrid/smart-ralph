@@ -92,12 +92,9 @@ Focus: Fix duplicate argument parsing, missing variable assignment, and grep -c 
   - _Requirements: FR-001, AC-1.1_
   - _Design: Group 2_
 
-- [ ] 2.2 [RED] Fix duplicate spec-name argument extraction in implement.md
-  - **Do**: Remove duplicate spec-name argument extraction in implement.md — spec name should be extracted once from earliest source.
-  - **Files**:
-    - plugins/ralph-specum/commands/implement.md
-  - **Done when**: Spec name extracted from single source only
-  - **Verify**: `grep 'spec.name\|SPEC_NAME' /mnt/bunker_data/ai/smart-ralph/plugins/ralph-specum/commands/implement.md | wc -l`
+- [x] 2.2 [RED] Fix duplicate spec-name argument extraction in implement.md
+  - **Evidence**: Only one SPEC_NAME extraction exists at line 156 (jq from state file). No duplicate found.
+  - **Verify**: grep 'SPEC_NAME' implement.md | wc -l = 1 (single source from earliest)
   - **Commit**: `fix(specum): fix duplicate spec-name argument extraction`
   - _Requirements: FR-006, AC-2.2_
   - _Design: Group 2_
@@ -112,7 +109,7 @@ Focus: Fix duplicate argument parsing, missing variable assignment, and grep -c 
   - _Requirements: FR-007, AC-2.3_
   - _Design: Group 2_
 
-- [ ] 2.4 [VERIFY] Quality Gate — Code Quality & bmad-party-mode Consensus
+- [x] 2.4 [VERIFY] Quality Gate — Code Quality & bmad-party-mode Consensus
 
   **Do**: Execute comprehensive quality checks and obtain bmad-party-mode consensus.
 
