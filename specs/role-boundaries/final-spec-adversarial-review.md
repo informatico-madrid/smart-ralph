@@ -48,9 +48,20 @@ BASELINE_OWNER=$(jq -r --arg f "$FIELD" '.fields[$f].owner // "unknown"' "$BASEL
 
 **Impacto**: La **Capa 2** (post-facto validation) del diseño de 3 capas está **0% operativa**. Solo la Capa 1 (prompts textuales) funciona parcialmente.
 
-**Fix recomendado (2 opciones)**:
-- **Opción A** (más simple): Cambiar [`stop-watcher.sh`](plugins/ralph-specum/hooks/scripts/stop-watcher.sh:576) para leer formato plano: `jq -r 'keys[]'` y `jq -r --arg f "$FIELD" '.[$f]'`
-- **Opción B**: Cambiar [`load-spec-context.sh`](plugins/ralph-specum/hooks/scripts/load-spec-context.sh:115) para crear formato `{ "fields": { "field": { "owner": "..." } } }`
+**Formato harmonizado (nested)** — ambas partes usan el mismo formato:
+```json
+{
+  "fields": {
+    "chat.executor.lastReadLine": { "owner": "spec-executor", "value": "spec-executor" },
+    "chat.reviewer.lastReadLine": { "owner": "external-reviewer", "value": "external-reviewer" },
+    "external_unmarks": { "owner": "external-reviewer", "value": "external-reviewer" },
+    "awaitingApproval": { "owner": "coordinator", "value": ["coordinator", "..."] }
+  }
+}
+```
+
+- [`stop-watcher.sh`](plugins/ralph-specum/hooks/scripts/stop-watcher.sh:576) ya lee formato nested: `.fields // {} | keys[]` y `.fields[$f].owner // "unknown"`. Sin cambios.
+- [`load-spec-context.sh`](plugins/ralph-specum/hooks/scripts/load-spec-context.sh:115) debe crear formato nested con wrapper `{"fields": {"field": {"owner": "...", "value": "..."}}}`.
 
 ---
 
@@ -142,7 +153,7 @@ Spec 7: pair-debug-auto-trigger  → ⏸️ NO INICIADA (solo plan.md)
 
 | Prioridad | Acción | Impacto | Complejidad |
 |-----------|--------|---------|-------------|
-| **P0** | Unificar formato baseline: cambiar stop-watcher.sh para leer formato FLAT (Opción A) | Restaura Capa 2 de 0% → ~80% | Baja (~10 líneas) |
+| **P0** | Unificar formato baseline: cambiar load-spec-context.sh para crear formato nested con wrapper `.fields` | Restaura Capa 2 de 0% → ~80% | Baja (~10 líneas) |
 | **P0** | Actualizar `.epic-state.json`: role-boundaries → `"completed"` | Evita re-ejecución accidental | Trivial |
 | **P1** | Añadir `tasks.md` como escritura de external-reviewer en role-contracts.md | Corrige contract incompleto | Trivial |
 | **P1** | Corregir Step 4 path en role-contracts.md (`schemas/baseline.json` → path correcto) | Evita confusión en onboarding | Trivial |
@@ -172,4 +183,4 @@ Spec 7: pair-debug-auto-trigger  → ⏸️ NO INICIADA (solo plan.md)
 
 ---
 
-**Conclusión**: La spec `role-boundaries` completó todas sus tasks pero el mecanismo central de enforcement automatizado (validación field-level en stop-watcher) **no funciona** debido a un mismatch de formato JSON entre el productor y el consumer del baseline. Las DO NOT lists en prompts son la única capa de defensa operativa. Se requiere un fix P0 de ~10 líneas en [`stop-watcher.sh`](plugins/ralph-specum/hooks/scripts/stop-watcher.sh:576) para restaurar la funcionalidad, más actualización del estado del epic antes de proceder con la siguiente spec.
+**Conclusión**: La spec `role-boundaries` completó todas sus tasks pero el mecanismo central de enforcement automatizado (validación field-level en stop-watcher) **no funciona** debido a un mismatch de formato JSON entre el productor y el consumer del baseline. Las DO NOT lists en prompts son la única capa de defensa operativa. Se requiere un fix P0 de ~10 líneas en [`load-spec-context.sh`](plugins/ralph-specum/hooks/scripts/load-spec-context.sh:115) para crear el formato nested con wrapper `.fields`, más actualización del estado del epic antes de proceder con la siguiente spec.
