@@ -14,7 +14,7 @@ Focus: Fix grep -c corruption, regex, basename, and eval bugs in import.sh.
   - _Requirements: FR-001, AC-1.1_
   - _Design: Group 1_
 
-- [ ] 1.2 [RED] Fix invalid POSIX regex [\s] in import.sh grep patterns
+- [x] 1.2 [RED] Fix invalid POSIX regex [\s] in import.sh grep patterns
   - **Do**: Check import.sh for any `[\s]` patterns in grep commands. If found, replace with `[[:space:]]`. If none found, confirm and document.
   - **Files**:
     - plugins/ralph-bmad-bridge/scripts/import.sh
