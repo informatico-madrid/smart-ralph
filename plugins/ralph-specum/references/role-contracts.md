@@ -26,8 +26,8 @@ and what each agent is explicitly forbidden from modifying. It complements the c
 |-------|-------|--------|----------|
 | spec-executor | All spec files, `.ralph-state.json`, channels | `.progress-task-*.md`, `chat.md`, `chat.executor.lastReadLine` | `.ralph-state.json` (except `chat.executor.lastReadLine`), `.epic-state.json`, spec meta files |
 | external-reviewer | `task_review.md`, `tasks.md`, `.ralph-state.json`, spec files | `task_review.md`, `tasks.md`, `chat.md`, `chat.reviewer.lastReadLine`, `external_unmarks` | `.ralph-state.json` (except `chat.reviewer.lastReadLine`, `external_unmarks`) |
-| qa-engineer | `.ralph-state.json` (taskIndex), spec files | _(read-only for state files; reads spec files for verification)_ | `.ralph-state.json` (except reading taskIndex) |
-| spec-reviewer | Spec content via delegation | _(read-only)_ | All files |
+| qa-engineer | `.ralph-state.json` (taskIndex), spec files | _(read-only)_ | `.ralph-state.json` (except reading taskIndex) |
+| spec-reviewer | Spec content via delegation | _(read-only)_ | _(read-only)_ |
 | architect-reviewer | Spec files, `.ralph-state.json` | `.ralph-state.json` (`awaitingApproval`) | `.ralph-state.json` (except `awaitingApproval`), `tasks.md`, task files |
 | product-manager | Spec files, `.ralph-state.json` | `.ralph-state.json` (`awaitingApproval`) | `.ralph-state.json` (except `awaitingApproval`), `tasks.md` |
 | research-analyst | Codebase, spec files, `.ralph-state.json` | `.ralph-state.json` (`awaitingApproval`) | `.ralph-state.json` (except `awaitingApproval`) |
