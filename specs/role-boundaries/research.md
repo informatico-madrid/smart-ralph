@@ -18,7 +18,7 @@ Industry patterns (CrewAI tool scoping, LangGraph reducers, GitHub CODEOWNERS) c
 **Existing infrastructure**: `channel-map.md` already documents inter-agent channel protocol (locking, signals, writer/reader ownership). `role-contracts.md` should be complementary, extending to cover spec artifact files.
 
 **Key findings**:
-- The state file has 27 top-level keys (24 in alternative state files). The access matrix covers ~8. ~19 fields are undocumented.
+- The state file has 27 top-level keys (24 in alternative state files). The access matrix covers ~8 fields. ~19 fields are undocumented.
 - The JSON schema is incomplete — missing `external_unmarks`, `awaitingApproval`, `failedStory`, `originTaskIndex`, `repairIteration`, `maxFixTaskDepth`, `chat.reviewer.lastReadLine`, `commitSpec`, `specName`. (The schema correctly defines `maxFixTasksPerOriginal`, `maxTaskIterations`, `globalIteration`, `maxGlobalIterations` and `chat.executor.*`.) The schema also defines `epicName`, `parallelGroup`, `relatedSpecs`, and `taskResults` which may not appear in every state file.
 - `chat.reviewer.lastReadLine` IS materialized in at least one state file (`prompt-diet-refactor`), but `chat.executor.lastReadLine` is null there. In `ralph-quality-improvements`, `chat` is null entirely. The schema defines `chat.executor.*` but NOT `chat.reviewer.*`.
 - Only 4 fields are written by agents other than the coordinator: `chat.executor.lastReadLine` (spec-executor), `chat.reviewer.lastReadLine` (external-reviewer), `external_unmarks` (external-reviewer), `awaitingApproval` (4 planning agents).
@@ -158,7 +158,7 @@ Beyond the core channels, these files require boundary declarations:
 | **Coordinator** | ALL | ALL | Primary state writer |
 | **spec-executor** | phase, taskIndex, totalTasks, chat.executor.lastReadLine | chat.executor.lastReadLine only | Forbidden: "Never modify .ralph-state.json (except chat.lastReadLine)" |
 | **external-reviewer** | All state fields | external_unmarks[taskId], chat.reviewer.lastReadLine | Forbidden: ".ralph-state.json (except chat state fields and external_unmarks)" |
-| `chat.reviewer.lastReadLine` is materialized in prompt-diet-refactor (value 490); `chat.executor.lastReadLine` is null there. The schema defines `chat.executor.*` but NOT `chat.reviewer.*`. |
+`chat.reviewer.lastReadLine` is materialized in prompt-diet-refactor (value 490); `chat.executor.lastReadLine` is null there. The schema defines `chat.executor.*` but NOT `chat.reviewer.*`.
 | **qa-engineer** | taskIndex | Nothing | Reads-only |
 | **spec-reviewer** | Nothing (content from delegation) | Nothing | Purely read-only |
 | **stop-watcher.sh** | All fields | Nothing | Read-only |
