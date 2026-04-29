@@ -34,7 +34,7 @@ Focus: Fix grep -c corruption, regex, basename, and eval bugs in import.sh.
   - _Requirements: FR-002, AC-1.2_
   - _Design: Group 1_
 
-- [ ] 1.4 [RED] Fix eval security vulnerability in import.sh
+- [x] 1.4 [RED] Fix eval security vulnerability in import.sh
   - **Do**: Replace any `eval` on untrusted input with safe jq/direct parsing in import.sh.
   - **Files**:
     - plugins/ralph-bmad-bridge/scripts/import.sh
