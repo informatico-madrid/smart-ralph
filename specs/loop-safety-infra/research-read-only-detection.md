@@ -490,24 +490,21 @@ HEARTBEAT_FILE="$HEARTBEAT_DIR/.ralph-heartbeat"
 HEARTBEAT_CONTENT="ok-$(date +%s)"
 HEARTBEAT_ERR="/tmp/ralph-hb-err.$$"
 
-# Check if filesystem was previously marked unhealthy
-PREV_HEALTHY=$(jq -r '.filesystemHealthy // true' "$STATE_FILE" 2>/dev/null || echo "true")
+# Initialize failure counter from state (persists across invocations)
 FAIL_COUNT=$(jq -r '.filesystemHealthFailures // 0' "$STATE_FILE" 2>/dev/null || echo "0")
 
-# Only check if we're already unhealthy, or always check on first run
-if [ "$PREV_HEALTHY" != "true" ] || [ "$FAIL_COUNT" -gt 0 ]; then
-    # Attempt heartbeat
-    echo "$HEARTBEAT_CONTENT" > "$HEARTBEAT_FILE" 2>"$HEARTBEAT_ERR"
-    HB_RC=$?
+# Attempt heartbeat every iteration
+echo "$HEARTBEAT_CONTENT" > "$HEARTBEAT_FILE" 2>"$HEARTBEAT_ERR"
+HB_RC=$?
 
-    if [ $HB_RC -ne 0 ]; then
-        HB_ERR=$(cat "$HEARTBEAT_ERR" 2>/dev/null || echo "unknown")
-        FAIL_COUNT=$((FAIL_COUNT + 1))
-        jq --argjson fc "$FAIL_COUNT" '.filesystemHealthFailures = $fc' "$STATE_FILE" > "$STATE_FILE.tmp" && mv "$STATE_FILE.tmp" "$STATE_FILE"
+if [ $HB_RC -ne 0 ]; then
+    HB_ERR=$(cat "$HEARTBEAT_ERR" 2>/dev/null || echo "unknown")
+    FAIL_COUNT=$((FAIL_COUNT + 1))
+    jq --argjson fc "$FAIL_COUNT" '.filesystemHealthFailures = $fc' "$STATE_FILE" > "$STATE_FILE.tmp" && mv "$STATE_FILE.tmp" "$STATE_FILE"
 
-        if [ $FAIL_COUNT -ge 3 ]; then
-            # Block with recovery instructions
-            REASON=$(cat <<EOF
+    if [ $FAIL_COUNT -ge 3 ]; then
+        # Block with recovery instructions
+        REASON=$(cat <<EOF
 Filesystem health check failed (consecutive failures: $FAIL_COUNT)
 
 Last error: $HB_ERR
@@ -523,31 +520,30 @@ Last error: $HB_ERR
 3. Resume with /ralph-specum:implement
 EOF
 )
-            jq -n --arg reason "$REASON" '{
-                "decision": "block",
-                "reason": $reason,
-                "systemMessage": "Ralph-specum: filesystem health check failed — verify disk space and permissions"
-            }'
-            rm -f "$HEARTBEAT_ERR"
-            exit 1
-        fi
-
-        echo "[ralph-specum] WARNING: Filesystem health check failed ($FAIL_COUNT/3): $HB_ERR" >&2
-    else
-        # Read-back verification
-        HB_READ=$(cat "$HEARTBEAT_FILE" 2>/dev/null || echo "")
-        if [ "$HB_READ" != "$HEARTBEAT_CONTENT" ]; then
-            FAIL_COUNT=$((FAIL_COUNT + 1))
-            jq --argjson fc "$FAIL_COUNT" '.filesystemHealthFailures = $fc' "$STATE_FILE" > "$STATE_FILE.tmp" && mv "$STATE_FILE.tmp" "$STATE_FILE"
-            echo "[ralph-specum] WARNING: Filesystem round-trip mismatch ($FAIL_COUNT/3)" >&2
-        else
-            # Success — reset counter
-            FAIL_COUNT=0
-            jq '.filesystemHealthFailures = 0 | .filesystemHealthy = true | .lastFilesystemCheck = now | todate' "$STATE_FILE" > "$STATE_FILE.tmp" && mv "$STATE_FILE.tmp" "$STATE_FILE"
-        fi
+        jq -n --arg reason "$REASON" '{
+            "decision": "block",
+            "reason": $reason,
+            "systemMessage": "Ralph-specum: filesystem health check failed — verify disk space and permissions"
+        }'
+        rm -f "$HEARTBEAT_ERR"
+        exit 1
     fi
-    rm -f "$HEARTBEAT_FILE" "$HEARTBEAT_ERR"
+
+    echo "[ralph-specum] WARNING: Filesystem health check failed ($FAIL_COUNT/3): $HB_ERR" >&2
+else
+    # Read-back verification
+    HB_READ=$(cat "$HEARTBEAT_FILE" 2>/dev/null || echo "")
+    if [ "$HB_READ" != "$HEARTBEAT_CONTENT" ]; then
+        FAIL_COUNT=$((FAIL_COUNT + 1))
+        jq --argjson fc "$FAIL_COUNT" '.filesystemHealthFailures = $fc' "$STATE_FILE" > "$STATE_FILE.tmp" && mv "$STATE_FILE.tmp" "$STATE_FILE"
+        echo "[ralph-specum] WARNING: Filesystem round-trip mismatch ($FAIL_COUNT/3)" >&2
+    else
+        # Success — reset counter
+        FAIL_COUNT=0
+        jq '.filesystemHealthFailures = 0 | .filesystemHealthy = true | .lastFilesystemCheck = now | todate' "$STATE_FILE" > "$STATE_FILE.tmp" && mv "$STATE_FILE.tmp" "$STATE_FILE"
+    fi
 fi
+rm -f "$HEARTBEAT_FILE" "$HEARTBEAT_ERR"
 ```
 
 ### 6.5 Performance Impact
