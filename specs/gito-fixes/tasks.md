@@ -710,7 +710,7 @@ Focus: Fix grep -c corruption, state file overwrite, date portability, and fragi
 
 Focus: Fix typos, corrupted tables, sentence fragments, and path harmonization.
 
-- [ ] 10.1 [RED] Fix typo Bmalph -> BMAD in .progress.md
+- [x] 10.1 [RED] Fix typo Bmalph -> BMAD in .progress.md
   - **Do**: Fix `Bmalph` -> `BMAD` in loop-safety-infra/.progress.md (line 4).
   - **Files**:
     - specs/loop-safety-infra/.progress.md
@@ -720,7 +720,7 @@ Focus: Fix typos, corrupted tables, sentence fragments, and path harmonization.
   - _Requirements: AC-8.1_
   - _Design: Group 8_
 
-- [ ] 10.2 [RED] Fix typo excption -> exception in research-circuit-breaker.md
+- [x] 10.2 [RED] Fix typo excption -> exception in research-circuit-breaker.md
   - **Do**: Fix `excption` -> `exception` in loop-safety-infra/research-circuit-breaker.md (line 16).
   - **Files**:
     - specs/loop-safety-infra/research-circuit-breaker.md
@@ -730,7 +730,7 @@ Focus: Fix typos, corrupted tables, sentence fragments, and path harmonization.
   - _Requirements: AC-8.1_
   - _Design: Group 8_
 
-- [ ] 10.3 [RED] Fix typo smart-ralsh -> smart-ralph in requirements.md
+- [x] 10.3 [RED] Fix typo smart-ralsh -> smart-ralph in requirements.md
   - **Do**: Fix `smart-ralsh` -> `smart-ralph` in bmad-bridge-plugin/requirements.md.
   - **Files**:
     - specs/bmad-bridge-plugin/requirements.md
@@ -740,7 +740,7 @@ Focus: Fix typos, corrupted tables, sentence fragments, and path harmonization.
   - _Requirements: AC-8.1_
   - _Design: Group 8_
 
-- [ ] 10.4 [RED] Fix corrupted table in role-boundaries research.md
+- [x] 10.4 [RED] Fix corrupted table in role-boundaries research.md
   - **Do**: Fix corrupted markdown table row in role-boundaries/research.md (line 161).
   - **Files**:
     - specs/role-boundaries/research.md
@@ -750,7 +750,7 @@ Focus: Fix typos, corrupted tables, sentence fragments, and path harmonization.
   - _Requirements: AC-8.3_
   - _Design: Group 8_
 
-- [ ] 10.5 [RED] Fix sentence fragment in role-boundaries research.md
+- [x] 10.5 [RED] Fix sentence fragment in role-boundaries research.md
   - **Do**: Fix sentence fragment "The access matrix covers ~8. ~19 fields are undocumented." -> "The access matrix covers ~8 fields. ~19 fields are undocumented."
   - **Files**:
     - specs/role-boundaries/research.md
@@ -770,7 +770,7 @@ Focus: Fix typos, corrupted tables, sentence fragments, and path harmonization.
   - _Requirements: AC-8.1_
   - _Design: Group 8_
 
-- [ ] 10.7 [VERIFY] Quality Gate — Code Quality & bmad-party-mode Consensus
+- [x] 10.7 [VERIFY] Quality Gate — Code Quality & bmad-party-mode Consensus
 
   **Do**: Execute comprehensive quality checks and obtain bmad-party-mode consensus.
 
