@@ -157,7 +157,7 @@ See `references/role-contracts.md` for the full access matrix.
 **Rules**:
 - Simple field owner → string (single owner)
 - Multi-owner field → array of owner names
-- `external_unmarks`: stored as parent key with single owner `external-reviewer`. During validation, if the current state value is an object, skip per-key validation (all keys in the object are task IDs being unmarked by the owner). If the value is NOT an object (e.g., null or scalar), skip validation for this field.
+- `external_unmarks`: stored as parent key with single owner `external-reviewer`. During validation, if the current state value is an object, validate its structure (all keys are task IDs being unmarked, all values are owner names). If the value is NOT an object (e.g., null or scalar), skip validation for this field.
 - Fields added by dependent specs (e.g., engine-state-hardening may add new owned fields) → NOT in baseline → skipped as "unknown ownership" per schema drift rules. Cross-spec coordination rule: a spec that adds a new owned field must update the baseline.
 - Dynamic fields not in state file → NOT included (schema drift tolerance)
 - Baseline is READ-ONLY after creation — stop-watcher only reads it
@@ -175,7 +175,7 @@ See `references/role-contracts.md` for the full access matrix.
 ```
 1. Read baseline file from <basePath>/references/.ralph-field-baseline.json
 2. If baseline missing → log warning to stderr, skip validation (graceful degradation)
-3. Acquire flock on fd 202 (dedicated fd for baseline validation)
+3. Acquire flock on fd 202 with lockfile backing: `exec 202>"${SPEC_PATH}/references/.ralph-baseline.lock" && flock -x 202` (dedicated fd for baseline validation)
 4. Retry loop: read state file up to 3 times with 1s delay (mitigate jq+mv race)
 5. For each field in baseline:
    a. Extract field value from current state via jq path-style addressing
