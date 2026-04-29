@@ -3,10 +3,10 @@
 Epic: specs/_epics/engine-roadmap-epic/epic.md
 
 ## Goal
-Add automatic pair-debug mode trigger (3-condition check) and Driver/Navigator role split so agents collaborate on hard bugs without human push.
+Add automatic pair-debug mode trigger (4-condition check) and Driver/Navigator role split so agents collaborate on hard bugs without human push.
 
 ## Acceptance Criteria
-1. `references/pair-debug.md` exists with 3-condition trigger and Driver/Navigator roles
+1. `references/pair-debug.md` exists with 4-condition trigger and Driver/Navigator roles
 2. Auto-trigger fires when: pre-existing test fails + test unchanged + first fix attempt failed (taskIteration >= 2) + reviewer didn't mark FAIL
 3. Debug logging listed as first-class investigation technique in spec-executor.md
 4. Failure-recovery.md announces pair-debug mode before fix task (pre-existing test failures)
