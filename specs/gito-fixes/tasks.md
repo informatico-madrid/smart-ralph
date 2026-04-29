@@ -240,7 +240,7 @@ Focus: Fix role contracts, schema fields, and loop safety reference.
   - _Requirements: AC-4.4_
   - _Design: Group 4_
 
-- [ ] 4.3 [RED] Fix spec.schema.json — add missing field definitions
+- [x] 4.3 [RED] Fix spec.schema.json — add missing field definitions
   - **Do**: Add any missing field definitions that agent docs reference but schema lacks in spec.schema.json.
   - **Files**:
     - plugins/ralph-specum/schemas/spec.schema.json
@@ -250,7 +250,7 @@ Focus: Fix role contracts, schema fields, and loop safety reference.
   - _Requirements: AC-4.5_
   - _Design: Group 4_
 
-- [ ] 4.4 [RED] Fix hardcoded placeholder in loop-safety.md
+- [x] 4.4 [RED] Fix hardcoded placeholder in loop-safety.md
   - **Do**: Replace hardcoded `/path/to/mount` with dynamic path reference matching the discovery command in Step 1 of the Filesystem Health Recovery section in loop-safety.md.
   - **Files**:
     - plugins/ralph-specum/references/loop-safety.md

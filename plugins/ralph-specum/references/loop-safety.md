@@ -37,7 +37,7 @@
 
 ### Filesystem Health Recovery
 1. Check filesystem: `mount | grep "$(df "$spec_dir" | tail -1 | awk '{print $1}')"`
-2. If read-only: `sudo mount -o remount,rw /path/to/mount`
+2. If read-only: `sudo mount -o remount,rw "$(df "$spec_dir" | tail -1 | awk '{print $NF}')"`
 3. Or resume with `/ralph-specum:cancel` and re-run in a writable environment
 
 ### Checkpoint Recovery
