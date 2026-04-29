@@ -218,7 +218,7 @@ Focus: Fix invalid regex, unchecked cd commands, and subshell exit code in hook 
 
 Focus: Fix role contracts, schema fields, and loop safety reference.
 
-- [ ] 4.1 [RED] Fix role-contracts.md denylist and writes column
+- [x] 4.1 [RED] Fix role-contracts.md denylist and writes column
   - **Do**:
     1. Change spec-reviewer denylist from "All files" to `_(read-only)_` (line 30)
     2. Change qa-engineer Writes column from read description to `_(read-only)_` (line 29)
