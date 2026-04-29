@@ -150,7 +150,7 @@ Create a bash-based structural mapper plugin that converts BMAD markdown artifac
 ## Out of Scope
 
 - LLM-based content synthesis (e.g., generating research.md executive summaries from PRD prose)
-- BMAD-to-smart-ralsh bidirectional sync (one-way import only)
+- BMAD-to-smart-ralph bidirectional sync (one-way import only)
 - Support for sharded BMAD artifacts (`*prd*/index.md` format)
 - BMAD UX Design artifact mapping
 - BMAD test scenario to Verify command generation (out-of-scope per research findings; deferred — requires LLM synthesis as noted in research.md)
