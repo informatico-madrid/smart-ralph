@@ -173,7 +173,7 @@ Focus: Fix invalid regex, unchecked cd commands, and subshell exit code in hook 
   - _Requirements: FR-009, AC-3.2_
   - _Design: Group 3_
 
-- [ ] 3.4 [RED] Fix subshell exit code in write-metric.sh
+- [x] 3.4 [RED] Fix subshell exit code in write-metric.sh
   - **Do**: Replace `return 0` on line 167 with `return $?` to capture the subshell exit code. The subshell (lines 81-165) may fail (flock, jq), but the parent unconditionally returns 0, silently masking write failures.
   - **Files**:
     - plugins/ralph-specum/hooks/scripts/write-metric.sh

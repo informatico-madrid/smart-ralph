@@ -164,5 +164,5 @@ write_metric() {
 
   ) 200>"$lock_file"
 
-  return 0
+  return $?
 }
