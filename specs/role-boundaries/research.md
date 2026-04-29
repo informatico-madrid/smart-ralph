@@ -158,10 +158,11 @@ Beyond the core channels, these files require boundary declarations:
 | **Coordinator** | ALL | ALL | Primary state writer |
 | **spec-executor** | phase, taskIndex, totalTasks, chat.executor.lastReadLine | chat.executor.lastReadLine only | Forbidden: "Never modify .ralph-state.json (except chat.lastReadLine)" |
 | **external-reviewer** | All state fields | external_unmarks[taskId], chat.reviewer.lastReadLine | Forbidden: ".ralph-state.json (except chat state fields and external_unmarks)" |
-`chat.reviewer.lastReadLine` is materialized in prompt-diet-refactor (value 490); `chat.executor.lastReadLine` is null there. The schema defines `chat.executor.*` but NOT `chat.reviewer.*`.
 | **qa-engineer** | taskIndex | Nothing | Reads-only |
 | **spec-reviewer** | Nothing (content from delegation) | Nothing | Purely read-only |
 | **stop-watcher.sh** | All fields | Nothing | Read-only |
+
+`chat.reviewer.lastReadLine` is materialized in prompt-diet-refactor (value 490); `chat.executor.lastReadLine` is null there. The schema defines `chat.executor.*` but NOT `chat.reviewer.*`.
 
 **Finding**: Only 4 fields are written by agents other than the coordinator. But the constraints are text-only — no mechanical enforcement exists. The spec-executor uses `jq` to write `chat.executor.lastReadLine`, which is an indirect write pattern that hooks cannot intercept.
 
