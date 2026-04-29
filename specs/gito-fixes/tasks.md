@@ -294,7 +294,7 @@ Focus: Fix role contracts, schema fields, and loop safety reference.
 
 Focus: Fix inconsistent phase value, self-referential dependencies, and epic command typo.
 
-- [ ] 5.1 [RED] Fix index-state.json phase value
+- [x] 5.1 [RED] Fix index-state.json phase value
   - **Do**: Change `"phase": "complete"` to `"phase": "completed"` for `ralph-quality-improvements` in index-state.json.
   - **Files**:
     - specs/.index/index-state.json
@@ -304,7 +304,7 @@ Focus: Fix inconsistent phase value, self-referential dependencies, and epic com
   - _Requirements: AC-5.1_
   - _Design: Group 5_
 
-- [ ] 5.2 [RED] Fix self-referential dependency in epic.md
+- [x] 5.2 [RED] Fix self-referential dependency in epic.md
   - **Do**: Fix self-referential dependency in engine-roadmap-epic/epic.md: change "Spec 6 (depends on Spec 6...)" to "Spec 7 (depends on Spec 6...)".
   - **Files**:
     - specs/_epics/engine-roadmap-epic/epic.md
@@ -314,7 +314,7 @@ Focus: Fix inconsistent phase value, self-referential dependencies, and epic com
   - _Requirements: AC-6.1_
   - _Design: Group 6_
 
-- [ ] 5.3 [RED] Fix command typo in epic.md
+- [x] 5.3 [RED] Fix command typo in epic.md
   - **Do**: Fix command typo `/ralph-specum` to correct command name in engine-roadmap-epic/epic.md.
   - **Files**:
     - specs/_epics/engine-roadmap-epic/epic.md

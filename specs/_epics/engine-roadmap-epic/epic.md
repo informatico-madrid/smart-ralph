@@ -135,7 +135,7 @@ Smart Ralph should autonomously handle the full execution lifecycle: enforce rol
 
 **Size**: small-medium
 
-**Dependencies**: Spec 6 (depends on Spec 6's collaboration signals and BUG_DISCOVERY pattern), Spec 3 (reads Spec 3's role restriction additions to spec-executor.md before adding its own debug logging section)
+**Dependencies**: Spec 7 (depends on Spec 6's collaboration signals and BUG_DISCOVERY pattern), Spec 3 (reads Spec 3's role restriction additions to spec-executor.md before adding its own debug logging section)
 
 **Interface Contracts**:
 
