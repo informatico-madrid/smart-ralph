@@ -47,6 +47,25 @@
           "default": 1,
           "description": "Current iteration for this task (resets per task)"
         },
+        "repairIteration": {
+          "type": "integer",
+          "minimum": 0,
+          "default": 0,
+          "description": "Current repair iteration count for recovery mode"
+        },
+        "failedStory": {
+          "type": ["string", "null"],
+          "description": "ID of the story that failed, for recovery tracking"
+        },
+        "originTaskIndex": {
+          "type": ["integer", "null"],
+          "description": "Original task index before fix task insertion"
+        },
+        "awaitingApproval": {
+          "type": "boolean",
+          "default": false,
+          "description": "Whether execution is waiting for external approval"
+        },
         "maxTaskIterations": {
           "type": "integer",
           "minimum": 1,
@@ -130,6 +149,12 @@
           "minimum": 1,
           "default": 3,
           "description": "Max fix tasks allowed per original task"
+        },
+        "maxFixTaskDepth": {
+          "type": "integer",
+          "minimum": 1,
+          "default": 3,
+          "description": "Max depth for fix task chains"
         },
         "fixTaskMap": {
           "type": "object",
@@ -233,7 +258,7 @@
           "properties": {
             "sha": {
               "type": ["string", "null"],
-              "description": "Full 40-char git commit SHA at checkpoint (SR-003: corrected from 'Short (7 chars)' to 'Full' to match implementation storing full SHA via git log -1 --format=%H)"
+              "description": "Full 40-char git commit SHA at checkpoint"
             },
             "timestamp": {
               "type": ["string", "null"],
@@ -267,7 +292,7 @@
             "sessionStartTime": {
               "type": ["string", "null"],
               "format": "date-time",
-              "description": "ISO 8601 UTC timestamp when current session started (SR-001: aligned with implement.md date -u +%Y-%m-%dT%H:%M:%SZ)"
+              "description": "ISO 8601 UTC timestamp when current session started"
             },
             "openedAt": {
               "type": ["string", "null"],
@@ -288,7 +313,7 @@
               "type": "integer",
               "minimum": 1,
               "default": 172800,
-              "description": "Max session duration in seconds before tripping open (SR-002: corrected from 3600/1h to 172800/48h)"
+              "description": "Max session duration in seconds before tripping open"
             }
           }
         },

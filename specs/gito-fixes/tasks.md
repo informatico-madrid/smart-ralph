@@ -230,7 +230,7 @@ Focus: Fix role contracts, schema fields, and loop safety reference.
   - _Requirements: AC-4.1, AC-4.2_
   - _Design: Group 4_
 
-- [ ] 4.2 [RED] Fix spec.schema.json — strip ticket refs
+- [x] 4.2 [RED] Fix spec.schema.json — strip ticket refs
   - **Do**: Strip internal ticket references (SR-003, SR-001, SR-002, etc.) from schema descriptions in spec.schema.json.
   - **Files**:
     - plugins/ralph-specum/schemas/spec.schema.json
