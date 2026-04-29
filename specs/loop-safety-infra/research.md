@@ -35,8 +35,6 @@ git add -A && git commit --no-verify -m "checkpoint: before $spec_name execution
 
 Using `git add -A` captures all changes (tracked, deleted, new files). Using `--no-verify` prevents pre-commit hooks (e.g., linters) from blocking checkpoint creation. This is the right default for Smart Ralph because the plugin is used in focused sessions and rollback is always possible.
 
-**Note**: Pre-commit hooks may still fail on the checkpoint itself (blocking execution). If a pre-commit hook is broken, fix it before running any spec. The `--no-verify` flag skips hook validation but does NOT prevent hook errors from blocking the commit.
-
 ### 1.3 SHA Storage in State File
 
 ```json

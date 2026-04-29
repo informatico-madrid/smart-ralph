@@ -388,7 +388,7 @@ Focus: Fix jq `//` false handling, exit codes, heartbeat guard, contradictory do
   - _Requirements: AC-6.4_
   - _Design: Group 6_
 
-- [ ] 6.4 [RED] Fix contradictory --no-verify docs and tr/jq issues
+- [x] 6.4 [RED] Fix contradictory --no-verify docs and tr/jq issues
   - **Do**:
     1. Clarify `--no-verify` docs in research.md — remove contradictory statement about hooks
     2. Fix useless `tr ',' ','` to use `split(",")` in jq (research-metrics-and-ci.md)
