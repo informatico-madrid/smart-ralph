@@ -163,7 +163,7 @@ Focus: Fix invalid regex, unchecked cd commands, and subshell exit code in hook 
   - _Requirements: FR-008, AC-3.1_
   - _Design: Group 3_
 
-- [ ] 3.3 [RED] Fix invalid regex [\s] in stop-watcher.sh
+- [x] 3.3 [RED] Fix invalid regex [\s] in stop-watcher.sh
   - **Do**: Replace `[\s]` with `[[:space:]]` in all grep patterns in stop-watcher.sh.
   - **Files**:
     - plugins/ralph-specum/hooks/scripts/stop-watcher.sh

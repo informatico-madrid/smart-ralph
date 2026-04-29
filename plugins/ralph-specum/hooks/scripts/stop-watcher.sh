@@ -595,7 +595,7 @@ fi
 if [ "$PHASE" = "execution" ] && [ "$TASK_INDEX" -ge "$TOTAL_TASKS" ] && [ "$TOTAL_TASKS" -gt 0 ]; then
     TASKS_FILE="$CWD/$SPEC_PATH/tasks.md"
     if [ -f "$TASKS_FILE" ]; then
-        UNCHECKED=$(grep -c '^\s*- \[ \]' "$TASKS_FILE" 2>/dev/null || echo "0")
+        UNCHECKED=$(grep -c '^[[:space:]]*- \[ \]' "$TASKS_FILE" 2>/dev/null || echo "0")
         if [ "$UNCHECKED" -gt 0 ]; then
             echo "[ralph-specum] State says complete but tasks.md has $UNCHECKED unchecked items" >&2
             REASON=$(cat <<EOF
@@ -874,7 +874,7 @@ discover_ci_commands() {
     for wf in "$spec_dir/.github/workflows"/*.yml; do
       [ -f "$wf" ] || continue
       # Extract content after "- run:" from each workflow file
-      { grep -E '^\s+-\s+run:' "$wf" 2>/dev/null \
+      { grep -E '^[[:space:]]+-[[:space:]]+run:' "$wf" 2>/dev/null \
           | sed -E 's/^[[:space:]]*-[[:space:]]+run:[[:space:]]*//' \
           | while IFS= read -r line; do
               [ -z "$line" ] && continue
@@ -894,9 +894,9 @@ discover_ci_commands() {
     for bats_file in "$spec_dir/tests"/*.bats; do
       [ -f "$bats_file" ] || continue
       # Extract test runner invocations (e.g., "bats tests/", "test/unit.sh")
-      grep -E '^\s*(bats|test|./tests/)' "$bats_file" 2>/dev/null \
-        | grep -v '^\s*#' \
-        | grep -v '^\s*local ' \
+      grep -E '^[[:space:]]*(bats|test|./tests/)' "$bats_file" 2>/dev/null \
+        | grep -v '^[[:space:]]*#' \
+        | grep -v '^[[:space:]]*local ' \
         | head -5 \
         | sed 's/^[[:space:]]*//' \
         | sed 's/[[:space:]]*$//' \
