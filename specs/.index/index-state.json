@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "updated": "2026-04-29T09:50:25Z",
+  "updated": "2026-04-29T14:13:15Z",
   "directories": [
     {
       "path": "./specs",
@@ -236,7 +236,7 @@
     {
       "name": "ralph-quality-improvements",
       "path": "./specs/ralph-quality-improvements",
-      "phase": "completed",
+      "phase": "complete",
       "taskIndex": 27,
       "totalTasks": 27
     },
@@ -324,10 +324,9 @@
     {
       "name": "gito-fixes",
       "path": "./specs/gito-fixes",
-      "phase": "tasks",
-      "taskIndex": 0,
-      "totalTasks": 32,
-      "awaitingApproval": true
+      "phase": "completed",
+      "taskIndex": 56,
+      "totalTasks": 56
     }
   ]
 }

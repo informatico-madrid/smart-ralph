@@ -46,7 +46,7 @@ Focus: Fix grep -c corruption, regex, basename, and eval bugs in import.sh.
   - **Evidence**: No `eval` commands found in file — confirmed false positive
   - **Verification**: PASS (grep confirms zero eval usage; bash -n syntax check passes)
 
-- [ ] 1.5 [VERIFY] Quality Gate — Code Quality & bmad-party-mode Consensus
+- [x] 1.5 [VERIFY] Quality Gate — Code Quality & bmad-party-mode Consensus
 
   **Do**: Execute comprehensive quality checks and obtain bmad-party-mode consensus.
 
@@ -99,7 +99,7 @@ Focus: Fix duplicate argument parsing, missing variable assignment, and grep -c 
   - _Requirements: FR-006, AC-2.2_
   - _Design: Group 2_
 
-- [ ] 2.3 [RED] Fix missing variable assignment in implement.md
+- [x] 2.3 [RED] Fix missing variable assignment in implement.md
   - **Do**: Add missing variable assignment for any unassigned variables referenced in implement.md.
   - **Files**:
     - plugins/ralph-specum/commands/implement.md
@@ -324,7 +324,7 @@ Focus: Fix inconsistent phase value, self-referential dependencies, and epic com
   - _Requirements: AC-6.2_
   - _Design: Group 6_
 
-- [ ] 5.4 [VERIFY] Quality Gate — Code Quality & bmad-party-mode Consensus
+- [x] 5.4 [VERIFY] Quality Gate — Code Quality & bmad-party-mode Consensus
 
   **Do**: Execute comprehensive quality checks and obtain bmad-party-mode consensus.
 
@@ -541,7 +541,7 @@ Focus: Fix metrics responsibility, sessionStartTime type, jq boolean chain, rege
   - _Requirements: AC-6.9, AC-6.10_
   - _Design: Group 6_
 
-- [ ] 8.2 [RED] Fix jq boolean chain in loop-safety-infra tasks.md
+- [x] 8.2 [RED] Fix jq boolean chain in loop-safety-infra tasks.md
   - **Do**: Fix jq boolean chain in loop-safety-infra/tasks.md: replace `and` with `has()` (fails on taskIndex=0).
   - **Files**:
     - specs/loop-safety-infra/tasks.md
@@ -551,7 +551,7 @@ Focus: Fix metrics responsibility, sessionStartTime type, jq boolean chain, rege
   - _Requirements: AC-6.14_
   - _Design: Group 6_
 
-- [ ] 8.3 [RED] Fix regex contradicting minimum-length in role-boundaries tasks.md
+- [x] 8.3 [RED] Fix regex contradicting minimum-length in role-boundaries tasks.md
   - **Do**: Fix regex contradicting minimum-length in role-boundaries/tasks.md: `^[a-z](-?[a-z0-9]+)*$` -> `^[a-z][a-z0-9]*(-[a-z0-9]+)*$`.
   - **Files**:
     - specs/role-boundaries/tasks.md
@@ -561,7 +561,7 @@ Focus: Fix metrics responsibility, sessionStartTime type, jq boolean chain, rege
   - _Requirements: AC-6.15_
   - _Design: Group 6_
 
-- [ ] 8.4 [RED] Fix grep -c file creation bug in role-boundaries tasks.md
+- [x] 8.4 [RED] Fix grep -c file creation bug in role-boundaries tasks.md
   - **Do**: Fix `grep -c > 0` file creation bug in role-boundaries/tasks.md: replace with `grep -q`.
   - **Files**:
     - specs/role-boundaries/tasks.md
@@ -636,7 +636,7 @@ Focus: Fix metrics responsibility, sessionStartTime type, jq boolean chain, rege
 
 Focus: Fix grep -c corruption, state file overwrite, date portability, and fragile sed in test scripts.
 
-- [ ] 9.1 [RED] Fix grep -c corruption in test-integration.sh
+- [x] 9.1 [RED] Fix grep -c corruption in test-integration.sh
   - **Do**: Replace `grep -c ... || echo 0` with `grep -c ... || true` on lines 25, 26, 27, 35, 36, 37 in test-integration.sh.
   - **Files**:
     - specs/loop-safety-infra/tests/test-integration.sh
@@ -646,7 +646,7 @@ Focus: Fix grep -c corruption, state file overwrite, date portability, and fragi
   - _Requirements: AC-7.1_
   - _Design: Group 7_
 
-- [ ] 9.2 [RED] Fix state file overwrite in test-integration.sh
+- [x] 9.2 [RED] Fix state file overwrite in test-integration.sh
   - **Do**: Remove `echo '{}' > "$tmp/.ralph-state.json"` on line 73 that overwrites circuit breaker state in test-integration.sh.
   - **Files**:
     - specs/loop-safety-infra/tests/test-integration.sh
@@ -656,7 +656,7 @@ Focus: Fix grep -c corruption, state file overwrite, date portability, and fragi
   - _Requirements: AC-7.2_
   - _Design: Group 7_
 
-- [ ] 9.3 [RED] Fix date portability in test-benchmark.sh
+- [x] 9.3 [RED] Fix date portability in test-benchmark.sh
   - **Do**: Add portable date wrapper: `if date +%s%N >/dev/null 2>&1; then date +%s%N; else echo "$(date +%s)000000000"; fi` replacing direct `date +%s%N` on lines 36, 40, 59, 63.
   - **Files**:
     - specs/loop-safety-infra/tests/test-benchmark.sh
@@ -666,7 +666,7 @@ Focus: Fix grep -c corruption, state file overwrite, date portability, and fragi
   - _Requirements: AC-7.6_
   - _Design: Group 7_
 
-- [ ] 9.4 [RED] Fix fragile sed regex in test-benchmark.sh
+- [x] 9.4 [RED] Fix fragile sed regex in test-benchmark.sh
   - **Do**: Fix fragile sed regex on line 26: anchor to `[[:space:]]*` for indented functions.
   - **Files**:
     - specs/loop-safety-infra/tests/test-benchmark.sh
@@ -802,7 +802,7 @@ Focus: Fix typos, corrupted tables, sentence fragments, and path harmonization.
 
 ## Phase 11: Verification Final (VF)
 
-- [ ] VF [VERIFY] Goal verification: all 55 issues now resolved
+- [x] VF [VERIFY] Goal verification: all 55 issues now resolved
   - **Do**:
     1. Verify all shell scripts pass `bash -n`: find all .sh files modified and run syntax check
     2. Verify all JSON files pass `jq empty`: index-state.json, spec.schema.json

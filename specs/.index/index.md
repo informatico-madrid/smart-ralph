@@ -3,7 +3,7 @@
 Auto-generated summary of all specs across configured directories.
 See [index-state.json](./index-state.json) for machine-readable data.
 
-**Last updated:** 2026-04-29T09:50:25Z
+**Last updated:** 2026-04-29T14:13:15Z
 
 ## Directories (1)
 
@@ -61,7 +61,7 @@ See [index-state.json](./index-state.json) for machine-readable data.
 | loop-safety-infra | ./specs | completed | done |
 | agent-chat-protocol | ./specs | completed | done |
 | gito-fix | ./specs | new |  |
-| gito-fixes | ./specs | tasks | awaiting approval |
+| gito-fixes | ./specs | completed | done |
 
 ---
 
