@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "updated": "2026-04-29T09:36:21Z",
+  "updated": "2026-04-29T09:50:25Z",
   "directories": [
     {
       "path": "./specs",
@@ -324,7 +324,9 @@
     {
       "name": "gito-fixes",
       "path": "./specs/gito-fixes",
-      "phase": "research",
+      "phase": "tasks",
+      "taskIndex": 0,
+      "totalTasks": 32,
       "awaitingApproval": true
     }
   ]
