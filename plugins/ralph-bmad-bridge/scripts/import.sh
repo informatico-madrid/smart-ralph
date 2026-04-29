@@ -791,7 +791,7 @@ function generate_tasks() {
 
     if [[ -f "$epics_path" ]]; then
         # Count stories from the epics file for total_tasks in frontmatter
-        STORY_COUNT=$(grep -c '### Story' "$epics_path" 2>/dev/null || echo 0)
+        STORY_COUNT=$(grep -c '### Story' "$epics_path" 2>/dev/null || true)
 
         # Generate Phase 1 content using parse_epics (writes full tasks.md to temp file)
         local epics_tmp
@@ -892,7 +892,7 @@ function generate_design() {
     # Call parse_architecture to fill Architecture, Technical Decisions, File Structure
     if [[ -f "$arch_path" ]]; then
         parse_architecture "$arch_path" "$design_file" "append" "$main_spec"
-        ARCH_COUNT=$(grep -c '^## ' "$design_file" 2>/dev/null || echo 0)
+        ARCH_COUNT=$(grep -c '^## ' "$design_file" 2>/dev/null || true)
     else
         echo "Warning: No architecture.md found, minimal design.md generated" >&2
         warnings+=("No architecture.md found")
