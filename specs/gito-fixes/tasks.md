@@ -82,7 +82,7 @@ Focus: Fix grep -c corruption, regex, basename, and eval bugs in import.sh.
 
 Focus: Fix duplicate argument parsing, missing variable assignment, and grep -c corruption in implement.md.
 
-- [ ] 2.1 [RED] Fix grep -c || echo 0 corruption in implement.md
+- [x] 2.1 [RED] Fix grep -c || echo 0 corruption in implement.md
   - **Do**: Replace `grep -c ... || echo 0` with `grep -c ... || true` on lines 54, 55, 196 (and any other instances) in implement.md.
   - **Files**:
     - plugins/ralph-specum/commands/implement.md
