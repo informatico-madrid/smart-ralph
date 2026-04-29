@@ -528,7 +528,7 @@ Focus: Fix awk regex, duplicate test entries, write targets, BMAD version, and c
 
 Focus: Fix metrics responsibility, sessionStartTime type, jq boolean chain, regex contradictions, grep file creation, JSON format, condition count, validation logic, and flock backing.
 
-- [ ] 8.1 [RED] Clarify metrics responsibility and sessionStartTime type
+- [x] 8.1 [RED] Clarify metrics responsibility and sessionStartTime type
   - **Do**:
     1. Clarify metrics field generation responsibility in requirements.md (write-metric.sh vs coordinator)
     2. Harmonize data type for sessionStartTime in research-circuit-breaker.md
@@ -571,7 +571,7 @@ Focus: Fix metrics responsibility, sessionStartTime type, jq boolean chain, rege
   - _Requirements: AC-6.16_
   - _Design: Group 6_
 
-- [ ] 8.5 [RED] Harmonize JSON baseline format in role-boundaries
+- [x] 8.5 [RED] Harmonize JSON baseline format in role-boundaries
   - **Do**: Harmonize JSON baseline format between producer and consumer in role-boundaries/final-spec-adversarial-review.md.
   - **Files**:
     - specs/role-boundaries/final-spec-adversarial-review.md
@@ -581,7 +581,7 @@ Focus: Fix metrics responsibility, sessionStartTime type, jq boolean chain, rege
   - _Requirements: AC-6.17_
   - _Design: Group 6_
 
-- [ ] 8.6 [RED] Fix condition count mismatch in pair-debug-auto-trigger plan.md
+- [x] 8.6 [RED] Fix condition count mismatch in pair-debug-auto-trigger plan.md
   - **Do**: Fix condition count mismatch in pair-debug-auto-trigger/plan.md — text says 3, lists 4 conditions. Harmonize to 4.
   - **Files**:
     - specs/pair-debug-auto-trigger/plan.md
@@ -591,7 +591,7 @@ Focus: Fix metrics responsibility, sessionStartTime type, jq boolean chain, rege
   - _Requirements: AC-6.13_
   - _Design: Group 6_
 
-- [ ] 8.7 [RED] Fix validation logic and flock backing in role-boundaries design.md
+- [x] 8.7 [RED] Fix validation logic and flock backing in role-boundaries design.md
   - **Do**:
     1. Fix validation logic that skips external_unmarks in role-boundaries/design.md — validate object structure instead of skipping
     2. Add lockfile backing to flock on fd 202: `exec 202>"${SPEC_PATH}/references/.ralph-baseline.lock" && flock -x 202`
@@ -603,7 +603,7 @@ Focus: Fix metrics responsibility, sessionStartTime type, jq boolean chain, rege
   - _Requirements: AC-6.17_
   - _Design: Group 6_
 
-- [ ] 8.8 [VERIFY] Quality Gate — Code Quality & bmad-party-mode Consensus
+- [x] 8.8 [VERIFY] Quality Gate — Code Quality & bmad-party-mode Consensus
 
   **Do**: Execute comprehensive quality checks and obtain bmad-party-mode consensus.
 
