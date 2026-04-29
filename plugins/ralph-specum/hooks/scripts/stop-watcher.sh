@@ -762,8 +762,6 @@ find "$CWD/$SPEC_PATH" -name ".progress-task-*.md" -mmin +60 -delete 2>/dev/null
 # Note: .progress.md and .ralph-state.json are preserved for loop continuation
 # Use /ralph-specum:cancel to explicitly stop execution and cleanup state
 
-exit 0
-
 
 # Filesystem Health Check
 check_filesystem_heartbeat() {

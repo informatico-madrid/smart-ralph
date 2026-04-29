@@ -123,7 +123,6 @@ jq --argjson taskIndex <first_incomplete> \
      circuitBreaker: {
        state: "closed",
        consecutiveFailures: 0,
-       sessionStartTime: "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
        maxConsecutiveFailures: 5,
        maxSessionSeconds: 172800
      }
@@ -360,7 +359,7 @@ Then Read and follow these references in order. They contain the complete coordi
     ```
   - **Task fail** (verify command exits non-0): increment `consecutiveFailures` by 1
     ```bash
-    jq --argjson cb '{consecutiveFailures: (.circuitBreaker.consecutiveFailures // 0) + 1}' '.circuitBreaker |= . + $cb' "$STATE_FILE" > "$STATE_FILE.tmp" && mv "$STATE_FILE.tmp" "$STATE_FILE"
+    jq '.circuitBreaker.consecutiveFailures = ((.circuitBreaker.consecutiveFailures // 0) + 1)' "$STATE_FILE" > "$STATE_FILE.tmp" && mv "$STATE_FILE.tmp" "$STATE_FILE"
     ```
   - **Circuit breaker trip check** (after increment, if consecutiveFailures >= maxConsecutiveFailures): set state to "open"
     ```bash
