@@ -33,11 +33,11 @@ sf="$tmp/sf.json"
 echo '{}' > "$sf"
 source <(extract_heartbeat_func)
 
-start_ns=$(date +%s%N 2>/dev/null || echo "$(date +%s)000000000")
+start_ns=$(if date +%s%N >/dev/null 2>&1; then date +%s%N; else echo "$(date +%s)000000000"; fi)
 for i in $(seq 1 100); do
   check_filesystem_heartbeat "$tmp" "$sf" 2>/dev/null || true
 done
-end_ns=$(date +%s%N 2>/dev/null || echo "$(date +%s)000000000")
+end_ns=$(if date +%s%N >/dev/null 2>&1; then date +%s%N; else echo "$(date +%s)000000000"; fi)
 
 # Calculate average time
 total_ms=$(( (end_ns - start_ns) / 1000000 ))
@@ -56,11 +56,11 @@ sf="$tmp/.ralph-state.json"
 echo '{}' > "$sf"
 source "$METRIC_SCRIPT"
 
-start_ns=$(date +%s%N 2>/dev/null || echo "$(date +%s)000000000")
+start_ns=$(if date +%s%N >/dev/null 2>&1; then date +%s%N; else echo "$(date +%s)000000000"; fi)
 for i in $(seq 1 100); do
   write_metric "$tmp" "pass" "$i" 1 0 "test" "impl" "$i" "abc" 2>/dev/null || true
 done
-end_ns=$(date +%s%N 2>/dev/null || echo "$(date +%s)000000000")
+end_ns=$(if date +%s%N >/dev/null 2>&1; then date +%s%N; else echo "$(date +%s)000000000"; fi)
 
 total_ms=$(( (end_ns - start_ns) / 1000000 ))
 echo "  Total time: ${total_ms}ms for 100 iterations"
