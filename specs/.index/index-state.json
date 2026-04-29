@@ -1,10 +1,10 @@
 {
   "version": "1.0",
-  "updated": "2026-04-28T05:07:29Z",
+  "updated": "2026-04-29T09:36:21Z",
   "directories": [
     {
       "path": "./specs",
-      "specsCount": 48,
+      "specsCount": 47,
       "isDefault": true
     }
   ],
@@ -241,13 +241,6 @@
       "totalTasks": 27
     },
     {
-      "name": "agent-chat-protocol",
-      "path": "./specs/agent-chat-protocol",
-      "phase": "completed",
-      "taskIndex": 51,
-      "totalTasks": 51
-    },
-    {
       "name": "codex-plugin-sync",
       "path": "./specs/codex-plugin-sync",
       "phase": "completed",
@@ -293,20 +286,6 @@
       "totalTasks": 45
     },
     {
-      "name": "loop-safety-infra",
-      "path": "./specs/loop-safety-infra",
-      "phase": "completed",
-      "taskIndex": 68,
-      "totalTasks": 68
-    },
-    {
-      "name": "bmad-bridge-plugin",
-      "path": "./specs/bmad-bridge-plugin",
-      "phase": "completed",
-      "taskIndex": 62,
-      "totalTasks": 62
-    },
-    {
       "name": "collaboration-resolution",
       "path": "./specs/collaboration-resolution",
       "phase": "new"
@@ -317,19 +296,36 @@
       "phase": "new"
     },
     {
-      "name": "existing-test-spec-1116112",
-      "path": "./specs/existing-test-spec-1116112",
+      "name": "bmad-bridge-plugin",
+      "path": "./specs/bmad-bridge-plugin",
+      "phase": "completed",
+      "taskIndex": 62,
+      "totalTasks": 62
+    },
+    {
+      "name": "loop-safety-infra",
+      "path": "./specs/loop-safety-infra",
+      "phase": "completed",
+      "taskIndex": 68,
+      "totalTasks": 68
+    },
+    {
+      "name": "agent-chat-protocol",
+      "path": "./specs/agent-chat-protocol",
+      "phase": "completed",
+      "taskIndex": 51,
+      "totalTasks": 51
+    },
+    {
+      "name": "gito-fix",
+      "path": "./specs/gito-fix",
       "phase": "new"
     },
     {
-      "name": "existing-test-spec-1121058",
-      "path": "./specs/existing-test-spec-1121058",
-      "phase": "new"
-    },
-    {
-      "name": "bmad-nfr-test",
-      "path": "./specs/bmad-nfr-test",
-      "phase": "new"
+      "name": "gito-fixes",
+      "path": "./specs/gito-fixes",
+      "phase": "research",
+      "awaitingApproval": true
     }
   ]
 }

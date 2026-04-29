@@ -3,15 +3,15 @@
 Auto-generated summary of all specs across configured directories.
 See [index-state.json](./index-state.json) for machine-readable data.
 
-**Last updated:** 2026-04-28T05:07:29Z
+**Last updated:** 2026-04-29T09:36:21Z
 
 ## Directories (1)
 
 | Directory | Specs | Default |
 |-----------|-------|---------|
-| ./specs | 48 | Yes |
+| ./specs | 47 | Yes |
 
-## All Specs (48)
+## All Specs (47)
 
 | Spec | Directory | Phase | Status |
 |------|-----------|-------|--------|
@@ -48,7 +48,6 @@ See [index-state.json](./index-state.json) for machine-readable data.
 | update-index-on-complete | ./specs | completed | done |
 | when-creating-worktree | ./specs | completed | done |
 | ralph-quality-improvements | ./specs | complete |  |
-| agent-chat-protocol | ./specs | completed | done |
 | codex-plugin-sync | ./specs | completed | done |
 | remove-codex-prefix | ./specs | tasks | 2/16 tasks |
 | engine-state-hardening | ./specs | completed | done |
@@ -56,13 +55,13 @@ See [index-state.json](./index-state.json) for machine-readable data.
 | test-coordinator-diet | ./specs | new |  |
 | _epics | ./specs | new |  |
 | role-boundaries | ./specs | completed | done |
-| loop-safety-infra | ./specs | completed | done |
-| bmad-bridge-plugin | ./specs | completed | done |
 | collaboration-resolution | ./specs | new |  |
 | pair-debug-auto-trigger | ./specs | new |  |
-| existing-test-spec-1116112 | ./specs | new |  |
-| existing-test-spec-1121058 | ./specs | new |  |
-| bmad-nfr-test | ./specs | new |  |
+| bmad-bridge-plugin | ./specs | completed | done |
+| loop-safety-infra | ./specs | completed | done |
+| agent-chat-protocol | ./specs | completed | done |
+| gito-fix | ./specs | new |  |
+| gito-fixes | ./specs | research | awaiting approval |
 
 ---
 
