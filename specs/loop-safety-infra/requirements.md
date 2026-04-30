@@ -111,7 +111,7 @@ If the git repo does not exist, the SHA is recorded as `null` and execution proc
 ### FR-002: Git checkpoint rollback
 
 **Priority**: HIGH
-**Maps to**: US-1
+**Maps to**: US-1 (AC-1.1, AC-1.2, AC-1.3)
 
 When invoked via `/ralph-specum:rollback`, the coordinator reads the checkpoint SHA from `.ralph-state.json` and executes `git reset --hard <SHA>`. This restores the working tree to the exact state at checkpoint creation time. The checkpoint commit is preserved in git history for audit trail.
 
@@ -124,7 +124,7 @@ Rollback is an **explicit user command** — it is not automatic. The engine cat
 ### FR-003: Circuit breaker state machine
 
 **Priority**: HIGH
-**Maps to**: US-2
+**Maps to**: US-2 (AC-2.1, AC-2.2, AC-2.3, AC-2.4, AC-2.5, AC-2.6, AC-2.7)
 
 The circuit breaker implements a three-state machine: CLOSED (normal), OPEN (tripped), manual RESET to CLOSED. HALF_OPEN is not implemented because the spec-executor is a deterministic agent — if it was stuck, it will be stuck again.
 
@@ -309,6 +309,7 @@ All schema changes (FR-001 through FR-009) are additive — no existing fields a
 |------|-----------|
 | **Circuit breaker** | A fault-tolerance pattern that stops execution after a configurable number of consecutive failures or a time limit. Three states: CLOSED (normal), OPEN (tripped), manual RESET. |
 | **Heartbeat** | A small file written to verify filesystem write capability. Used for read-only filesystem detection. |
+| **jq** | A command-line JSON processor. Processes JSON only — NOT YAML. YAML files must be converted to JSON first (e.g., with yq) before jq processing. |
 | **JSONL** | JSON Lines — one JSON object per line, append-safe, stream-processable. |
 | **`flock`** | Linux file-locking utility used for concurrent access safety. |
 | **`git reset --hard`** | Git command that restores the working tree to a specific commit, discarding all changes since that commit. |
