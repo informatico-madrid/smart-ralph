@@ -7,7 +7,7 @@ Add Bmalph-style pre-loop git checkpoint, circuit breaker, per-task metrics, rea
 
 ## Acceptance Criteria
 1. Pre-loop git checkpoint stores SHA in .ralph-state.json
-2. Circuit breaker stops after N consecutive failures (default 5) or N hours (default 48h)
+2. Circuit breaker stops after max_failures (default 5) consecutive failures or max_duration_hours (default 48) hours
 3. `.metrics.jsonl` file exists after execution with per-task entries
 4. Read-only detection at loop start via heartbeat write check
 5. CI snapshot tracking: auto-detects CI commands, records global CI state

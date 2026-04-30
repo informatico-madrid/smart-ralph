@@ -285,7 +285,7 @@ Focus: 5 requirements gaps including missing references, ambiguous terminology, 
   - _Requirements: US-5, AC-5.5_
   - _Design: Fix 15 (AC-5.5)_
 
-- [ ] 5.4 [P] Fix ambiguous `N` variable in `plan.md` (Bug #84)
+- [x] 5.4 [P] Fix ambiguous `N` variable in `plan.md` (Bug #84)
   - **Do**: Read `specs/loop-safety-infra/plan.md` line 10. Replace `"Circuit breaker stops after N consecutive failures (default 5) or N hours (default 48h)"` with `"Circuit breaker stops after max_failures (default 5) consecutive failures or max_duration_hours (default 48) hours"`.
   - **Files**: `specs/loop-safety-infra/plan.md`
   - **Done when**: Line 10 uses distinct variable names `max_failures` and `max_duration_hours`
