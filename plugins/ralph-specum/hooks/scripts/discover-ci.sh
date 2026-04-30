@@ -45,9 +45,40 @@ discover_ci_commands() {
     done
   fi
 
-  # Deduplicate and return as JSON array
+  # Deduplicate, classify into categories, and return as JSON array
   if [ -s "$tmpfile" ]; then
-    jq -R -n '[inputs | select(length > 0)] | unique' < "$tmpfile"
+    # Deduplicate input lines
+    local deduped
+    deduped=$(mktemp)
+    sort -u "$tmpfile" > "$deduped"
+
+    local json_entries="["
+    local first=true
+    while IFS= read -r cmd; do
+      [ -z "$cmd" ] && continue
+      local category="test"
+      case "$cmd" in
+        *mocha*|*jest*|*vitest*|*pytest*|*bats*|*tape*|*nodeunit*|*tap*|*"npm test"*|*"npm run test"*|*"yarn test"*|*"pnpm test"*)
+          category="test" ;;
+        *eslint*|*prettier*|*stylelint*|*biome*|*flake8*|*pylint*|*shellcheck*|*black*|*checkstyle*|*"npm run lint"*|*"npm run format"*)
+          category="lint" ;;
+        *webpack*|*rollup*|*esbuild*|*vite*|*"npm run build"*|*gradle*|*mvn*|*make*|*cargo*|"go build")
+          category="build" ;;
+        *--noEmit*|*mypy*|*pyright*|*"npx tsc"*)
+          category="typecheck" ;;
+        *tsc*)
+          category="build" ;;
+      esac
+      if [ "$first" = true ]; then
+        first=false
+      else
+        json_entries+=","
+      fi
+      json_entries+=$(jq -n --arg c "$cmd" --arg cat "$category" '{"command": $c, "category": $cat}')
+    done < "$deduped"
+    json_entries+="]"
+    echo "$json_entries" | jq -S '.'
+    rm -f "$deduped"
   else
     echo '[]'
   fi
