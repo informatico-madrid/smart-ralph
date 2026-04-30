@@ -22,7 +22,7 @@ Focus: 8 confirmed runtime bugs that cause silent failures, CI blocks, or config
   - _Requirements: FR-002, AC-1.2_
   - _Design: Fix 2_
 
-- [ ] 1.3 [P] Fixed-string grep in `checkpoint.sh` (Bug #44)
+- [x] 1.3 [P] Fixed-string grep in `checkpoint.sh` (Bug #44)
   - **Do**: Read `plugins/ralph-specum/hooks/scripts/checkpoint.sh` lines 53-54. Replace the two `grep -q` calls that use regex with unescaped `${fs_check_dir}`. Use `grep -F` for fixed-string matching, then pipe to `grep -E` for the `ro` check on filtered results.
   - **Files**: `plugins/ralph-specum/hooks/scripts/checkpoint.sh`
   - **Done when**: Lines 53-54 use `grep -F` for the path, `grep -E` for the `ro` flag on filtered output
@@ -55,7 +55,7 @@ Focus: 8 confirmed runtime bugs that cause silent failures, CI blocks, or config
   - **Commit**: `quality(gate): quality gate consensus for tasks 1.1-1.3`
   - _Design: All fixes in Phase 1_
 
-- [ ] 1.5 [P] Exit on `mkdir` failure in `load-spec-context.sh` (Bug #45)
+- [x] 1.5 [P] Exit on `mkdir` failure in `load-spec-context.sh` (Bug #45)
   - **Do**: Read `plugins/ralph-specum/hooks/scripts/load-spec-context.sh` line 114, add `return 1;` after the error echo in the `|| { ... }` block
   - **Files**: `plugins/ralph-specum/hooks/scripts/load-spec-context.sh`
   - **Done when**: Line 114 block includes `return 1;` after the error echo
@@ -64,7 +64,7 @@ Focus: 8 confirmed runtime bugs that cause silent failures, CI blocks, or config
   - _Requirements: FR-004, AC-1.4_
   - _Design: Fix 4_
 
-- [ ] 1.6 [P] Fix CI command hash computation (Bug #46)
+- [x] 1.6 [P] Fix CI command hash computation (Bug #46)
   - **Do**: Read `plugins/ralph-specum/hooks/scripts/stop-watcher.sh` line 942. Replace `cmd_hash=$(echo "$cmd" | jq -R -s 'sha256sum | split(" ")[0]')` with `cmd_hash=$(echo -n "$cmd" | sha256sum | cut -d' ' -f1)`
   - **Files**: `plugins/ralph-specum/hooks/scripts/stop-watcher.sh`
   - **Done when**: Line 942 uses `sha256sum` shell command instead of invalid jq
@@ -73,7 +73,7 @@ Focus: 8 confirmed runtime bugs that cause silent failures, CI blocks, or config
   - _Requirements: FR-005, AC-1.5_
   - _Design: Fix 5_
 
-- [ ] 1.7 [P] Add CI command categories in `discover-ci.sh` (Bug #85)
+- [x] 1.7 [P] Add CI command categories in `discover-ci.sh` (Bug #85)
   - **Do**: Read `plugins/ralph-specum/hooks/scripts/discover-ci.sh` lines 48-53. Replace the `jq -R -n '[inputs | select(length > 0)] | unique'` output with a jq expression that maps each command to a `{command, category}` object using regex classification (test, lint, build, typecheck). Unknown commands default to `"test"` category.
   - **Files**: `plugins/ralph-specum/hooks/scripts/discover-ci.sh`
   - **Done when**: Each output object has `command` + `category` keys, category is one of {test, lint, build, typecheck}
@@ -107,7 +107,7 @@ Focus: 8 confirmed runtime bugs that cause silent failures, CI blocks, or config
 
 Focus: 2 test script bugs that cause test results to be lost.
 
-- [ ] 2.1 [P] Remove `exit 1` from `test-benchmark.sh` (Bug #94)
+- [x] 2.1 [P] Remove `exit 1` from `test-benchmark.sh` (Bug #94)
   - **Do**: Read `specs/loop-safety-infra/tests/test-benchmark.sh` line 48. Replace `[ "$avg_ms" -lt 10 ] || { assert_fail "Average ${avg_ms}ms exceeds 10ms threshold"; exit 1; }` with `[ "$avg_ms" -lt 10 ] || assert_fail "Average ${avg_ms}ms exceeds 10ms threshold"`
   - **Files**: `specs/loop-safety-infra/tests/test-benchmark.sh`
   - **Done when**: Line 48 no longer calls `exit 1`, test continues to summary block on failure
@@ -116,7 +116,7 @@ Focus: 2 test script bugs that cause test results to be lost.
   - _Requirements: FR-007, AC-2.1_
   - _Design: Fix 7_
 
-- [ ] 2.2 [P] Fix tautology in `test-checkpoint.sh` (Bug #96)
+- [x] 2.2 [P] Fix tautology in `test-checkpoint.sh` (Bug #96)
   - **Do**: Read `specs/loop-safety-infra/tests/test-checkpoint.sh` line 49. Replace `assert_eq "$sha" "$sha" "sha is non-empty (${#sha} chars)" || true` with `assert_eq "true" "$(if [ ${#sha} -ge 7 ]; then echo true; else echo false; fi)" "sha length >= 7 characters" || true`
   - **Files**: `specs/loop-safety-infra/tests/test-checkpoint.sh`
   - **Done when**: Line 49 performs a real assertion (SHA length >= 7) instead of comparing variable with itself
@@ -294,7 +294,7 @@ Focus: 5 requirements gaps including missing references, ambiguous terminology, 
   - _Requirements: US-5, AC-5.6_
   - _Design: Fix 15 (AC-5.6)_
 
-- [ ] 5.5 [VERIFY] Quality gate: JSON validity, syntax, SOLID check
+- [x] 5.5 [VERIFY] Quality gate: JSON validity, syntax, SOLID check
   - **Do**: Run `/bmad-party-mode` with voices architect, dev, test architect, pm
     - Ask each agent to validate:
       1. SRP: Each requirements fix has single purpose
@@ -324,7 +324,7 @@ Focus: 5 requirements gaps including missing references, ambiguous terminology, 
 
 Focus: Prove all fixes resolve original issues and no regressions introduced.
 
-- [ ] VF [VERIFY] Goal verification: all bugs resolved, no regressions
+- [x] VF [VERIFY] Goal verification: all bugs resolved, no regressions
   - **Do**:
     1. Verify each original bug is fixed:
        - `.gitignore` no longer contains `.github/` — `! grep -q '^\s*\.github/\s*$' /mnt/bunker_data/ai/smart-ralph/.gitignore`
