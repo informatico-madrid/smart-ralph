@@ -4,7 +4,7 @@
 
 Focus: 8 confirmed runtime bugs that cause silent failures, CI blocks, or config corruption.
 
-- [ ] 1.1 [P] Remove `.github/` from `.gitignore` (Bug #4)
+- [x] 1.1 [P] Remove `.github/` from `.gitignore` (Bug #4)
   - **Do**: Read `.gitignore` line 51, remove the line containing `.github/`
   - **Files**: `.gitignore`
   - **Done when**: Line 51 no longer contains `.github/`
