@@ -148,7 +148,7 @@ Focus: 2 test script bugs that cause test results to be lost.
 
 Focus: 3 documentation typos and contradictory comments.
 
-- [ ] 3.1 [P] Fix `distillator` typos in `module-help.csv` (Bugs #11, #18, #13)
+- [x] 3.1 [P] Fix `distillator` typos in `module-help.csv` (Bugs #11, #18, #13)
   - **Do**: Read `_bmad/core/module-help.csv` line 12. Change `bmad-distillator` to `bmad-distiller`, `Distillator` to `Distiller`, and add missing article: `"Use when you need token-efficient distillates"` to `"Use when you need **a** token-efficient distillate"`
   - **Files**: `_bmad/core/module-help.csv`
   - **Done when**: Line 12 uses `bmad-distiller` and `Distiller`, has article `**a**`, singular `distillate`
@@ -157,7 +157,7 @@ Focus: 3 documentation typos and contradictory comments.
   - _Requirements: US-3, AC-3.1, AC-3.2_
   - _Design: Fix 9_
 
-- [ ] 3.2 [P] Fix `O_TMPF` heading and circuit-breaker timestamp comment (Bugs #93, #90)
+- [x] 3.2 [P] Fix `O_TMPF` heading and circuit-breaker timestamp comment (Bugs #93, #90)
   - **Do**: Read `specs/loop-safety-infra/research-read-only-detection.md` line 210, change `### 3.5 Alternative: O_TMPF (Linux 3.11+)` to `### 3.5 Alternative: O_TMPFILE (Linux 3.11+)`. Read `specs/loop-safety-infra/research-circuit-breaker.md` line 267, remove the contradictory comment `(ISO in human-readable output)` from the `// epoch seconds` comment.
   - **Files**: `specs/loop-safety-infra/research-read-only-detection.md`, `specs/loop-safety-infra/research-circuit-breaker.md`
   - **Done when**: Heading uses `O_TMPFILE`, contradictory comment removed from circuit-breaker
@@ -166,7 +166,7 @@ Focus: 3 documentation typos and contradictory comments.
   - _Requirements: US-3, AC-3.3, AC-3.4_
   - _Design: Fix 10_
 
-- [ ] 3.3 [P] Fix epic.md self-reference (Bug #52)
+- [x] 3.3 [P] Fix epic.md self-reference (Bug #52)
   - **Do**: Read `specs/_epics/engine-roadmap-epic/epic.md` line 138. Change `Spec 7 (depends on Spec 6's collaboration signals...` to `This spec (depends on Spec 6's collaboration signals...` to avoid self-reference.
   - **Files**: `specs/_epics/engine-roadmap-epic/epic.md`
   - **Done when**: Line 138 says `This spec` instead of `Spec 7` in its own dependency section

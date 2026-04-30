@@ -8,7 +8,7 @@ Create a BMAD→smart-ralph structural mapper plugin that converts BMAD artifact
 ## Acceptance Criteria
 1. Plugin at `plugins/ralph-bmad-bridge/` with valid plugin.json
 2. `/ralph-bmad:import` command works: `/ralph-bmad:import <bmad-path> <spec-name>`
-3. Output spec files in `specs/<name>/` are valid and can be executed by `/ralph-specum:implement`
+3. Output spec files in `specs/<name>/` are valid and can be executed by `/ralph-spec:implement`
 4. Mapping covers: PRD→requirements.md, user stories→verification contract, ADRs→design.md, epic→tasks.md, test scenarios→Verify commands
 
 ## Interface Contracts

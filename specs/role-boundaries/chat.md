@@ -28,7 +28,7 @@ CYCLE 2: All Phase 6 tasks verified PASS. Phase 6 execution complete.
 - 8246fea: `fix(role-boundaries): fix jq nested path resolution using getpath (RR-001)`
 - 2cdf30d: `fix(role-boundaries): move validation block before ALL_TASKS_COMPLETE exit (RR-002)`
 - a639c2c: `fix(role-boundaries): fix baseline.json typo to .ralph-field-baseline.json (RR-003)`
-- f84aab7: `fix(role-boundaries): fix BOUNDARY_VOLATION typo to BOUNDARY_VIOLATION (RR-007)`
+- f84aab7: `fix(role-boundaries): fix BOUNDARY_VIOLATION typo to BOUNDARY_VIOLATION (RR-007)`
 
 **Phase 6: COMPLETE — Capa 2 Fully Restored**
 
