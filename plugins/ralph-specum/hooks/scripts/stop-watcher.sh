@@ -939,7 +939,7 @@ check_ci_drift() {
     [ -z "$cmd" ] && continue
     cmd_count=$((cmd_count + 1))
     local cmd_hash
-    cmd_hash=$(echo "$cmd" | jq -R -s 'sha256sum | split(" ")[0]')
+    cmd_hash=$(echo -n "$cmd" | sha256sum | cut -d' ' -f1)
     local start_time
     start_time=$(date +%s%N 2>/dev/null || date +%s)
     set +e
