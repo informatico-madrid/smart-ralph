@@ -50,13 +50,13 @@ checkpoint-create() {
   fs_check_dir="$(cd "$git_root" && pwd)"
   local is_read_only=false
   if [ -f /proc/mounts ]; then
-    if grep -q "^.* ${fs_check_dir}.*ro[,[[:space:]]]" /proc/mounts 2>/dev/null || \
-       grep -q "^.* / ${fs_check_dir%%/*}.*ro[,[[:space:]]]" /proc/mounts 2>/dev/null; then
+    if awk -v dir="$fs_check_dir" '$2 == dir || index($2, dir "/") == 1 { for(i=4;i<=NF;i++) if($i ~ /ro/) { exit 0 } }' /proc/mounts 2>/dev/null || \
+       awk -v dir="$fs_check_dir" 'index($2, dir) == 1 { for(i=4;i<=NF;i++) if($i ~ /ro/) { exit 0 } }' /proc/mounts 2>/dev/null; then
       is_read_only=true
     fi
   fi
   # Also check via mount command for systems without /proc/mounts
-  if [ "$is_read_only" = false ] && mount 2>/dev/null | grep -q " on ${fs_check_dir} .*ro[,[[:space:]]]"; then
+  if [ "$is_read_only" = false ] && mount 2>/dev/null | grep -F " on ${fs_check_dir} " | grep -q 'ro'; then
     is_read_only=true
   fi
   if [ "$is_read_only" = true ]; then
