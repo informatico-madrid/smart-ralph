@@ -199,7 +199,7 @@ Focus: 3 documentation typos and contradictory comments.
 
 Focus: 4 naming inconsistencies across plugin agent prompts and spec files.
 
-- [ ] 4.1 [P] Fix lock file naming in `external-reviewer.md` (Bug #35)
+- [x] 4.1 [P] Fix lock file naming in `external-reviewer.md` (Bug #35)
   - **Do**: Read `plugins/ralph-specum/agents/external-reviewer.md` lines 479 and 514. Replace `${basePath}/tasks.md.lock` with `${basePath}/.tasks.lock` to match the canonical naming convention.
   - **Files**: `plugins/ralph-specum/agents/external-reviewer.md`
   - **Done when**: Lines 479 and 514 use `.tasks.lock` instead of `tasks.md.lock`
@@ -208,7 +208,7 @@ Focus: 4 naming inconsistencies across plugin agent prompts and spec files.
   - _Requirements: US-4, AC-4.1_
   - _Design: Fix 12_
 
-- [ ] 4.2 [P] Normalize arrow notation in `spec-executor.md` (Bug #38)
+- [x] 4.2 [P] Normalize arrow notation in `spec-executor.md` (Bug #38)
   - **Do**: Read `plugins/ralph-specum/agents/spec-executor.md` line 91. Replace the arrow notation `.ralph-state.json → clarificationRequested[taskId]` with dot notation `.ralph-state.json.clarificationRequested[taskId]`. Also normalize shorthand `chat.lastReadLine` to full path `chat.executor.lastReadLine` where applicable.
   - **Files**: `plugins/ralph-specum/agents/spec-executor.md`
   - **Done when**: All state.json field paths use consistent dot notation (no `→` for field paths)
@@ -217,7 +217,7 @@ Focus: 4 naming inconsistencies across plugin agent prompts and spec files.
   - _Requirements: US-4, AC-4.2_
   - _Design: Fix 13_
 
-- [ ] 4.3 [P] Fix header casing and phase status (Bugs #47, #50)
+- [x] 4.3 [P] Fix header casing and phase status (Bugs #47, #50)
   - **Do**: Read `plugins/ralph-specum/references/loop-safety.md` line 85, change `### filesystem Health` to `### filesystemHealth`. Read `specs/.index/index-state.json` line 239, change `"phase": "complete"` to `"phase": "completed"`.
   - **Files**: `plugins/ralph-specum/references/loop-safety.md`, `specs/.index/index-state.json`
   - **Done when**: Header uses camelCase `filesystemHealth`, phase status uses `"completed"`

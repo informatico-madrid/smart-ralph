@@ -82,7 +82,7 @@
 }
 ```
 
-### filesystem Health
+### filesystemHealth
 ```json
 {
   "filesystemHealthy": true,
