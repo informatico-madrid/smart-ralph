@@ -46,7 +46,7 @@ test_checkpoint_create() {
   git -C "$tmp" commit -m init --no-verify >/dev/null 2>&1
   checkpoint-create "test" "1" "$sf" 2>/dev/null
   local sha=$(jq -r '.checkpoint.sha' "$sf")
-  assert_eq "$sha" "$sha" "sha is non-empty (${#sha} chars)" || true
+  [ ${#sha} -gt 0 ] || assert_fail "sha is empty"
   [ ${#sha} -ge 7 ] && { echo "  PASS: sha length ${#sha} >= 7"; ((PASSED++)); } || { echo "  FAIL: sha too short"; ((FAILED++)); }
   rm -rf "$tmp"
 }
