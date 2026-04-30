@@ -92,7 +92,8 @@ def _merge_by_key(base, override, key_name):
             continue
         key = item.get(key_name)
         if key is not None and key in index_by_key:
-            result[index_by_key[key]] = dict(item)
+            base_item = dict(result[index_by_key[key]])
+            result[index_by_key[key]] = deep_merge(dict(base_item), dict(item))
         else:
             if key is not None:
                 index_by_key[key] = len(result)
