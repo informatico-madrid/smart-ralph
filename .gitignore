@@ -48,6 +48,5 @@ node_modules/
 .claude/
 .cursor/
 .gemini/
-.github/
 .roo/
 .venv/
