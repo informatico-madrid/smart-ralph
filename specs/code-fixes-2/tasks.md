@@ -82,7 +82,7 @@ Focus: 8 confirmed runtime bugs that cause silent failures, CI blocks, or config
   - _Requirements: FR-006, AC-1.6_
   - _Design: Fix 6_
 
-- [ ] 1.8 [VERIFY] Quality gate: shell syntax, JSON validity, python syntax, SOLID check
+- [x] 1.8 [VERIFY] Quality gate: shell syntax, JSON validity, python syntax, SOLID check
   - **Do**: Run `/bmad-party-mode` with voices architect, dev, test architect, pm
     - Ask each agent to validate:
       1. SRP: Each function/file has single responsibility
