@@ -13,7 +13,7 @@ Focus: 8 confirmed runtime bugs that cause silent failures, CI blocks, or config
   - _Requirements: FR-001, AC-1.1_
   - _Design: Fix 1_
 
-- [x] 1.2 [P] Deep merge in `_merge_by_key()` (Bug #19)
+- [x] 1.2 [P] Deep merge in `_merge_by_key()` (Bug #19) - already fixed, verified
   - **Do**: Read `_bmad/scripts/resolve_config.py` line 95, replace `result[index_by_key[key]] = dict(item)` with `result[index_by_key[key]] = deep_merge(dict(base_item), dict(item))` where base_item comes from the base array
   - **Files**: `_bmad/scripts/resolve_config.py`
   - **Done when**: `_merge_by_key` calls `deep_merge` instead of `dict(item)` replacement
