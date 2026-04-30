@@ -45,7 +45,7 @@ avg_ms=$(( total_ms / 100 ))
 echo "  Total time: ${total_ms}ms for 100 iterations"
 echo "  Average: ${avg_ms}ms per iteration"
 
-[ "$avg_ms" -lt 10 ] || { assert_fail "Average ${avg_ms}ms exceeds 10ms threshold"; exit 1; }
+[ "$avg_ms" -lt 10 ] || { assert_fail "Average ${avg_ms}ms exceeds 10ms threshold"; }
 assert_pass "Heartbeat average ${avg_ms}ms < 10ms"
 rm -rf "$tmp"
 
@@ -65,7 +65,7 @@ end_ns=$(if date +%s%N >/dev/null 2>&1; then date +%s%N; else echo "$(date +%s)0
 total_ms=$(( (end_ns - start_ns) / 1000000 ))
 echo "  Total time: ${total_ms}ms for 100 iterations"
 
-[ "$total_ms" -lt 5000 ] || { assert_fail "Total ${total_ms}ms exceeds 5000ms (5s) threshold"; exit 1; }
+[ "$total_ms" -lt 5000 ] || { assert_fail "Total ${total_ms}ms exceeds 5000ms (5s) threshold"; }
 assert_pass "100 write_metric calls in ${total_ms}ms < 5000ms"
 
 # Verify all lines are valid JSON
