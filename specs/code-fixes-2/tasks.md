@@ -259,7 +259,7 @@ Focus: 5 requirements gaps including missing references, ambiguous terminology, 
   - _Requirements: US-5, AC-5.4_
   - _Design: Fix 15_
 
-- [ ] 5.2 [P] Add AC references and glossary clarification to `requirements.md` (Bugs #57, #58)
+- [x] 5.2 [P] Add AC references and glossary clarification to `requirements.md` (Bugs #57, #58)
   - **Do**: Read `specs/loop-safety-infra/requirements.md`. Add explicit AC references to the Maps to lines:
     - FR-002 (line ~114): Change `**Maps to**: US-1` to `**Maps to**: US-1 (AC-1.1, AC-1.2, AC-1.3)`
     - FR-003 (line ~127): Change `**Maps to**: US-2` to `**Maps to**: US-2 (AC-2.1, AC-2.2, AC-2.3, AC-2.4, AC-2.5, AC-2.6, AC-2.7)`
@@ -271,7 +271,7 @@ Focus: 5 requirements gaps including missing references, ambiguous terminology, 
   - _Requirements: US-5, AC-5.1, AC-5.2, AC-5.3_
   - _Design: Fix 15 (AC-5.1, AC-5.2, AC-5.3/AC-5.4)_
 
-- [ ] 5.3 [P] Add output file references to `plan.md` Interface Contracts (Bug #83)
+- [x] 5.3 [P] Add output file references to `plan.md` Interface Contracts (Bug #83)
   - **Do**: Read `specs/loop-safety-infra/plan.md` lines 21-26 (Writes section). Add output file references:
     - `references/loop-safety.md` — adds to `.ralph-state.json` (checkpoint.sha, checkpoint.timestamp, circuitBreaker.state)
     - `hooks/scripts/checkpoint.sh` — writes to `.ralph-state.json` (checkpoint.sha, checkpoint.timestamp)

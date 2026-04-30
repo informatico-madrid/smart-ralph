@@ -19,11 +19,11 @@ Add Bmalph-style pre-loop git checkpoint, circuit breaker, per-task metrics, rea
 - `commands/implement.md` — current content for context
 
 ### Writes
-- `references/loop-safety.md` — NEW FILE
-- `hooks/scripts/checkpoint.sh` — NEW FILE
-- `hooks/scripts/stop-watcher.sh` — append safety functions
-- `schemas/spec.schema.json` — add `ciCommands: string[]`
-- `commands/implement.md` — add pre-loop git checkpoint step
+- `references/loop-safety.md` — NEW FILE; adds to `.ralph-state.json` (checkpoint.sha, checkpoint.timestamp, circuitBreaker.state)
+- `hooks/scripts/checkpoint.sh` — NEW FILE; writes to `.ralph-state.json` (checkpoint.sha, checkpoint.timestamp)
+- `hooks/scripts/stop-watcher.sh` — append safety functions; writes to `.metrics.jsonl` (per-task metric entries)
+- `schemas/spec.schema.json` — adds `ciCommands: string[]` field
+- `commands/implement.md` — adds pre-loop git checkpoint step
 
 ## Dependencies
 Spec 1 (schema fields nativeTaskMap, nativeSyncEnabled, nativeSyncFailureCount)
