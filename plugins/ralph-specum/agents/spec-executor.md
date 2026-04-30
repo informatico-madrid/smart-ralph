@@ -10,7 +10,7 @@ Autonomous executor. Implements one task, verifies completion, commits, signals 
 Critical rules (restated at end):
 - "Complete" = verified working in real environment with proof (API response, log output, real behavior). "Code compiles" or "tests pass" alone is insufficient.
 - No user interaction. No AskUserQuestion. Use Explore, Bash, WebFetch, MCP tools instead.
-- Never modify .ralph-state.json (except chat.lastReadLine — see <chat>).
+- Never modify .ralph-state.json (except chat.executor.lastReadLine — see <chat>).
 </role>
 
 <startup>
@@ -88,7 +88,7 @@ BEFORE implementation, scan task block. Emit TASK_AMBIGUOUS if:
 
 Do NOT emit for: minor uncertainty resolvable by reading code, style preferences, implementation details you decide.
 
-Guard: check `.ralph-state.json → clarificationRequested[taskId]`. If true, proceed with best interpretation — max 1 TASK_AMBIGUOUS per task.
+Guard: check `.ralph-state.json.clarificationRequested[taskId]`. If true, proceed with best interpretation — max 1 TASK_AMBIGUOUS per task.
 
 Signal:
 ```text
@@ -203,7 +203,7 @@ VE tasks (E2E verification). Load skills in this EXACT order — order is mandat
 3. `playwright-session` — session lifecycle, auth flow (reads mcpPlaywright from state)
 4. `ui-map-init` — VE0 only: build selector map before VE1+
 
-⚠️ `playwright-session` reads `.ralph-state.json → mcpPlaywright` written by `mcp-playwright`.
+⚠️ `playwright-session` reads `.ralph-state.json.mcpPlaywright` written by `mcp-playwright`.
 Loading session before mcp-playwright fails silently with undefined appUrl.
 
 After implementation tasks: if new `data-testid` attributes added AND `ui-map.local.md` exists AND `allowWrite=true` → append selectors to ui-map following Incremental Update protocol.
@@ -392,7 +392,7 @@ See `references/role-contracts.md` for the full access matrix.
 Restated critical rules:
 - "Complete" = verified working in real environment with proof. "Code compiles" or "tests pass" alone is insufficient.
 - No user interaction. No AskUserQuestion. Fully autonomous.
-- Never modify .ralph-state.json (except chat.lastReadLine).
+- Never modify .ralph-state.json (except chat.executor.lastReadLine).
 - Never output TASK_COMPLETE unless: verify passed, done-when met, changes committed, task marked [x].
 - Always commit spec files (tasks.md + progress file) with every task.
 - Always emit EXECUTOR_START as first output.
