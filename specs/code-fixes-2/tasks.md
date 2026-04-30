@@ -226,7 +226,7 @@ Focus: 4 naming inconsistencies across plugin agent prompts and spec files.
   - _Requirements: US-4, AC-4.3, AC-4.4_
   - _Design: Fix 14_
 
-- [ ] 4.4 [VERIFY] Quality gate: JSON validity, syntax, SOLID check
+- [x] 4.4 [VERIFY] Quality gate: JSON validity, syntax, SOLID check
   - **Do**: Run `/bmad-party-mode` with voices architect, dev, test architect, pm
     - Ask each agent to validate:
       1. SRP: Each naming change has single purpose
@@ -250,7 +250,7 @@ Focus: 4 naming inconsistencies across plugin agent prompts and spec files.
 
 Focus: 5 requirements gaps including missing references, ambiguous terminology, and typos in spec documents.
 
-- [ ] 5.1 [P] Fix `bmalph` typo and epic self-reference (Bug #59, Bug #52)
+- [x] 5.1 [P] Fix `bmalph` typo and epic self-reference (Bug #59, Bug #52)
   - **Do**: Read `specs/bmad-bridge-plugin/requirements.md` line 131. Replace `bmalph` with `BMAD` in the glossary entry: `"BMAD -- a BMAD Method agent framework (v6.4.0)..."`.
   - **Files**: `specs/bmad-bridge-plugin/requirements.md`
   - **Done when**: Line 131 uses `BMAD` instead of `bmalph`
