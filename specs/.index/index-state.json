@@ -1,10 +1,10 @@
 {
   "version": "1.0",
-  "updated": "2026-04-29T14:13:15Z",
+  "updated": "2026-04-30T07:28:53Z",
   "directories": [
     {
       "path": "./specs",
-      "specsCount": 47,
+      "specsCount": 48,
       "isDefault": true
     }
   ],
@@ -236,7 +236,7 @@
     {
       "name": "ralph-quality-improvements",
       "path": "./specs/ralph-quality-improvements",
-      "phase": "completed",
+      "phase": "complete",
       "taskIndex": 27,
       "totalTasks": 27
     },
@@ -327,6 +327,13 @@
       "phase": "completed",
       "taskIndex": 56,
       "totalTasks": 56
+    },
+    {
+      "name": "code-fixes-2",
+      "path": "./specs/code-fixes-2",
+      "phase": "completed",
+      "taskIndex": 25,
+      "totalTasks": 25
     }
   ]
 }

@@ -3,15 +3,15 @@
 Auto-generated summary of all specs across configured directories.
 See [index-state.json](./index-state.json) for machine-readable data.
 
-**Last updated:** 2026-04-29T14:13:15Z
+**Last updated:** 2026-04-30T07:28:53Z
 
 ## Directories (1)
 
 | Directory | Specs | Default |
 |-----------|-------|---------|
-| ./specs | 47 | Yes |
+| ./specs | 48 | Yes |
 
-## All Specs (47)
+## All Specs (48)
 
 | Spec | Directory | Phase | Status |
 |------|-----------|-------|--------|
@@ -62,6 +62,7 @@ See [index-state.json](./index-state.json) for machine-readable data.
 | agent-chat-protocol | ./specs | completed | done |
 | gito-fix | ./specs | new |  |
 | gito-fixes | ./specs | completed | done |
+| code-fixes-2 | ./specs | completed | done |
 
 ---
 
