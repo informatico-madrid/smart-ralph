@@ -53,7 +53,7 @@ Count tasks using these exact commands:
 ```bash
 TOTAL=$(grep -c -e '- \[.\]' "$SPEC_PATH/tasks.md" 2>/dev/null || true)
 COMPLETED=$(grep -c -e '- \[x\]' "$SPEC_PATH/tasks.md" 2>/dev/null || true)
-FIRST_INCOMPLETE=$((COMPLETED))
+FIRST_INCOMPLETE=$((COMPLETED + 1))
 ```
 
 Key: Use `-e` flag so grep doesn't interpret the pattern's leading hyphen as an option.
@@ -330,6 +330,9 @@ Then Read and follow these references in order. They contain the complete coordi
 
   # Determine actual verify exit code (coordinator runs verify independently)
   VERIFY_EXIT=0  # default if verify not yet run this iteration
+
+  # Determine metric status from verification outcome
+  WRITE_METRIC_STATUS=$([ "$VERIFY_EXIT" -eq 0 ] && echo "pass" || echo "fail")
 
   # Extract task title and id from the delegated task block
   TASK_TITLE="$(sed -n "/^## Task $CURRENT_INDEX:/,/^-/p" "$SPEC_PATH/tasks.md" | head -1 | sed 's/^## Task [0-9]*: //')"

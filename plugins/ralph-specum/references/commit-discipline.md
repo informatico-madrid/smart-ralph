@@ -68,7 +68,7 @@ git diff --cached --quiet || git commit -m "chore(spec): update progress for tas
 ## What NOT to Include
 
 - `.ralph-state.json` - never committed, managed by coordinator
-- Lock files (`.tasks.lock`, `.git-commit.lock`) - temporary, cleaned up after batch
+- Lock files (`tasks.md.lock`, `.git-commit.lock`) - temporary, cleaned up after batch
 - Temp progress files (`.progress-task-*.md`) - merged into main .progress.md by coordinator
 
 ## File Locking for Parallel Commits
@@ -80,7 +80,7 @@ When running in parallel mode, use flock to prevent race conditions:
 (
   flock -x 200
   sed -i 's/- \[ \] X.Y/- [x] X.Y/' "<basePath>/tasks.md"
-) 200>"<basePath>/.tasks.lock"
+) 200>"<basePath>/tasks.md.lock"
 
 # git commit operations:
 (

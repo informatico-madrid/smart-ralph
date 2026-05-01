@@ -476,7 +476,7 @@ After writing any FAIL or WARNING to `task_review.md`, **immediately also**:
 2. **For FAIL only — unmark and annotate directly in tasks.md** using atomic flock:
    ```bash
    (
-     exec 201>"${basePath}/.tasks.lock"
+     exec 201>"${basePath}/tasks.md.lock"
      flock -e 201 || exit 1
      # Unmark + annotate inside Python to avoid sed regex issues with dots in TASK_ID
      # (e.g., "1.3.1" → sed treats "." as any char, matching wrong task)
@@ -511,7 +511,7 @@ for i, line in enumerate(lines):
         break
 open(tasks_md_path, 'w').write(''.join(lines))
 PY
-   ) 201>"${basePath}/.tasks.lock"
+   ) 201>"${basePath}/tasks.md.lock"
    ```
    Then increment `.ralph-state.json → external_unmarks[taskId]`.
 
@@ -702,12 +702,7 @@ constitutes a role boundary violation. Full matrix: `references/role-contracts.m
 - `.epic-state.json` — coordinator only
 - `task_review.md` — THIS agent only (writes review feedback)
 - Implementation files — read-only review scope
-- Lock files (`.tasks.lock`, `.git-commit.lock`, `chat.md.lock`) — auto-generated
-
-### Lock Files (Auto-Generated)
-
-- `.tasks.lock`, `.git-commit.lock`, `chat.md.lock` — these are created by the
-  flock mechanism. No agent should manually create, modify, or delete them.
+- Lock files (`tasks.md.lock`, `.git-commit.lock`, `chat.md.lock`) — auto-generated
 
 ### Read Boundaries (Advisory — Severity)
 

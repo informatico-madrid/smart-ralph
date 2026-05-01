@@ -26,14 +26,14 @@ and what each agent is explicitly forbidden from modifying. It complements the c
 |-------|-------|--------|----------|
 | spec-executor | All spec files, `.ralph-state.json`, channels | `.progress-task-*.md`, `chat.md`, `chat.executor.lastReadLine` | `.ralph-state.json` (except `chat.executor.lastReadLine`), `.epic-state.json`, spec meta files |
 | external-reviewer | `task_review.md`, `tasks.md`, `.ralph-state.json`, spec files | `task_review.md`, `tasks.md`, `chat.md`, `chat.reviewer.lastReadLine`, `external_unmarks` | `.ralph-state.json` (except `chat.reviewer.lastReadLine`, `external_unmarks`) |
-| qa-engineer | `.ralph-state.json` (taskIndex), spec files | _(read-only)_ | `.ralph-state.json` (except reading taskIndex) |
-| spec-reviewer | Spec content via delegation | _(read-only)_ | _(read-only)_ |
+| qa-engineer | .ralph-state.json (taskIndex), spec files | _(read-only)_ | N/A |
+| spec-reviewer | Spec content via delegation | _(read-only)_ | N/A |
 | architect-reviewer | Spec files, `.ralph-state.json` | `.ralph-state.json` (`awaitingApproval`) | `.ralph-state.json` (except `awaitingApproval`), `tasks.md`, task files |
 | product-manager | Spec files, `.ralph-state.json` | `.ralph-state.json` (`awaitingApproval`) | `.ralph-state.json` (except `awaitingApproval`), `tasks.md` |
 | research-analyst | Codebase, spec files, `.ralph-state.json` | `.ralph-state.json` (`awaitingApproval`) | `.ralph-state.json` (except `awaitingApproval`) |
 | task-planner | Spec files, `.ralph-state.json` | `.ralph-state.json` (`awaitingApproval`) | `.ralph-state.json` (except `awaitingApproval`), `tasks.md` |
 | refactor-specialist | Spec files, `.ralph-state.json` | _(read-only for state files; creates and updates spec markdown files)_ | `.ralph-state.json`, lock files |
-| triage-analyst | `.progress.md`, spec files | _(read-only)_ | `.ralph-state.json` |
+| triage-analyst | .progress.md, spec files | _(read-only)_ | N/A |
 | coordinator (human) | All | All | None |
 | stop-watcher.sh | `.ralph-state.json`, `.ralph-field-baseline.json` | _(read-only — does NOT modify files)_ | N/A |
 

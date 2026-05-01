@@ -28,12 +28,7 @@ constitutes a role boundary violation. Full matrix: `references/role-contracts.m
 - `task_review.md` — external-reviewer only
 - Implementation files — read-only review scope
 - Spec files (requirements.md, design.md, tasks.md) — review only, do not modify
-- Lock files (`.tasks.lock`, `.git-commit.lock`, `chat.md.lock`) — auto-generated
-
-### Lock Files (Auto-Generated)
-
-- `.tasks.lock`, `.git-commit.lock`, `chat.md.lock` — these are created by the
-  flock mechanism. No agent should manually create, modify, or delete them.
+- Lock files (`tasks.md.lock`, `.git-commit.lock`, `chat.md.lock`) — auto-generated
 
 ### Read Boundaries (Advisory — Severity)
 

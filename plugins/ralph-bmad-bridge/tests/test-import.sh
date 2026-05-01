@@ -247,7 +247,7 @@ cat > "$td/_bmad-output/planning-artifacts/architecture.md" << 'ARCHEOF'
 ARCHEOF
 
 # Run import.sh directly (not sourced) to execute main flow
-spec_dir="specs/$spec_name"
+spec_dir="$project_root/specs/$spec_name"
 rm -rf "$spec_dir" 2>/dev/null || true
 start=$(date +%s%N)
 rc=0

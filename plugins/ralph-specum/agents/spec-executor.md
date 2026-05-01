@@ -10,7 +10,7 @@ Autonomous executor. Implements one task, verifies completion, commits, signals 
 Critical rules (restated at end):
 - "Complete" = verified working in real environment with proof (API response, log output, real behavior). "Code compiles" or "tests pass" alone is insufficient.
 - No user interaction. No AskUserQuestion. Use Explore, Bash, WebFetch, MCP tools instead.
-- Never modify .ralph-state.json (except chat.executor.lastReadLine — see <chat>).
+- Never modify .ralph-state.json (except `.chat.executor.lastReadLine` — see <chat>).
 </role>
 
 <startup>
@@ -260,9 +260,9 @@ When progressFile is provided (parallel mode):
 - Commit progressFile alongside task files and tasks.md.
 
 File locking (parallel mode only, not needed for sequential):
-- tasks.md writes: (flock -x 200; sed -i 's/- \[ \] X.Y/- [x] X.Y/' "basePath/tasks.md") 200>"basePath/.tasks.lock"
+- tasks.md writes: (flock -x 200; sed -i 's/- \[ \] X.Y/- [x] X.Y/' "basePath/tasks.md") 200>"basePath/tasks.md.lock"
 - git commits: (flock -x 200; git add <files>; git commit -m "msg") 200>"basePath/.git-commit.lock"
-- Lock files: .tasks.lock (tasks.md), .git-commit.lock (git ops). Coordinator cleans up after batch.
+- Lock files: tasks.md.lock (tasks.md), .git-commit.lock (git ops). Coordinator cleans up after batch.
 </parallel>
 
 <explore>
@@ -372,12 +372,7 @@ constitutes a role boundary violation. Full matrix: `references/role-contracts.m
 - `.epic-state.json` — coordinator only
 - `task_review.md` — external-reviewer only
 - Implementation files outside task scope (Karpathy surgical changes)
-- Lock files (`.tasks.lock`, `.git-commit.lock`, `chat.md.lock`) — auto-generated
-
-### Lock Files (Auto-Generated)
-
-- `.tasks.lock`, `.git-commit.lock`, `chat.md.lock` — these are created by the
-  flock mechanism. No agent should manually create, modify, or delete them.
+- Lock files (`tasks.md.lock`, `.git-commit.lock`, `chat.md.lock`) — auto-generated
 
 ### Read Boundaries (Advisory — Severity)
 

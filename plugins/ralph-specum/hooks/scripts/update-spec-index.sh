@@ -99,8 +99,8 @@ while IFS='|' read -r name path; do
         # No state file - check what files exist to determine phase
         if [ -f "$path/tasks.md" ]; then
             # Count completed tasks
-            COMPLETED=$(grep -c '\- \[x\]' "$path/tasks.md" 2>/dev/null || echo 0)
-            TOTAL_TASKS=$(grep -c '\- \[.\]' "$path/tasks.md" 2>/dev/null || echo 0)
+            COMPLETED=$(grep -c '\- \[x\]' "$path/tasks.md" 2>/dev/null) || COMPLETED=0
+            TOTAL_TASKS=$(grep -c '\- \[.\]' "$path/tasks.md" 2>/dev/null) || TOTAL_TASKS=0
             if [ "$COMPLETED" -eq "$TOTAL_TASKS" ] && [ "$TOTAL_TASKS" -gt 0 ]; then
                 PHASE="completed"
             else
@@ -169,7 +169,7 @@ log "Updated $INDEX_DIR/index-state.json"
 
 # Generate human-readable index.md
 # Count directories
-DIR_COUNT=$(echo "$SPECS_DIRS" | grep -c . || echo 0)
+DIR_COUNT=$(echo "$SPECS_DIRS" | grep -c .) || DIR_COUNT=0
 
 cat > "$INDEX_DIR/index.md" << EOF
 # Spec Index
@@ -237,8 +237,8 @@ while IFS='|' read -r name path; do
     else
         # Determine from files
         if [ -f "$path/tasks.md" ]; then
-            COMPLETED=$(grep -c '\- \[x\]' "$path/tasks.md" 2>/dev/null || echo 0)
-            TOTAL=$(grep -c '\- \[.\]' "$path/tasks.md" 2>/dev/null || echo 0)
+            COMPLETED=$(grep -c '\- \[x\]' "$path/tasks.md" 2>/dev/null) || COMPLETED=0
+            TOTAL=$(grep -c '\- \[.\]' "$path/tasks.md" 2>/dev/null) || TOTAL=0
             if [ "$COMPLETED" -eq "$TOTAL" ] && [ "$TOTAL" -gt 0 ]; then
                 PHASE="completed"
                 STATUS="done"
