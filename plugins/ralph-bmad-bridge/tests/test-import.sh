@@ -2,8 +2,8 @@
 set -euo pipefail
 
 PLUGIN_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-TMPDIR=$(mktemp -d)
-trap 'rm -rf "$TMPDIR"' EXIT
+TEST_TMPDIR=$(mktemp -d)
+trap 'rm -rf "$TEST_TMPDIR"' EXIT
 
 passed=0
 failed=0
@@ -43,7 +43,7 @@ echo "  validate_inputs tests:"
 (
     # 3.2: reject missing BMAD path (expect non-zero, test passes if non-zero)
     # Use subshell wrapper because error_exit calls exit 1 which terminates the process
-    cat > "$TMPDIR/t32.sh" << 'SCRIPT'
+    cat > "$TEST_TMPDIR/t32.sh" << 'SCRIPT'
 source "${PLUGIN_ROOT}/scripts/import.sh"
 rc=0
 (validate_inputs "/does/not/exist" "my-spec" 2>/dev/null) || rc=$?
@@ -52,11 +52,11 @@ if [ "$rc" -ne 0 ]; then
 fi
 exit 1
 SCRIPT
-    run_test "validate_inputs rejects missing BMAD path" bash "$TMPDIR/t32.sh"
+    run_test "validate_inputs rejects missing BMAD path" bash "$TEST_TMPDIR/t32.sh"
 
     # 3.3: reject existing target directory
     # Use subshell wrapper because error_exit calls exit 1
-    cat > "$TMPDIR/t33.sh" << 'SCRIPT'
+    cat > "$TEST_TMPDIR/t33.sh" << 'SCRIPT'
 source "${PLUGIN_ROOT}/scripts/import.sh"
 bmad_tmp=$(mktemp -d)
 spec_name="existing-test-spec"
@@ -69,10 +69,10 @@ if [ "$rc" -ne 0 ]; then
 fi
 exit 1
 SCRIPT
-    run_test "validate_inputs rejects existing target dir" bash "$TMPDIR/t33.sh"
+    run_test "validate_inputs rejects existing target dir" bash "$TEST_TMPDIR/t33.sh"
 
     # 3.4: accept valid inputs (expect zero, test passes if zero)
-    cat > "$TMPDIR/t34.sh" << 'SCRIPT'
+    cat > "$TEST_TMPDIR/t34.sh" << 'SCRIPT'
 source "${PLUGIN_ROOT}/scripts/import.sh"
 bmad_tmp=$(mktemp -d -p "$(dirname "$PLUGIN_ROOT")")
 spec_name="valid-test-spec-xx"
@@ -82,13 +82,13 @@ fi
 rm -rf "$bmad_tmp"
 exit 1
 SCRIPT
-    run_test "validate_inputs accepts valid inputs" bash "$TMPDIR/t34.sh"
+    run_test "validate_inputs accepts valid inputs" bash "$TEST_TMPDIR/t34.sh"
 )
 
 echo "  parse_prd_frs tests:"
 (
     # 3.5: parse_prd_frs extracts FRs from fixture PRD
-    cat > "$TMPDIR/t35.sh" << 'SCRIPT'
+    cat > "$TEST_TMPDIR/t35.sh" << 'SCRIPT'
 source "${PLUGIN_ROOT}/scripts/import.sh"
 prd_tmp=$(mktemp -d)
 req_tmp=$(mktemp)
@@ -109,13 +109,13 @@ grep -q '## Functional Requirements' "$req_tmp" || rc=1
 rm -rf "$prd_tmp" "$req_tmp"
 exit $rc
 SCRIPT
-    run_test "parse_prd_frs extracts FRs from fixture PRD" bash "$TMPDIR/t35.sh"
+    run_test "parse_prd_frs extracts FRs from fixture PRD" bash "$TEST_TMPDIR/t35.sh"
 )
 
 echo "  write_frontmatter tests:"
 (
     # 3.6: write_frontmatter produces valid YAML frontmatter
-    cat > "$TMPDIR/t36.sh" << 'SCRIPT'
+    cat > "$TEST_TMPDIR/t36.sh" << 'SCRIPT'
 source "${PLUGIN_ROOT}/scripts/import.sh"
 tmpfile=$(mktemp)
 write_frontmatter "$tmpfile" "requirements" "test-spec"
@@ -133,13 +133,13 @@ tail -1 "$tmpfile" | grep -q '^---$' || rc=1
 rm -f "$tmpfile"
 exit $rc
 SCRIPT
-    run_test "write_frontmatter produces valid YAML frontmatter" bash "$TMPDIR/t36.sh"
+    run_test "write_frontmatter produces valid YAML frontmatter" bash "$TEST_TMPDIR/t36.sh"
 )
 
 echo "  parse_prd_nfrs tests:"
 (
     # 3.7: parse_prd_nfrs extracts NFR subsections with ### headings preserved
-    cat > "$TMPDIR/t37.sh" << 'SCRIPT'
+    cat > "$TEST_TMPDIR/t37.sh" << 'SCRIPT'
 source "${PLUGIN_ROOT}/scripts/import.sh"
 prd_tmp=$(mktemp -d)
 req_tmp=$(mktemp)
@@ -170,13 +170,13 @@ grep -q '### Security' "$req_tmp" || rc=1
 rm -rf "$prd_tmp" "$req_tmp"
 exit $rc
 SCRIPT
-    run_test "parse_prd_nfrs extracts NFR subsections" bash "$TMPDIR/t37.sh"
+    run_test "parse_prd_nfrs extracts NFR subsections" bash "$TEST_TMPDIR/t37.sh"
 )
 
 echo "  parse_architecture tests:"
 (
     # 3.8: parse_architecture maps sections correctly
-    cat > "$TMPDIR/t38.sh" << 'SCRIPT'
+    cat > "$TEST_TMPDIR/t38.sh" << 'SCRIPT'
 source "${PLUGIN_ROOT}/scripts/import.sh"
 SPEC_DIR=$(mktemp -d)
 arch_tmp=$(mktemp -d)
@@ -200,14 +200,14 @@ grep -q 'src/api/' "$SPEC_DIR/design.md" || rc=1
 rm -rf "$SPEC_DIR" "$arch_tmp"
 exit $rc
 SCRIPT
-    run_test "parse_architecture maps sections correctly" bash "$TMPDIR/t38.sh"
+    run_test "parse_architecture maps sections correctly" bash "$TEST_TMPDIR/t38.sh"
 )
 
 echo "  integration tests:"
 (
     # 3.9: full flow integration test with latency and data integrity
     # BMAD root must be within project root (validate_inputs check)
-    cat > "$TMPDIR/t39.sh" << 'SCRIPT'
+    cat > "$TEST_TMPDIR/t39.sh" << 'SCRIPT'
 import_sh="${PLUGIN_ROOT}/scripts/import.sh"
 project_root="$(cd "${PLUGIN_ROOT}/../.." && pwd)"
 td=$(mktemp -d "$project_root/tmp_bmad_XXXXXX")
@@ -287,15 +287,16 @@ echo "$OUTPUT" | grep -q '2 stories extracted' || check_rc=1
 [ $elapsed -lt 5000 ] || check_rc=1
 
 rc=$(( rc + check_rc ))
-rm -rf "$td" "$spec_dir" "$project_root/tmp_bmad_"*
+rm -rf "$td" "$spec_dir"
+find "$project_root" -maxdepth 1 -type d -name 'tmp_bmad_*' -exec rm -rf {} + 2>/dev/null || true
 exit $rc
 SCRIPT
-    run_test "full flow integration test with latency (< 5s)" bash "$TMPDIR/t39.sh"
+    run_test "full flow integration test with latency (< 5s)" bash "$TEST_TMPDIR/t39.sh"
 )
 
 (
     # 3.10: validate_output validates frontmatter — missing frontmatter causes failure
-    cat > "$TMPDIR/t30.sh" << 'SCRIPT'
+    cat > "$TEST_TMPDIR/t30.sh" << 'SCRIPT'
 import_sh="${PLUGIN_ROOT}/scripts/import.sh"
 td=$(mktemp -d)
 mkdir -p "$td"
@@ -319,13 +320,13 @@ if [ "$rc" -ne 0 ]; then
 fi
 exit 1
 SCRIPT
-    run_test "validate_output detects missing frontmatter and exits non-zero" bash "$TMPDIR/t30.sh"
+    run_test "validate_output detects missing frontmatter and exits non-zero" bash "$TEST_TMPDIR/t30.sh"
 )
 
 echo "  parse_epics error scenario tests:"
 (
     # 3.11: parse_epics extracts stories from fixture epics.md
-    cat > "$TMPDIR/t311.sh" << 'SCRIPT'
+    cat > "$TEST_TMPDIR/t311.sh" << 'SCRIPT'
 import_sh="${PLUGIN_ROOT}/scripts/import.sh"
 td=$(mktemp -d)
 cat > "$td/epics.md" << 'EPICEOF'
@@ -358,10 +359,10 @@ grep -q 'Phase 1:' "$td/tasks.md" || rc=1
 rm -rf "$td"
 exit $rc
 SCRIPT
-    run_test "parse_epics extracts stories from fixture epics.md" bash "$TMPDIR/t311.sh"
+    run_test "parse_epics extracts stories from fixture epics.md" bash "$TEST_TMPDIR/t311.sh"
 
     # 3.12: error scenario — graceful degradation with missing artifacts
-    cat > "$TMPDIR/t312.sh" << 'SCRIPT'
+    cat > "$TEST_TMPDIR/t312.sh" << 'SCRIPT'
 import_sh="${PLUGIN_ROOT}/scripts/import.sh"
 project_root="$(cd "${PLUGIN_ROOT}/../.." && pwd)"
 td=$(mktemp -d "$project_root/tmp_bmad_XXXXXX")
@@ -392,16 +393,17 @@ echo "$OUTPUT" | grep -q 'No architecture.md found' || rc=1
 [ -f "$project_root/specs/$spec_name/.ralph-state.json" ] || rc=1
 # Requirements should have FR-1 from PRD
 grep -q 'FR-1' "$project_root/specs/$spec_name/requirements.md" || rc=1
-rm -rf "$td" "$project_root/specs/$spec_name" "$project_root/tmp_bmad_"*
+rm -rf "$td" "$project_root/specs/$spec_name"
+find "$project_root" -maxdepth 1 -type d -name 'tmp_bmad_*' -exec rm -rf {} + 2>/dev/null || true
 exit $rc
 SCRIPT
-    run_test "import.sh handles missing epics.md and architecture.md gracefully" bash "$TMPDIR/t312.sh"
+    run_test "import.sh handles missing epics.md and architecture.md gracefully" bash "$TEST_TMPDIR/t312.sh"
 )
 
 echo "  parse_prd_frs edge case tests:"
 (
     # 3.13: parse_prd_frs skips malformed FR lines
-    cat > "$TMPDIR/t313.sh" << 'SCRIPT'
+    cat > "$TEST_TMPDIR/t313.sh" << 'SCRIPT'
 import_sh="${PLUGIN_ROOT}/scripts/import.sh"
 td=$(mktemp -d)
 cat > "$td/prd.md" << 'PRDEOF'
@@ -436,13 +438,13 @@ grep -q '4 items extracted' "$td/reqs.md" || rc=1
 rm -rf "$td"
 exit $rc
 SCRIPT
-    run_test "parse_prd_frs skips malformed FR lines" bash "$TMPDIR/t313.sh"
+    run_test "parse_prd_frs skips malformed FR lines" bash "$TEST_TMPDIR/t313.sh"
 )
 
 echo "  parse_epics edge case tests:"
 (
     # 3.14: parse_epics handles story blocks without Given/When/Then ACs
-    cat > "$TMPDIR/t314.sh" << 'SCRIPT'
+    cat > "$TEST_TMPDIR/t314.sh" << 'SCRIPT'
 import_sh="${PLUGIN_ROOT}/scripts/import.sh"
 td=$(mktemp -d)
 cat > "$td/epics.md" << 'EPICEOF'
@@ -479,7 +481,7 @@ grep -q 'total_tasks: 2' "$td/tasks.md" || rc=1
 rm -rf "$td"
 exit $rc
 SCRIPT
-    run_test "parse_epics handles story blocks without ACs" bash "$TMPDIR/t314.sh"
+    run_test "parse_epics handles story blocks without ACs" bash "$TEST_TMPDIR/t314.sh"
 )
 
 echo ""

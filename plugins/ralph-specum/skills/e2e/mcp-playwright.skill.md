@@ -102,14 +102,14 @@ read-modify-write to prevent corruption if two VE tasks ever run in parallel:
   flock -x 200
   jq '.mcpPlaywright = "available"' <basePath>/.ralph-state.json > /tmp/state.json \
     && mv /tmp/state.json <basePath>/.ralph-state.json
-) 200><basePath>/tasks.md.lock
+) 200><basePath>/.tasks.lock
 
 # If MISSING:
 (
   flock -x 200
   jq '.mcpPlaywright = "missing"' <basePath>/.ralph-state.json > /tmp/state.json \
     && mv /tmp/state.json <basePath>/.ralph-state.json
-) 200><basePath>/tasks.md.lock
+) 200><basePath>/.tasks.lock
 ```
 
 ### Decision tree after check

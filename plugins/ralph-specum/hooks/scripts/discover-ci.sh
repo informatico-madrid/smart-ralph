@@ -16,7 +16,7 @@ discover_ci_commands() {
       # Extract content after "- run:" from each workflow file
       { grep -E '^\s+-\s+run:' "$wf" 2>/dev/null \
           | sed -E 's/^[[:space:]]*-[[:space:]]+run:[[:space:]]*//' \
-          | while IFS= read -r line; do
+          | while IFS= read -r line || [[ -n "$line" ]]; do
               [ -z "$line" ] && continue
               # Skip YAML block scalar indicators and comments
               case "$line" in

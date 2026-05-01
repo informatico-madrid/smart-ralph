@@ -144,7 +144,7 @@ MSGEOF
 
 Update lastReadLine after reading:
 ```bash
-jq --argjson idx N '.chat.executor.lastReadLine = $idx' <basePath>/.ralph-state.json > /tmp/state.json && mv /tmp/state.json <basePath>/.ralph-state.json
+jq --argjson idx N '.chat.executor.lastReadLine = $idx' "${basePath}/.ralph-state.json" > /tmp/state.json && mv /tmp/state.json "${basePath}/.ralph-state.json"
 ```
 
 When to write: architectural decisions, cross-task dependencies, design rationale, task completion notices.
@@ -255,13 +255,13 @@ Before implementing typed Python/TypeScript tasks, verify type annotations match
 
 <parallel>
 When progressFile is provided (parallel mode):
-- Write learnings and completed entries to basePath/<progressFile> instead of .progress.md.
+- Write learnings and completed entries to "${basePath}/<progressFile>" instead of .progress.md.
 - Do not touch .progress.md. Still update tasks.md.
 - Commit progressFile alongside task files and tasks.md.
 
 File locking (parallel mode only, not needed for sequential):
-- tasks.md writes: (flock -x 200; sed -i 's/- \[ \] X.Y/- [x] X.Y/' "basePath/tasks.md") 200>"basePath/tasks.md.lock"
-- git commits: (flock -x 200; git add <files>; git commit -m "msg") 200>"basePath/.git-commit.lock"
+- tasks.md writes: (flock -x 200; sed -i 's/- \[ \] X.Y/- [x] X.Y/' "${basePath}/tasks.md") 200>"${basePath}/tasks.md.lock"
+- git commits: (flock -x 200; git add <files>; git commit -m "msg") 200>"${basePath}/.git-commit.lock"
 - Lock files: tasks.md.lock (tasks.md), .git-commit.lock (git ops). Coordinator cleans up after batch.
 </parallel>
 

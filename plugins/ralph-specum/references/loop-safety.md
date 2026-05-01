@@ -32,7 +32,7 @@
 1. Read `.ralph-state.json`
 2. Inspect `circuitBreaker.trippedReason` for failure cause
 3. Fix underlying issue
-4. Manually reset: `jq '.circuitBreaker.state = "closed" | .circuitBreaker.consecutiveFailures = 0' .ralph-state.json > tmp && mv tmp .ralph-state.json`
+4. Manually reset: `jq '.circuitBreaker.state = "closed" | .circuitBreaker.consecutiveFailures = 0 | .circuitBreaker.openedAt = null | .circuitBreaker.sessionStartTime = now | strftime("%Y-%m-%dT%H:%M:%SZ")' .ralph-state.json > tmp && mv tmp .ralph-state.json`
 5. Resume with `/ralph-specum:implement`
 
 ### Filesystem Health Recovery

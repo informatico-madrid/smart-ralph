@@ -104,7 +104,7 @@ if [ -n "$TRANSCRIPT_PATH" ] && [ -f "$TRANSCRIPT_PATH" ]; then
             LAST_COMPLETE_LINE=$(grep -n 'ALL_TASKS_COMPLETE' "$TRANSCRIPT_PATH" 2>/dev/null | tail -1 | cut -d: -f1)
             if [ -n "$LAST_COMPLETE_LINE" ]; then
                 SWEEP_ALREADY_DONE=$(tail -n +"$LAST_COMPLETE_LINE" "$TRANSCRIPT_PATH" 2>/dev/null \
-                    | grep -cE '(^|\W)REGRESSION_SWEEP_COMPLETE(\W|$)' || echo "0")
+                    | grep -cE '(^|\W)REGRESSION_SWEEP_COMPLETE(\W|$)' || true)
             else
                 SWEEP_ALREADY_DONE="0"
             fi
@@ -595,7 +595,7 @@ fi
 if [ "$PHASE" = "execution" ] && [ "$TASK_INDEX" -ge "$TOTAL_TASKS" ] && [ "$TOTAL_TASKS" -gt 0 ]; then
     TASKS_FILE="$CWD/$SPEC_PATH/tasks.md"
     if [ -f "$TASKS_FILE" ]; then
-        UNCHECKED=$(grep -c '^[[:space:]]*- \[ \]' "$TASKS_FILE" 2>/dev/null || echo "0")
+        UNCHECKED=$(grep -c '^[[:space:]]*- \[ \]' "$TASKS_FILE" 2>/dev/null || true)
         if [ "$UNCHECKED" -gt 0 ]; then
             echo "[ralph-specum] State says complete but tasks.md has $UNCHECKED unchecked items" >&2
             REASON=$(cat <<EOF
