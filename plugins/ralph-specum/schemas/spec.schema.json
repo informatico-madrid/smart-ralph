@@ -262,6 +262,7 @@
             },
             "timestamp": {
               "type": ["string", "null"],
+              "format": "date-time",
               "description": "ISO 8601 UTC timestamp when checkpoint was created"
             },
             "branch": {
@@ -328,6 +329,7 @@
         },
         "lastFilesystemCheck": {
           "type": ["string", "null"],
+          "format": "date-time",
           "description": "Timestamp of last filesystem health check"
         },
         "ciCommands": {

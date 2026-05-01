@@ -184,10 +184,12 @@ _write_checkpoint() {
   fi
 
   # Merge with existing state if present, otherwise create new
-  local existing
-  existing="$(cat "$state_file" 2>/dev/null || echo '{}')"
+  local existing="{}"
+  if [ -f "$state_file" ] && [ -s "$state_file" ]; then
+    existing="$(cat "$state_file")"
+  fi
 
-  echo "$existing" | jq \
+  printf '%s\n' "$existing" | jq \
     --argjson sha "$sha_json" \
     --argjson ts "$ts_json" \
     --argjson branch "$branch_json" \

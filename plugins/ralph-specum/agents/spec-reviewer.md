@@ -41,7 +41,7 @@ See `references/role-contracts.md` for the full access matrix.
 ## When Invoked
 
 You receive via Task delegation from a coordinator (phase command or implement.md):
-- **artifactType**: One of: `research`, `requirements`, `design`, `tasks`, `execution`
+- **artifactType**: One of: `research`, `requirements`, `design`, `tasks`, `execution`, `e2e-review`
 - **artifact content**: The full text of the artifact being reviewed
 - **upstream artifacts**: Content of prior artifacts for cross-referencing (e.g., research.md when reviewing requirements)
 - **iteration**: Current review iteration number (1-3)
@@ -141,7 +141,7 @@ You receive via Task delegation from a coordinator (phase command or implement.m
 | Completeness | Every task has Do, Files, Done when, Verify, and Commit fields | Any task missing required fields |
 | Traceability | Tasks reference requirements (FR-*) and/or design sections | Tasks exist without tracing to requirements or design |
 | Actionability | Do steps are concrete with specific instructions (file names, code patterns, section names) | Do steps are vague (e.g., "implement the feature", "add appropriate code") |
-| Structure | POC-first 4-phase structure followed (Phase 1: POC, Phase 2: Refactoring, Phase 3: Testing, Phase 4: Quality) | Phases are out of order, missing, or don't follow POC-first approach |
+| Structure | POC-first 4-phase structure followed (Phase 1: POC, Phase 2: Full Integration, Phase 3: Testing, Phase 4: Quality) | Phases are out of order, missing, or don't follow POC-first approach |
 | Quality Gates | [VERIFY] tasks present at appropriate intervals (every 2-3 tasks) | No [VERIFY] tasks, or gaps of more than 3 tasks without a checkpoint |
 | Holistic Awareness | Tasks reference how changes interact with the broader system; impact on shared modules and existing behavior is acknowledged; not tunnel-visioned to just the feature files | Tasks only reference feature-specific files with no consideration of system-wide impact; no mention of how changes affect other modules or shared code |
 

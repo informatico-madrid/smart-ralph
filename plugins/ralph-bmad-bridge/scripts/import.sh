@@ -43,7 +43,7 @@ function validate_inputs() {
 
     local project_root
     project_root="$(cd . && pwd)"
-    if [[ "$abs_bmad_root" != "$project_root"* && "$abs_bmad_root" != "$project_root" ]]; then
+    if [[ "$abs_bmad_root" != "$project_root" && "$abs_bmad_root" != "$project_root/"* ]]; then
         error_exit "BMAD root must be within project root (resolved to '$abs_bmad_root')"
     fi
 
@@ -110,8 +110,8 @@ function parse_prd_frs() {
     } | extract_fr_lines > "$output_path"
 
     local count
-    count=$(tail -1 "$output_path")
-    echo "$count" | grep -o '^[0-9]*'
+    count=$(tail -1 "$output_path" 2>/dev/null || echo "0 items extracted.")
+    echo "${count%% *}" | grep -o '^[0-9]*' || true
 
     return 0
 }
@@ -518,7 +518,7 @@ write_arch_table() {
             if (lower ~ hp) { in_block = 1; label = h; next }
             else { in_block = 0 }
         }
-        in_block && /^- / { line = $0; sub(/^- /, "", line); sub(/\n$/, "", line); printf "| %s | %s |\n", label, line }
+        in_block && /^- / { line = $0; sub(/^- /, "", line); sub(/\n$/, "", line); printf "| %s | %s |\n", label, line; next }
         in_block && /^[^#]/ && !/^$/ { printf "| %s | %s |\n", label, $0 }
         ' "$arch_path"
     else
@@ -799,13 +799,8 @@ function generate_tasks() {
         parse_epics "$epics_path" "$epics_tmp" "$spec_name" 2>/dev/null
 
         # Build output: frontmatter + Phase 1 from parse_epics (stripped of its frontmatter/footer) + Phase 2-5 placeholders
+        write_frontmatter "$tasks_file" "tasks" "$spec_name" "$STORY_COUNT"
         {
-            echo '---'
-            echo "spec: ${spec_name}"
-            echo "phase: tasks"
-            echo "created: $(date -Iseconds)"
-            echo "total_tasks: ${STORY_COUNT}"
-            echo '---'
             echo ""
             echo "# Tasks: ${spec_name}"
             echo ""
@@ -828,7 +823,7 @@ function generate_tasks() {
             echo "## Phase 5: PR Lifecycle"
             echo ""
             echo "TODO: CI and review"
-        } > "$tasks_file"
+        } >> "$tasks_file"
 
         rm -f "$epics_tmp"
     else

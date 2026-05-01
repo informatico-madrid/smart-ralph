@@ -60,12 +60,12 @@ write_metric() {
   # --- Generate unique event ID: {task_index}-{task_iteration}-{epoch_ns} ---
   # Uses date +%s%N for nanosecond precision (macOS fallback via python3).
   local epoch_ns
-  if epoch_ns="$(date +%s%N 2>/dev/null)" && [ -n "$epoch_ns" ] && [ "$epoch_ns" != "N" ]; then
+  if epoch_ns="$(date +%s%N 2>/dev/null)" && [[ "$epoch_ns" =~ ^[0-9]+$ ]]; then
     : # Linux: date +%s%N produces epoch in nanoseconds
-  elif epoch_ns="$(python3 -c 'import time; print(int(time.time()*1000000000))' 2>/dev/null)" && [ -n "$epoch_ns" ]; then
+  elif epoch_ns="$(python3 -c 'import time; print(int(time.time()*1000000000))' 2>/dev/null)" && [[ "$epoch_ns" =~ ^[0-9]+$ ]]; then
     : # macOS fallback: python3 produces epoch * 1e9
   else
-    epoch_ns="$(date +%s 2>/dev/null || echo 0)"000000000 # Final fallback: epoch seconds + padding
+    epoch_ns="$(date +%s 2>/dev/null || echo 0)000000000" # Final fallback: epoch seconds + padding
   fi
   local event_id="${task_index}-${task_iteration}-${epoch_ns}"
 

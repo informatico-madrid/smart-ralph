@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+PLUGIN_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 TMPDIR=$(mktemp -d)
 trap 'rm -rf "$TMPDIR"' EXIT
 
@@ -43,7 +44,7 @@ echo "  validate_inputs tests:"
     # 3.2: reject missing BMAD path (expect non-zero, test passes if non-zero)
     # Use subshell wrapper because error_exit calls exit 1 which terminates the process
     cat > "$TMPDIR/t32.sh" << 'SCRIPT'
-source "/mnt/bunker_data/ai/smart-ralph/plugins/ralph-bmad-bridge/scripts/import.sh"
+source "${PLUGIN_ROOT}/scripts/import.sh"
 rc=0
 (validate_inputs "/does/not/exist" "my-spec" 2>/dev/null) || rc=$?
 if [ "$rc" -ne 0 ]; then
@@ -56,13 +57,13 @@ SCRIPT
     # 3.3: reject existing target directory
     # Use subshell wrapper because error_exit calls exit 1
     cat > "$TMPDIR/t33.sh" << 'SCRIPT'
-source "/mnt/bunker_data/ai/smart-ralph/plugins/ralph-bmad-bridge/scripts/import.sh"
+source "${PLUGIN_ROOT}/scripts/import.sh"
 bmad_tmp=$(mktemp -d)
 spec_name="existing-test-spec"
-mkdir -p "/mnt/bunker_data/ai/smart-ralph/specs/$spec_name"
+mkdir -p "${PLUGIN_ROOT}/../specs/$spec_name"
 rc=0
 (validate_inputs "$bmad_tmp" "$spec_name" 2>/dev/null) || rc=$?
-rm -rf "/mnt/bunker_data/ai/smart-ralph/specs/$spec_name" "$bmad_tmp"
+rm -rf "${PLUGIN_ROOT}/../specs/$spec_name" "$bmad_tmp"
 if [ "$rc" -ne 0 ]; then
     exit 0
 fi
@@ -72,8 +73,8 @@ SCRIPT
 
     # 3.4: accept valid inputs (expect zero, test passes if zero)
     cat > "$TMPDIR/t34.sh" << 'SCRIPT'
-source "/mnt/bunker_data/ai/smart-ralph/plugins/ralph-bmad-bridge/scripts/import.sh"
-bmad_tmp=$(mktemp -d -p /mnt/bunker_data/ai/smart-ralph)
+source "${PLUGIN_ROOT}/scripts/import.sh"
+bmad_tmp=$(mktemp -d -p "$(dirname "$PLUGIN_ROOT")")
 spec_name="valid-test-spec-xx"
 if validate_inputs "$bmad_tmp" "$spec_name" 2>/dev/null; then
     exit 0
@@ -88,7 +89,7 @@ echo "  parse_prd_frs tests:"
 (
     # 3.5: parse_prd_frs extracts FRs from fixture PRD
     cat > "$TMPDIR/t35.sh" << 'SCRIPT'
-source "/mnt/bunker_data/ai/smart-ralph/plugins/ralph-bmad-bridge/scripts/import.sh"
+source "${PLUGIN_ROOT}/scripts/import.sh"
 prd_tmp=$(mktemp -d)
 req_tmp=$(mktemp)
 cat > "$prd_tmp/prd.md" << 'PRDEOF'
@@ -115,7 +116,7 @@ echo "  write_frontmatter tests:"
 (
     # 3.6: write_frontmatter produces valid YAML frontmatter
     cat > "$TMPDIR/t36.sh" << 'SCRIPT'
-source "/mnt/bunker_data/ai/smart-ralph/plugins/ralph-bmad-bridge/scripts/import.sh"
+source "${PLUGIN_ROOT}/scripts/import.sh"
 tmpfile=$(mktemp)
 write_frontmatter "$tmpfile" "requirements" "test-spec"
 rc=0
@@ -139,7 +140,7 @@ echo "  parse_prd_nfrs tests:"
 (
     # 3.7: parse_prd_nfrs extracts NFR subsections with ### headings preserved
     cat > "$TMPDIR/t37.sh" << 'SCRIPT'
-source "/mnt/bunker_data/ai/smart-ralph/plugins/ralph-bmad-bridge/scripts/import.sh"
+source "${PLUGIN_ROOT}/scripts/import.sh"
 prd_tmp=$(mktemp -d)
 req_tmp=$(mktemp)
 cat > "$prd_tmp/prd.md" << 'PRDEOF'
@@ -176,7 +177,7 @@ echo "  parse_architecture tests:"
 (
     # 3.8: parse_architecture maps sections correctly
     cat > "$TMPDIR/t38.sh" << 'SCRIPT'
-source "/mnt/bunker_data/ai/smart-ralph/plugins/ralph-bmad-bridge/scripts/import.sh"
+source "${PLUGIN_ROOT}/scripts/import.sh"
 SPEC_DIR=$(mktemp -d)
 arch_tmp=$(mktemp -d)
 cat > "$arch_tmp/architecture.md" << 'ARCHEOF'
@@ -207,8 +208,8 @@ echo "  integration tests:"
     # 3.9: full flow integration test with latency and data integrity
     # BMAD root must be within project root (validate_inputs check)
     cat > "$TMPDIR/t39.sh" << 'SCRIPT'
-import_sh="/mnt/bunker_data/ai/smart-ralph/plugins/ralph-bmad-bridge/scripts/import.sh"
-project_root="/mnt/bunker_data/ai/smart-ralph"
+import_sh="${PLUGIN_ROOT}/scripts/import.sh"
+project_root="$(cd "${PLUGIN_ROOT}/../.." && pwd)"
 td=$(mktemp -d "$project_root/tmp_bmad_XXXXXX")
 spec_name="integration-test-xx"
 
@@ -280,7 +281,7 @@ grep -q 'Story' "$spec_dir/tasks.md" || check_rc=1
 jq -e '.totalTasks >= 2' "$spec_dir/.ralph-state.json" >/dev/null 2>&1 || check_rc=1
 
 # CRITICAL: Verify summary output shows correct story count (not "0 stories")
-echo "$OUTPUT" | grep -q '2 stories extracted' || echo "$OUTPUT" | grep -q 'stories extracted' || check_rc=1
+echo "$OUTPUT" | grep -q '2 stories extracted' || check_rc=1
 
 # Check latency < 5000ms
 [ $elapsed -lt 5000 ] || check_rc=1
@@ -295,7 +296,7 @@ SCRIPT
 (
     # 3.10: validate_output validates frontmatter — missing frontmatter causes failure
     cat > "$TMPDIR/t30.sh" << 'SCRIPT'
-import_sh="/mnt/bunker_data/ai/smart-ralph/plugins/ralph-bmad-bridge/scripts/import.sh"
+import_sh="${PLUGIN_ROOT}/scripts/import.sh"
 td=$(mktemp -d)
 mkdir -p "$td"
 # Create requirements.md missing frontmatter (no spec/phase/created fields)
@@ -325,7 +326,7 @@ echo "  parse_epics error scenario tests:"
 (
     # 3.11: parse_epics extracts stories from fixture epics.md
     cat > "$TMPDIR/t311.sh" << 'SCRIPT'
-import_sh="/mnt/bunker_data/ai/smart-ralph/plugins/ralph-bmad-bridge/scripts/import.sh"
+import_sh="${PLUGIN_ROOT}/scripts/import.sh"
 td=$(mktemp -d)
 cat > "$td/epics.md" << 'EPICEOF'
 # Epics
@@ -346,9 +347,8 @@ EPICEOF
 bash -c "
 source '$import_sh'
 parse_epics '$td/epics.md' '$td/tasks.md' 2>/dev/null
-exit 0
-"
-rc=0
+" || rc=$?
+rc=${rc:-0}
 grep -q 'Story 1.1' "$td/tasks.md" || rc=1
 grep -q 'Story 1.2' "$td/tasks.md" || rc=1
 grep -q 'Given' "$td/tasks.md" || rc=1
@@ -362,8 +362,8 @@ SCRIPT
 
     # 3.12: error scenario — graceful degradation with missing artifacts
     cat > "$TMPDIR/t312.sh" << 'SCRIPT'
-import_sh="/mnt/bunker_data/ai/smart-ralph/plugins/ralph-bmad-bridge/scripts/import.sh"
-project_root="/mnt/bunker_data/ai/smart-ralph"
+import_sh="${PLUGIN_ROOT}/scripts/import.sh"
+project_root="$(cd "${PLUGIN_ROOT}/../.." && pwd)"
 td=$(mktemp -d "$project_root/tmp_bmad_XXXXXX")
 # Create BMAD root with PRD but NO epics.md or architecture.md
 mkdir -p "$td/_bmad-output/planning-artifacts"
@@ -402,7 +402,7 @@ echo "  parse_prd_frs edge case tests:"
 (
     # 3.13: parse_prd_frs skips malformed FR lines
     cat > "$TMPDIR/t313.sh" << 'SCRIPT'
-import_sh="/mnt/bunker_data/ai/smart-ralph/plugins/ralph-bmad-bridge/scripts/import.sh"
+import_sh="${PLUGIN_ROOT}/scripts/import.sh"
 td=$(mktemp -d)
 cat > "$td/prd.md" << 'PRDEOF'
 # Test PRD
@@ -443,7 +443,7 @@ echo "  parse_epics edge case tests:"
 (
     # 3.14: parse_epics handles story blocks without Given/When/Then ACs
     cat > "$TMPDIR/t314.sh" << 'SCRIPT'
-import_sh="/mnt/bunker_data/ai/smart-ralph/plugins/ralph-bmad-bridge/scripts/import.sh"
+import_sh="${PLUGIN_ROOT}/scripts/import.sh"
 td=$(mktemp -d)
 cat > "$td/epics.md" << 'EPICEOF'
 # Epics
@@ -460,9 +460,8 @@ EPICEOF
 bash -c "
 source '$import_sh'
 parse_epics '$td/epics.md' '$td/tasks.md' 2>/dev/null
-exit 0
-"
-rc=0
+" || rc=$?
+rc=${rc:-0}
 # Both stories should appear in output
 grep -q 'Story 1.1' "$td/tasks.md" || rc=1
 grep -q 'Story 1.2' "$td/tasks.md" || rc=1

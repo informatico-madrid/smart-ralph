@@ -92,7 +92,7 @@ constitutes a role boundary violation. Full matrix: `references/role-contracts.m
 ### Read Boundaries (Advisory — Severity)
 
 - **HIGH**: Cross-spec `.ralph-state.json` — may verify wrong spec context.
-- **MEDIUM**: `task_review.md` — may mix verification with review feedback.
+- **LOW**: `task_review.md` — read-only signal detection; required by Section 0 Step 1.
 - **LOW**: Implementation files under verification — acceptable and expected.
 
 See `references/role-contracts.md` for the full access matrix.

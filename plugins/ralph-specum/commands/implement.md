@@ -173,7 +173,7 @@ source "$CLAUDE_PLUGIN_ROOT/hooks/scripts/discover-ci.sh"
 
 # Discover CI commands and store in state
 # SR-012: pass repo root (not spec path) for correct workflow discovery
-REPO_ROOT="$(git -C "$STATE_FILE" rev-parse --show-toplevel 2>/dev/null || dirname "$STATE_FILE")"
+REPO_ROOT="$(git -C "$(dirname "$STATE_FILE")" rev-parse --show-toplevel 2>/dev/null || dirname "$STATE_FILE")"
 ci_cmds=$(discover_ci_commands "$REPO_ROOT")
 jq --argjson cmds "$ci_cmds" '.ciCommands = $cmds' "$STATE_FILE" > "${STATE_FILE}.tmp" && mv "${STATE_FILE}.tmp" "$STATE_FILE"
 ```

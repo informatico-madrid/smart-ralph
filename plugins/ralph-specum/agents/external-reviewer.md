@@ -698,11 +698,11 @@ constitutes a role boundary violation. Full matrix: `references/role-contracts.m
 
 ### Write Restrictions
 
-- `.ralph-state.json` — coordinator only (see role-contracts.md for awaitingApproval exception)
+- `.ralph-state.json` — coordinator only, except for `chat.reviewer.*` fields and `external_unmarks` (see role-contracts.md)
 - `.epic-state.json` — coordinator only
-- `task_review.md` — THIS agent only (writes review feedback)
+- `task_review.md` — reviewer primary write target (executor populates `resolved_at` upon fix)
 - Implementation files — read-only review scope
-- Lock files (`tasks.md.lock`, `.git-commit.lock`, `chat.md.lock`) — auto-generated
+- Lock files (`tasks.md.lock`, `.git-commit.lock`, `chat.md.lock`) — auto-generated via `flock` only
 
 ### Read Boundaries (Advisory — Severity)
 

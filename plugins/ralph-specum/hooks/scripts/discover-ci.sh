@@ -22,7 +22,7 @@ discover_ci_commands() {
               case "$line" in
                 \#*|"|"*) continue ;;
               esac
-              line=$(echo "$line" | sed 's/[[:space:]]*$//')
+              line=$(printf '%s\n' "$line" | sed 's/[[:space:]]*$//')
               [ -z "$line" ] && continue
               echo "$line"
             done; } >> "$tmpfile"
@@ -62,7 +62,7 @@ discover_ci_commands() {
           category="test" ;;
         *eslint*|*prettier*|*stylelint*|*biome*|*flake8*|*pylint*|*shellcheck*|*black*|*checkstyle*|*"npm run lint"*|*"npm run format"*)
           category="lint" ;;
-        *webpack*|*rollup*|*esbuild*|*vite*|*"npm run build"*|*gradle*|*mvn*|*make*|*cargo*|"go build")
+        *webpack*|*rollup*|*esbuild*|*vite*|*"npm run build"*|*gradle*|*mvn*|*make*|*cargo*|*"go build"*)
           category="build" ;;
         *--noEmit*|*mypy*|*pyright*|*"npx tsc"*)
           category="typecheck" ;;
