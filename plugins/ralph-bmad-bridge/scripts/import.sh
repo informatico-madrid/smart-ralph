@@ -465,7 +465,7 @@ ENDTPL
             _print_task()
         }
     }
-    ' "$epics_path" > /tmp/_epics_tasks_tmp_$$
+    ' "$epics_path" > "$output_path"
 
     # Build output file
     {
@@ -480,7 +480,7 @@ ENDTPL
         echo ""
         echo "## Phase 1: Make It Work (POC)"
         echo ""
-        cat /tmp/_epics_tasks_tmp_$$
+        cat "$output_path"
         echo ""
         echo "## Phase 2: Refactoring"
         echo ""
@@ -720,7 +720,7 @@ function generate_requirements() {
 
         # Extract FRs (User Stories + FR table)
         FR_TMP=$(mktemp)
-        FR_COUNT=$(parse_prd_frs "$prd_path" "$FR_TMP" 2>/dev/null)
+        FR_COUNT=$(parse_prd_frs "$prd_path" "$FR_TMP" 2>/dev/null || true)
 
         # Extract NFRs
         NFR_TMP="${FR_TMP}.nfr"

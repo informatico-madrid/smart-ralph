@@ -993,7 +993,7 @@ check_ci_drift() {
   spec_name=$(basename "$(dirname "$state_file")")
   jq -n \
     --argjson drift "$drift" \
-    --argjson commands "$(echo "[$ci_commands]" | jq -R -s 'split("\n") | map(select(length > 0))')" \
+    --argjson commands "$(echo "$ci_commands" | jq -R -s 'split("\n") | map(select(length > 0))')" \
     --argjson baseline "$baseline_json" \
     --argjson current "{${current_results}}" \
     --argjson drifted "$drifted_json" \
