@@ -336,7 +336,7 @@ Then Read and follow these references in order. They contain the complete coordi
 
   # Extract task title and id from the delegated task block
   TASK_TITLE="$(sed -n "/^## Task $CURRENT_INDEX:/,/^-/p" "$SPEC_PATH/tasks.md" | head -1 | sed 's/^## Task [0-9]*: //')"
-  TASK_TYPE="$(grep '^\- \[.\] [0-9]' "$SPEC_PATH/tasks.md" | sed -n "${CURRENT_INDEX}p" | grep -oiP '\[(implementation|test|refactor|quality)\]' | tr -d '[]' || echo 'implementation')"
+  TASK_TYPE="$(grep '^\- \[.\] [0-9]' "$SPEC_PATH/tasks.md" | sed -n "${CURRENT_INDEX}p" | grep -oiE '\[(implementation|test|refactor|quality)\]' | tr -d '[]' || echo 'implementation')"
   TASK_ID="$(jq -r '.taskIndex' "$STATE_FILE")"
 
   # Get commit SHA from last git commit
@@ -347,7 +347,7 @@ Then Read and follow these references in order. They contain the complete coordi
   TASK_ITERATION=$((TASK_ITERATION - 1))
 
   # Call write_metric — use status from verification outcome
-  if ! write_metric "$SPEC_PATH" "$WRITE_METRIC_STATUS" "$TASK_ID" "$TASK_ITERATION" "$VERIFY_EXIT" "$TASK_TITLE" "$TASK_TYPE" "$TASK_ID" "$COMMIT_SHA"; then
+  if ! write_metric "$SPEC_PATH" "$WRITE_METRIC_STATUS" "$TASK_ID" "$TASK_ITERATION" "$VERIFY_EXIT" "$TASK_TITLE" "$TASK_TYPE" "$COMMIT_SHA"; then
     echo "[ralph-specum] WARN: write_metric failed (non-fatal)" >&2
   fi
   ```

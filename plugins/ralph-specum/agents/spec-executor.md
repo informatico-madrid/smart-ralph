@@ -129,7 +129,7 @@ Atomic append (CRITICAL — never use mv, always flock):
 ```bash
 (
   exec 200>"${basePath}/chat.md.lock"
-  flock -e 200 || exit 1
+  flock -x 200 || exit 1
   cat >> "${basePath}/chat.md" << 'MSGEOF'
 ### [YYYY-MM-DD HH:MM:SS] Spec-Executor → External-Reviewer
 **Task**: T<taskIndex>

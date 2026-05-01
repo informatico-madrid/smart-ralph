@@ -23,7 +23,7 @@ Import BMAD planning artifacts into a smart-ralph spec.
 # Parse positional arguments from $ARGUMENTS
 read -r BMAD_PATH SPEC_NAME <<< "$ARGUMENTS"
 
-# Validate args ($1=bmad_path, $2=spec_name)
+# Validate parsed arguments from $ARGUMENTS
 if [ -z "$BMAD_PATH" ] || [ -z "$SPEC_NAME" ]; then
   echo "Usage: /ralph-bmad:import <bmad-project-path> <spec-name>"
   exit 1
