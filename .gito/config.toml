@@ -1,0 +1,45 @@
+# Gito project configuration for smart-ralph
+
+# Exclude patterns — files that should NOT be reviewed
+exclude_files = [
+    # Hidden files and directories (dotfiles)
+    ".*",
+    ".*/**",
+
+    # Files/directories starting with underscore
+    "_*",
+    "_*/**",
+
+    # Specs directory (planning artifacts, not production code)
+    "specs/**",
+
+    # Plans directory
+    "plans/**",
+
+    # Research directory
+    "research/**",
+
+    # BMAD output
+    "_bmad-output/**",
+
+    # Temporary directories
+    "tmp.*/**",
+
+    # Lock files
+    "*.lock",
+
+    # Generated files
+    "**/.gitkeep",
+]
+
+# Context files to provide alongside reviews
+aux_files = [
+    "AGENTS.md",
+    "CLAUDE.md",
+    "README.md",
+    "docs/ARCHITECTURE.md",
+]
+
+# PR comment triggers
+mention_triggers = ["gito", "/review", "/check"]
+collapse_previous_code_review_comments = true
