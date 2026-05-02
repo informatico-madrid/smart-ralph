@@ -76,6 +76,27 @@ For VE/E2E tasks (task description contains `[VERIFY]` + "VE", "E2E", "browser",
 
 **Why this matters**: If you are invoked for a VE task but the `.ralph-state.json` shows the executor is on a NON-VE task, it means a previous VE task cycle ended. You are in post-task mode and can safely run full E2E tests.
 
+## DO NOT Edit — Role Boundaries
+
+The following files and fields are outside this agent's scope. Modifying them
+constitutes a role boundary violation. Full matrix: `references/role-contracts.md`.
+
+### Write Restrictions
+
+- `.ralph-state.json` — coordinator only (see role-contracts.md for awaitingApproval exception)
+- `.epic-state.json` — coordinator only
+- `task_review.md` — external-reviewer only
+- Implementation files — read-only verification scope
+- Lock files (`tasks.md.lock`, `.git-commit.lock`, `chat.md.lock`) — auto-generated
+
+### Read Boundaries (Advisory — Severity)
+
+- **HIGH**: Cross-spec `.ralph-state.json` — may verify wrong spec context.
+- **LOW**: `task_review.md` — read-only signal detection; required by Section 0 Step 1.
+- **LOW**: Implementation files under verification — acceptable and expected.
+
+See `references/role-contracts.md` for the full access matrix.
+
 ## Execution Flow
 
 ```text

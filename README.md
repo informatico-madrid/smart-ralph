@@ -8,6 +8,9 @@ Spec-driven development with smart compaction. A Claude Code plugin that combine
 - **Smart Compaction**: Strategic context management between phases and tasks
 - **Persistent Progress**: Learnings and state survive compaction via progress file
 - **Two Modes**: Interactive (pause per phase) or fully autonomous
+- **BMAD Bridge**: Import BMAD planning artifacts (PRD, epics, architecture) into ralph-specum specs via `/ralph-bmad:import`
+- **Loop Safety**: Pre-loop git checkpoint, circuit breaker, per-task metrics, and read-only detection
+- **Role Boundaries**: Mechanical enforcement of file access rules per agent role
 
 ## Installation
 
@@ -44,6 +47,30 @@ git clone https://github.com/tzachbon/ralph-specum.git
 cd ralph-specum
 /plugin install .
 ```
+
+## Packaged Distribution
+
+When installed via the Codex-packaged distribution (`ralph-specum-codex`), commands are exposed with the `ralph-specum-` prefix:
+
+```
+$ralph-specum-triage "Build a multi-tenant SaaS platform"
+$ralph-specum-research
+$ralph-specum-requirements
+$ralph-specum-design
+$ralph-specum-tasks
+$ralph-specum-implement
+$ralph-specum-start my-feature "Build user authentication"
+$ralph-specum-cancel
+$ralph-specum-status
+$ralph-specum-feedback
+$ralph-specum-help
+$ralph-specum-index
+$ralph-specum-refactor
+$ralph-specum-rollback
+$ralph-specum-switch
+```
+
+See the [Codex plugin README](plugins/ralph-specum-codex/README.md) for full Codex-specific documentation.
 
 ## Quick Start
 
@@ -85,7 +112,12 @@ This will:
 | `/ralph-specum "goal" [options]` | Start the spec-driven loop |
 | `/ralph-specum:approve` | Approve current phase (interactive mode) |
 | `/ralph-specum:cancel` | Cancel active loop and cleanup |
+| `/ralph-specum:feedback` | Collect and process user feedback |
 | `/ralph-specum:help` | Show help |
+| `/ralph-specum:index` | Index/rebuild spec directory |
+| `/ralph-specum:refactor` | Refactor existing spec |
+| `/ralph-specum:rollback` | Rollback to git checkpoint |
+| `/ralph-specum:switch` | Switch to another spec |
 
 ---
 

@@ -4,65 +4,80 @@
 
 ```
 plugins/ralph-specum/
-├── .claude-plugin/plugin.json          # Plugin manifest v4.9.3
-├── agents/                            # 9 subagent definitions (markdown)
-│   ├── spec-executor.md              # Task executor (autonomous implementation)
-│   ├── task-planner.md               # POC-first task breakdown generator
-│   ├── qa-engineer.md                # Verification agent (Playwright)
-│   ├── research-analyst.md            # Web search + codebase analysis
-│   ├── product-manager.md             # User stories + acceptance criteria
-│   ├── architect-reviewer.md          # Technical design document
-│   ├── spec-reviewer.md              # Artifact reviewer (rubric-based)
-│   ├── triage-analyst.md             # Feature decomposition for epics
-│   └── refactor-specialist.md        # Spec file refactorer
-├── commands/                         # 15 slash commands
-│   ├── start.md                      # Smart orchestrator (auto-detects what to do)
-│   ├── new.md                        # Create spec + optionally run research
-│   ├── research.md                   # Run research-analyst on current spec
-│   ├── requirements.md               # Run product-manager on current spec
-│   ├── design.md                     # Run architect-reviewer on current spec
-│   ├── tasks.md                      # Run task-planner on current spec
-│   ├── implement.md                  # Start execution loop (loop coordinator)
-│   ├── verify.md                     # Run qa-engineer verification
-│   ├── cancel.md                     # Cancel loop + cleanup
-│   ├── triage.md                    # Epic decomposition
-│   ├── epic.md                       # Resume epic tracking
-│   ├── quick.md                      # Auto-generate all phases without stopping
-│   ├── refactor.md                   # Refactor spec files
-│   ├── review.md                    # Review spec artifacts
-│   └── switch.md                    # Switch active spec
+├── .claude-plugin/plugin.json # Plugin manifest v4.9.3
+├── agents/ # 9 subagent definitions (markdown)
+│   ├── spec-executor.md # Task executor (autonomous implementation)
+│   ├── task-planner.md # POC-first task breakdown generator
+│   ├── qa-engineer.md # Verification agent (Playwright)
+│   ├── research-analyst.md # Web search + codebase analysis
+│   ├── product-manager.md # User stories + acceptance criteria
+│   ├── architect-reviewer.md # Technical design document
+│   ├── spec-reviewer.md # Artifact reviewer (rubric-based)
+│   ├── triage-analyst.md # Feature decomposition for epics
+│   └── refactor-specialist.md # Spec file refactorer
+├── commands/ # 15 slash commands
+│   ├── start.md # Smart orchestrator (auto-detects what to do)
+│   ├── new.md # Create spec + optionally run research
+│   ├── research.md # Run research-analyst on current spec
+│   ├── requirements.md # Run product-manager on current spec
+│   ├── design.md # Run architect-reviewer on current spec
+│   ├── tasks.md # Run task-planner on current spec
+│   ├── implement.md # Start execution loop (loop coordinator)
+│   ├── verify.md # Run qa-engineer verification
+│   ├── cancel.md # Cancel loop + cleanup
+│   ├── triage.md # Epic decomposition
+│   ├── epic.md # Resume epic tracking
+│   ├── quick.md # Auto-generate all phases without stopping
+│   ├── refactor.md # Refactor spec files
+│   ├── review.md # Review spec artifacts
+│   └── switch.md # Switch active spec
 ├── hooks/
-│   ├── hooks.json                    # 3 hooks: Stop, SessionStart, PreToolUse
+│   ├── hooks.json # 3 hooks: Stop, SessionStart, PreToolUse
 │   └── scripts/
-│       ├── stop-watcher.sh           # Loop controller (500+ lines)
-│       ├── path-resolver.sh          # Multi-directory spec discovery
-│       └── update-spec-index.sh      # Spec index maintenance
-├── references/                       # 17 internal reference documents
-│   ├── coordinator-pattern.md        # Coordinator logic bible
-│   ├── failure-recovery.md           # Recovery + repair loops
-│   ├── verification-layers.md        # 3-layer verification system
-│   ├── quality-checkpoints.md         # VE tasks + verify-fix-reverify loop
-│   ├── triage-flow.md                # Epic triage workflow
-│   ├── branch-management.md          # Git branch strategy
-│   ├── design-rubric.md              # Design document review rubric
-│   ├── task-rubric.md                # Tasks review rubric
-│   ├── verification-rubric.md        # Verification review rubric
-│   ├── requirements-rubric.md        # Requirements review rubric
-│   ├── research-rubric.md            # Research review rubric
-│   ├── epic-rubric.md                # Epic review rubric
-│   ├── epic-coordinator.md          # Epic workflow reference
-│   ├── epic-decomposition.md         # Triage decomposition patterns
-│   ├── coordinator-signals.md        # Signal catalog (15+ signals)
-│   ├── e2e-chain.md                  # E2E Playwright skill chain
-│   └── context-auditor.md            # Memory/context auditor
-├── templates/                         # Spec file templates
+│       ├── stop-watcher.sh # Loop controller (500+ lines)
+│       ├── path-resolver.sh # Multi-directory spec discovery
+│       ├── update-spec-index.sh # Spec index maintenance
+│       ├── checkpoint.sh # Pre-loop git checkpoint (loop-safety-infra)
+│       ├── write-metric.sh # Per-task metrics append (loop-safety-infra)
+│       └── discover-ci.sh # CI command discovery (loop-safety-infra)
+├── references/ # 20 internal reference documents
+│   ├── coordinator-pattern.md # Coordinator logic bible
+│   ├── failure-recovery.md # Recovery + repair loops
+│   ├── verification-layers.md # 3-layer verification system
+│   ├── quality-checkpoints.md # VE tasks + verify-fix-reverify loop
+│   ├── triage-flow.md # Epic triage workflow
+│   ├── branch-management.md # Git branch strategy
+│   ├── design-rubric.md # Design document review rubric
+│   ├── task-rubric.md # Tasks review rubric
+│   ├── verification-rubric.md # Verification review rubric
+│   ├── requirements-rubric.md # Requirements review rubric
+│   ├── research-rubric.md # Research review rubric
+│   ├── epic-rubric.md # Epic review rubric
+│   ├── epic-coordinator.md # Epic workflow reference
+│   ├── epic-decomposition.md # Triage decomposition patterns
+│   ├── coordinator-signals.md # Signal catalog (15+ signals)
+│   ├── e2e-chain.md # E2E Playwright skill chain
+│   ├── context-auditor.md # Memory/context auditor
+│   ├── role-contracts.md # File access matrix per agent (role-boundaries spec)
+│   ├── loop-safety.md # Circuit breaker, checkpoint, metrics (loop-safety-infra spec)
+│   └── collaboration-resolution.md # Agent collaboration protocol (pending spec)
+├── templates/ # Spec file templates
 │   ├── research.md
 │   ├── requirements.md
 │   ├── design.md
 │   ├── tasks.md
 │   └── epic.md
-└── schemas/                          # JSON schemas
+└── schemas/ # JSON schemas
     └── ralph-state.json
+
+plugins/ralph-bmad-bridge/           # BMAD structural mapper plugin
+├── .claude-plugin/plugin.json       # Plugin manifest v0.1.0
+├── commands/
+│   └── ralph-bmad-import.md         # /ralph-bmad:import <path> <spec-name>
+├── scripts/
+│   └── import.sh                    # Main mapper (985 lines, bash+jq)
+└── tests/
+    └── test-import.sh               # Test harness (13 tests: unit+integration+E2E)
 ```
 
 ## 2. Complete Execution Order
@@ -367,6 +382,46 @@ e2e
 ### 5.2 Context Auditor (`references/context-auditor.md`)
 
 Memory/context auditor for long sessions. Detects context bloat and suggests consolidation.
+
+### 5.3 Role Contracts (`references/role-contracts.md`)
+
+File access matrix defining which agent can read/write which files. Enforced by agent prompts and state integrity hook.
+
+| Agent | Can Write | Cannot Write |
+|-------|-----------|--------------|
+| spec-executor | Source code, tests, .progress.md | .ralph-state.json, task_review.md, chat.md |
+| external-reviewer | task_review.md, chat.md, .progress.md (intervention) | Source code, .ralph-state.json |
+| qa-engineer | test-results/ | .ralph-state.json, tasks.md, task_review.md |
+| coordinator | .ralph-state.json, tasks.md | Source code, task_review.md |
+
+### 5.4 Loop Safety (`references/loop-safety.md`)
+
+Circuit breaker, pre-loop git checkpoint, per-task metrics, and read-only detection for the execution loop.
+
+- **Checkpoint**: `checkpoint.sh` creates git commit before execution starts
+- **Circuit breaker**: Stop after N consecutive failures or M hours elapsed
+- **Metrics**: `write-metric.sh` appends per-task timing and iteration count
+- **Read-only detection**: Heartbeat write check to detect stuck agents
+- **CI discovery**: `discover-ci.sh` auto-detects project CI commands
+
+## 5.5 BMAD Bridge Plugin (`plugins/ralph-bmad-bridge/`)
+
+Structural mapper that converts BMAD planning artifacts into smart-ralph spec files using deterministic bash+jq parsing (no LLM).
+
+**Command**: `/ralph-bmad:import <bmad-project-path> <spec-name>`
+
+**Mapping**:
+| BMAD Artifact | smart-ralph Output | Parser |
+|---------------|-------------------|--------|
+| `prd.md` (FRs) | `requirements.md` (FR table + User Stories) | `parse_prd_frs()` |
+| `prd.md` (NFRs) | `requirements.md` (NFR table with ### subsections) | `parse_prd_nfrs()` |
+| `epics.md` | `tasks.md` (Phase 1 tasks with BDD criteria) | `parse_epics()` |
+| `architecture.md` | `design.md` (Technical Decisions + File Structure) | `parse_architecture()` |
+| — | `.ralph-state.json` (with correct totalTasks) | `write_state()` |
+
+**Input validation**: Path traversal protection, spec name regex (`^[a-z](-?[a-z0-9]+)*$`), BMAD root must be within project root.
+
+**Test harness**: 13 tests (unit + integration + E2E) in `tests/test-import.sh`.
 
 ## 6. State Files
 

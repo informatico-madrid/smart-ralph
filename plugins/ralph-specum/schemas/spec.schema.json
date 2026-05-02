@@ -47,6 +47,25 @@
           "default": 1,
           "description": "Current iteration for this task (resets per task)"
         },
+        "repairIteration": {
+          "type": "integer",
+          "minimum": 0,
+          "default": 0,
+          "description": "Current repair iteration count for recovery mode"
+        },
+        "failedStory": {
+          "type": ["string", "null"],
+          "description": "ID of the story that failed, for recovery tracking"
+        },
+        "originTaskIndex": {
+          "type": ["integer", "null"],
+          "description": "Original task index before fix task insertion"
+        },
+        "awaitingApproval": {
+          "type": "boolean",
+          "default": false,
+          "description": "Whether execution is waiting for external approval"
+        },
         "maxTaskIterations": {
           "type": "integer",
           "minimum": 1,
@@ -130,6 +149,12 @@
           "minimum": 1,
           "default": 3,
           "description": "Max fix tasks allowed per original task"
+        },
+        "maxFixTaskDepth": {
+          "type": "integer",
+          "minimum": 1,
+          "default": 3,
+          "description": "Max depth for fix task chains"
         },
         "fixTaskMap": {
           "type": "object",
@@ -226,6 +251,91 @@
               }
             }
           }
+        },
+        "checkpoint": {
+          "type": "object",
+          "description": "Pre-execution git checkpoint for rollback safety",
+          "properties": {
+            "sha": {
+              "type": ["string", "null"],
+              "description": "Full 40-char git commit SHA at checkpoint"
+            },
+            "timestamp": {
+              "type": ["string", "null"],
+              "format": "date-time",
+              "description": "ISO 8601 UTC timestamp when checkpoint was created"
+            },
+            "branch": {
+              "type": ["string", "null"],
+              "description": "Git branch name at checkpoint"
+            },
+            "message": {
+              "type": ["string", "null"],
+              "description": "Checkpoint commit message"
+            }
+          }
+        },
+        "circuitBreaker": {
+          "type": "object",
+          "description": "Session circuit breaker for safety",
+          "properties": {
+            "state": {
+              "type": ["string", "null"],
+              "enum": ["closed", "open", null],
+              "description": "Circuit breaker state: closed (normal), open (blocked), or null"
+            },
+            "consecutiveFailures": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0,
+              "description": "Count of consecutive session failures"
+            },
+            "sessionStartTime": {
+              "type": ["string", "null"],
+              "format": "date-time",
+              "description": "ISO 8601 UTC timestamp when current session started"
+            },
+            "openedAt": {
+              "type": ["string", "null"],
+              "format": "date-time",
+              "description": "ISO 8601 UTC timestamp when circuit breaker tripped open"
+            },
+            "trippedReason": {
+              "type": ["string", "null"],
+              "description": "Reason the circuit breaker was tripped open"
+            },
+            "maxConsecutiveFailures": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 5,
+              "description": "Max consecutive failures before tripping open"
+            },
+            "maxSessionSeconds": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 172800,
+              "description": "Max session duration in seconds before tripping open"
+            }
+          }
+        },
+        "filesystemHealthy": {
+          "type": "boolean",
+          "description": "Whether the filesystem is healthy and writable"
+        },
+        "filesystemHealthFailures": {
+          "type": "integer",
+          "description": "Number of consecutive filesystem health check failures",
+          "default": 0
+        },
+        "lastFilesystemCheck": {
+          "type": ["string", "null"],
+          "format": "date-time",
+          "description": "Timestamp of last filesystem health check"
+        },
+        "ciCommands": {
+          "type": "array",
+          "items": {"type": "string"},
+          "description": "List of CI commands discovered at execution start"
         }
       }
     },

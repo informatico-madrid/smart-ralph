@@ -104,7 +104,7 @@ if [ -n "$TRANSCRIPT_PATH" ] && [ -f "$TRANSCRIPT_PATH" ]; then
             LAST_COMPLETE_LINE=$(grep -n 'ALL_TASKS_COMPLETE' "$TRANSCRIPT_PATH" 2>/dev/null | tail -1 | cut -d: -f1)
             if [ -n "$LAST_COMPLETE_LINE" ]; then
                 SWEEP_ALREADY_DONE=$(tail -n +"$LAST_COMPLETE_LINE" "$TRANSCRIPT_PATH" 2>/dev/null \
-                    | grep -cE '(^|\W)REGRESSION_SWEEP_COMPLETE(\W|$)' || echo "0")
+                    | grep -cE '(^|\W)REGRESSION_SWEEP_COMPLETE(\W|$)' || true)
             else
                 SWEEP_ALREADY_DONE="0"
             fi
@@ -459,6 +459,37 @@ if [ "$GLOBAL_ITERATION" -ge "$MAX_GLOBAL" ]; then
     exit 0
 fi
 
+# Check fix task depth (shell enforcement — complements LLM check in implement.md)
+MAX_FIX_DEPTH=$(jq -r '.maxFixTaskDepth // 3' "$STATE_FILE" 2>/dev/null || echo "3")
+FIX_TASK_MAP=$(jq -r '.fixTaskMap // {}' "$STATE_FILE" 2>/dev/null || echo "{}")
+MAX_FIX_ATTEMPTS=$(jq -r '.maxFixTasksPerOriginal // 3' "$STATE_FILE" 2>/dev/null || echo "3")
+
+if [ "$FIX_TASK_MAP" != "{}" ] && [ -n "$FIX_TASK_MAP" ]; then
+    # Check attempts per original task
+    TASK_IDS=$(echo "$FIX_TASK_MAP" | jq -r 'keys[]')
+    for TASK_ID in $TASK_IDS; do
+        ATTEMPTS=$(echo "$FIX_TASK_MAP" | jq -r --arg id "$TASK_ID" '.[$id].attempts // 0')
+        if [ "$ATTEMPTS" -ge "$MAX_FIX_ATTEMPTS" ] 2>/dev/null; then
+            FIX_IDS=$(echo "$FIX_TASK_MAP" | jq -r --arg id "$TASK_ID" '.[$id].fixTaskIds // [] | join(", ")')
+            echo "[ralph-specum] ERROR: Max fix attempts ($MAX_FIX_ATTEMPTS) reached for task $TASK_ID" >&2
+            echo "[ralph-specum] Fix history: $FIX_IDS" >&2
+            echo "[ralph-specum] Recovery: manual intervention required, then /ralph-specum:cancel" >&2
+            exit 0
+        fi
+        # Check fix task chain depth: count dots in fix task IDs
+        DEPTH_IDS=$(echo "$FIX_TASK_MAP" | jq -r --arg id "$TASK_ID" '.[$id].fixTaskIds // [] | .[]')
+        for FIX_ID in $DEPTH_IDS; do
+            DOT_COUNT=$(echo "$FIX_ID" | tr -cd '.' | wc -c)
+            FIX_DEPTH=$((DOT_COUNT - 1))
+            if [ "$FIX_DEPTH" -ge "$MAX_FIX_DEPTH" ] 2>/dev/null; then
+                echo "[ralph-specum] ERROR: Max fix task depth ($MAX_FIX_DEPTH) exceeded for task $FIX_ID (depth=$FIX_DEPTH)" >&2
+                echo "[ralph-specum] Recovery: fix chain too deep, manual intervention required" >&2
+                exit 0
+            fi
+        done
+    done
+fi
+
 # Quick mode guard: block stop during ANY phase when quickMode is active
 if [ "$QUICK_MODE" = "true" ] && [ "$PHASE" != "execution" ]; then
     STOP_HOOK_ACTIVE=$(echo "$INPUT" | jq -r '.stop_hook_active // false' 2>/dev/null || echo "false")
@@ -486,16 +517,119 @@ EOF
     exit 0
 fi
 
-# Log current state
-if [ "$PHASE" = "execution" ]; then
-    echo "[ralph-specum] Session stopped during spec: $SPEC_NAME | Task: $((TASK_INDEX + 1))/$TOTAL_TASKS | Attempt: $TASK_ITERATION" >&2
+# Non-execution phase: exit silently (no output, no block)
+if [ "$PHASE" != "execution" ]; then
+    exit 0
 fi
+
+# Log current state
+echo "[ralph-specum] Session stopped during spec: $SPEC_NAME | Task: $((TASK_INDEX + 1))/$TOTAL_TASKS | Attempt: $TASK_ITERATION" >&2
+
+# --- Role Boundaries: Field-Level Validation ---
+# Validates state file fields against a baseline to detect role boundary violations.
+# Phase 1 limitation: agent identity reported as "unknown" — we only flag
+# agent-owned fields (owner != "coordinator") regardless of who changed them.
+
+# Resolve baseline file path
+BASELINE_FILE="$CWD/$SPEC_PATH/references/.ralph-field-baseline.json"
+
+# Graceful degradation: if no baseline exists, skip validation
+if [ ! -f "$BASELINE_FILE" ]; then
+    echo "[ralph-specum] BASELINE_MISSING no baseline at $BASELINE_FILE; skipping field validation" >&2
+    VALIDATION_SKIPPED=1
+else
+    # Validate baseline is valid JSON before proceeding
+    if ! jq empty "$BASELINE_FILE" 2>/dev/null; then
+        echo "[ralph-specum] BASELINE_CORRUPT invalid JSON in baseline at $BASELINE_FILE; skipping field validation" >&2
+        VALIDATION_SKIPPED=1
+    else
+        VALIDATION_SKIPPED=0
+    fi
+fi
+
+# Read state file with retry loop to mitigate jq+mv race condition
+# (3 attempts with 1s delay between retries)
+STATE_CONTENT=""
+if [ $VALIDATION_SKIPPED -eq 0 ]; then
+    RETRY_COUNT=0
+    while [ $RETRY_COUNT -lt 3 ]; do
+        if STATE_CONTENT=$(cat "$STATE_FILE" 2>/dev/null) && echo "$STATE_CONTENT" | jq empty 2>/dev/null; then
+            break
+        fi
+        RETRY_COUNT=$((RETRY_COUNT + 1))
+        if [ $RETRY_COUNT -lt 3 ]; then sleep 1; fi
+    done
+
+    if [ -z "$STATE_CONTENT" ]; then
+        echo "[ralph-specum] BASELINE_RETRY_EXHAUSTED unable to read state file after 3 retries; skipping validation" >&2
+        VALIDATION_SKIPPED=1
+    fi
+fi
+
+# Perform field-level validation if baseline is available and valid
+if [ $VALIDATION_SKIPPED -eq 0 ]; then
+    (
+        exec 202>"${BASELINE_FILE}.lock"
+        flock -x 202 || exit 0
+
+        # Iterate over each field defined in the baseline (flat JSON format)
+        # Flat format: {"field": "string" | ["array"]} — values are owners directly
+        FIELDS=$(jq -r 'keys[]' "$BASELINE_FILE" 2>/dev/null)
+
+        for FIELD in $FIELDS; do
+            # Extract baseline owner — value itself is the owner (string or array)
+            BASELINE_OWNER=$(jq -r --arg f "$FIELD" '.[$f] // "unknown"' "$BASELINE_FILE" 2>/dev/null)
+            # Derive baseline type from the actual baseline value (string | array)
+            BASELINE_TYPE=$(jq -r --arg f "$FIELD" '.[$f] | type' "$BASELINE_FILE" 2>/dev/null)
+            BASELINE_DEFAULT=""
+
+            # Resolve the jq path for this field from state
+            # Strip leading dot if present to avoid double-dot paths
+            CLEAN_FIELD="${FIELD#.}"
+
+            # Check if field exists in state file using getpath for nested path resolution
+            if ! echo "$STATE_CONTENT" | jq --arg f "$CLEAN_FIELD" 'getpath(($f | split("."))) != null' 2>/dev/null | grep -q true; then
+                echo "[ralph-specum] BASELINE_SKIP missing in state: $FIELD (owner=$BASELINE_OWNER)" >&2
+                continue
+            fi
+
+            # Extract current state value type
+            FIELD_VALUE_TYPE=$(echo "$STATE_CONTENT" | jq -r --arg f "$CLEAN_FIELD" 'getpath(($f | split("."))) | type' 2>/dev/null)
+
+            # Type mismatch: baseline owner is a simple type (string=owner name)
+            # but state value is structured (object/array) — baseline stores OWNER names,
+            # not data values, so we skip validation for such fields.
+            # Baseline arrays (multi-owner fields) fall through to coordinator check.
+            case "$BASELINE_TYPE" in
+                string|number|boolean)
+                    if [ "$FIELD_VALUE_TYPE" = "object" ] || [ "$FIELD_VALUE_TYPE" = "array" ]; then
+                        echo "[ralph-specum] BASELINE_SKIP type-mismatch: $FIELD (baseline=$BASELINE_TYPE, state=$FIELD_VALUE_TYPE)" >&2
+                        continue
+                    fi
+                    ;;
+            esac
+
+            # Skip coordinator-owned fields — coordinator legitimately writes these
+            case "$BASELINE_OWNER" in
+                *coordinator*)
+                    echo "[ralph-specum] BASELINE_SKIP coordinator-owned: $FIELD (owner=$BASELINE_OWNER)" >&2
+                    continue
+                    ;;
+            esac
+
+            # Agent-owned-only field changed or present — report boundary violation
+            # In Phase 1, we report agent identity as "unknown"
+            echo "[ralph-specum] BOUNDARY_VIOLATION field=$FIELD owner=$BASELINE_OWNER severity=HIGH agent=unknown" >&2
+        done
+    ) 202>"${BASELINE_FILE}.lock"
+fi
+# --- End Role Boundaries Validation ---
 
 # Execution completion verification: cross-check state AND tasks.md
 if [ "$PHASE" = "execution" ] && [ "$TASK_INDEX" -ge "$TOTAL_TASKS" ] && [ "$TOTAL_TASKS" -gt 0 ]; then
     TASKS_FILE="$CWD/$SPEC_PATH/tasks.md"
     if [ -f "$TASKS_FILE" ]; then
-        UNCHECKED=$(grep -c '^\s*- \[ \]' "$TASKS_FILE" 2>/dev/null || echo "0")
+        UNCHECKED=$(grep -c '^[[:space:]]*- \[ \]' "$TASKS_FILE" 2>/dev/null || true)
         if [ "$UNCHECKED" -gt 0 ]; then
             echo "[ralph-specum] State says complete but tasks.md has $UNCHECKED unchecked items" >&2
             REASON=$(cat <<EOF
@@ -661,5 +795,3 @@ find "$CWD/$SPEC_PATH" -name ".progress-task-*.md" -mmin +60 -delete 2>/dev/null
 
 # Note: .progress.md and .ralph-state.json are preserved for loop continuation
 # Use /ralph-specum:cancel to explicitly stop execution and cleanup state
-
-exit 0

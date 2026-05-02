@@ -456,7 +456,7 @@ CHAT_TEMPLATE="plugins/ralph-specum/templates/chat.md"
     grep -q "Never modify implementation files" "$EXTERNAL_REVIEWER"
 }
 
-@test "spec-executor cannot modify .ralph-state.json (except chat.lastReadLine)" {
+@test "spec-executor cannot modify .ralph-state.json (except chat.executor.lastReadLine)" {
     grep -q "Never modify .ralph-state.json" "$SPEC_EXECUTOR"
-    grep -q "chat.lastReadLine" "$SPEC_EXECUTOR"
+    grep -q "chat.executor.lastReadLine" "$SPEC_EXECUTOR"
 }

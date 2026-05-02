@@ -93,7 +93,7 @@ MCP_LOCK_STALE_REMOVING       → proceed (stale lock removed)
 MCP_LOCK_CLEAN                → proceed normally
 ```
 
-Write result to `.ralph-state.json` — acquire a flock on `.tasks.lock` before the
+Write result to `.ralph-state.json` — acquire a flock on `tasks.md.lock` before the
 read-modify-write to prevent corruption if two VE tasks ever run in parallel:
 
 ```bash

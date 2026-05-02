@@ -244,32 +244,32 @@ Bmalph avoids this by putting complexity in **infra** (git commands, exit codes,
 └──────────────────────┬──────────────────────────────┘
                        │
 ┌──────────────────────▼──────────────────────────────┐
-│  PHASE 3: Enforce Role Boundaries                   │
-│  Spec: role-boundaries                              │
-│                                                     │
-│  1. Role contract file → who can write what         │
-│  2. File-access constraints in all agent files      │
-│  3. State integrity hook → detect unauthorized edits│
+│ PHASE 3: Enforce Role Boundaries ✅ DONE │
+│ Spec: role-boundaries (completed 2026-04-27) │
+│ │
+│ 1. Role contract file → who can write what ✅ │
+│ 2. File-access constraints in all agent files ✅ │
+│ 3. State integrity hook → detect unauthorized edits ✅ │
 └──────────────────────┬──────────────────────────────┘
                        │
 ┌──────────────────────▼──────────────────────────────┐
-│  PHASE 4: Add Bmalph-Style Safety                   │
-│  Spec: loop-safety-infra                            │
-│                                                     │
-│  1. Pre-loop git checkpoint → rollback safety       │
-│  2. Circuit breaker → stop after N failures/hours   │
-│  3. Metrics append → iterations, fabrications, time │
-│  4. Read-only detection → heartbeat write check     │
-│  5. CI snapshot → separate task verify from global  │
+│ PHASE 4: Add Bmalph-Style Safety ✅ DONE │
+│ Spec: loop-safety-infra (completed 2026-04-27) │
+│ │
+│ 1. Pre-loop git checkpoint → rollback safety ✅ │
+│ 2. Circuit breaker → stop after N failures/hours ✅ │
+│ 3. Metrics append → iterations, fabrications, time ✅ │
+│ 4. Read-only detection → heartbeat write check ✅ │
+│ 5. CI snapshot → separate task verify from global ✅ │
 └──────────────────────┬──────────────────────────────┘
                        │
 ┌──────────────────────▼──────────────────────────────┐
-│  PHASE 5: Extend with BMAD Bridge                   │
-│  Spec: bmad-bridge-plugin                           │
-│                                                     │
-│  1. BMAD → smart-ralph spec mapper (structural)     │
-│  2. Plugin: plugins/ralph-bmad-bridge/              │
-│  3. Entry: /ralph-bmad:import <path> <spec-name>    │
+│ PHASE 5: Extend with BMAD Bridge ✅ DONE │
+│ Spec: bmad-bridge-plugin (completed 2026-04-28) │
+│ │
+│ 1. BMAD → smart-ralph spec mapper (structural) ✅ │
+│ 2. Plugin: plugins/ralph-bmad-bridge/ ✅ │
+│ 3. Entry: /ralph-bmad:import <path> <spec-name> ✅ │
 └──────────────────────┬──────────────────────────────┘
                        │
 ┌──────────────────────▼──────────────────────────────┐
@@ -330,7 +330,7 @@ Bmalph avoids this by putting complexity in **infra** (git commands, exit codes,
 
 ---
 
-### Spec 3: `role-boundaries`
+### Spec 3: `role-boundaries` ✅ COMPLETED (2026-04-27)
 
 **Targets**: I2
 
@@ -352,7 +352,7 @@ Bmalph avoids this by putting complexity in **infra** (git commands, exit codes,
 
 ---
 
-### Spec 4: `loop-safety-infra`
+### Spec 4: `loop-safety-infra` ✅ COMPLETED (2026-04-27)
 
 **Targets**: I3, C4 (CI snapshot part)
 
@@ -368,9 +368,11 @@ Bmalph avoids this by putting complexity in **infra** (git commands, exit codes,
 
 ---
 
-### Spec 5: `bmad-bridge-plugin`
+### Spec 5: `bmad-bridge-plugin` ✅ COMPLETED (2026-04-28)
 
 **Targets**: S1
+
+**Implementation**: `plugins/ralph-bmad-bridge/` — 985-line bash+jq structural mapper with 13 tests. Maps PRD→requirements.md, epics→tasks.md, architecture→design.md. Input sanitization with path traversal protection and spec name regex validation.
 
 > **Note**: The BMAD→SSD mapping below is a **v1**. It should be validated and adjusted once you have a real BMAD PRD in hand. Don't over-engineer the mapping before seeing real data.
 

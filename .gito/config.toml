@@ -1,0 +1,70 @@
+# Gito project configuration for smart-ralph
+
+# Exclude patterns — files that should NOT be reviewed
+exclude_files = [
+    # Hidden files and directories (dotfiles)
+    ".*",
+    ".*/**",
+
+    # Files/directories starting with underscore
+    "_*",
+    "_*/**",
+
+    # Specs directory (planning artifacts, not production code)
+    "specs/**",
+
+    # Plans directory
+    "plans/**",
+
+    # Research directory
+    "research/**",
+
+    # BMAD output
+    "_bmad-output/**",
+
+    # Temporary directories
+    "tmp.*/**",
+
+    # Lock files
+    "*.lock",
+
+    # Generated files
+    "**/.gitkeep",
+]
+
+# Context files to provide alongside reviews
+aux_files = [
+    "AGENTS.md",
+    "CLAUDE.md",
+    "README.md",
+    "docs/ARCHITECTURE.md",
+    "docs/ENGINE_ROADMAP.md",
+]
+
+# PR comment triggers
+mention_triggers = ["gito", "/review", "/check"]
+collapse_previous_code_review_comments = true
+
+# Custom review instructions — provides project-specific context
+[prompt_vars]
+# Requirements that apply to ALL code reviews in this project
+requirements = """
+- This is the Smart Ralph project: a Claude Code plugin for spec-driven development
+- Smart Ralph transforms feature requests into structured specs (research, requirements, design, tasks) then executes them task-by-task
+- Key principles: SPEC FIRST, POC BEFORE TESTS, VERIFY EVERY TASK, NO MERGE WITHOUT REVIEW
+- Follow existing patterns in the codebase — do not refactor adjacent code
+- All plugin files are markdown-based (commands, agents, hooks, skills)
+- For plugins: use plugin.json manifest, follow Claude Code plugin conventions
+- For specs: use specs/<name>/tasks.md with done-when + verify commands
+- Never commit directly to main — always PR
+"""
+
+# Summary-specific requirements
+summary_requirements = """
+- Evaluate if the code aligns with Smart Ralph's spec-driven workflow
+- Check for consistency with existing patterns (markdown commands, agent system prompts, hooks)
+- Verify architectural decisions match the epic goals
+"""
+
+# Additional context injected into the system prompt
+awards = ""

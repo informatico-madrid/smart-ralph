@@ -142,6 +142,7 @@ Copy templates from `agent-configs/*.toml.template` into your `.codex/config.tom
 | `$ralph-specum-refactor` | Spec file updates |
 | `$ralph-specum-feedback` | Submit feedback/bugs |
 | `$ralph-specum-help` | Show help and workflow guide |
+| `$ralph-specum-rollback` | Restore to git checkpoint |
 
 ## Hooks
 
