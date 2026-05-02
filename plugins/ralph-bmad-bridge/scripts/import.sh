@@ -465,7 +465,8 @@ ENDTPL
             _print_task()
         }
     }
-    ' "$epics_path" > "$output_path"
+    ' "$epics_path" > "${output_path}.tmp"
+    cp "${output_path}.tmp" "$output_path"
 
     # Build output file
     {
@@ -480,8 +481,9 @@ ENDTPL
         echo ""
         echo "## Phase 1: Make It Work (POC)"
         echo ""
-        cat "$output_path"
+        cat "${output_path}.tmp"
         echo ""
+        rm -f "${output_path}.tmp"
         echo "## Phase 2: Refactoring"
         echo ""
         echo "TODO: Refactor imported code"

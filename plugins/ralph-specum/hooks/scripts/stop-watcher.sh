@@ -486,10 +486,13 @@ EOF
     exit 0
 fi
 
-# Log current state
-if [ "$PHASE" = "execution" ]; then
-    echo "[ralph-specum] Session stopped during spec: $SPEC_NAME | Task: $((TASK_INDEX + 1))/$TOTAL_TASKS | Attempt: $TASK_ITERATION" >&2
+# Non-execution phase: exit silently (no output, no block)
+if [ "$PHASE" != "execution" ]; then
+    exit 0
 fi
+
+# Log current state
+echo "[ralph-specum] Session stopped during spec: $SPEC_NAME | Task: $((TASK_INDEX + 1))/$TOTAL_TASKS | Attempt: $TASK_ITERATION" >&2
 
 # --- Role Boundaries: Field-Level Validation ---
 # Validates state file fields against a baseline to detect role boundary violations.

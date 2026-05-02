@@ -74,15 +74,32 @@ SCRIPT
     # 3.4: accept valid inputs (expect zero, test passes if zero)
     cat > "$TEST_TMPDIR/t34.sh" << 'SCRIPT'
 source "${PLUGIN_ROOT}/scripts/import.sh"
-bmad_tmp=$(mktemp -d)
+bmad_tmp="$(pwd)/bmad_tmp_$$"
+mkdir -p "$bmad_tmp"
 spec_name="valid-test-spec-xx"
 if validate_inputs "$bmad_tmp" "$spec_name" 2>/dev/null; then
+    rm -rf "$bmad_tmp"
     exit 0
 fi
 rm -rf "$bmad_tmp"
 exit 1
 SCRIPT
     run_test "validate_inputs accepts valid inputs" bash "$TEST_TMPDIR/t34.sh"
+
+    # 3.4b: accept valid inputs using project-root temp dir
+    cat > "$TEST_TMPDIR/t34b.sh" << 'SCRIPT'
+source "${PLUGIN_ROOT}/scripts/import.sh"
+bmad_tmp="$(pwd)/bmad_tmp_$$"
+mkdir -p "$bmad_tmp"
+spec_name="valid-test-spec-yy"
+if validate_inputs "$bmad_tmp" "$spec_name" 2>/dev/null; then
+    rm -rf "$bmad_tmp"
+    exit 0
+fi
+rm -rf "$bmad_tmp"
+exit 1
+SCRIPT
+    run_test "validate_inputs accepts valid inputs (project-root)" bash "$TEST_TMPDIR/t34b.sh"
 )
 
 echo "  parse_prd_frs tests:"
@@ -210,7 +227,8 @@ echo "  integration tests:"
     cat > "$TEST_TMPDIR/t39.sh" << 'SCRIPT'
 import_sh="${PLUGIN_ROOT}/scripts/import.sh"
 project_root="$(cd "${PLUGIN_ROOT}/../.." && pwd)"
-td=$(mktemp -d)
+td="$(pwd)/bmad_tmp_$$"
+mkdir -p "$td"
 spec_name="integration-test-xx"
 
 # Create BMAD mini-project structure
@@ -365,7 +383,8 @@ SCRIPT
     cat > "$TEST_TMPDIR/t312.sh" << 'SCRIPT'
 import_sh="${PLUGIN_ROOT}/scripts/import.sh"
 project_root="$(cd "${PLUGIN_ROOT}/../.." && pwd)"
-td=$(mktemp -d)
+td="$(pwd)/bmad_tmp_$$"
+mkdir -p "$td"
 # Create BMAD root with PRD but NO epics.md or architecture.md
 mkdir -p "$td/_bmad-output/planning-artifacts"
 cat > "$td/_bmad-output/planning-artifacts/prd.md" << 'PRDEOF'
