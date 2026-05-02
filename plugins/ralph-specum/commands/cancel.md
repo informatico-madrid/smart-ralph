@@ -70,24 +70,21 @@ If state file exists, read and display:
    rm -f ./specs/.current-spec
    ```
 
-4. Clean up epic state (if spec belongs to an active epic):
+4. Clean up epic state (if spec belongs to the active epic):
    ```bash
-   # Check if this spec belongs to any active epic
-   EPIC_ROOT="$CWD/specs/_epics"
-   if [ -d "$EPIC_ROOT" ]; then
-       for EPIC_DIR in "$EPIC_ROOT"/*/; do
-           if [ -f "$EPIC_DIR/.epic-state.json" ]; then
-               # Check if this spec name is in the epic's specs array
-               if jq -e ".specs[] | select(.name == \"$SPEC_NAME\")" "$EPIC_DIR/.epic-state.json" >/dev/null 2>&1; then
-                   # Remove the spec entry from the epic's specs array
-                   EPIC_STATE="$EPIC_DIR/.epic-state.json"
-                   TMP=$(mktemp)
-                   jq 'del(.specs[] | select(.name == "'"$SPEC_NAME"'"))' "$EPIC_STATE" > "$TMP"
-                   cp "$TMP" "$EPIC_STATE"
-                   rm -f "$TMP"
-               fi
-           fi
-       done
+   # Read active epic from .current-epic
+   EPIC_NAME=$(cat "$CWD/specs/.current-epic" 2>/dev/null || true)
+   if [ -n "$EPIC_NAME" ] && [ -f "$CWD/specs/_epics/$EPIC_NAME/.epic-state.json" ]; then
+       EPIC_STATE="$CWD/specs/_epics/$EPIC_NAME/.epic-state.json"
+       # Check if this spec exists in the epic's specs array
+       if jq -e --arg name "$SPEC_NAME" '.specs[] | select(.name == $name)' "$EPIC_STATE" >/dev/null 2>&1; then
+           # Remove the spec entry from the epic's specs array (atomic via same-dir mktemp + mv)
+           TMP=$(mktemp "$(dirname "$EPIC_STATE")/.epic-state.XXXXXX")
+           jq --arg name "$SPEC_NAME" 'del(.specs[] | select(.name == $name))' "$EPIC_STATE" > "$TMP"
+           mv "$TMP" "$EPIC_STATE"
+       else
+           rm -f "$TMP"
+       fi
    fi
    ```
 
