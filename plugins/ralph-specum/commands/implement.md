@@ -53,7 +53,7 @@ Count tasks using these exact commands:
 ```bash
 TOTAL=$(grep -c -e '- \[.\]' "$SPEC_PATH/tasks.md" 2>/dev/null || true)
 COMPLETED=$(grep -c -e '- \[x\]' "$SPEC_PATH/tasks.md" 2>/dev/null || true)
-FIRST_INCOMPLETE=$((COMPLETED + 1))
+FIRST_INCOMPLETE=$COMPLETED
 ```
 
 Key: Use `-e` flag so grep doesn't interpret the pattern's leading hyphen as an option.
