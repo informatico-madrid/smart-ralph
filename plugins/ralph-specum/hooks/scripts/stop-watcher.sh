@@ -459,6 +459,37 @@ if [ "$GLOBAL_ITERATION" -ge "$MAX_GLOBAL" ]; then
     exit 0
 fi
 
+# Check fix task depth (shell enforcement — complements LLM check in implement.md)
+MAX_FIX_DEPTH=$(jq -r '.maxFixTaskDepth // 3' "$STATE_FILE" 2>/dev/null || echo "3")
+FIX_TASK_MAP=$(jq -r '.fixTaskMap // {}' "$STATE_FILE" 2>/dev/null || echo "{}")
+MAX_FIX_ATTEMPTS=$(jq -r '.maxFixTasksPerOriginal // 3' "$STATE_FILE" 2>/dev/null || echo "3")
+
+if [ "$FIX_TASK_MAP" != "{}" ] && [ -n "$FIX_TASK_MAP" ]; then
+    # Check attempts per original task
+    TASK_IDS=$(echo "$FIX_TASK_MAP" | jq -r 'keys[]')
+    for TASK_ID in $TASK_IDS; do
+        ATTEMPTS=$(echo "$FIX_TASK_MAP" | jq -r --arg id "$TASK_ID" '.[$id].attempts // 0')
+        if [ "$ATTEMPTS" -ge "$MAX_FIX_ATTEMPTS" ] 2>/dev/null; then
+            FIX_IDS=$(echo "$FIX_TASK_MAP" | jq -r --arg id "$TASK_ID" '.[$id].fixTaskIds // [] | join(", ")')
+            echo "[ralph-specum] ERROR: Max fix attempts ($MAX_FIX_ATTEMPTS) reached for task $TASK_ID" >&2
+            echo "[ralph-specum] Fix history: $FIX_IDS" >&2
+            echo "[ralph-specum] Recovery: manual intervention required, then /ralph-specum:cancel" >&2
+            exit 0
+        fi
+        # Check fix task chain depth: count dots in fix task IDs
+        DEPTH_IDS=$(echo "$FIX_TASK_MAP" | jq -r --arg id "$TASK_ID" '.[$id].fixTaskIds // [] | .[]')
+        for FIX_ID in $DEPTH_IDS; do
+            DOT_COUNT=$(echo "$FIX_ID" | tr -cd '.' | wc -c)
+            FIX_DEPTH=$((DOT_COUNT - 1))
+            if [ "$FIX_DEPTH" -ge "$MAX_FIX_DEPTH" ] 2>/dev/null; then
+                echo "[ralph-specum] ERROR: Max fix task depth ($MAX_FIX_DEPTH) exceeded for task $FIX_ID (depth=$FIX_DEPTH)" >&2
+                echo "[ralph-specum] Recovery: fix chain too deep, manual intervention required" >&2
+                exit 0
+            fi
+        done
+    done
+fi
+
 # Quick mode guard: block stop during ANY phase when quickMode is active
 if [ "$QUICK_MODE" = "true" ] && [ "$PHASE" != "execution" ]; then
     STOP_HOOK_ACTIVE=$(echo "$INPUT" | jq -r '.stop_hook_active // false' 2>/dev/null || echo "false")
@@ -764,249 +795,3 @@ find "$CWD/$SPEC_PATH" -name ".progress-task-*.md" -mmin +60 -delete 2>/dev/null
 
 # Note: .progress.md and .ralph-state.json are preserved for loop continuation
 # Use /ralph-specum:cancel to explicitly stop execution and cleanup state
-
-
-# Filesystem Health Check
-check_filesystem_heartbeat() {
-  local spec_dir="$1"
-  local state_file="$2"
-  local timestamp=$(date -u +%Y-%m-%dT%H:%M:%SZ)
-
-  # Write heartbeat file
-  echo "heartbeat: $timestamp" > "$spec_dir/.ralph-heartbeat"
-
-  # Read it back and verify content
-  local content
-  content=$(cat "$spec_dir/.ralph-heartbeat")
-  if echo "$content" | grep -q "^heartbeat:"; then
-    # Success — reset failure tracking AND set filesystemHealthy=true
-    local tmp="${state_file}.tmp"
-    jq \
-      --arg now "$timestamp" \
-      '.filesystemHealthy = true | .filesystemHealthFailures = 0 | .lastFilesystemCheck = $now' \
-      "$state_file" > "$tmp" && mv "$tmp" "$state_file"
-    echo "[ralph-specum] Filesystem heartbeat OK" >&2
-    # SR-018: Cleanup heartbeat file on success (avoid stale file)
-    rm -f "$spec_dir/.ralph-heartbeat"
-    return 0
-  fi
-
-  # Failure — increment counter in state AND set filesystemHealthy=false
-  local failures
-  failures=$(jq -r '.filesystemHealthFailures // 0' "$state_file" 2>/dev/null || echo "0")
-  failures=$((failures + 1))
-  local tmp="${state_file}.tmp"
-  jq --argjson f "$failures" --arg now "$timestamp" \
-    '.filesystemHealthFailures = $f | .lastFilesystemCheck = $now | .filesystemHealthy = false' \
-    "$state_file" > "$tmp" && mv "$tmp" "$state_file"
-
-  echo "[ralph-specum] Filesystem heartbeat FAILED (attempt $failures)" >&2
-
-  if [ "$failures" -eq 1 ]; then
-    # 1st failure: warn, log to .progress.md (SR-008), continue
-    echo "[$(date -u +%Y-%m-%dT%H:%M:%SZ)] WARN: Filesystem heartbeat failed (1/$failures). Filesystem may be read-only." >> "$spec_dir/.progress.md" 2>/dev/null || true
-    return 0
-  elif [ "$failures" -eq 2 ]; then
-    # 2nd failure: escalate, log to .progress.md, block
-    echo "[$(date -u +%Y-%m-%dT%H:%M:%SZ)] ERROR: Filesystem heartbeat failed (2/2). Filesystem is likely read-only." >> "$spec_dir/.progress.md" 2>/dev/null || true
-    local recovery_instructions='
-## Recovery
-1. Check filesystem: mount | grep "$(df "$spec_dir" | tail -1 | awk \"{print \\$1}\")"
-2. If read-only: remount rw: sudo mount -o remount,rw /path/to/mount
-3. Or resume with /ralph-specum:cancel and re-run in a writable environment'
-    printf '{"decision":"block","reason":"Filesystem heartbeat failed 2nd time — filesystem may be degraded","filesystemHealthFailures":%d,"spec":"%s","recoveryInstructions":"%s"}\n' "$failures" "$SPEC_NAME" "$(echo "$recovery_instructions" | tr '\n' ' ' | sed 's/  */ /g')"
-    exit 0
-  else
-    # 3rd+ failure: full block and exit
-    printf '{"decision":"block","reason":"Filesystem heartbeat failed %d consecutive times — full filesystem block","filesystemHealthFailures":%d,"spec":"%s"}\n' "$failures" "$failures" "$SPEC_NAME"
-    exit 0
-  fi
-}
-
-
-# Circuit Breaker Check
-check_circuit_breaker() {
-  local state_file="$1"
-  local spec_name="$2"
-
-  # Read circuitBreaker state (default: closed)
-  local cb_state=$(jq -r '.circuitBreaker.state // "closed"' "$state_file")
-
-  # If already open, block
-  if [ "$cb_state" = "open" ]; then
-    printf '{"decision":"block","reason":"Circuit breaker OPEN — manual reset required","spec":"%s"}\n' "$spec_name"
-    exit 0
-  fi
-
-  # Read failure counts
-  local max_failures=$(jq -r '.circuitBreaker.maxConsecutiveFailures // 5' "$state_file")
-  local consec_failures=$(jq -r '.circuitBreaker.consecutiveFailures // 0' "$state_file")
-  local max_session=$(jq -r '.circuitBreaker.maxSessionSeconds // 172800' "$state_file")
-  local session_start=$(jq -r '.circuitBreaker.sessionStartTime // ""' "$state_file")
-
-  # Check consecutive failures
-  # NOTE: State write is intentionally REMOVED here (SR-005: single-writer principle).
-  # The coordinator (implement.md) owns state writes. stop-watcher.sh only BLOCKS.
-  if [ "$consec_failures" -ge "$max_failures" ] 2>/dev/null; then
-    printf '{"decision":"block","reason":"Consecutive failures exceeded","consecutiveFailures":%d,"maxConsecutiveFailures":%d,"spec":"%s"}\n' "$consec_failures" "$max_failures" "$spec_name"
-    exit 0
-  fi
-
-  # Check session timeout
-  # SR-016: sessionStartTime is now ISO 8601 string (not epoch integer)
-  if [ -n "$session_start" ]; then
-    local start_epoch=$(date -u -d "$session_start" +%s 2>/dev/null || echo 0)
-    local now_epoch=$(date -u +%s)
-    local session_elapsed=$((now_epoch - start_epoch))
-    if [ "$session_elapsed" -ge "$max_session" ] 2>/dev/null; then
-      printf '{"decision":"block","reason":"Session timeout exceeded","sessionElapsedSeconds":%d,"maxSessionSeconds":%d,"spec":"%s"}\n' "$session_elapsed" "$max_session" "$spec_name"
-      exit 0
-    fi
-  fi
-}
-
-
-# CI Command Discovery
-discover_ci_commands() {
-  local spec_dir="$1"
-  local tmpfile
-  tmpfile=$(mktemp)
-
-  # Scan .github/workflows/*.yml for "- run:" command lines
-  if [ -d "$spec_dir/.github/workflows" ]; then
-    for wf in "$spec_dir/.github/workflows"/*.yml; do
-      [ -f "$wf" ] || continue
-      # Extract content after "- run:" from each workflow file
-      { grep -E '^[[:space:]]+-[[:space:]]+run:' "$wf" 2>/dev/null \
-          | sed -E 's/^[[:space:]]*-[[:space:]]+run:[[:space:]]*//' \
-          | while IFS= read -r line; do
-              [ -z "$line" ] && continue
-              # Skip YAML block scalar indicators and comments
-              case "$line" in
-                \#*|"|"*) continue ;;
-              esac
-              line=$(echo "$line" | sed 's/[[:space:]]*$//')
-              [ -z "$line" ] && continue
-              echo "$line"
-            done; } >> "$tmpfile"
-    done
-  fi
-
-  # Scan tests/*.bats for test commands
-  if [ -d "$spec_dir/tests" ]; then
-    for bats_file in "$spec_dir/tests"/*.bats; do
-      [ -f "$bats_file" ] || continue
-      # Extract test runner invocations (e.g., "bats tests/", "test/unit.sh")
-      grep -E '^[[:space:]]*(bats|test|./tests/)' "$bats_file" 2>/dev/null \
-        | grep -v '^[[:space:]]*#' \
-        | grep -v '^[[:space:]]*local ' \
-        | head -5 \
-        | sed 's/^[[:space:]]*//' \
-        | sed 's/[[:space:]]*$//' \
-        | grep -v '^$' \
-        >> "$tmpfile"
-    done
-  fi
-
-  # Deduplicate and return as JSON array
-  if [ -s "$tmpfile" ]; then
-    jq -R -n '[inputs | select(length > 0)] | unique' < "$tmpfile"
-  else
-    echo '[]'
-  fi
-
-  rm -f "$tmpfile"
-}
-
-# CI drift snapshot check
-check_ci_drift() {
-  local state_file="$1"
-
-  # Read ciCommands array from state file (default: empty)
-  local ci_commands
-  ci_commands=$(jq -r '.ciCommands // [] | .[]' "$state_file" 2>/dev/null || true)
-  if [ -z "$ci_commands" ]; then
-    printf '{"drift":false,"commands":[],"baseline":{},"current":{},"spec":"%s"}\n' "$(basename "$(dirname "$state_file")")"
-    return 0
-  fi
-
-  # Resolve baseline file path
-  local spec_dir
-  spec_dir=$(dirname "$state_file")
-  local baseline_file="$spec_dir/.ci-ci-drift-baseline.json"
-
-  # Run each CI command and record pass/fail
-  local current_results=""
-  local cmd_count=0
-  while IFS= read -r cmd; do
-    [ -z "$cmd" ] && continue
-    cmd_count=$((cmd_count + 1))
-    local cmd_hash
-    cmd_hash=$(echo -n "$cmd" | sha256sum | cut -d' ' -f1)
-    local start_time
-    start_time=$(date +%s%N 2>/dev/null || date +%s)
-    set +e
-    # SR-010: Replace eval with bash -c to avoid injection risk
-    bash -c "$cmd" > /dev/null 2>&1
-    local exit_code=$?
-    set -e
-    local end_time
-    end_time=$(date +%s%N 2>/dev/null || date +%s)
-    local status="pass"
-    if [ "$exit_code" -ne 0 ]; then
-      status="fail"
-    fi
-    if [ -n "$current_results" ]; then
-      current_results="$current_results,"
-    fi
-    current_results="${current_results}\"${cmd_hash}\":\"${status}\""
-  done <<< "$ci_commands"
-
-  # Read baseline if it exists
-  local baseline_json="{}"
-  if [ -f "$baseline_file" ]; then
-    baseline_json=$(cat "$baseline_file")
-  fi
-
-  # Compare against baseline and compute drift
-  # SR-011: Use jq --arg instead of string concatenation for JSON safety
-  local drift=false
-  local drifted_json="{}"
-  for cmd_hash in $(echo "{${current_results}}" | jq -r 'keys[]' 2>/dev/null); do
-    local baseline_status
-    baseline_status=$(echo "$baseline_json" | jq -r --arg h "$cmd_hash" '.[$h] // "unknown"' 2>/dev/null)
-    local current_status
-    current_status=$(echo "{${current_results}}" | jq -r --arg h "$cmd_hash" '.[$h]' 2>/dev/null)
-    if [ "$baseline_status" != "unknown" ] && [ "$baseline_status" != "$current_status" ]; then
-      drift=true
-      # Use jq --arg for safe JSON string escaping (SR-011)
-      drifted_json=$(echo "$drifted_json" | jq \
-        --arg h "$cmd_hash" \
-        --arg bs "$baseline_status" \
-        --arg cs "$current_status" \
-        '. + {($h): {"baseline": $bs, "current": $cs}}')
-    fi
-  done
-
-  # Persist baseline for next comparison
-  printf '{%s}' "$current_results" > "$baseline_file" 2>/dev/null || true
-
-  # Return drift result as JSON
-  local spec_name
-  spec_name=$(basename "$(dirname "$state_file")")
-  jq -n \
-    --argjson drift "$drift" \
-    --argjson commands "$(echo "$ci_commands" | jq -R -s 'split("\n") | map(select(length > 0))')" \
-    --argjson baseline "$baseline_json" \
-    --argjson current "{${current_results}}" \
-    --argjson drifted "$drifted_json" \
-    --arg spec "$spec_name" \
-    '{
-      drift: $drift,
-      commands: $commands,
-      baseline: $baseline,
-      current: $current,
-      drifted: $drifted,
-      spec: $spec
-    }'
-}

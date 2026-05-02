@@ -70,7 +70,28 @@ If state file exists, read and display:
    rm -f ./specs/.current-spec
    ```
 
-4. Update Spec Index (removes deleted spec from index):
+4. Clean up epic state (if spec belongs to an active epic):
+   ```bash
+   # Check if this spec belongs to any active epic
+   EPIC_ROOT="$CWD/specs/_epics"
+   if [ -d "$EPIC_ROOT" ]; then
+       for EPIC_DIR in "$EPIC_ROOT"/*/; do
+           if [ -f "$EPIC_DIR/.epic-state.json" ]; then
+               # Check if this spec name is in the epic's specs array
+               if jq -e ".specs[] | select(.name == \"$SPEC_NAME\")" "$EPIC_DIR/.epic-state.json" >/dev/null 2>&1; then
+                   # Remove the spec entry from the epic's specs array
+                   EPIC_STATE="$EPIC_DIR/.epic-state.json"
+                   TMP=$(mktemp)
+                   jq 'del(.specs[] | select(.name == "'"$SPEC_NAME"'"))' "$EPIC_STATE" > "$TMP"
+                   cp "$TMP" "$EPIC_STATE"
+                   rm -f "$TMP"
+               fi
+           fi
+       done
+   fi
+   ```
+
+5. Update Spec Index (removes deleted spec from index):
    ```bash
    ./plugins/ralph-specum/hooks/scripts/update-spec-index.sh --quiet
    ```
@@ -90,6 +111,7 @@ Cleanup:
 - [x] Removed .ralph-state.json
 - [x] Removed spec directory ($spec_path)
 - [x] Cleared current spec marker
+- [x] Cleaned up epic state (removed spec from epic registry)
 
 The spec and all its files have been permanently removed.
 
