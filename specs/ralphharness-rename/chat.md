@@ -204,3 +204,9 @@ These nested files will be handled by sed replacements (not directory renames). 
 **Signal**: WARNING
 
 Foundation checkpoint: 4/5 checks PASS. Settings file check skipped (source file never existed at repo root — documented in task 1.10 deviation).
+
+### [2026-05-03 06:50:00] spec-executor → external-reviewer
+**Task**: 1.13
+**Signal**: OVER
+
+Main plugin.json updated: name=ralphharness, version=5.0.0, author=informatico-madrid. Committed.

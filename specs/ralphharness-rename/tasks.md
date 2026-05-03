@@ -206,7 +206,7 @@ This spec is not complete until ALL criteria are met:
   - **Commit**: `chore(rename): pass foundation checkpoint` (only if fixes needed)
   - _Requirements: AC-1.1, AC-2.1, AC-3.1, AC-13.1, AC-9.1, FR-1, FR-2, FR-5, FR-13_
 
-- [ ] 1.13 Update main plugin.json (name, author, version)
+- [x] 1.13 Update main plugin.json (name, author, version)
   - **Do**:
     1. Set `"name": "ralphharness"` in `plugins/ralphharness/.claude-plugin/plugin.json`
     2. Set `author.name` to `"informatico-madrid"`
