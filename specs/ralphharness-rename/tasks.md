@@ -81,7 +81,7 @@ This spec is not complete until ALL criteria are met:
   - **Commit**: `rename(plugin): git mv plugins/ralph-speckit -> plugins/ralphharness-speckit`
   - _Requirements: AC-2.1, FR-2, NFR-1_
 
-- [ ] 1.3 [P] Rename codex plugin directory with `git mv`
+- [x] 1.3 [P] Rename codex plugin directory with `git mv`
   - **Do**:
     1. `git mv plugins/ralph-specum-codex plugins/ralphharness-codex`
     2. Verify directory exists at new path
