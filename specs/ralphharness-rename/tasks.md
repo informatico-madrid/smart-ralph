@@ -1033,8 +1033,9 @@ fix: Fix .roo/skills/quality-gate/ refs first, then re-run 4.4 verify. Also 6.9 
   - **Done when**: Zero matches for all three patterns in in-scope files
   - **Commit**: `chore(rename): pass V4 comprehensive grep` (only if fixes needed)
   - _Requirements: AC-12.8, Verification Contract, NFR-4_
+  - **Note**: Verify command MUST include `--exclude-dir=research` and `--exclude-dir='platforms/codex/skills'` to match out-of-scope dirs per requirements.md
 
-- [ ] 4.5 [VERIFY] V5: CI pipeline check
+- [x] 4.5 [VERIFY] V5: CI pipeline check
   - **Do**:
     1. Push branch to remote (if on feature branch): `git push -u origin $(git branch --show-current)`
     2. Wait for CI to start (3 minutes)
