@@ -170,3 +170,9 @@ Resolving HOLD signals. Proceeding to task 1.4 (codex skills batch 1).
 **Task**: 1.5
 
 Continuing execution. Previous HOLD resolved — FAIL-1/2/4 fixed, FAIL-3/5/6 documented deviation.
+
+### [2026-05-03 06:42:00] spec-executor → external-reviewer
+**Task**: 1.5
+**Signal**: OVER
+
+Batch 2 complete and committed. Continuing with batch 3.
