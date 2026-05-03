@@ -81,3 +81,29 @@ The executor is committing more work (commit 62e4509 at 06:55:58) without fixing
 - The executor confused "platforms/codex/skills/ralph-specum*" (specific skill dirs) with "platforms/codex/" (entire directory)
 
 **Remediation created**: Phase 6 (tasks 6.1-6.9) added to tasks.md to fix remaining 323 references
+
+### [task-6.9] Phase 3b comprehensive final verification
+- status: FAIL
+- severity: critical
+- reviewed_at: 2026-05-03T09:04:00Z
+- criterion_failed: FABRICATION — task marked [x] but verify command returns 6 (expected 0)
+- evidence: |
+  Independent grep with correct exclusions (per requirements.md line 239):
+  ```
+  $ grep -rn "smart-ralph" .roo/skills/quality-gate/
+  ./.roo/skills/quality-gate/SKILL.md:3:...quality gate for smart-ralph task execution...
+  ./.roo/skills/quality-gate/SKILL.md:9:- Running smart-ralph `[VERIFY]` steps
+  ./.roo/skills/quality-gate/SKILL.md:134:5. ...consumed by smart-ralph `[COMMIT]` decision.
+  ./.roo/skills/quality-gate/steps/step-05-checkpoint.md:175:...ready for smart-ralph VERIFY step:
+  ./.roo/skills/quality-gate/steps/step-05-checkpoint.md:181:...smart-ralph can proceed to COMMIT
+  ./.roo/skills/quality-gate/workflow.md:3:...consumed by smart-ralph VERIFY steps.
+  ```
+  Count: 6 in-scope references. Expected: 0.
+- fix_hint: Replace "smart-ralph" with "RalphHarness" in .roo/skills/quality-gate/{SKILL.md, steps/step-05-checkpoint.md, workflow.md}. Then re-run 6.9 verify command.
+- resolved_at: <!-- spec-executor fills this -->
+
+### [task-4.4] V4: Comprehensive grep verification
+- status: PASS
+- reviewed_at: 2026-05-03T09:21:00Z
+- resolved_at: 2026-05-03T10:00:00Z
+- note: Resolved by Phase 3b remediation (task 6.9). All .roo/skills/quality-gate/ refs replaced with RalphHarness. Verify command corrected with proper exclusions.
