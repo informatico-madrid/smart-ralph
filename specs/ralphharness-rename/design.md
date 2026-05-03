@@ -28,7 +28,17 @@ The project transitions from `tzachbon/smart-ralph` (a fork) to `informatico-mad
 | Test infrastructure | ~13 | 6 .bats files, 1 helper script, version-sync |
 | BMAD configs + output | ~8 | 4 config files in `_bmad/`, 3 output files |
 | Skills outside plugins | ~8 | `.claude/skills/` and `.agents/skills/` review skills |
-| Hidden configs | ~5 | `.gito/`, `.serena/`, `.bmad-harness/` |
+| Other hidden configs | ~5 | `.gito/`, `.serena/`, `.bmad-harness/`, `.roo/` |
+
+### 17. Roo IDE Config (8+ files)
+
+| File | Changes |
+|------|---------|
+| `.roo/skills/quality-gate/SKILL.md` | `smart-ralph` -> `RalphHarness` (3+ refs) |
+| `.roo/skills/quality-gate/steps/step-05-checkpoint.md` | `smart-ralph` -> `RalphHarness` (2 refs) |
+| `.roo/skills/quality-gate/workflow.md` | `smart-ralph` -> `RalphHarness` (1 ref) |
+| `.roo/mcp.json` | Check for plugin path references |
+| `.roo/commands/external-reviewer.md` | Check for command references |
 | Directory renames | 4 directories | `git mv` operations |
 | File deletion | 1 file | `README.fork.md` |
 
@@ -106,7 +116,7 @@ Every mapping below is derived from the research inventory and 9 rounds of adver
 |---------------|----------|--------|
 | `plugins/ralph-specum/` | `plugins/ralphharness/` | `git mv` |
 | `plugins/ralph-speckit/` | `plugins/ralphharness-speckit/` | `git mv` |
-| `plugins/ralph-bmad-bridge/` | `plugins/ralphharness-bmad-bridge/` | `git mv` (author update only, directory name unchanged as it contains no "ralph-specum" references) |
+| `plugins/ralph-bmad-bridge/` | `plugins/ralphharness-bmad-bridge/` | Content update only (author/description). Directory name unchanged — no `ralph-specum` in original name. |
 | `plugins/ralph-specum-codex/` | `plugins/ralphharness-codex/` | `git mv` |
 | `plugins/ralphharness/skills/smart-ralph/` | `plugins/ralphharness/skills/ralphharness/` | `git mv` + SKILL.md update |
 | `plugins/ralphharness-speckit/skills/smart-ralph/` | `plugins/ralphharness-speckit/skills/ralphharness/` | `git mv` + SKILL.md update |
@@ -426,8 +436,7 @@ find plugins/ralphharness -type f -name '*.md' | head -5 | xargs sed -n \
   -e 's/ralph-specum:/ralph-harness:/g' \
   -e 's/ralph-specum/ralphharness/g' \
   -e 's/smart-ralph/ralphharness/g' \
-  -e 's/tzachbon/informatico-madrid/g' \
-  -p
+  -e 's/tzachbon/informatico-madrid/g'
 ```
 Compare output against expected changes in the File Change Matrix. Any unexpected modifications are red flags. Do this for ALL target directories (ralphharness, ralphharness-codex, ralphharness-speckit, root docs) before applying actual changes.
 
@@ -447,6 +456,8 @@ Compare output against expected changes in the File Change Matrix. Any unexpecte
    find plugins/ralphharness-codex -type f -exec sed -i \
      -e 's/ralph-specum:/ralph-harness:/g' \
      -e 's/ralph-specum/ralphharness/g' \
+     -e 's/smart-ralph/ralphharness/g' \
+     -e 's/Ralph Specum/RalphHarness/g' -e 's/Smart Ralph/RalphHarness/g' \
      -e 's/tzachbon/informatico-madrid/g' \
      {} +
    ```
@@ -547,7 +558,8 @@ All patterns must return **0**:
 grep -rn "ralph-specum\|tzachbon\|smart-ralph" . \
   --include='*.md' --include='*.json' --include='*.sh' --include='*.yml' --include='*.yaml' \
   --exclude-dir=specs --exclude-dir=_bmad-output --exclude-dir=docs/brainstormmejora \
-  --exclude-dir=docs/plans --exclude-dir=plans --exclude-dir=.git | wc -l
+  --exclude-dir=docs/plans --exclude-dir=plans --exclude-dir=.git \
+  --exclude-dir=.roo --exclude-dir=.cursor --exclude-dir=.gemini --exclude-dir=.qwen | wc -l
 ```
 Expected: `0`
 
