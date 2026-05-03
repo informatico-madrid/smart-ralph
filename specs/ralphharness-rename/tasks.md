@@ -919,28 +919,28 @@ This spec is not complete until ALL criteria are met:
 3. `git add` and `git commit`
 - **Verify**: `grep -c "ralph-specum\|tzachbon\|smart-ralph" .gito/config.toml .claude-plugin/marketplace.json` returns 0
 
-- [ ] 6.4 — Fix remaining references in _bmad/ configs
+- [x] 6.4 — Fix remaining references in _bmad/ configs
 - **Do**:
 1. `grep -rn "ralph-specum\|tzachbon\|smart-ralph" _bmad/`
 2. Fix all references in `_bmad/config.toml`, `_bmad/config.user.toml`, `_bmad/bmm/config.yaml`, `_bmad/bmb/config.yaml`
 3. `git add` and `git commit`
 - **Verify**: `grep -c "ralph-specum\|tzachbon\|smart-ralph" _bmad/*.toml _bmad/bmm/config.yaml _bmad/bmb/config.yaml` returns 0
 
-- [ ] 6.5 — Fix remaining references in specs/.index/
+- [x] 6.5 — Fix remaining references in specs/.index/
 - **Do**:
 1. `grep -rn "ralph-specum\|tzachbon\|smart-ralph" specs/.index/`
 2. Fix all references in `specs/.index/index.md` and `specs/.index/index-state.json`
 3. `git add` and `git commit`
 - **Verify**: `grep -c "ralph-specum\|tzachbon\|smart-ralph" specs/.index/index.md specs/.index/index-state.json` returns 0
 
-- [ ] 6.6 — Fix remaining references in tests/ helpers
+- [x] 6.6 — Fix remaining references in tests/ helpers
 - **Do**:
 1. `grep -rn "ralph-specum\|tzachbon\|smart-ralph" tests/`
 2. Fix all references in test helper files (`tests/helpers/setup.bash`, `tests/helpers/version-sync.sh`) and bats tests
 3. `git add` and `git commit`
 - **Verify**: `grep -c "ralph-specum\|tzachbon\|smart-ralph" tests/helpers/*.bash` returns 0
 
-- [ ] 6.7 — Fix remaining references in plugins/ content
+- [x] 6.7 — Fix remaining references in plugins/ content
 - **Do**:
 1. `grep -rn "ralph-specum\|tzachbon\|smart-ralph" plugins/ralphharness*/`
 2. Check if any renamed directories still have old references in file content
@@ -948,7 +948,7 @@ This spec is not complete until ALL criteria are met:
 4. `git add` and `git commit`
 - **Verify**: `grep -c "ralph-specum\|tzachbon\|smart-ralph" plugins/ralphharness*/**/*.{md,json,yaml,yml,toml,sh}` returns 0
 
-- [ ] 6.8 — Fix platforms/codex/README.md and codex bats tests
+- [x] 6.8 — Fix platforms/codex/README.md and codex bats tests
 - **Do**:
 1. `grep -rn "ralph-specum\|tzachbon\|smart-ralph" platforms/codex/`
 2. Fix references in `platforms/codex/README.md` and `tests/codex-*.bats`
@@ -957,6 +957,11 @@ This spec is not complete until ALL criteria are met:
 - **Verify**: `grep -c "ralph-specum\|tzachbon\|smart-ralph" platforms/codex/README.md tests/codex-*.bats` returns 0
 
 - [ ] 6.9 [VERIFY] — Phase 3b comprehensive final verification
+<!-- reviewer-diagnosis
+what: Task marked [x] but verify command FAILS — 6 in-scope refs remain in .roo/skills/quality-gate/
+why: grep -rn "smart-ralph" .roo/skills/quality-gate/ returns 6 matches. The verify command in 6.9 expects 0.
+fix: Replace "smart-ralph" with "RalphHarness" in .roo/skills/quality-gate/SKILL.md, steps/step-05-checkpoint.md, workflow.md. Then re-run verify.
+-->
 - **Done when**: All 323+ in-scope references have been replaced
 - **Verify**:
 ```bash
@@ -978,7 +983,7 @@ Expected: 0
 
 **Goal:** Run full verification sequence V1 through V8. Quality checkpoints, CI checks, and acceptance criteria checklist.
 
-- [ ] 4.1 [VERIFY] V1: JSON/TOML/YAML structured file validation
+- [x] 4.1 [VERIFY] V1: JSON/TOML/YAML structured file validation
   - **Do**:
     1. Validate all JSON files in plugins, .claude-plugin, .agents, .gito, .serena: `jq . <file>`
     2. Validate all TOML files in plugins, .gito, _bmad, .bmad-harness: `python3 -c "import tomllib; tomllib.load(open('$f', 'rb'))"`
