@@ -1,4 +1,4 @@
-# Smart Ralph — Master Improvement Plan
+# RalphHarness — Master Improvement Plan
 
 > **Date**: 2026-04-13
 > **Sources**: Brainstorm 1 (Perplexity, 1273 lines) + Brainstorm 2 (Perplexity, ~330 turns) + Full codebase audit + 20-claim verification against real files
@@ -149,7 +149,7 @@ Wait — re-checking: `recoveryMode` IS in the schema. `nativeTaskMap`, `nativeS
 ### Strategic Gaps (Future)
 
 #### S1: No BMAD Integration
-BMAD generates excellent rigid specs for large features. No bridge to smart-ralph format exists.
+BMAD generates excellent rigid specs for large features. No bridge to ralphharness format exists.
 
 #### S2: Unused speckit Plugin
 `plugins/ralph-speckit/` exists (47 files) but is not referenced in any command or skill.
@@ -267,7 +267,7 @@ Bmalph avoids this by putting complexity in **infra** (git commands, exit codes,
 │ PHASE 5: Extend with BMAD Bridge ✅ DONE │
 │ Spec: bmad-bridge-plugin (completed 2026-04-28) │
 │ │
-│ 1. BMAD → smart-ralph spec mapper (structural) ✅ │
+│ 1. BMAD → ralphharness spec mapper (structural) ✅ │
 │ 2. Plugin: plugins/ralph-bmad-bridge/ ✅ │
 │ 3. Entry: /ralph-bmad:import <path> <spec-name> ✅ │
 └──────────────────────┬──────────────────────────────┘
@@ -364,7 +364,7 @@ Bmalph avoids this by putting complexity in **infra** (git commands, exit codes,
 | 4 | **Read-only detection** | At loop start: attempt small write to .progress.md. If fails → exit with "Repository is read-only". |
 | 5 | **CI snapshot tracking** | Separate from task verification: after each quality checkpoint task, record global CI state (ruff exit code, mypy exit code, coverage %) in .ralph-state.json. This is different from per-task verify results. **Includes CI command discovery**: coordinator auto-detects project CI commands from Verification Contract in requirements.md (Project type + CI commands field) or from project config files (package.json scripts, pyproject.toml lint config, Makefile targets). Stores discovered commands in `.ralph-state.json` as `ciCommands: string[]` (schema field added in Spec 1). The conceptual separation rule was added in Spec 1; this spec adds the mechanical discovery and tracking. |
 
-**Borrowed from Bmalph**: These are proven features. Adapt to smart-ralph's architecture, don't copy blindly.
+**Borrowed from Bmalph**: These are proven features. Adapt to ralphharness's architecture, don't copy blindly.
 
 ---
 
@@ -379,7 +379,7 @@ Bmalph avoids this by putting complexity in **infra** (git commands, exit codes,
 | Component | Detail |
 |-----------|--------|
 | **Plugin** | `plugins/ralph-bmad-bridge/` following standard plugin structure (plugin.json, commands/, scripts/) |
-| **Mapper** | Structural (not AI prompts). Read BMAD artifacts → map to smart-ralph spec format. |
+| **Mapper** | Structural (not AI prompts). Read BMAD artifacts → map to ralphharness spec format. |
 | **Entry point** | `/ralph-bmad:import <bmad-project-path> <spec-name>` |
 | **Mapping**: | |
 
@@ -516,7 +516,7 @@ Bmalph avoids this by putting complexity in **infra** (git commands, exit codes,
 | 9 | **Rollback available** | After Spec 4: pre-loop checkpoint SHA stored in .ralph-state.json. Test: run spec, intentionally break code, `git reset --hard <SHA>` restores. |
 | 10 | **Circuit breaker stops runaway loops** | After Spec 4: after N consecutive failures, execution stops with error. Test: create spec with failing tasks, verify stop. |
 | 11 | **Metrics visible** | After Spec 4: `.metrics.jsonl` file exists after execution with per-task entries. |
-| 12 | **BMAD specs accepted** | After Spec 5: `/ralph-bmad:import` produces valid spec in `specs/<name>/` that `/ralph-specum:implement` can execute. |
+| 12 | **BMAD specs accepted** | After Spec 5: `/ralph-bmad:import` produces valid spec in `specs/<name>/` that `/ralphharness:implement` can execute. |
 | 13 | **Human escalation only for judgment** | Problems like "tests broken", "coverage faked", "state inconsistent" caught by engine. Only semantic/product decisions reach human. |
 | 14 | **Cross-branch regression solved autonomously** | After Spec 6: when a test passes on main but fails on HEAD (with no test/fixture changes), agents follow the collaboration workflow to find root cause without human escalation. Test: intentionally break code in a spec, verify agents investigate via git diff and find the bug. |
 | 15 | **BUG_DISCOVERY creates fix tasks** | After Spec 6: reviewer can write BUG_DISCOVERY to task_review.md, coordinator generates a fix task from it. Test: reviewer discovers a bug, verify fix task is created and executed. |
@@ -529,7 +529,7 @@ Bmalph avoids this by putting complexity in **infra** (git commands, exit codes,
 ## 9. Execution Rules
 
 1. **Sequential only**: Each spec depends on the previous. Do not skip or parallelize.
-2. **Use smart-ralph's own workflow**: Each spec goes through research → requirements → design → tasks → implement.
+2. **Use ralphharness's own workflow**: Each spec goes through research → requirements → design → tasks → implement.
 3. **Tasks must have concrete Verify commands**: grep, file existence, content validation. Not "verify quality".
 4. **Show tasks.md for review before implementing**.
 5. **No breaking changes**: Existing specs must continue to work after each spec.
@@ -583,12 +583,12 @@ This document differs from earlier versions in these ways (after full codebase a
 
 ## 11. Next Action
 
-**This document is frozen as the source of truth for the smart-ralph engine.**
+**This document is frozen as the source of truth for the ralphharness engine.**
 Location: `docs/ENGINE_ROADMAP.md`
 
 **To create Spec 1, give this to your VS Code agent:**
 
-> Create spec `engine-state-hardening` using smart-ralph's own workflow.
+> Create spec `engine-state-hardening` using ralphharness's own workflow.
 > Use `docs/ENGINE_ROADMAP.md` as the single source of truth for gaps and requirements.
-> Follow the Spec 1 brief in Section 6. Read `plugins/ralph-specum/templates/` for format.
+> Follow the Spec 1 brief in Section 6. Read `plugins/ralphharness/templates/` for format.
 > Show me tasks.md for review before implementing.

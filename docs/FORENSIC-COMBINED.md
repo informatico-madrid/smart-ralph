@@ -28,12 +28,12 @@ Las discrepancias se resolvieron verificando contra código fuente. El veredicto
 ## 1. Flujo Completo de Fases
 
 ```
-[1] /ralph-specum:start
+[1] /ralphharness:start
     → product-manager.md
     → requirements.md + ## Verification Contract
     → awaitingApproval = true  ──► PAUSA (usuario aprueba)
 
-[2] /ralph-specum:design
+[2] /ralphharness:design
     → architect-reviewer.md
     → design.md + ## Test Strategy (MANDATORY)
     │     • Test Double Policy (4 tipos: Stub/Fake/Mock/Fixture)
@@ -43,7 +43,7 @@ Las discrepancias se resolvieron verificando contra código fuente. El veredicto
     │     • Test File Conventions ← Descubre via Explore scan
     → awaitingApproval = true  ──► PAUSA (usuario aprueba)
 
-[3] /ralph-specum:plan
+[3] /ralphharness:plan
     → task-planner.md
     → tasks.md
     │     Phase 1: Make It Work (NO tests)
@@ -52,7 +52,7 @@ Las discrepancias se resolvieron verificando contra código fuente. El veredicto
     │     Phase 4: Quality Gates
     │     ← SIN regla de orden: tests después de implementación
     │
-[4] /ralph-specum:implement
+[4] /ralphharness:implement
     → spec-executor.md + stop-watcher.sh
     → tasks.md se ejecutan una a una
     │     Sequential → spec-executor (implementa + marca [x])
