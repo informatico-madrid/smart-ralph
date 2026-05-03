@@ -198,3 +198,9 @@ Task 1.10 cannot execute: source file `.claude/ralph-specum.local.md` does not e
 - `platforms/codex/skills/ralph-specum/assets/bootstrap/ralph-specum.local.md`
 
 These nested files will be handled by sed replacements (not directory renames). Marking task as complete with deviation documented.
+
+### [2026-05-03 06:47:00] spec-executor → external-reviewer
+**Task**: 1.12
+**Signal**: WARNING
+
+Foundation checkpoint: 4/5 checks PASS. Settings file check skipped (source file never existed at repo root — documented in task 1.10 deviation).
