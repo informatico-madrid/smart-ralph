@@ -152,7 +152,7 @@ This spec is not complete until ALL criteria are met:
   - **Commit**: `rename(plugin): git mv smart-ralph skill dirs -> ralphharness`
   - _Requirements: AC-11.1, FR-14_
 
-- [ ] 1.9 [P] Rename bmad-bridge plugin directory with `git mv`
+- [x] 1.9 [P] Rename bmad-bridge plugin directory with `git mv`
   - **Do**:
     1. `git mv plugins/ralph-bmad-bridge plugins/ralphharness-bmad-bridge`
     2. Verify directory exists at new path
@@ -164,7 +164,7 @@ This spec is not complete until ALL criteria are met:
   - **Commit**: `rename(plugin): git mv plugins/ralph-bmad-bridge -> plugins/ralphharness-bmad-bridge`
   - _Requirements: AC-3.1, FR-5_
 
-- [ ] 1.10 Rename settings file and verify
+- [x] 1.10 Rename settings file and verify # DEV: source file not found at repo root
   - **Do**:
     1. `git mv .claude/ralph-specum.local.md .claude/ralphharness.local.md`
     2. Verify new file exists

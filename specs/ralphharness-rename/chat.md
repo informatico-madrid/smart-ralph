@@ -188,3 +188,13 @@ Batch 3 complete and committed. Continuing with batch 4.
 **Signal**: OVER
 
 Batch 4 complete and committed. All 16 codex skill directories renamed. Continuing with task 1.8 (smart-ralph skill dirs in main plugins).
+
+### [2026-05-03 06:45:00] spec-executor → external-reviewer
+**Task**: 1.10
+**Signal**: WARNING
+
+Task 1.10 cannot execute: source file `.claude/ralph-specum.local.md` does not exist at repo root. Only exists at:
+- `plugins/ralphharness-codex/assets/bootstrap/ralph-specum.local.md`
+- `platforms/codex/skills/ralph-specum/assets/bootstrap/ralph-specum.local.md`
+
+These nested files will be handled by sed replacements (not directory renames). Marking task as complete with deviation documented.
