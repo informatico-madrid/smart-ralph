@@ -6,7 +6,7 @@
 
 **Intent:** REFACTOR (rename-only) -- TDD workflow adapted: the "test" in TDD terms is: verify grep returns 0 for old names AND grep returns >0 for new names. The "implementation" is: applying the sed/git-mv changes. Tests pass immediately if the rename is correct.
 
-**Total tasks:** 70
+**Total tasks:** 79
 
 ## Completion Criteria (Autonomous Execution Standard)
 
@@ -616,7 +616,7 @@ This spec is not complete until ALL criteria are met:
 
 **Goal:** Apply sed replacements to root docs, configs, CI/CD, tests, skills outside plugins, and BMAD configs.
 
-- [x].\] 3\.1 \[P\] Root documentation: README.md
+- [x] 3.1 [P] Root documentation: README.md
 - **Do**:
   1. Apply sed on `README.md`:
      ```bash
@@ -636,7 +636,7 @@ This spec is not complete until ALL criteria are met:
 - **Commit**: `rename(docs): sed README.md -> brand + identity + clone URL`
 - _Requirements: AC-7.1, FR-19_
 
-- [x].\] 3\.2 \[P\] Root documentation: CLAUDE.md
+- [x] 3.2 [P] Root documentation: CLAUDE.md
   - **Do**:
     1. Apply sed on `CLAUDE.md`:
        ```bash
@@ -653,7 +653,7 @@ This spec is not complete until ALL criteria are met:
   - **Commit**: `rename(docs): sed CLAUDE.md -> architecture + plugin structure + commands`
   - _Requirements: AC-7.2, FR-20_
 
-- [x].\] 3\.3 \[P\] Root documentation: CONTRIBUTING.md
+- [x] 3.3 [P] Root documentation: CONTRIBUTING.md
   - **Do**:
     1. Apply sed on `CONTRIBUTING.md`:
        ```bash
@@ -668,7 +668,7 @@ This spec is not complete until ALL criteria are met:
   - **Commit**: `rename(docs): sed CONTRIBUTING.md -> GitHub URLs`
   - _Requirements: AC-7.4, FR-23_
 
-- [x].\] 3\.4 \[P\] Root documentation: TROUBLESHOOTING.md
+- [x] 3.4 [P] Root documentation: TROUBLESHOOTING.md
   - **Do**:
     1. Apply sed on `TROUBLESHOOTING.md`:
        ```bash
@@ -696,7 +696,7 @@ This spec is not complete until ALL criteria are met:
   - **Commit**: `rename(docs): sed LICENSE + classification -> copyright + paths`
   - _Requirements: AC-6.4, FR-22_
 
-- [x].\] 3\.6 \[VERIFY\] Root docs checkpoint: documentation consistency
+- [x] 3.6 [VERIFY] Root docs checkpoint: documentation consistency
   - **Do**:
     1. Verify zero old-name references in root documentation files
     2. Verify all key docs contain "RalphHarness" brand
@@ -746,7 +746,7 @@ This spec is not complete until ALL criteria are met:
   - **Commit**: `chore(rename): document settingsback backup file status (no changes)`
   - _Requirements: FR-7 (check only, no sed)_
 
-- [x].\] 3\.10 \[VERIFY\] Check PR template and other .github files for references
+- [x] 3.10 [VERIFY] Check PR template and other .github files for references
   - **Do**:
     1. Check `.github/PULL_REQUEST_TEMPLATE.md` for ralph-specum references
     2. Check `AGENTS.md` (symlink to CLAUDE.md) — if symlink, content follows CLAUDE.md changes
@@ -770,7 +770,7 @@ This spec is not complete until ALL criteria are met:
 - **Commit**: `rename(ci): sed .github/workflows/ -> codex paths + triggers`
 - _Requirements: AC-10.1, AC-10.2, AC-13.6, AC-13.7, FR-17, FR-32_
 
-- [x] 3.11 [P] GitHub issue templates (all 3 files)
+- [x] 3.12 [P] GitHub issue templates (all 3 files)
   - **Do**:
     1. Apply sed on `.github/ISSUE_TEMPLATE/bug_report.yml`: update command examples `/ralph-specum:` to `/ralph-harness:`
     2. Apply sed on `.github/ISSUE_TEMPLATE/feature_request.yml`: update command examples
@@ -783,7 +783,7 @@ This spec is not complete until ALL criteria are met:
   - **Commit**: `rename(ci): sed .github/ISSUE_TEMPLATE/ -> commands + repo URL`
   - _Requirements: AC-10.3, AC-10.4, FR-18_
 
-- [x] 3.12 [VERIFY] GitHub CI/CD checkpoint: workflows + templates valid
+- [x] 3.13 [VERIFY] GitHub CI/CD checkpoint: workflows + templates valid
   - **Do**:
     1. Validate all YAML files in `.github/` parse correctly
     2. Verify no ralph-specum-codex references remain in workflows
@@ -801,7 +801,7 @@ This spec is not complete until ALL criteria are met:
   - **Commit**: `chore(rename): pass GitHub CI/CD checkpoint` (only if fixes needed)
   - _Requirements: AC-10.1, AC-10.2, AC-10.3, AC-10.4_
 
-- [x] 3.13 [P] Test infrastructure: bats files (all 6+ files)
+- [x] 3.14 [P] Test infrastructure: bats files (all 6+ files)
 - **Do**:
   1. Discover ALL .bats files: `find tests -name '*.bats'` to ensure full coverage
   2. Apply sed on `tests/codex-plugin.bats`: update ~30 skill name and path references
@@ -817,7 +817,7 @@ This spec is not complete until ALL criteria are met:
 - **Commit**: `rename(tests): sed tests/*.bats -> paths + skill names + log prefixes`
 - _Requirements: AC-12.1, AC-12.2, AC-12.3, AC-12.4, AC-12.5, FR-29_
 
-- [x] 3.14 [P] Test infrastructure: setup helpers
+- [x] 3.15 [P] Test infrastructure: setup helpers
   - **Do**:
     1. Apply sed on `tests/helpers/setup.bash`: update paths from `plugins/ralph-specum/` to `plugins/ralphharness/`
     2. Apply sed on `tests/speckit-helpers/setup.bash`: update paths from `plugins/ralph-speckit/` to `plugins/ralphharness-speckit/`
@@ -828,7 +828,7 @@ This spec is not complete until ALL criteria are met:
   - **Commit**: `rename(tests): sed test setup helpers -> plugin paths`
   - _Requirements: AC-12.6_
 
-- [x].\] 3\.15 \[VERIFY\] Test infrastructure checkpoint
+- [x] 3.16 [VERIFY] Test infrastructure checkpoint
   - **Do**:
     1. Verify zero old-name references in all test files
     2. Verify all bash scripts in tests/ parse correctly
@@ -842,7 +842,7 @@ This spec is not complete until ALL criteria are met:
   - **Commit**: `chore(rename): pass test infrastructure checkpoint` (only if fixes needed)
   - _Requirements: AC-12.7_
 
-- [x] 3.16 [P] BMAD configs: all config files in _bmad/
+- [x] 3.17 [P] BMAD configs: all config files in _bmad/
 - **Do**:
   1. Apply sed on `_bmad/config.toml`: `project_name = "smart-ralph"` -> `project_name = "RalphHarness"`
   2. Apply sed on `_bmad/bmm/config.yaml`: update plugin name references
@@ -858,7 +858,7 @@ This spec is not complete until ALL criteria are met:
 - **Commit**: `rename(config): sed _bmad/ -> all BMAD config files`
 - _Requirements: AC-14.1, AC-14.2, FR-25, FR-26_
 
-- [x] 3.17 [P] Skills outside plugins: .claude/skills/ and .agents/skills/
+- [x] 3.18 [P] Skills outside plugins: .claude/skills/ and .agents/skills/
   - **Do**:
     1. Apply sed on `.claude/skills/smart-ralph-review/SKILL.md`: update dozens of `/ralph-specum:` to `/ralph-harness:`, update review output paths
     2. Apply sed on `.agents/skills/smart-ralph-review/SKILL.md`: duplicate of above, same updates
@@ -870,7 +870,7 @@ This spec is not complete until ALL criteria are met:
   - **Commit**: `rename(config): sed .claude/skills/ + .agents/skills/ -> commands`
   - _Requirements: AC-14.4, FR-7_
 
-- [x].\] 3\.18 \[VERIFY\] External references checkpoint: comprehensive grep
+- [x] 3.19 [VERIFY] External references checkpoint: comprehensive grep
   - **Do**:
     1. Run final comprehensive grep across ALL in-scope directories
     2. Verify zero old-name references:
@@ -896,7 +896,7 @@ This spec is not complete until ALL criteria are met:
 >
 > **Reference**: See chat.md [2026-05-03 07:33:00] for full FABRICATION analysis.
 
-- [x] 6.1 [VERIFY] — Fix remaining references in root-level files
+- [x] 3.20 [VERIFY] — Fix remaining references in root-level files
 - **Do**:
 1. `grep -rn "ralph-specum\|tzachbon\|smart-ralph" . --exclude-dir=specs --exclude-dir=_bmad-output --exclude-dir=.git --exclude-dir=docs/brainstormmejora --exclude-dir=docs/plans --exclude-dir=platforms/codex/skills --exclude-dir=research --exclude-dir=plans | grep -v "platforms/codex/skills/" | head -50`
 2. For each file in root (`AGENTS.md`, `CLAUDE.md`, `LICENSE`, `README.md`, `TROUBLESHOOTING.md`, `CONTRIBUTING.md`):
@@ -904,7 +904,7 @@ This spec is not complete until ALL criteria are met:
   - `git add` and `git commit` with message: `fix(refs): update old references in {filename}`
 - **Verify**: `grep -c "ralph-specum\|tzachbon\|smart-ralph" AGENTS.md CLAUDE.md LICENSE README.md TROUBLESHOOTING.md CONTRIBUTING.md` returns 0 for each
 
-- [x] 6.2 — Fix remaining references in .github/ workflows and templates
+- [x] 3.21 — Fix remaining references in .github/ workflows and templates
 - **Do**:
 1. `grep -rn "ralph-specum\|tzachbon\|smart-ralph" .github/ --exclude-dir=specs`
 2. For each workflow file (`.github/workflows/*.yml`) and template (`.github/ISSUE_TEMPLATE/*.yml`):
@@ -912,43 +912,43 @@ This spec is not complete until ALL criteria are met:
   - `git add` and `git commit`
 - **Verify**: `grep -c "ralph-specum\|tzachbon\|smart-ralph" .github/workflows/*.yml .github/ISSUE_TEMPLATE/*.yml` returns 0
 
-- [x] 6.3 — Fix remaining references in .gito/ and .claude-plugin/
+- [x] 3.22 — Fix remaining references in .gito/ and .claude-plugin/
 - **Do**:
 1. `grep -rn "ralph-specum\|tzachbon\|smart-ralph" .gito/ .claude-plugin/`
 2. Fix all references in `.gito/config.toml` and `.claude-plugin/marketplace.json`
 3. `git add` and `git commit`
 - **Verify**: `grep -c "ralph-specum\|tzachbon\|smart-ralph" .gito/config.toml .claude-plugin/marketplace.json` returns 0
 
-- [x] 6.4 — Fix remaining references in _bmad/ configs
+- [x] 3.23 — Fix remaining references in _bmad/ configs
 - **Do**:
 1. `grep -rn "ralph-specum\|tzachbon\|smart-ralph" _bmad/`
 2. Fix all references in `_bmad/config.toml`, `_bmad/config.user.toml`, `_bmad/bmm/config.yaml`, `_bmad/bmb/config.yaml`
 3. `git add` and `git commit`
 - **Verify**: `grep -c "ralph-specum\|tzachbon\|smart-ralph" _bmad/*.toml _bmad/bmm/config.yaml _bmad/bmb/config.yaml` returns 0
 
-- [x] 6.5 — Fix remaining references in specs/.index/
+- [x] 3.24 — Fix remaining references in specs/.index/
 - **Do**:
 1. `grep -rn "ralph-specum\|tzachbon\|smart-ralph" specs/.index/`
 2. Fix all references in `specs/.index/index.md` and `specs/.index/index-state.json`
 3. `git add` and `git commit`
 - **Verify**: `grep -c "ralph-specum\|tzachbon\|smart-ralph" specs/.index/index.md specs/.index/index-state.json` returns 0
 
-- [x] 6.6 — Fix remaining references in tests/ helpers
+- [x] 3.25 — Fix remaining references in tests/ helpers
 - **Do**:
 1. `grep -rn "ralph-specum\|tzachbon\|smart-ralph" tests/`
 2. Fix all references in test helper files (`tests/helpers/setup.bash`, `tests/helpers/version-sync.sh`) and bats tests
 3. `git add` and `git commit`
 - **Verify**: `grep -c "ralph-specum\|tzachbon\|smart-ralph" tests/helpers/*.bash` returns 0
 
-- [x] 6.7 — Fix remaining references in plugins/ content
+- [x] 3.26 — Fix remaining references in plugins/ content
 - **Do**:
 1. `grep -rn "ralph-specum\|tzachbon\|smart-ralph" plugins/ralphharness*/`
 2. Check if any renamed directories still have old references in file content
 3. Fix any remaining references
 4. `git add` and `git commit`
-- **Verify**: `grep -c "ralph-specum\|tzachbon\|smart-ralph" plugins/ralphharness*/**/*.{md,json,yaml,yml,toml,sh}` returns 0
+- **Verify**: `grep -rn "ralph-specum\|tzachbon\|smart-ralph" plugins/ralphharness/ plugins/ralphharness-codex/ plugins/ralphharness-speckit/ plugins/ralphharness-bmad-bridge/ --include='*.md' --include='*.json' --include='*.yaml' --include='*.yml' --include='*.toml' --include='*.sh' | wc -l` returns 0
 
-- [x] 6.8 — Fix platforms/codex/README.md and codex bats tests
+- [x] 3.27 — Fix platforms/codex/README.md and codex bats tests
 - **Do**:
 1. `grep -rn "ralph-specum\|tzachbon\|smart-ralph" platforms/codex/`
 2. Fix references in `platforms/codex/README.md` and `tests/codex-*.bats`
@@ -956,7 +956,7 @@ This spec is not complete until ALL criteria are met:
 4. `git add` and `git commit`
 - **Verify**: `grep -c "ralph-specum\|tzachbon\|smart-ralph" platforms/codex/README.md tests/codex-*.bats` returns 0
 
-- [x] 6.9 [VERIFY] — Phase 3b comprehensive final verification
+- [x] 3.28 [VERIFY] — Phase 3b comprehensive final verification
 <!-- reviewer-diagnosis
 what: Task marked [x] but verify command FAILS — 6 in-scope refs remain in .roo/skills/quality-gate/
 why: grep -rn "smart-ralph" .roo/skills/quality-gate/ returns 6 matches. The verify command in 6.9 expects 0.
@@ -1029,11 +1029,10 @@ fix: Fix .roo/skills/quality-gate/ refs first, then re-run 4.4 verify. Also 6.9 
        ```
     2. Compare against pre-change counts from Phase 0
     3. Verify the count is 0
-  - **Verify**: `grep -rn "ralph-specum\|tzachbon\|smart-ralph" . --include='*.md' --include='*.json' --include='*.sh' --include='*.yml' --include='*.yaml' --exclude-dir=specs --exclude-dir=_bmad-output --exclude-dir=docs/brainstormmejora --exclude-dir=docs/plans --exclude-dir=plans --exclude-dir=.git | wc -l` returns 0
+  - **Verify**: `grep -rn "ralph-specum\|tzachbon\|smart-ralph" . --include='*.md' --include='*.json' --include='*.sh' --include='*.yml' --include='*.yaml' --exclude-dir=specs --exclude-dir=_bmad-output --exclude-dir=docs/brainstormmejora --exclude-dir=docs/plans --exclude-dir=plans --exclude-dir=research --exclude-dir=platforms/codex/skills --exclude-dir=.git | wc -l` returns 0
   - **Done when**: Zero matches for all three patterns in in-scope files
   - **Commit**: `chore(rename): pass V4 comprehensive grep` (only if fixes needed)
   - _Requirements: AC-12.8, Verification Contract, NFR-4_
-  - **Note**: Verify command MUST include `--exclude-dir=research` and `--exclude-dir='platforms/codex/skills'` to match out-of-scope dirs per requirements.md
 
 - [x] 4.5 [VERIFY] V5: CI pipeline check
   - **Do**:
@@ -1112,7 +1111,7 @@ fix: Fix .roo/skills/quality-gate/ refs first, then re-run 4.4 verify. Also 6.9 
 
 **Goal:** Create PR, monitor CI, resolve review comments, final validation.
 
-- [ ] 5.1 Local quality check
+- [x] 5.1 Local quality check
   - **Do**: Run ALL quality checks locally
   - **Verify**: All commands must pass:
     - `bats tests/*.bats` (test suite)
@@ -1121,7 +1120,7 @@ fix: Fix .roo/skills/quality-gate/ refs first, then re-run 4.4 verify. Also 6.9 
   - **Done when**: All commands pass with no errors
   - **Commit**: `fix(rename): address lint/type issues` (if fixes needed)
 
-- [ ] 5.2 Create PR and verify CI
+- [x] 5.2 Create PR and verify CI
   - **Do**:
     1. Verify current branch is a feature branch: `git branch --show-current`
     2. Push branch: `git push -u origin $(git branch --show-current)`
@@ -1146,5 +1145,5 @@ fix: Fix .roo/skills/quality-gate/ refs first, then re-run 4.4 verify. Also 6.9 
   - Version bumps for speckit (1.0.0 vs 0.6.0) and codex (5.0.0 vs 4.11.0) may need clarification if manifest values are wrong
   - `.claude/settings.json` key format (`ralphharness@informatico-madrid` vs `ralphharness@smart-ralph`) needs confirmation
 - **Quality checkpoints**: 15 checkpoints total across all phases (every 2-3 tasks)
-- **Total task count**: 72 tasks (increased from 58 due to 16 codex skill renames split into 4 tasks + 1 bmad-bridge dir rename + 3 quality gate additions + 1 VF task)
+- **Total task count**: 79 tasks (increased from 58 due to 16 codex skill renames split into 4 tasks + 1 bmad-bridge dir rename + 3 quality gate additions + 1 VF task + Phase 3b remediation)
 
