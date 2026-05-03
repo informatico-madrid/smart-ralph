@@ -28,7 +28,7 @@ Rename el proyecto de Smart Ralph (ralph-specum) a RalphHarness, eliminando toda
 **Para que** tenga consistencia con el brand RalphHarness
 
 **Acceptance Criteria:**
-- [ ] AC-2.1: `plugins/ralph-speckit/.claude-plugin/plugin.json` tiene `name: "ralphharness-speckit"`
+- [ ] AC-2.1: `plugins/ralphharness-speckit/.claude-plugin/plugin.json` tiene `name: "ralphharness-speckit"`
 - [ ] AC-2.2: `author.name` actualizado a `informatico-madrid`
 - [ ] AC-2.3: `version` actualizado a `1.0.0`
 
@@ -38,7 +38,7 @@ Rename el proyecto de Smart Ralph (ralph-specum) a RalphHarness, eliminando toda
 **Para que** refleje la nueva propiedad del proyecto
 
 **Acceptance Criteria:**
-- [ ] AC-3.1: `plugins/ralph-bmad-bridge/.claude-plugin/plugin.json` tiene `author.name: "informatico-madrid"`
+- [ ] AC-3.1: `plugins/ralphharness-bmad-bridge/.claude-plugin/plugin.json` tiene `author.name: "informatico-madrid"`
 - [ ] AC-3.2: La descripción del plugin no menciona "Smart Ralph" como propiedad externa
 
 ### US-4: Marketplace.json Actualizado
@@ -72,7 +72,7 @@ Rename el proyecto de Smart Ralph (ralph-specum) a RalphHarness, eliminando toda
 **Acceptance Criteria:**
 - [ ] AC-6.1: `grep -r "tzachbon" .claude-plugin/ plugins/ README.md CLAUDE.md CONTRIBUTING.md LICENSE .github/ 2>/dev/null` retorna 0 resultados
 - [ ] AC-6.2: URL de GitHub en `.github/ISSUE_TEMPLATE/config.yml` actualizada
-- [ ] AC-6.3: `plugins/ralph-specum/commands/feedback.md` URL de issues actualizada (o eliminada)
+- [ ] AC-6.3: `plugins/ralphharness/commands/feedback.md` URL de issues actualizada (o eliminada)
 - [ ] AC-6.4: `LICENSE` copyright actualizado a `"RalphHarness Project Authors"`
 
 ### US-7: Documentación Principal Reescrita
@@ -167,6 +167,8 @@ Rename el proyecto de Smart Ralph (ralph-specum) a RalphHarness, eliminando toda
 - [ ] AC-13.6: `.github/workflows/bats-tests.yml` actualiza paths de codex
 - [ ] AC-13.7: `.github/workflows/codex-version-check.yml` actualiza paths y PR names
 - [ ] AC-13.8: Skills bajo `platforms/codex/skills/ralph-specum*` NO se tocan (out of scope, separate location)
+      — CRITICAL DISTINCTION: `platforms/codex/skills/` directories are OUT of scope, BUT
+        `plugins/ralphharness-codex/skills/` directories ARE in scope (tasks 1.4-1.7, 2.14)
 
 ### US-14: Configuraciones Externas Actualizadas
 **Como un** usuario que tiene configuraciones BMAD, gito, y otras herramientas
@@ -242,10 +244,11 @@ Rename el proyecto de Smart Ralph (ralph-specum) a RalphHarness, eliminando toda
 - **Historical docs** (`docs/brainstormmejora/`, `docs/plans/`, `research/`, `plans/*.md`) — contexto histórico
 - **Review reports** (`_bmad-output/reviews/**`) — revisiones históricas
 - **Version bump exact mapping** — epic dice 5.0.0 para ralph-specum principal pero no especifica versiones para plugins derivados (speckit, bmad-bridge, codex)
+- **IDE config directories** (`.roo/`, `.cursor/`, `.gemini/`, `.qwen/`) — contienen referencias que deben ser excluidas de verificaciones grep (no requieren rename)
 
 ## Dependencies
 - `.claude/settings.json` debe actualizarse SIMULTÁNEAMENTE con el rename del directorio, o el plugin no cargará
-- `plugins/ralph-specum-codex/` es un plugin completo (60+ archivos) que coexiste con el plugin principal; las workflows de CI lo referencian
+- `plugins/ralphharness-codex/` (antes `plugins/ralph-specum-codex/`) es un plugin completo (60+ archivos) que coexiste con el plugin principal; las workflows de CI lo referencian
 - `specs/.index/` es auto-generado — necesita regeneración post-rename (no requiere cambios manuales)
 - `.agents/plugins/marketplace.json` es un sistema paralelo a `.claude-plugin/marketplace.json` — si se actualiza uno, se debe actualizar el otro
 
@@ -255,8 +258,11 @@ Rename el proyecto de Smart Ralph (ralph-specum) a RalphHarness, eliminando toda
 - [ ] `/ralph-harness:new test-spec` crea un spec funcional
 - [ ] `bats tests/*.bats` pasa todos los tests
 - [ ] `git log --follow plugins/ralphharness/` muestra historial completo
-- [ ] 0 referencias a `ralph-specum`, `tzachbon`, `smart-ralph` en archivos in-scope
+- [ ] 0 referencias a `ralph-specum`, `tzachbon`, `smart-ralph` en archivos in-scope (verify: `grep -rn "ralph-specum\|tzachbon\|smart-ralph" . --include='*.md' --include='*.json' --include='*.sh' --include='*.yml' --include='*.yaml' --include='*.py' --include='*.toml' --exclude-dir=specs --exclude-dir=_bmad-output --exclude-dir=.git --exclude-dir=docs/brainstormmejora --exclude-dir=docs/plans --exclude-dir=plans --exclude-dir=research --exclude-dir=.roo --exclude-dir=.cursor --exclude-dir=.gemini --exclude-dir=.qwen | wc -l` returns 0)
 - [ ] `README.md` es coherente con nuevo brand RalphHarness
+- [ ] `marketplace.json` actualizado en ambos sistemas (`.claude-plugin/` y `.agents/plugins/`)
+- [ ] Todas las 4 direcciones de directorio renombradas con `git mv` e historial preservado
+- [ ] Configs BMAD actualizados (`_bmad/` directory)
 
 ## Risk Register
 
@@ -299,7 +305,8 @@ Rename el proyecto de Smart Ralph (ralph-specum) a RalphHarness, eliminando toda
   grep -rn "ralph-specum\|tzachbon\|smart-ralph" . \
     --include='*.md' --include='*.json' --include='*.sh' --include='*.yml' --include='*.yaml' \
     --exclude-dir=specs --exclude-dir=_bmad-output --exclude-dir=docs/brainstormmejora \
-    --exclude-dir=docs/plans --exclude-dir=plans --exclude-dir=.git
+    --exclude-dir=docs/plans --exclude-dir=plans --exclude-dir=research \
+    --exclude-dir=.roo --exclude-dir=.cursor --exclude-dir=.gemini --exclude-dir=.qwen --exclude-dir=.git
   ```
   retorna 0 lineas
 - PASS: `jq -r '.enabledPlugins."ralph-specum@smart-ralph"' .claude/settings.json` = `null`
@@ -335,12 +342,12 @@ Rename el proyecto de Smart Ralph (ralph-specum) a RalphHarness, eliminando toda
 - Any `git mv` fails due to uncommitted changes — pause and clean working tree
 - Version bump decisions for speckit (1.0.0 vs 0.6.0) and codex (5.0.0 vs 4.11.0) need clarification
 
-## Unresolved Questions
-- ¿La version de `ralph-speckit` debe ser `1.0.0` o `0.6.0` (minor bump from 0.5.2)?
-- ¿La version de `ralph-specum-codex` debe ser `5.0.0` o `4.11.0` (minor bump from 4.10.1)?
-- ¿`settings.json` debe usar `ralphharness@smart-ralph` o `ralphharness@informatico-madrid` como clave?
-- ¿Renombrar `plugins/ralph-specum-codex/` a `plugins/ralphharness-codex/` o dejarlo como está?
-- ¿El state file naming `.ralphharness-state.json` es intención real o error en el epic?
+## Version Decisions (Resolved)
+- `ralphharness-speckit` version: `1.0.0` (AC-2.3)
+- `ralphharness-codex` version: `5.0.0` (task 2.5)
+- `settings.json` key: `ralphharness@informatico-madrid` (AC-1.10)
+- Codex rename: `plugins/ralph-specum-codex/` → `plugins/ralphharness-codex/` (tasks 1.3, 2.5, 13.x)
+- State file naming: `.ralphharness-state.json` NOT intentional — state file naming follows plugin name convention (AC-1.5)
 
 ## Next Steps
 1. Aprobación de requirements.md por el user

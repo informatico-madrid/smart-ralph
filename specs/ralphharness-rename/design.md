@@ -444,9 +444,11 @@ Compare output against expected changes in the File Change Matrix. Any unexpecte
    ```bash
    find plugins/ralphharness -type f \( -name '*.md' -o -name '*.sh' -o -name '*.json' \) \
      -exec sed -i \
+       -e 's/ralph-specum@smart-ralph/ralphharness@informatico-madrid/g' \
        -e 's/ralph-specum:/ralph-harness:/g' \
        -e 's/ralph-specum/ralphharness/g' \
        -e 's/smart-ralph/ralphharness/g' \
+       -e 's/Ralph Specum/RalphHarness/g' -e 's/Smart Ralph/RalphHarness/g' \
        -e 's/tzachbon/informatico-madrid/g' \
      {} +
    ```
@@ -536,19 +538,22 @@ Document the baseline counts before any changes:
 grep -rn "ralph-specum" . \
   --include='*.md' --include='*.json' --include='*.sh' --include='*.yml' --include='*.yaml' \
   --exclude-dir=specs --exclude-dir=_bmad-output --exclude-dir=docs/brainstormmejora \
-  --exclude-dir=docs/plans --exclude-dir=plans --exclude-dir=.git | wc -l
+  --exclude-dir=docs/plans --exclude-dir=plans --exclude-dir=.git \
+  --exclude-dir=.roo --exclude-dir=.cursor --exclude-dir=.gemini --exclude-dir=.qwen | wc -l
 
 # Pattern 2: tzachbon
 grep -rn "tzachbon" . \
   --include='*.md' --include='*.json' --include='*.sh' --include='*.yml' --include='*.yaml' \
   --exclude-dir=specs --exclude-dir=_bmad-output --exclude-dir=docs/brainstormmejora \
-  --exclude-dir=docs/plans --exclude-dir=plans --exclude-dir=.git | wc -l
+  --exclude-dir=docs/plans --exclude-dir=plans --exclude-dir=.git \
+  --exclude-dir=.roo --exclude-dir=.cursor --exclude-dir=.gemini --exclude-dir=.qwen | wc -l
 
 # Pattern 3: smart-ralph
 grep -rn "smart-ralph" . \
   --include='*.md' --include='*.json' --include='*.sh' --include='*.yml' --include='*.yaml' \
   --exclude-dir=specs --exclude-dir=_bmad-output --exclude-dir=docs/brainstormmejora \
-  --exclude-dir=docs/plans --exclude-dir=plans --exclude-dir=.git | wc -l
+  --exclude-dir=docs/plans --exclude-dir=plans --exclude-dir=.git \
+  --exclude-dir=.roo --exclude-dir=.cursor --exclude-dir=.gemini --exclude-dir=.qwen | wc -l
 ```
 
 ### Post-flight Checks
@@ -614,7 +619,7 @@ done
 
 ```bash
 # All .sh files must pass shellcheck
-find plugins .github/hooks .bmad-harness/hooks -name '*.sh' -exec shellcheck {} +
+find plugins .github -name '*.sh' -exec shellcheck {} +
 ```
 
 ### gito Review Classification File

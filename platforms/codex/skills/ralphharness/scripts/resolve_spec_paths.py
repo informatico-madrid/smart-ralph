@@ -114,7 +114,7 @@ def default_specs_dir(cwd: Path, specs_dirs: list[str]) -> str:
 
 
 def resolve_config(cwd: Path) -> dict[str, object]:
-    settings = parse_frontmatter(cwd / ".claude" / "ralph-specum.local.md")
+    settings = parse_frontmatter(cwd / ".claude" / "ralphharness.local.md")
     raw_dirs = settings.get("specs_dirs")
     if isinstance(raw_dirs, list):
         specs_dirs = [str(item) for item in raw_dirs if str(item).strip()]
