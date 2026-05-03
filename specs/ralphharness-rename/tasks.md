@@ -994,7 +994,7 @@ Expected: 0
   - **Commit**: `chore(rename): pass V1 structured file validation` (only if fixes needed)
   - _Requirements: Verification Contract_
 
-- [ ] 4.2 [VERIFY] V2: shellcheck on all shell scripts
+- [x] 4.2 [VERIFY] V2: shellcheck on all shell scripts
   - **Do**:
     1. Run `shellcheck` on all .sh files in plugins/, .github/hooks/, .bmad-harness/hooks/, tests/
     2. Fix any syntax errors introduced by sed (unlikely but verify)
@@ -1003,7 +1003,7 @@ Expected: 0
   - **Commit**: `chore(rename): pass V2 shellcheck` (only if fixes needed)
   - _Requirements: Verification Contract_
 
-- [ ] 4.3 [VERIFY] V3: BATS test suite runs
+- [x] 4.3 [VERIFY] V3: BATS test suite runs
   - **Do**:
     1. Run `bats tests/*.bats` and capture results
     2. Verify all tests pass (expected: 100% pass rate)
