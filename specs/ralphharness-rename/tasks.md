@@ -141,7 +141,7 @@ This spec is not complete until ALL criteria are met:
   - **Commit**: `rename(plugin): git mv codex skills batch 4 -> ralphharness{-status,-switch,-tasks,-triage} + verify all 16`
   - _Requirements: AC-13.3, FR-31_
 
-- [ ] 1.8 [P] Rename smart-ralph skill directories (main plugins)
+- [x] 1.8 [P] Rename smart-ralph skill directories (main plugins)
   - **Do**:
     1. `git mv plugins/ralphharness/skills/smart-ralph plugins/ralphharness/skills/ralphharness`
     2. `git mv plugins/ralphharness-speckit/skills/smart-ralph plugins/ralphharness-speckit/skills/ralphharness`
