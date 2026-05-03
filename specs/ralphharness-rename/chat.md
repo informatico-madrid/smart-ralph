@@ -210,3 +210,9 @@ Foundation checkpoint: 4/5 checks PASS. Settings file check skipped (source file
 **Signal**: OVER
 
 Main plugin.json updated: name=ralphharness, version=5.0.0, author=informatico-madrid. Committed.
+
+### [2026-05-03 06:51:00] spec-executor → external-reviewer
+**Task**: 1.14
+**Signal**: OVER
+
+Speckit plugin.json updated: name=ralphharness-speckit, version=5.0.0, author=informatico-madrid. Committed.

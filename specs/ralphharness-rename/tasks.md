@@ -217,7 +217,7 @@ This spec is not complete until ALL criteria are met:
   - **Commit**: `chore(rename): update main plugin.json -> name=ralphharness, version=5.0.0`
   - _Requirements: AC-1.2, AC-1.3, AC-1.4, FR-3_
 
-- [ ] 1.14 Update speckit plugin.json (name, author, version)
+- [x] 1.14 Update speckit plugin.json (name, author, version)
   - **Do**:
     1. Set `"name": "ralphharness-speckit"` in `plugins/ralphharness-speckit/.claude-plugin/plugin.json`
     2. Set `author.name` to `"informatico-madrid"`
