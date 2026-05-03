@@ -10,7 +10,7 @@
 #   ralph_get_default_dir()  - Returns first specs_dir (for new spec creation)
 
 RALPH_CWD="${RALPH_CWD:-$(pwd)}"
-RALPH_SETTINGS_FILE="$RALPH_CWD/.claude/ralph-specum.local.md"
+RALPH_SETTINGS_FILE="$RALPH_CWD/.claude/ralphharness.local.md"
 RALPH_DEFAULT_SPECS_DIR="./specs"
 
 # Internal: Log warning messages to stderr
@@ -211,7 +211,7 @@ ralph_find_spec() {
         # Disambiguation needed
         echo "Multiple specs named '$name' found:" >&2
         echo "$found" | nl >&2
-        echo "Specify full path: /ralph-specum:switch <path>" >&2
+        echo "Specify full path: /ralph-harness:switch <path>" >&2
         return 2
     fi
 }

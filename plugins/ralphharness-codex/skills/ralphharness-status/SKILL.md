@@ -1,6 +1,6 @@
 ---
-name: ralph-specum-status
-description: This skill should be used only when the user explicitly asks to use `$ralph-specum-status`, or explicitly asks Ralph Specum in Codex for status or active spec progress.
+name: ralphharness-status
+description: This skill should be used only when the user explicitly asks to use `$ralphharness-status`, or explicitly asks Ralph Specum in Codex for status or active spec progress.
 metadata:
   surface: helper
   action: status
@@ -12,7 +12,7 @@ Use this to report Ralph state across configured spec roots.
 
 ## Contract
 
-- Read `.claude/ralph-specum.local.md` when present
+- Read `.claude/ralphharness.local.md` when present
 - Default specs root is `./specs`
 - `.current-spec` lives in the default specs root
 - Hidden directories do not count as specs

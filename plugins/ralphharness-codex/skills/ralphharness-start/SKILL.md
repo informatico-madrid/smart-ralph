@@ -1,6 +1,6 @@
 ---
-name: ralph-specum-start
-description: This skill should be used only when the user explicitly asks to use `$ralph-specum-start`, or explicitly asks Ralph Specum in Codex to start or resume a spec.
+name: ralphharness-start
+description: This skill should be used only when the user explicitly asks to use `$ralphharness-start`, or explicitly asks Ralph Specum in Codex to start or resume a spec.
 metadata:
   surface: helper
   action: start
@@ -12,7 +12,7 @@ Use this for the `start` and `new` entrypoints.
 
 ## Contract
 
-- Read `.claude/ralph-specum.local.md` when present
+- Read `.claude/ralphharness.local.md` when present
 - Default specs root is `./specs`
 - Keep `.current-spec` in the default specs root
 - Keep the standard Ralph files stable

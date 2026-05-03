@@ -1,6 +1,6 @@
 ---
-name: ralph-specum-switch
-description: This skill should be used only when the user explicitly asks to use `$ralph-specum-switch`, or explicitly asks Ralph Specum in Codex to switch the active spec.
+name: ralphharness-switch
+description: This skill should be used only when the user explicitly asks to use `$ralphharness-switch`, or explicitly asks Ralph Specum in Codex to switch the active spec.
 metadata:
   surface: helper
   action: switch
@@ -12,7 +12,7 @@ Use this to switch the active spec.
 
 ## Contract
 
-- Read `.claude/ralph-specum.local.md` when present
+- Read `.claude/ralphharness.local.md` when present
 - Parse `specs_dirs` from frontmatter to discover all spec roots
 - Treat the first `specs_dirs` entry as the default root
 - Default specs root is `./specs`

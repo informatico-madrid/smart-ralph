@@ -180,7 +180,7 @@ Output: specs/.index/
 | External Resources | {{count}} |
 | **Total** | **{{total}}** |
 
-Next: Run /ralph-specum:start to create specs that reference indexed components.
+Next: Run /ralph-harness:start to create specs that reference indexed components.
 ```
 
 ## Error Handling

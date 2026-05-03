@@ -43,7 +43,7 @@ write_metric() {
   local jq_ver
   jq_ver="$(jq --version 2>/dev/null | sed 's/jq-\([0-9]*\)\.\([0-9]*\).*/\1\2/')"
   if [ -n "$jq_ver" ] && [ "${jq_ver:0:1}" -lt 1 ] 2>/dev/null; then
-    echo "[ralph-specum] WARNING: jq version < 1.5 may not support --arg" >&2
+    echo "[ralphharness] WARNING: jq version < 1.5 may not support --arg" >&2
   fi
 
   # --- Read spec name from state file ---
@@ -80,7 +80,7 @@ write_metric() {
 
   (
     flock -x 200 || {
-      echo "[ralph-specum] ERROR: failed to acquire lock for $metrics_file" >&2
+      echo "[ralphharness] ERROR: failed to acquire lock for $metrics_file" >&2
       exit 1
     }
 
@@ -156,7 +156,7 @@ write_metric() {
 
     # SR-006: Return non-zero on write failure
     if [ "$write_exit" -ne 0 ]; then
-      echo "[ralph-specum] ERROR: Failed to write metric (exit code $write_exit)" >&2
+      echo "[ralphharness] ERROR: Failed to write metric (exit code $write_exit)" >&2
       return "$write_exit"
     fi
 

@@ -1,6 +1,6 @@
 ---
-name: ralph-specum
-description: Use only when the user explicitly invokes `$ralph-specum`, requests Ralph Specum in Codex, asks Ralph Specum to handle a named phase, or explicitly requests autonomous or quick mode or continuation without pauses.
+name: ralphharness
+description: Use only when the user explicitly invokes `$ralphharness`, requests Ralph Specum in Codex, asks Ralph Specum to handle a named phase, or explicitly requests autonomous or quick mode or continuation without pauses.
 metadata:
   surface: primary
 ---
@@ -51,7 +51,7 @@ If the corresponding helper skill is installed and the user invoked it explicitl
 
 0. **You are a coordinator, not a doer.** For every phase (research, requirements, design, tasks, implement, triage, refactor), delegate the actual generation work to the appropriate sub-agent. Never write spec artifacts (research.md, requirements.md, design.md, tasks.md) yourself. Your job is to gather context, run the interview, delegate, validate the output, and present results for approval.
 1. Keep the Ralph disk contract stable.
-2. Treat `.claude/ralph-specum.local.md` as the settings source when present.
+2. Treat `.claude/ralphharness.local.md` as the settings source when present.
 3. Default to `./specs` when no valid config exists.
 4. Keep `.current-spec` in the default specs root.
 5. Merge state fields. Do not replace the whole state object.
@@ -103,6 +103,6 @@ Bootstrap project-local files only when the user wants them.
 Suggested bootstrap files:
 
 - `assets/bootstrap/AGENTS.md` to give a consumer repo local Ralph guidance
-- `assets/bootstrap/ralph-specum.local.md` to seed local settings
+- `assets/bootstrap/ralphharness.local.md` to seed local settings
 
 Do not bootstrap by default. Installation into `$CODEX_HOME/skills` is enough.

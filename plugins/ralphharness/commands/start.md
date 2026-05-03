@@ -6,7 +6,7 @@ allowed-tools: "*"
 
 # Smart Start
 
-Smart entry point for ralph-specum. Detects whether to create a new spec or resume an existing one.
+Smart entry point for ralphharness. Detects whether to create a new spec or resume an existing one.
 
 ## Checklist
 
@@ -83,7 +83,7 @@ fi
 
 **If no active epic AND goal appears complex** (multiple distinct components, cross-cutting concerns, user mentions "big" or "large"):
 - Suggest: "This looks like it might need multiple specs. Want to run `/triage` instead?"
-- If user accepts: invoke `/ralph-specum:triage` with no positional args and let triage collect epic-name + goal interactively. STOP.
+- If user accepts: invoke `/ralph-harness:triage` with no positional args and let triage collect epic-name + goal interactively. STOP.
 - If user declines: continue normal Step 4 routing.
 
 ## Step 4: Route to Action
@@ -152,13 +152,13 @@ Continuing...
 8. Create `.progress.md` with goal
 9. **Skill Discovery Pass 1** -- Scan all skill files and match against the goal text:
    0. **Mandatory pre-scan: Context Audit** -- Before any semantic matching, ALWAYS invoke the context-auditor skill unconditionally:
-      - Invoke: `Skill({ skill: "ralph-specum:context-auditor" })`
+      - Invoke: `Skill({ skill: "ralph-harness:context-auditor" })`
       - This is mandatory for every spec regardless of goal — do not skip, do not apply relevance matching
       - On success: add `{ name: "context-auditor", source: "${CLAUDE_PLUGIN_ROOT}/skills/context-auditor/SKILL.md", matchedAt: "start", invoked: true }` to `discoveredSkills`
       - On failure: add `{ name: "context-auditor", ..., invoked: false }`, log warning, continue
       - Log in `## Skill Discovery` section: `- **context-auditor** (plugin): always-invoked (reason: mandatory system prompt validation)`
    1. Scan SKILL.md files from all skill paths (collect all skills before matching):
-      - **Plugin skills**: `${CLAUDE_PLUGIN_ROOT}/skills/*/SKILL.md` → invoked as `Skill({ skill: "ralph-specum:<name>" })`
+      - **Plugin skills**: `${CLAUDE_PLUGIN_ROOT}/skills/*/SKILL.md` → invoked as `Skill({ skill: "ralph-harness:<name>" })`
       - **Project skills**: `.agents/skills/*/SKILL.md` → invoked as `Skill({ skill: "<name>" })`
       - **Claude skills**: `.claude/skills/*/SKILL.md` → invoked as `Skill({ skill: "<name>" })`
 
@@ -187,7 +187,7 @@ Continuing...
       - **<skill-name>** (<source>): skipped (no description)
       ```
       If no skills match: `- No skills matched`
-10. Update Spec Index: `./plugins/ralph-specum/hooks/scripts/update-spec-index.sh --quiet`
+10. Update Spec Index: `./plugins/ralphharness/hooks/scripts/update-spec-index.sh --quiet`
 11. **Goal Interview** -- Read `${CLAUDE_PLUGIN_ROOT}/references/goal-interview.md` and follow brainstorming dialogue
 12. **Team Research Phase** -- Read `${CLAUDE_PLUGIN_ROOT}/references/parallel-research.md` and follow the dispatch pattern
 13. **Skill Discovery Pass 2 (Post-Research Retry)** -- Re-scan skills with enriched context after research completes:
@@ -197,7 +197,7 @@ Continuing...
     Scan all skill files and match against goal + research context:
 
     1. Scan SKILL.md files from all skill paths (collect all skills before matching):
-       - **Plugin skills**: `${CLAUDE_PLUGIN_ROOT}/skills/*/SKILL.md` → invoked as `Skill({ skill: "ralph-specum:<name>" })`
+       - **Plugin skills**: `${CLAUDE_PLUGIN_ROOT}/skills/*/SKILL.md` → invoked as `Skill({ skill: "ralph-harness:<name>" })`
        - **Project skills**: `.agents/skills/*/SKILL.md` → invoked as `Skill({ skill: "<name>" })`
        - **Claude skills**: `.claude/skills/*/SKILL.md` → invoked as `Skill({ skill: "<name>" })`
 
@@ -252,7 +252,7 @@ Output: $basePath/research.md
 **Feasibility**: [High/Medium/Low] | **Risk**: [High/Medium/Low] | **Effort**: [S/M/L/XL]
 ```
 
-Then STOP. Output: `-> Next: Run /ralph-specum:requirements`
+Then STOP. Output: `-> Next: Run /ralph-harness:requirements`
 End response immediately.
 </mandatory>
 

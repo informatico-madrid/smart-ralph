@@ -12,7 +12,7 @@ new/start -> research -> requirements -> design -> tasks -> implement
 
 ### 1. Research Phase
 
-**Command**: `/ralph-specum:research`
+**Command**: `/ralph-harness:research`
 **Agent**: research-analyst
 **Output**: `./specs/<name>/research.md`
 
@@ -28,7 +28,7 @@ Ends with: `awaitingApproval: true`
 
 ### 2. Requirements Phase
 
-**Command**: `/ralph-specum:requirements`
+**Command**: `/ralph-harness:requirements`
 **Agent**: product-manager
 **Output**: `./specs/<name>/requirements.md`
 
@@ -46,7 +46,7 @@ Ends with: `awaitingApproval: true`
 
 ### 3. Design Phase
 
-**Command**: `/ralph-specum:design`
+**Command**: `/ralph-harness:design`
 **Agent**: architect-reviewer
 **Output**: `./specs/<name>/design.md`
 
@@ -62,7 +62,7 @@ Ends with: `awaitingApproval: true`
 
 ### 4. Tasks Phase
 
-**Command**: `/ralph-specum:tasks`
+**Command**: `/ralph-harness:tasks`
 **Agent**: task-planner
 **Output**: `./specs/<name>/tasks.md`
 
@@ -81,7 +81,7 @@ Ends with: `awaitingApproval: true`
 
 ### 5. Execution Phase
 
-**Command**: `/ralph-specum:implement`
+**Command**: `/ralph-harness:implement`
 **Agent**: spec-executor (via Ralph Loop)
 **State**: `phase: "execution"`
 
@@ -117,7 +117,7 @@ With `--quick` flag:
 ## Phase Skipping
 
 Not recommended but possible:
-- `/ralph-specum:tasks` can be run after minimal research
+- `/ralph-harness:tasks` can be run after minimal research
 - Quality may suffer without full spec phases
 - Use `--fresh` to restart from any phase
 - **Warning**: skipping requirements means `Project type` may be missing → task-planner will need to infer or ask

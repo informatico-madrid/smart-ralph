@@ -22,7 +22,7 @@ checkpoint-create() {
 
   # --- Idempotency: skip if checkpoint already stored ---
   if [ -f "$state_file" ] && jq -e '.checkpoint // empty' "$state_file" >/dev/null 2>&1; then
-    echo "[ralph-specum] checkpoint already exists, skipping create"
+    echo "[ralphharness] checkpoint already exists, skipping create"
     return 0
   fi
 
@@ -39,7 +39,7 @@ checkpoint-create() {
 
   # --- No-repo detection ---
   if [ -z "$git_root" ]; then
-    echo "[ralph-specum] no git repo found, storing null checkpoint"
+    echo "[ralphharness] no git repo found, storing null checkpoint"
     _write_checkpoint "$state_file" "null" "null" "null" "null"
     return 0
   fi
@@ -60,7 +60,7 @@ checkpoint-create() {
     is_read_only=true
   fi
   if [ "$is_read_only" = true ]; then
-    echo "[ralph-specum] WARNING: filesystem appears read-only at ${fs_check_dir}, storing null checkpoint"
+    echo "[ralphharness] WARNING: filesystem appears read-only at ${fs_check_dir}, storing null checkpoint"
     _write_checkpoint "$state_file" "null" "null" "null" "null"
     return 0
   fi
@@ -69,7 +69,7 @@ checkpoint-create() {
   local branch
   branch="$(cd "$git_root" && git symbolic-ref HEAD 2>/dev/null)"
   if [ -z "$branch" ]; then
-    echo "[ralph-specum] WARNING: detached HEAD detected, storing null checkpoint"
+    echo "[ralphharness] WARNING: detached HEAD detected, storing null checkpoint"
     _write_checkpoint "$state_file" "null" "null" "null" "null"
     return 0
   fi
@@ -81,7 +81,7 @@ checkpoint-create() {
   if [ "${jq_ver:0:2}" = "14" ] || [ "${jq_ver:0:2}" = "15" ]; then
     : # jq 1.4-1.5 OK
   elif [ -n "$jq_ver" ] && [ "${jq_ver:0:1}" -lt 1 ] 2>/dev/null; then
-    echo "[ralph-specum] WARNING: jq version < 1.5 detected, some features may fail" >&2
+    echo "[ralphharness] WARNING: jq version < 1.5 detected, some features may fail" >&2
   fi
 
   # --- Validate git config ---
@@ -89,7 +89,7 @@ checkpoint-create() {
   git_user_name="$(git config user.name 2>/dev/null)"
   git_user_email="$(git config user.email 2>/dev/null)"
   if [ -z "$git_user_name" ] || [ -z "$git_user_email" ]; then
-    echo "[ralph-specum] ERROR: git user.name and user.email must be configured" >&2
+    echo "[ralphharness] ERROR: git user.name and user.email must be configured" >&2
     return 1
   fi
 
@@ -97,7 +97,7 @@ checkpoint-create() {
   cd "$git_root" || { echo "[error] checkpoint-create: cannot cd to git_root"; return 1; }
 
   if ! git add -A 2>/dev/null; then
-    echo "[ralph-specum] ERROR: git add -A failed, aborting checkpoint"
+    echo "[ralphharness] ERROR: git add -A failed, aborting checkpoint"
     return 1
   fi
 
@@ -108,14 +108,14 @@ checkpoint-create() {
     sha="$(git log -1 --format=%H 2>/dev/null)"
     local ts
     ts="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
-    local msg="[ralph-specum] checkpoint ${spec_name} (${total_tasks} tasks) — no changes to commit"
+    local msg="[ralphharness] checkpoint ${spec_name} (${total_tasks} tasks) — no changes to commit"
     _write_checkpoint "$state_file" "$sha" "$ts" "$branch" "$msg"
-    echo "[ralph-specum] checkpoint created: sha=${sha} (no changes to commit)"
+    echo "[ralphharness] checkpoint created: sha=${sha} (no changes to commit)"
     return 0
   fi
 
-  if ! git commit -m "[ralph-specum] pre-execution checkpoint: ${spec_name}" --no-verify 2>/dev/null; then
-    echo "[ralph-specum] ERROR: git commit failed, aborting checkpoint"
+  if ! git commit -m "[ralphharness] pre-execution checkpoint: ${spec_name}" --no-verify 2>/dev/null; then
+    echo "[ralphharness] ERROR: git commit failed, aborting checkpoint"
     return 1
   fi
 
@@ -123,7 +123,7 @@ checkpoint-create() {
   local sha
   sha="$(git log -1 --format=%H 2>/dev/null)"
   if [ -z "$sha" ]; then
-    echo "[ralph-specum] ERROR: failed to extract SHA from git log"
+    echo "[ralphharness] ERROR: failed to extract SHA from git log"
     return 1
   fi
 
@@ -133,12 +133,12 @@ checkpoint-create() {
 
   # --- Message ---
   local msg
-  msg="[ralph-specum] checkpoint ${spec_name} (${total_tasks} tasks)"
+  msg="[ralphharness] checkpoint ${spec_name} (${total_tasks} tasks)"
 
   # --- Write to state file ---
   _write_checkpoint "$state_file" "$sha" "$ts" "$branch" "$msg"
 
-  echo "[ralph-specum] checkpoint created: sha=${sha}"
+  echo "[ralphharness] checkpoint created: sha=${sha}"
   return 0
 }
 
@@ -217,7 +217,7 @@ checkpoint-rollback() {
   local state_file="$1"
 
   if [ ! -f "$state_file" ]; then
-    echo "[ralph-specum] ERROR: state file not found: ${state_file}"
+    echo "[ralphharness] ERROR: state file not found: ${state_file}"
     return 1
   fi
 
@@ -226,7 +226,7 @@ checkpoint-rollback() {
   sha="$(jq -r '.checkpoint.sha // empty' "$state_file" 2>/dev/null)"
 
   if [ -z "$sha" ]; then
-    echo "[ralph-specum] ERROR: no checkpoint SHA found in state file"
+    echo "[ralphharness] ERROR: no checkpoint SHA found in state file"
     return 1
   fi
 
@@ -242,7 +242,7 @@ checkpoint-rollback() {
   done
 
   if [ -z "$git_root" ]; then
-    echo "[ralph-specum] ERROR: no git repo found for rollback"
+    echo "[ralphharness] ERROR: no git repo found for rollback"
     return 1
   fi
 
@@ -250,16 +250,16 @@ checkpoint-rollback() {
 
   # Verify SHA exists in the repo
   if ! git cat-file -e "$sha" 2>/dev/null; then
-    echo "[ralph-specum] ERROR: checkpoint SHA does not exist: ${sha}"
+    echo "[ralphharness] ERROR: checkpoint SHA does not exist: ${sha}"
     return 1
   fi
 
   # Perform the rollback
   if ! git reset --hard "$sha" 2>/dev/null; then
-    echo "[ralph-specum] ERROR: git reset --hard failed for ${sha}"
+    echo "[ralphharness] ERROR: git reset --hard failed for ${sha}"
     return 1
   fi
 
-  echo "[ralph-specum] rolled back to checkpoint: sha=${sha}"
+  echo "[ralphharness] rolled back to checkpoint: sha=${sha}"
   return 0
 }

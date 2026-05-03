@@ -1,6 +1,6 @@
 ---
-name: ralph-specum-design
-description: This skill should be used only when the user explicitly asks to use `$ralph-specum-design`, or explicitly asks Ralph Specum in Codex to run the design phase.
+name: ralphharness-design
+description: This skill should be used only when the user explicitly asks to use `$ralphharness-design`, or explicitly asks Ralph Specum in Codex to run the design phase.
 metadata:
   surface: helper
   action: design

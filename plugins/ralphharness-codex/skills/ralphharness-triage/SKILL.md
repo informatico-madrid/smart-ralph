@@ -1,6 +1,6 @@
 ---
-name: ralph-specum-triage
-description: This skill should be used only when the user explicitly asks to use `$ralph-specum-triage`, or explicitly asks Ralph Specum in Codex to triage a large effort into multiple specs.
+name: ralphharness-triage
+description: This skill should be used only when the user explicitly asks to use `$ralphharness-triage`, or explicitly asks Ralph Specum in Codex to triage a large effort into multiple specs.
 metadata:
   surface: helper
   action: triage
@@ -34,7 +34,7 @@ You are a **coordinator, not a triage analyst** -- delegate decomposition work t
    - interface contracts and sequencing notes
 5. Persist `.epic-state.json` with each spec, its status, and dependencies.
 6. Set `specs/.current-epic` to the active epic name.
-7. Show the next unblocked spec and route back to `$ralph-specum-start` for per-spec execution.
+7. Show the next unblocked spec and route back to `$ralphharness-start` for per-spec execution.
 
 ## Output Shape
 

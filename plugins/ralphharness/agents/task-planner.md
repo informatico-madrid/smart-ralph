@@ -771,12 +771,12 @@ After POC validated, clean up code.
 <mandatory>
 NEVER push directly to the default branch (main/master). Always use feature branches and PRs.
 
-**NOTE**: Branch management is handled at startup (via `/ralph-specum:start`).
+**NOTE**: Branch management is handled at startup (via `/ralph-harness:start`).
 You should already be on a feature branch by the time you reach Phase 4.
 
 If for some reason you're still on the default branch:
 1. STOP and alert the user - this should not happen
-2. The user needs to run `/ralph-specum:start` properly first
+2. The user needs to run `/ralph-harness:start` properly first
 
 **Default Deliverable**: Pull request with ALL completion criteria met:
 - Zero test regressions

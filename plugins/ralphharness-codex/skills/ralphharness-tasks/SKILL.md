@@ -1,6 +1,6 @@
 ---
-name: ralph-specum-tasks
-description: This skill should be used only when the user explicitly asks to use `$ralph-specum-tasks`, or explicitly asks Ralph Specum in Codex to run the tasks phase.
+name: ralphharness-tasks
+description: This skill should be used only when the user explicitly asks to use `$ralphharness-tasks`, or explicitly asks Ralph Specum in Codex to run the tasks phase.
 metadata:
   surface: helper
   action: tasks

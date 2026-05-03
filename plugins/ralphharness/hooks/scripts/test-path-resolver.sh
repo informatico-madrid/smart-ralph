@@ -1,6 +1,6 @@
 #!/bin/bash
 # Unit tests for path-resolver.sh
-# Run: bash plugins/ralph-specum/hooks/scripts/test-path-resolver.sh
+# Run: bash plugins/ralphharness/hooks/scripts/test-path-resolver.sh
 
 set -e
 
@@ -18,7 +18,7 @@ NC='\033[0m' # No Color
 setup() {
     TEST_TMPDIR=$(mktemp -d)
     export RALPH_CWD="$TEST_TMPDIR"
-    export RALPH_SETTINGS_FILE="$TEST_TMPDIR/.claude/ralph-specum.local.md"
+    export RALPH_SETTINGS_FILE="$TEST_TMPDIR/.claude/ralphharness.local.md"
 
     # Source the path resolver
     source "$SCRIPT_DIR/path-resolver.sh"

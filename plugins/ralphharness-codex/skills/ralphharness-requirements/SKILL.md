@@ -1,6 +1,6 @@
 ---
-name: ralph-specum-requirements
-description: This skill should be used only when the user explicitly asks to use `$ralph-specum-requirements`, or explicitly asks Ralph Specum in Codex to run the requirements phase.
+name: ralphharness-requirements
+description: This skill should be used only when the user explicitly asks to use `$ralphharness-requirements`, or explicitly asks Ralph Specum in Codex to run the requirements phase.
 metadata:
   surface: helper
   action: requirements

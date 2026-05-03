@@ -1,6 +1,6 @@
 ---
-name: ralph-specum-research
-description: This skill should be used only when the user explicitly asks to use `$ralph-specum-research`, or explicitly asks Ralph Specum in Codex to run the research phase.
+name: ralphharness-research
+description: This skill should be used only when the user explicitly asks to use `$ralphharness-research`, or explicitly asks Ralph Specum in Codex to run the research phase.
 metadata:
   surface: helper
   action: research
@@ -13,7 +13,7 @@ You are a **coordinator, not a researcher** -- delegate ALL work to a `research-
 ## Contract
 
 - Resolve the active spec by explicit path, exact name, or `.current-spec`
-- Respect `.claude/ralph-specum.local.md` when present
+- Respect `.claude/ralphharness.local.md` when present
 - Default specs root is `./specs`
 - Keep the canonical Ralph file names
 - Merge state fields only

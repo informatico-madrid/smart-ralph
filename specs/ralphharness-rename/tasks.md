@@ -128,7 +128,7 @@ This spec is not complete until ALL criteria are met:
   - **Commit**: `rename(plugin): git mv codex skills batch 3 -> ralphharness{-requirements,-research,-rollback,-start}`
   - _Requirements: AC-13.3, FR-31_
 
-- [ ] 1.7 [P] Codex skill directory renames -- batch 4 + VERIFY
+- [x] 1.7 [P] Codex skill directory renames -- batch 4 + VERIFY
   - **Do**:
     1. `git mv plugins/ralphharness-codex/skills/ralph-specum-status plugins/ralphharness-codex/skills/ralphharness-status`
     2. `git mv plugins/ralphharness-codex/skills/ralph-specum-switch plugins/ralphharness-codex/skills/ralphharness-switch`
@@ -228,7 +228,7 @@ This spec is not complete until ALL criteria are met:
   - **Commit**: `chore(rename): update speckit plugin.json -> ralphharness-speckit v1.0.0`
   - _Requirements: AC-2.1, AC-2.2, AC-2.3, FR-4_
 
-- [ ] 1.15 [VERIFY] Manifest validation: JSON parsing + jq checks
+- [x] 1.15 [VERIFY] Manifest validation: JSON parsing + jq checks
   - **Do**:
     1. Validate all four plugin.json files parse correctly: `jq . <file>` for each
     2. Verify main plugin: `jq -r '.name' = "ralphharness"`
@@ -316,7 +316,7 @@ This spec is not complete until ALL criteria are met:
   - **Commit**: `chore(rename): pass manifest validation checkpoint 2` (only if fixes needed)
   - _Requirements: AC-4.5, AC-13.2_
 
-- [ ] 2.7 [P] Core rename: commands directory (all 16 files)
+- [x] 2.7 [P] Core rename: commands directory (all 16 files)
 - **Do**:
   1. Dry-run on `plugins/ralphharness/commands/` to verify expected matches
   2. Apply sed with longer-first ordering:
@@ -335,7 +335,7 @@ This spec is not complete until ALL criteria are met:
 - **Commit**: `rename(plugin): sed commands/ -> ralph-harness prefix + identities`
 - _Requirements: AC-5.1, AC-5.2, AC-5.3, AC-5.4, FR-7, FR-11_
 
-- [ ] 2.8 [P] Core rename: hook scripts directory (all 10 files)
+- [x] 2.8 [P] Core rename: hook scripts directory (all 10 files)
   - **Do**:
     1. Dry-run on `plugins/ralphharness/hooks/scripts/` to verify expected matches
     2. Apply sed with all patterns including log prefixes:
@@ -356,7 +356,7 @@ This spec is not complete until ALL criteria are met:
   - **Commit**: `rename(plugin): sed hooks/scripts/ -> log prefixes + settings path`
   - _Requirements: AC-8.1, AC-8.2, AC-8.3, FR-7, FR-12_
 
-- [ ] 2.9 [P] Core rename: agents directory (all 10 files)
+- [x] 2.9 [P] Core rename: agents directory (all 10 files)
   - **Do**:
     1. Dry-run on `plugins/ralphharness/agents/` to verify expected matches
     2. Apply sed:
@@ -375,7 +375,7 @@ This spec is not complete until ALL criteria are met:
   - **Commit**: `rename(plugin): sed agents/ -> skill invocations + identities`
   - _Requirements: AC-5.2, FR-7_
 
-- [ ] 2.10 [P] Core rename: skills directory (all 17 files)
+- [x] 2.10 [P] Core rename: skills directory (all 17 files)
   - **Do**:
     1. Dry-run on `plugins/ralphharness/skills/` to verify expected matches
     2. Apply sed:
@@ -410,7 +410,7 @@ This spec is not complete until ALL criteria are met:
   - **Commit**: `chore(rename): pass core plugin checkpoint` (only if fixes needed)
   - _Requirements: FR-7, FR-9, FR-10_
 
-- [ ] 2.12 [P] Codex plugin: agent-config TOML templates (all 10 files)
+- [x] 2.12 [P] Codex plugin: agent-config TOML templates (all 10 files)
 - **Do**:
   1. Dry-run on `plugins/ralphharness-codex/agent-configs/` to verify expected matches
   2. Apply sed:
@@ -543,7 +543,7 @@ This spec is not complete until ALL criteria are met:
   - **Commit**: `rename(plugin): sed ralphharness-bmad-bridge/ -> smart-ralph/tzachbon`
   - _Requirements: AC-3.2, FR-7_
 
-- [ ] 2.20 [P] Core rename: templates directory (all 14+ files)
+- [x] 2.20 [P] Core rename: templates directory (all 14+ files)
   - **Do**:
     1. Dry-run on `plugins/ralphharness/templates/` to verify expected matches
     2. Apply sed:

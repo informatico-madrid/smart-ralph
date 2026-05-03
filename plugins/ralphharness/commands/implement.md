@@ -24,7 +24,7 @@ Create a task for each item and complete in order:
 - `ralph_resolve_current()` -- resolves .current-spec to full path (bare name = ./specs/$name, full path = as-is)
 - `ralph_find_spec(name)` -- find spec by name across all configured roots
 
-**Configuration**: Specs directories are configured in `.claude/ralph-specum.local.md`:
+**Configuration**: Specs directories are configured in `.claude/ralphharness.local.md`:
 ```yaml
 specs_dirs: ["./specs", "./packages/api/specs", "./packages/web/specs"]
 ```
@@ -32,11 +32,11 @@ specs_dirs: ["./specs", "./packages/api/specs", "./packages/web/specs"]
 **Resolve**:
 1. If `$ARGUMENTS` contains a spec name, use `ralph_find_spec()` to resolve it
 2. Otherwise, use `ralph_resolve_current()` to get the active spec path
-3. If no active spec, error: "No active spec. Run /ralph-specum:new <name> first."
+3. If no active spec, error: "No active spec. Run /ralph-harness:new <name> first."
 
 **Validate**:
 1. Check the resolved spec directory exists
-2. Check the spec's tasks.md exists. If not: error "Tasks not found. Run /ralph-specum:tasks first."
+2. Check the spec's tasks.md exists. If not: error "Tasks not found. Run /ralph-harness:tasks first."
 3. Set `$SPEC_PATH` to the resolved spec directory path. All references use this variable.
 
 ## Step 2: Parse Arguments
@@ -157,7 +157,7 @@ SPEC_NAME="$(jq -r '.name // "unknown"' "$STATE_FILE" 2>/dev/null || echo "unkno
 
 # Create checkpoint — blocks execution if it fails
 if ! checkpoint-create "$SPEC_NAME" "$TOTAL" "$STATE_FILE"; then
-  echo "[ralph-specum] ERROR: checkpoint creation failed. Aborting execution."
+  echo "[ralphharness] ERROR: checkpoint creation failed. Aborting execution."
   exit 1
 fi
 ```
@@ -224,8 +224,8 @@ If yes:
 ```
 
 **If user answers YES:**
-1. Copy `plugins/ralph-specum/templates/task_review.md` → `specs/<specName>/task_review.md`
-2. Copy `plugins/ralph-specum/templates/chat.md` → `specs/<specName>/chat.md`
+1. Copy `plugins/ralphharness/templates/task_review.md` → `specs/<specName>/task_review.md`
+2. Copy `plugins/ralphharness/templates/chat.md` → `specs/<specName>/chat.md`
 3. Ask which quality principles to activate:
    ```
    Which quality principles should the reviewer enforce?
@@ -348,7 +348,7 @@ Then Read and follow these references in order. They contain the complete coordi
 
   # Call write_metric — use status from verification outcome
   if ! write_metric "$SPEC_PATH" "$WRITE_METRIC_STATUS" "$TASK_ID" "$TASK_ITERATION" "$VERIFY_EXIT" "$TASK_TITLE" "$TASK_TYPE" "$COMMIT_SHA"; then
-    echo "[ralph-specum] WARN: write_metric failed (non-fatal)" >&2
+    echo "[ralphharness] WARN: write_metric failed (non-fatal)" >&2
   fi
   ```
   Set `$WRITE_METRIC_STATUS` to `pass` if verify command exited 0, `fail` if non-0.
@@ -380,9 +380,9 @@ Then Read and follow these references in order. They contain the complete coordi
 
 ### Error States (never output ALL_TASKS_COMPLETE)
 
-- Missing/corrupt state file: error and suggest re-running /ralph-specum:implement
-- Missing tasks.md: error and suggest running /ralph-specum:tasks
-- Missing spec directory: error and suggest running /ralph-specum:new
+- Missing/corrupt state file: error and suggest re-running /ralph-harness:implement
+- Missing tasks.md: error and suggest running /ralph-harness:tasks
+- Missing spec directory: error and suggest running /ralph-harness:new
 - Max retries exceeded: error with failure details, suggest manual fix then resume
 - Max fix task depth/count exceeded (recovery mode): error with fix history
 
@@ -393,7 +393,7 @@ When all tasks complete (taskIndex >= totalTasks):
 2. Delete .ralph-state.json
 3. Keep .progress.md (preserve learnings and history)
 4. Cleanup orphaned temp progress files: `find "$SPEC_PATH" -name ".progress-task-*.md" -mmin +60 -delete 2>/dev/null || true`
-5. Update spec index: `./plugins/ralph-specum/hooks/scripts/update-spec-index.sh --quiet`
+5. Update spec index: `./plugins/ralphharness/hooks/scripts/update-spec-index.sh --quiet`
 6. Commit remaining spec changes:
    ```bash
    git add "$SPEC_PATH/tasks.md" "$SPEC_PATH/.progress.md" ./specs/.index/

@@ -4,18 +4,18 @@ Use Ralph Specum as the spec workflow for this repo.
 
 ## Preferred Entry Surface
 
-- `$ralph-specum` for the general flow
-- `$ralph-specum-start` to create, resume, or run in quick mode, then stop unless quick or autonomous flow was explicit
-- `$ralph-specum-research`
-- `$ralph-specum-requirements`
-- `$ralph-specum-design`
-- `$ralph-specum-tasks`
-- `$ralph-specum-implement`
-- `$ralph-specum-status`
+- `$ralphharness` for the general flow
+- `$ralphharness-start` to create, resume, or run in quick mode, then stop unless quick or autonomous flow was explicit
+- `$ralphharness-research`
+- `$ralphharness-requirements`
+- `$ralphharness-design`
+- `$ralphharness-tasks`
+- `$ralphharness-implement`
+- `$ralphharness-status`
 
 ## Project Contract
 
-- Specs live in `./specs` unless `.claude/ralph-specum.local.md` defines `specs_dirs`
+- Specs live in `./specs` unless `.claude/ralphharness.local.md` defines `specs_dirs`
 - `.current-spec` lives in the default specs root
 - `.ralph-state.json` is transient execution state
 - `.progress.md` persists learnings and blockers

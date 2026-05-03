@@ -56,7 +56,7 @@ Use these defaults when a new spec starts:
 }
 ```
 
-Read `default_max_iterations` and `auto_commit_spec` from `.claude/ralph-specum.local.md` when present.
+Read `default_max_iterations` and `auto_commit_spec` from `.claude/ralphharness.local.md` when present.
 
 ## Merge Rule
 

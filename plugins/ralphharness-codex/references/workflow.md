@@ -4,20 +4,20 @@
 
 | Claude surface | Codex surface |
 |----------------|---------------|
-| `/ralph-specum:start` | `$ralph-specum` or `$ralph-specum-start` |
-| `/ralph-specum:new` | `$ralph-specum` or `$ralph-specum-start` |
-| `/ralph-specum:research` | `$ralph-specum` or `$ralph-specum-research` |
-| `/ralph-specum:requirements` | `$ralph-specum` or `$ralph-specum-requirements` |
-| `/ralph-specum:design` | `$ralph-specum` or `$ralph-specum-design` |
-| `/ralph-specum:tasks` | `$ralph-specum` or `$ralph-specum-tasks` |
-| `/ralph-specum:implement` | `$ralph-specum` or `$ralph-specum-implement` |
-| `/ralph-specum:status` | `$ralph-specum` or `$ralph-specum-status` |
-| `/ralph-specum:switch` | `$ralph-specum` or `$ralph-specum-switch` |
-| `/ralph-specum:cancel` | `$ralph-specum` or `$ralph-specum-cancel` |
-| `/ralph-specum:index` | `$ralph-specum` or `$ralph-specum-index` |
-| `/ralph-specum:refactor` | `$ralph-specum` or `$ralph-specum-refactor` |
-| `/ralph-specum:feedback` | `$ralph-specum` or `$ralph-specum-feedback` |
-| `/ralph-specum:help` | `$ralph-specum` or `$ralph-specum-help` |
+| `/ralph-harness:start` | `$ralphharness` or `$ralphharness-start` |
+| `/ralph-harness:new` | `$ralphharness` or `$ralphharness-start` |
+| `/ralph-harness:research` | `$ralphharness` or `$ralphharness-research` |
+| `/ralph-harness:requirements` | `$ralphharness` or `$ralphharness-requirements` |
+| `/ralph-harness:design` | `$ralphharness` or `$ralphharness-design` |
+| `/ralph-harness:tasks` | `$ralphharness` or `$ralphharness-tasks` |
+| `/ralph-harness:implement` | `$ralphharness` or `$ralphharness-implement` |
+| `/ralph-harness:status` | `$ralphharness` or `$ralphharness-status` |
+| `/ralph-harness:switch` | `$ralphharness` or `$ralphharness-switch` |
+| `/ralph-harness:cancel` | `$ralphharness` or `$ralphharness-cancel` |
+| `/ralph-harness:index` | `$ralphharness` or `$ralphharness-index` |
+| `/ralph-harness:refactor` | `$ralphharness` or `$ralphharness-refactor` |
+| `/ralph-harness:feedback` | `$ralphharness` or `$ralphharness-feedback` |
+| `/ralph-harness:help` | `$ralphharness` or `$ralphharness-help` |
 
 ## Delegation Rules
 
@@ -147,7 +147,7 @@ The Stop hook is experimental and requires `codex_hooks = true`. It is disabled 
 
 When hooks are disabled or unavailable, re-invoke the implement skill after each task to advance the loop:
 
-1. Run `$ralph-specum-implement` (or the primary `$ralph-specum` skill with an implement intent).
+1. Run `$ralphharness-implement` (or the primary `$ralphharness` skill with an implement intent).
 2. The skill reads `.ralph-state.json`, finds `taskIndex` pointing to the next incomplete task, and executes it.
 3. After the task completes, the skill updates state and stops.
 4. Repeat step 1 until the skill reports all tasks complete.
@@ -161,7 +161,7 @@ When `[features] codex_hooks = true` is set in `config.toml`, the execution loop
 
 ### How it works
 
-1. User invokes `$ralph-specum-implement`
+1. User invokes `$ralphharness-implement`
 2. Skill reads `.ralph-state.json`, delegates current task to a subagent
 3. Subagent completes task, outputs `TASK_COMPLETE`
 4. Codex attempts to stop the turn
@@ -175,7 +175,7 @@ When `[features] codex_hooks = true` is set in `config.toml`, the execution loop
 ### Stop hook output format
 
 ```json
-{"decision": "block", "reason": "Continue to task 5/20. Next: 1.6 Write ralph-specum-research skill"}
+{"decision": "block", "reason": "Continue to task 5/20. Next: 1.6 Write ralphharness-research skill"}
 ```
 
 ### Guard conditions
@@ -190,9 +190,9 @@ When hooks are disabled (no `codex_hooks = true`, or on Windows), run phases man
 
 ### Step-by-step re-invocation
 
-1. Invoke `$ralph-specum-implement` -- executes first incomplete task
+1. Invoke `$ralphharness-implement` -- executes first incomplete task
 2. After task completes, Codex stops naturally
-3. Re-invoke `$ralph-specum-implement` -- reads state, picks up next task
+3. Re-invoke `$ralphharness-implement` -- reads state, picks up next task
 4. Repeat until all tasks complete
 5. Final invocation outputs `ALL_TASKS_COMPLETE`
 
@@ -202,4 +202,4 @@ When hooks are disabled (no `codex_hooks = true`, or on Windows), run phases man
 - State persists in `.ralph-state.json` between invocations
 - Progress is tracked in `.progress.md`
 - If a task fails, fix the issue and re-invoke -- the same task will retry
-- Use `$ralph-specum-status` to check progress at any time
+- Use `$ralphharness-status` to check progress at any time

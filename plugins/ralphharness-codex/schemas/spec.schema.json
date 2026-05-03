@@ -1,8 +1,8 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "ralph-specum",
+  "$id": "ralphharness",
   "title": "Ralph Specum Specification Schema",
-  "description": "Schema for ralph-specum state files and spec document frontmatter",
+  "description": "Schema for ralphharness state files and spec document frontmatter",
 
   "definitions": {
     "state": {

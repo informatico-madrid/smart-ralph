@@ -65,9 +65,9 @@ Available specs:
   5. web-login
 
 Examples:
-  /ralph-specum:switch feature-b
-  /ralph-specum:switch api-auth
-  /ralph-specum:switch ./packages/api/specs/api-auth  (full path for disambiguation)
+  /ralph-harness:switch feature-b
+  /ralph-harness:switch api-auth
+  /ralph-harness:switch ./packages/api/specs/api-auth  (full path for disambiguation)
 ```
 
 **No specs found:**
@@ -81,8 +81,8 @@ Searched:
   - ./packages/web/specs
 
 To create a new spec:
-  /ralph-specum:new my-feature
-  /ralph-specum:new my-feature --specs-dir ./packages/api/specs
+  /ralph-harness:new my-feature
+  /ralph-harness:new my-feature --specs-dir ./packages/api/specs
 ```
 
 ## Handle Disambiguation
@@ -94,11 +94,11 @@ Multiple specs named 'api-auth' found:
 
 1. ./specs/api-auth
    Location: default specs directory
-   Run: /ralph-specum:switch ./specs/api-auth
+   Run: /ralph-harness:switch ./specs/api-auth
 
 2. ./packages/api/specs/api-auth
    Location: packages/api
-   Run: /ralph-specum:switch ./packages/api/specs/api-auth
+   Run: /ralph-harness:switch ./packages/api/specs/api-auth
 
 Select by running the command for your desired spec.
 ```
@@ -117,8 +117,8 @@ Searched directories:
   - ./packages/api/specs
   - ./packages/web/specs
 
-To see available specs: /ralph-specum:switch
-To create a new spec: /ralph-specum:new my-feature
+To see available specs: /ralph-harness:switch
+To create a new spec: /ralph-harness:new my-feature
 ```
 
 List all configured specs_dirs that were searched, helping user understand where to create the spec.
@@ -160,5 +160,5 @@ Files present:
 - [x/blank] design.md
 - [x/blank] tasks.md
 
-Next: Run /ralph-specum:<appropriate-phase> to continue
+Next: Run /ralph-harness:<appropriate-phase> to continue
 ```

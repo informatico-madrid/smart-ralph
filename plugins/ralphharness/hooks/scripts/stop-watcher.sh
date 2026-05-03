@@ -21,7 +21,7 @@ export RALPH_CWD
 source "$SCRIPT_DIR/path-resolver.sh"
 
 # Check for settings file to see if plugin is enabled
-SETTINGS_FILE="$CWD/.claude/ralph-specum.local.md"
+SETTINGS_FILE="$CWD/.claude/ralphharness.local.md"
 if [ -f "$SETTINGS_FILE" ]; then
     # Extract enabled setting from YAML frontmatter (normalize case and strip quotes)
     ENABLED=$(sed -n '/^---$/,/^---$/p' "$SETTINGS_FILE" 2>/dev/null \
@@ -68,7 +68,7 @@ TRANSCRIPT_PATH=$(echo "$INPUT" | jq -r '.transcript_path // empty' 2>/dev/null 
 if [ -n "$TRANSCRIPT_PATH" ] && [ -f "$TRANSCRIPT_PATH" ]; then
     # Primary: 500 lines covers most sessions for reliable detection
     if tail -500 "$TRANSCRIPT_PATH" 2>/dev/null | grep -qE '(^|\W)ALL_TASKS_COMPLETE(\W|$)'; then
-        echo "[ralph-specum] ALL_TASKS_COMPLETE detected in transcript" >&2
+        echo "[ralphharness] ALL_TASKS_COMPLETE detected in transcript" >&2
         # Note: State file cleanup is handled by the coordinator (implement.md Section 10)
         # Do not delete here to avoid race condition
         # Update epic state if this spec belongs to an epic
@@ -85,7 +85,7 @@ if [ -n "$TRANSCRIPT_PATH" ] && [ -f "$TRANSCRIPT_PATH" ]; then
                 else
                     rm -f "$TMP_FILE"
                 fi
-                echo "[ralph-specum] Updated epic '$EPIC_NAME_VAL': spec '$SPEC_NAME' marked completed" >&2
+                echo "[ralphharness] Updated epic '$EPIC_NAME_VAL': spec '$SPEC_NAME' marked completed" >&2
             fi
         fi
         "$SCRIPT_DIR/update-spec-index.sh" --quiet 2>/dev/null || true
@@ -110,7 +110,7 @@ if [ -n "$TRANSCRIPT_PATH" ] && [ -f "$TRANSCRIPT_PATH" ]; then
             fi
 
             if [ "$SWEEP_ALREADY_DONE" -gt 0 ]; then
-                echo "[ralph-specum] Phase 4 regression sweep already completed, skipping" >&2
+                echo "[ralphharness] Phase 4 regression sweep already completed, skipping" >&2
             else
                 # Extract the Dependency map entries from the Verification Contract section
                 DEP_SPECS=$(awk '
@@ -181,7 +181,7 @@ if [ -n "$TRANSCRIPT_PATH" ] && [ -f "$TRANSCRIPT_PATH" ]; then
                 ' "$REQUIREMENTS_FILE" | tr ',' '\n' | sed 's/^[[:space:]]*//' | grep -v '^$' || true)
 
                 if [ -n "$DEP_SPECS" ]; then
-                    echo "[ralph-specum] Phase 4 regression sweep: found dependency map entries" >&2
+                    echo "[ralphharness] Phase 4 regression sweep: found dependency map entries" >&2
                     SWEEP_LIST=""
                     while IFS= read -r dep; do
                         # dep may be a spec name or relative path — resolve to spec path
@@ -197,7 +197,7 @@ if [ -n "$TRANSCRIPT_PATH" ] && [ -f "$TRANSCRIPT_PATH" ]; then
                         STOP_HOOK_ACTIVE=$(echo "$INPUT" | jq -r '.stop_hook_active // false' 2>/dev/null || echo "false")
                         if [ "$STOP_HOOK_ACTIVE" != "true" ]; then
                             SWEEP_REASON=$(cat <<SWEEP_EOF
-[ralph-specum] Regression sweep triggered by completion of: $SPEC_NAME
+[ralphharness] Regression sweep triggered by completion of: $SPEC_NAME
 
 ## Specs to sweep (from Dependency map)
 $SWEEP_LIST
@@ -236,7 +236,7 @@ SWEEP_EOF
     fi
     # Fallback: check last 20 lines for edge cases (very recent signal)
     if tail -20 "$TRANSCRIPT_PATH" 2>/dev/null | grep -qE '(^|\W)ALL_TASKS_COMPLETE(\W|$)'; then
-        echo "[ralph-specum] ALL_TASKS_COMPLETE detected in transcript (tail-end)" >&2
+        echo "[ralphharness] ALL_TASKS_COMPLETE detected in transcript (tail-end)" >&2
         # Update epic state if this spec belongs to an epic
         EPIC_NAME_VAL=$(jq -r '.epicName // empty' "$STATE_FILE" 2>/dev/null || true)
         CURRENT_EPIC_FILE="$CWD/specs/.current-epic"
@@ -251,7 +251,7 @@ SWEEP_EOF
                 else
                     rm -f "$TMP_FILE"
                 fi
-                echo "[ralph-specum] Updated epic '$EPIC_NAME_VAL': spec '$SPEC_NAME' marked completed" >&2
+                echo "[ralphharness] Updated epic '$EPIC_NAME_VAL': spec '$SPEC_NAME' marked completed" >&2
             fi
         fi
         "$SCRIPT_DIR/update-spec-index.sh" --quiet 2>/dev/null || true
@@ -274,16 +274,16 @@ SWEEP_EOF
             # that would cause double-escalation (both spec-executor and stop-watcher blocking).
             # Instead, allow the stop so the human sees only the single spec-executor escalation.
             if echo "$TRANSCRIPT_TAIL" | grep -qE '(^|\W)ESCALATE(\W|$)' && echo "$TRANSCRIPT_TAIL" | grep -qE 'verification-degraded'; then
-                echo "[ralph-specum] DEGRADED + ESCALATE (verification-degraded) already in transcript — allowing stop (spec-executor handled)" >&2
+                echo "[ralphharness] DEGRADED + ESCALATE (verification-degraded) already in transcript — allowing stop (spec-executor handled)" >&2
                 exit 0
             fi
             STOP_HOOK_ACTIVE=$(echo "$INPUT" | jq -r '.stop_hook_active // false' 2>/dev/null || echo "false")
             if [ "$STOP_HOOK_ACTIVE" = "true" ]; then
-                echo "[ralph-specum] stop_hook_active=true in DEGRADED handler, allowing stop" >&2
+                echo "[ralphharness] stop_hook_active=true in DEGRADED handler, allowing stop" >&2
                 exit 0
             fi
             DEGRADED_REASON=$(cat <<DEGRADED_EOF
-[ralph-specum] ESCALATION REQUIRED — VERIFICATION_DEGRADED detected for: $SPEC_NAME
+[ralphharness] ESCALATION REQUIRED — VERIFICATION_DEGRADED detected for: $SPEC_NAME
 
 UI verification was skipped because @playwright/mcp is not installed.
 The repair loop cannot fix a missing tool — human action is required.
@@ -303,7 +303,7 @@ The repair loop cannot fix a missing tool — human action is required.
 3. Ensure your MCP client config includes the server with --isolated --caps=testing
    (see mcp-playwright.skill.md § MCP Server Configuration)
 4. Resume verification:
-     /ralph-specum:implement
+     /ralph-harness:implement
 DEGRADED_EOF
 )
             jq -n \
@@ -321,18 +321,18 @@ DEGRADED_EOF
             ORIGIN_TASK=$(jq -r '.originTaskIndex // "unknown"' "$STATE_FILE" 2>/dev/null || echo "unknown")
             MAX_REPAIR=2
 
-            echo "[ralph-specum] VERIFICATION_FAIL detected | story: $FAILED_STORY | repair iter: $REPAIR_ITER/$MAX_REPAIR" >&2
+            echo "[ralphharness] VERIFICATION_FAIL detected | story: $FAILED_STORY | repair iter: $REPAIR_ITER/$MAX_REPAIR" >&2
 
             STOP_HOOK_ACTIVE=$(echo "$INPUT" | jq -r '.stop_hook_active // false' 2>/dev/null || echo "false")
             if [ "$STOP_HOOK_ACTIVE" = "true" ]; then
-                echo "[ralph-specum] stop_hook_active=true in repair loop, allowing stop" >&2
+                echo "[ralphharness] stop_hook_active=true in repair loop, allowing stop" >&2
                 exit 0
             fi
 
             if [ "$REPAIR_ITER" -ge "$MAX_REPAIR" ]; then
                 # Escalate to human
                 ESCALATE_REASON=$(cat <<ESCALATE_EOF
-[ralph-specum] ESCALATION REQUIRED — Repair loop exhausted for: $FAILED_STORY
+[ralphharness] ESCALATION REQUIRED — Repair loop exhausted for: $FAILED_STORY
 
 The verification for story '$FAILED_STORY' has failed $MAX_REPAIR times.
 Automatic repair has been exhausted.
@@ -352,7 +352,7 @@ Automatic repair has been exhausted.
 5. Fix manually or clarify the spec
 6. Reset repair state: update .ralph-state.json — set phase back to "execution",
    repairIteration to 0, remove failedStory and originTaskIndex
-7. Resume with /ralph-specum:implement
+7. Resume with /ralph-harness:implement
 ESCALATE_EOF
 )
             jq -n \
@@ -369,7 +369,7 @@ ESCALATE_EOF
         # Classify failure and trigger targeted repair
         NEXT_REPAIR=$((REPAIR_ITER + 1))
         REPAIR_REASON=$(cat <<REPAIR_EOF
-[ralph-specum] Repair loop — attempt $NEXT_REPAIR/$MAX_REPAIR for story: $FAILED_STORY
+[ralphharness] Repair loop — attempt $NEXT_REPAIR/$MAX_REPAIR for story: $FAILED_STORY
 
 ## State
 Spec: $SPEC_PATH | Failed story: $FAILED_STORY | Origin task index: $ORIGIN_TASK
@@ -425,8 +425,8 @@ if ! jq empty "$STATE_FILE" 2>/dev/null; then
 ERROR: Corrupt state file at $SPEC_PATH/.ralph-state.json
 
 Recovery options:
-1. Reset state: /ralph-specum:implement (reinitializes from tasks.md)
-2. Cancel spec: /ralph-specum:cancel
+1. Reset state: /ralph-harness:implement (reinitializes from tasks.md)
+2. Cancel spec: /ralph-harness:cancel
 EOF
 )
 
@@ -454,8 +454,8 @@ GLOBAL_ITERATION=$(jq -r '.globalIteration // 1' "$STATE_FILE" 2>/dev/null || ec
 MAX_GLOBAL=$(jq -r '.maxGlobalIterations // 100' "$STATE_FILE" 2>/dev/null || echo "100")
 
 if [ "$GLOBAL_ITERATION" -ge "$MAX_GLOBAL" ]; then
-    echo "[ralph-specum] ERROR: Maximum global iterations ($MAX_GLOBAL) reached. Review .progress.md for failure patterns." >&2
-    echo "[ralph-specum] Recovery: fix issues manually, then run /ralph-specum:implement or /ralph-specum:cancel" >&2
+    echo "[ralphharness] ERROR: Maximum global iterations ($MAX_GLOBAL) reached. Review .progress.md for failure patterns." >&2
+    echo "[ralphharness] Recovery: fix issues manually, then run /ralph-harness:implement or /ralph-harness:cancel" >&2
     exit 0
 fi
 
@@ -471,9 +471,9 @@ if [ "$FIX_TASK_MAP" != "{}" ] && [ -n "$FIX_TASK_MAP" ]; then
         ATTEMPTS=$(echo "$FIX_TASK_MAP" | jq -r --arg id "$TASK_ID" '.[$id].attempts // 0')
         if [ "$ATTEMPTS" -ge "$MAX_FIX_ATTEMPTS" ] 2>/dev/null; then
             FIX_IDS=$(echo "$FIX_TASK_MAP" | jq -r --arg id "$TASK_ID" '.[$id].fixTaskIds // [] | join(", ")')
-            echo "[ralph-specum] ERROR: Max fix attempts ($MAX_FIX_ATTEMPTS) reached for task $TASK_ID" >&2
-            echo "[ralph-specum] Fix history: $FIX_IDS" >&2
-            echo "[ralph-specum] Recovery: manual intervention required, then /ralph-specum:cancel" >&2
+            echo "[ralphharness] ERROR: Max fix attempts ($MAX_FIX_ATTEMPTS) reached for task $TASK_ID" >&2
+            echo "[ralphharness] Fix history: $FIX_IDS" >&2
+            echo "[ralphharness] Recovery: manual intervention required, then /ralph-harness:cancel" >&2
             exit 0
         fi
         # Check fix task chain depth: count dots in fix task IDs
@@ -482,8 +482,8 @@ if [ "$FIX_TASK_MAP" != "{}" ] && [ -n "$FIX_TASK_MAP" ]; then
             DOT_COUNT=$(echo "$FIX_ID" | tr -cd '.' | wc -c)
             FIX_DEPTH=$((DOT_COUNT - 1))
             if [ "$FIX_DEPTH" -ge "$MAX_FIX_DEPTH" ] 2>/dev/null; then
-                echo "[ralph-specum] ERROR: Max fix task depth ($MAX_FIX_DEPTH) exceeded for task $FIX_ID (depth=$FIX_DEPTH)" >&2
-                echo "[ralph-specum] Recovery: fix chain too deep, manual intervention required" >&2
+                echo "[ralphharness] ERROR: Max fix task depth ($MAX_FIX_DEPTH) exceeded for task $FIX_ID (depth=$FIX_DEPTH)" >&2
+                echo "[ralphharness] Recovery: fix chain too deep, manual intervention required" >&2
                 exit 0
             fi
         done
@@ -494,7 +494,7 @@ fi
 if [ "$QUICK_MODE" = "true" ] && [ "$PHASE" != "execution" ]; then
     STOP_HOOK_ACTIVE=$(echo "$INPUT" | jq -r '.stop_hook_active // false' 2>/dev/null || echo "false")
     if [ "$STOP_HOOK_ACTIVE" = "true" ]; then
-        echo "[ralph-specum] stop_hook_active=true in quick mode, allowing stop to prevent loop" >&2
+        echo "[ralphharness] stop_hook_active=true in quick mode, allowing stop to prevent loop" >&2
         exit 0
     fi
 
@@ -523,7 +523,7 @@ if [ "$PHASE" != "execution" ]; then
 fi
 
 # Log current state
-echo "[ralph-specum] Session stopped during spec: $SPEC_NAME | Task: $((TASK_INDEX + 1))/$TOTAL_TASKS | Attempt: $TASK_ITERATION" >&2
+echo "[ralphharness] Session stopped during spec: $SPEC_NAME | Task: $((TASK_INDEX + 1))/$TOTAL_TASKS | Attempt: $TASK_ITERATION" >&2
 
 # --- Role Boundaries: Field-Level Validation ---
 # Validates state file fields against a baseline to detect role boundary violations.
@@ -535,12 +535,12 @@ BASELINE_FILE="$CWD/$SPEC_PATH/references/.ralph-field-baseline.json"
 
 # Graceful degradation: if no baseline exists, skip validation
 if [ ! -f "$BASELINE_FILE" ]; then
-    echo "[ralph-specum] BASELINE_MISSING no baseline at $BASELINE_FILE; skipping field validation" >&2
+    echo "[ralphharness] BASELINE_MISSING no baseline at $BASELINE_FILE; skipping field validation" >&2
     VALIDATION_SKIPPED=1
 else
     # Validate baseline is valid JSON before proceeding
     if ! jq empty "$BASELINE_FILE" 2>/dev/null; then
-        echo "[ralph-specum] BASELINE_CORRUPT invalid JSON in baseline at $BASELINE_FILE; skipping field validation" >&2
+        echo "[ralphharness] BASELINE_CORRUPT invalid JSON in baseline at $BASELINE_FILE; skipping field validation" >&2
         VALIDATION_SKIPPED=1
     else
         VALIDATION_SKIPPED=0
@@ -561,7 +561,7 @@ if [ $VALIDATION_SKIPPED -eq 0 ]; then
     done
 
     if [ -z "$STATE_CONTENT" ]; then
-        echo "[ralph-specum] BASELINE_RETRY_EXHAUSTED unable to read state file after 3 retries; skipping validation" >&2
+        echo "[ralphharness] BASELINE_RETRY_EXHAUSTED unable to read state file after 3 retries; skipping validation" >&2
         VALIDATION_SKIPPED=1
     fi
 fi
@@ -589,7 +589,7 @@ if [ $VALIDATION_SKIPPED -eq 0 ]; then
 
             # Check if field exists in state file using getpath for nested path resolution
             if ! echo "$STATE_CONTENT" | jq --arg f "$CLEAN_FIELD" 'getpath(($f | split("."))) != null' 2>/dev/null | grep -q true; then
-                echo "[ralph-specum] BASELINE_SKIP missing in state: $FIELD (owner=$BASELINE_OWNER)" >&2
+                echo "[ralphharness] BASELINE_SKIP missing in state: $FIELD (owner=$BASELINE_OWNER)" >&2
                 continue
             fi
 
@@ -603,7 +603,7 @@ if [ $VALIDATION_SKIPPED -eq 0 ]; then
             case "$BASELINE_TYPE" in
                 string|number|boolean)
                     if [ "$FIELD_VALUE_TYPE" = "object" ] || [ "$FIELD_VALUE_TYPE" = "array" ]; then
-                        echo "[ralph-specum] BASELINE_SKIP type-mismatch: $FIELD (baseline=$BASELINE_TYPE, state=$FIELD_VALUE_TYPE)" >&2
+                        echo "[ralphharness] BASELINE_SKIP type-mismatch: $FIELD (baseline=$BASELINE_TYPE, state=$FIELD_VALUE_TYPE)" >&2
                         continue
                     fi
                     ;;
@@ -612,14 +612,14 @@ if [ $VALIDATION_SKIPPED -eq 0 ]; then
             # Skip coordinator-owned fields — coordinator legitimately writes these
             case "$BASELINE_OWNER" in
                 *coordinator*)
-                    echo "[ralph-specum] BASELINE_SKIP coordinator-owned: $FIELD (owner=$BASELINE_OWNER)" >&2
+                    echo "[ralphharness] BASELINE_SKIP coordinator-owned: $FIELD (owner=$BASELINE_OWNER)" >&2
                     continue
                     ;;
             esac
 
             # Agent-owned-only field changed or present — report boundary violation
             # In Phase 1, we report agent identity as "unknown"
-            echo "[ralph-specum] BOUNDARY_VIOLATION field=$FIELD owner=$BASELINE_OWNER severity=HIGH agent=unknown" >&2
+            echo "[ralphharness] BOUNDARY_VIOLATION field=$FIELD owner=$BASELINE_OWNER severity=HIGH agent=unknown" >&2
         done
     ) 202>"${BASELINE_FILE}.lock"
 fi
@@ -631,7 +631,7 @@ if [ "$PHASE" = "execution" ] && [ "$TASK_INDEX" -ge "$TOTAL_TASKS" ] && [ "$TOT
     if [ -f "$TASKS_FILE" ]; then
         UNCHECKED=$(grep -c '^[[:space:]]*- \[ \]' "$TASKS_FILE" 2>/dev/null || true)
         if [ "$UNCHECKED" -gt 0 ]; then
-            echo "[ralph-specum] State says complete but tasks.md has $UNCHECKED unchecked items" >&2
+            echo "[ralphharness] State says complete but tasks.md has $UNCHECKED unchecked items" >&2
             REASON=$(cat <<EOF
 Tasks incomplete: state index ($TASK_INDEX) reached total ($TOTAL_TASKS), but tasks.md has $UNCHECKED unchecked items.
 
@@ -655,7 +655,7 @@ EOF
         fi
     fi
     # All tasks verified complete — allow stop
-    echo "[ralph-specum] All tasks verified complete for $SPEC_NAME" >&2
+    echo "[ralphharness] All tasks verified complete for $SPEC_NAME" >&2
     exit 0
 fi
 
@@ -664,7 +664,7 @@ if [ "$PHASE" = "execution" ] && [ "$TASK_INDEX" -lt "$TOTAL_TASKS" ]; then
     # Respect user approval gates (e.g. PR creation, manual review steps)
     AWAITING=$(jq -r '.awaitingApproval // false' "$STATE_FILE" 2>/dev/null || echo "false")
     if [ "$AWAITING" = "true" ]; then
-        echo "[ralph-specum] awaitingApproval=true, allowing stop for user gate" >&2
+        echo "[ralphharness] awaitingApproval=true, allowing stop for user gate" >&2
         exit 0
     fi
 
@@ -680,7 +680,7 @@ if [ "$PHASE" = "execution" ] && [ "$TASK_INDEX" -lt "$TOTAL_TASKS" ]; then
     # fires during an existing stop-hook continuation.
     STOP_HOOK_ACTIVE=$(echo "$INPUT" | jq -r '.stop_hook_active // false' 2>/dev/null || echo "false")
     if [ "$STOP_HOOK_ACTIVE" = "true" ]; then
-        echo "[ralph-specum] stop_hook_active=true, skipping continuation to prevent re-invocation loop" >&2
+        echo "[ralphharness] stop_hook_active=true, skipping continuation to prevent re-invocation loop" >&2
         exit 0
     fi
 
@@ -794,4 +794,4 @@ fi
 find "$CWD/$SPEC_PATH" -name ".progress-task-*.md" -mmin +60 -delete 2>/dev/null || true
 
 # Note: .progress.md and .ralph-state.json are preserved for loop continuation
-# Use /ralph-specum:cancel to explicitly stop execution and cleanup state
+# Use /ralph-harness:cancel to explicitly stop execution and cleanup state

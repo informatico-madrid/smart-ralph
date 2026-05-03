@@ -36,7 +36,7 @@ When a spec name exists in multiple directories, commands will prompt for disamb
 
 ## Usage
 
-Create this file at `.claude/ralph-specum.local.md` in your project root to customize plugin behavior.
+Create this file at `.claude/ralphharness.local.md` in your project root to customize plugin behavior.
 
 ## Example
 
@@ -73,7 +73,7 @@ Specs are organized by package in this monorepo.
 ```
 
 With this setup:
-- `/ralph-specum:start my-feature` creates spec in `./specs/` (first configured dir)
-- `/ralph-specum:start my-feature --specs-dir ./packages/frontend/specs` creates in frontend
-- `/ralph-specum:status` lists all specs from all configured directories
-- `/ralph-specum:switch my-feature` prompts if name exists in multiple directories
+- `/ralph-harness:start my-feature` creates spec in `./specs/` (first configured dir)
+- `/ralph-harness:start my-feature --specs-dir ./packages/frontend/specs` creates in frontend
+- `/ralph-harness:status` lists all specs from all configured directories
+- `/ralph-harness:switch my-feature` prompts if name exists in multiple directories

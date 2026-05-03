@@ -29,7 +29,7 @@ else
 fi
 
 # Check for settings file to see if plugin is enabled
-SETTINGS_FILE="$CWD/.claude/ralph-specum.local.md"
+SETTINGS_FILE="$CWD/.claude/ralphharness.local.md"
 if [ -f "$SETTINGS_FILE" ]; then
     # Extract enabled setting from YAML frontmatter (normalize case and strip quotes)
     ENABLED=$(sed -n '/^---$/,/^---$/p' "$SETTINGS_FILE" 2>/dev/null \
@@ -57,7 +57,7 @@ SPEC_NAME=$(basename "$SPEC_RELATIVE_PATH")
 STATE_FILE="$SPEC_PATH/.ralph-state.json"
 PROGRESS_FILE="$SPEC_PATH/.progress.md"
 
-echo "[ralph-specum] Active spec detected: $SPEC_NAME" >&2
+echo "[ralphharness] Active spec detected: $SPEC_NAME" >&2
 
 # Output state summary if state file exists
 if [ -f "$STATE_FILE" ] && jq empty "$STATE_FILE" 2>/dev/null; then
@@ -66,36 +66,36 @@ if [ -f "$STATE_FILE" ] && jq empty "$STATE_FILE" 2>/dev/null; then
     TOTAL_TASKS=$(jq -r '.totalTasks // 0' "$STATE_FILE" 2>/dev/null)
     AWAITING=$(jq -r '.awaitingApproval // false' "$STATE_FILE" 2>/dev/null)
 
-    echo "[ralph-specum] Phase: $PHASE | Task: $((TASK_INDEX + 1))/$TOTAL_TASKS | Awaiting approval: $AWAITING" >&2
+    echo "[ralphharness] Phase: $PHASE | Task: $((TASK_INDEX + 1))/$TOTAL_TASKS | Awaiting approval: $AWAITING" >&2
 
     if [ "$PHASE" = "execution" ] && [ "$AWAITING" = "false" ]; then
-        echo "[ralph-specum] Execution in progress. Run /ralph-specum:implement to continue." >&2
+        echo "[ralphharness] Execution in progress. Run /ralph-harness:implement to continue." >&2
     elif [ "$AWAITING" = "true" ]; then
         case "$PHASE" in
             research)
-                echo "[ralph-specum] Research complete. Run /ralph-specum:requirements to continue." >&2
+                echo "[ralphharness] Research complete. Run /ralph-harness:requirements to continue." >&2
                 ;;
             requirements)
-                echo "[ralph-specum] Requirements complete. Run /ralph-specum:design to continue." >&2
+                echo "[ralphharness] Requirements complete. Run /ralph-harness:design to continue." >&2
                 ;;
             design)
-                echo "[ralph-specum] Design complete. Run /ralph-specum:tasks to continue." >&2
+                echo "[ralphharness] Design complete. Run /ralph-harness:tasks to continue." >&2
                 ;;
             tasks)
-                echo "[ralph-specum] Tasks complete. Run /ralph-specum:implement to start execution." >&2
+                echo "[ralphharness] Tasks complete. Run /ralph-harness:implement to start execution." >&2
                 ;;
         esac
     fi
 else
     # No state file - check what spec files exist
     if [ -f "$SPEC_PATH/tasks.md" ]; then
-        echo "[ralph-specum] Tasks defined but no execution state. Run /ralph-specum:implement to start." >&2
+        echo "[ralphharness] Tasks defined but no execution state. Run /ralph-harness:implement to start." >&2
     elif [ -f "$SPEC_PATH/design.md" ]; then
-        echo "[ralph-specum] Design exists. Run /ralph-specum:tasks to generate tasks." >&2
+        echo "[ralphharness] Design exists. Run /ralph-harness:tasks to generate tasks." >&2
     elif [ -f "$SPEC_PATH/requirements.md" ]; then
-        echo "[ralph-specum] Requirements exist. Run /ralph-specum:design to continue." >&2
+        echo "[ralphharness] Requirements exist. Run /ralph-harness:design to continue." >&2
     elif [ -f "$SPEC_PATH/research.md" ]; then
-        echo "[ralph-specum] Research exists. Run /ralph-specum:requirements to continue." >&2
+        echo "[ralphharness] Research exists. Run /ralph-harness:requirements to continue." >&2
     fi
 fi
 
@@ -103,7 +103,7 @@ fi
 if [ -f "$PROGRESS_FILE" ]; then
     GOAL=$(grep -A1 "^## Original Goal" "$PROGRESS_FILE" 2>/dev/null | tail -1)
     if [ -n "$GOAL" ]; then
-        echo "[ralph-specum] Goal: $GOAL" >&2
+        echo "[ralphharness] Goal: $GOAL" >&2
     fi
 fi
 
@@ -111,7 +111,7 @@ fi
 BASELINE_DIR="${SPEC_PATH}/references"
 BASELINE_FILE="${BASELINE_DIR}/.ralph-field-baseline.json"
 if [ ! -f "$BASELINE_FILE" ] && [ -f "$STATE_FILE" ]; then
-    mkdir -p "$BASELINE_DIR" || { echo "[ralph-specum] Failed to create baseline dir: $BASELINE_DIR" >&2; return 1; }
+    mkdir -p "$BASELINE_DIR" || { echo "[ralphharness] Failed to create baseline dir: $BASELINE_DIR" >&2; return 1; }
     cat << 'EOF' > "$BASELINE_FILE"
 {
   "chat.executor.lastReadLine": "spec-executor",
@@ -120,7 +120,7 @@ if [ ! -f "$BASELINE_FILE" ] && [ -f "$STATE_FILE" ]; then
   "awaitingApproval": ["coordinator", "architect-reviewer", "product-manager", "research-analyst", "task-planner"]
 }
 EOF
-    echo "[ralph-specum] Baseline captured: $BASELINE_FILE" >&2
+    echo "[ralphharness] Baseline captured: $BASELINE_FILE" >&2
 fi
 
 exit 0

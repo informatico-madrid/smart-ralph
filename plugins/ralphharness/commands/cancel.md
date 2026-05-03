@@ -36,7 +36,7 @@ Multiple specs named '$name' found:
 1. ./specs/$name
 2. ./packages/api/specs/$name
 
-Specify: /ralph-specum:cancel ./packages/api/specs/$name
+Specify: /ralph-harness:cancel ./packages/api/specs/$name
 ```
 
 Do NOT automatically select one. User must specify the full path.
@@ -90,7 +90,7 @@ If state file exists, read and display:
 
 5. Update Spec Index (removes deleted spec from index):
    ```bash
-   ./plugins/ralph-specum/hooks/scripts/update-spec-index.sh --quiet
+   ./plugins/ralphharness/hooks/scripts/update-spec-index.sh --quiet
    ```
 
 ## Output
@@ -113,8 +113,8 @@ Cleanup:
 The spec and all its files have been permanently removed.
 
 To start a new spec:
-- Run /ralph-specum:new <name>
-- Or /ralph-specum:start <name> <goal>
+- Run /ralph-harness:new <name>
+- Or /ralph-harness:start <name> <goal>
 ```
 
 ## If No Active Loop
@@ -132,6 +132,6 @@ Cleanup:
 The spec has been removed.
 
 To start a new spec:
-- Run /ralph-specum:new <name>
-- Or /ralph-specum:start <name> <goal>
+- Run /ralph-harness:new <name>
+- Or /ralph-harness:start <name> <goal>
 ```

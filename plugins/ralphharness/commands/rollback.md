@@ -59,6 +59,6 @@ Working tree restored to the state captured before execution.
 All uncommitted changes since the checkpoint have been discarded.
 
 To start fresh execution:
-- Run /ralph-specum:start $spec_name
-- Or /ralph-specum:new $spec_name <goal>
+- Run /ralph-harness:start $spec_name
+- Or /ralph-harness:new $spec_name <goal>
 ```

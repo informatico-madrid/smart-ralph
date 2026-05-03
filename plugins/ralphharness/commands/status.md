@@ -19,7 +19,7 @@ If `--update-index` is present in `$ARGUMENTS`:
 
 ```bash
 # Regenerate spec index files
-./plugins/ralph-specum/hooks/scripts/update-spec-index.sh
+./plugins/ralphharness/hooks/scripts/update-spec-index.sh
 ```
 
 This updates:
@@ -36,7 +36,7 @@ This command uses the path resolver to discover specs from all configured direct
 - `ralph_list_specs()` - Returns all specs as `name|path` pairs
 - `ralph_resolve_current()` - Resolves .current-spec to full path
 
-**Configuration**: Specs directories are configured in `.claude/ralph-specum.local.md`:
+**Configuration**: Specs directories are configured in `.claude/ralphharness.local.md`:
 ```yaml
 specs_dirs: ["./specs", "./packages/api/specs", "./packages/web/specs"]
 ```
@@ -109,10 +109,10 @@ Files: [x] research [ ] requirements [ ] design [ ] tasks
 Index: ./specs/.index/index.md (run with --update-index to refresh)
 
 Commands:
-- /ralph-specum:switch <name> - Switch active spec
-- /ralph-specum:new <name> - Create new spec
-- /ralph-specum:<phase> - Run phase for active spec
-- /ralph-specum:status --update-index - Refresh spec index
+- /ralph-harness:switch <name> - Switch active spec
+- /ralph-harness:new <name> - Create new spec
+- /ralph-harness:<phase> - Run phase for active spec
+- /ralph-harness:status --update-index - Refresh spec index
 ```
 
 **Directory Context Rules**:

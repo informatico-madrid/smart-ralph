@@ -7,12 +7,12 @@ arguments:
 ---
 
 <example>
-user: /ralph-specum:feedback The task verification system sometimes misses TASK_COMPLETE markers
+user: /ralph-harness:feedback The task verification system sometimes misses TASK_COMPLETE markers
 assistant: I'll create a GitHub issue for that feedback.
 </example>
 
 <example>
-user: /ralph-specum:feedback Feature request: add support for parallel task execution
+user: /ralph-harness:feedback Feature request: add support for parallel task execution
 assistant: I'll submit that feature request as a GitHub issue.
 </example>
 
@@ -26,7 +26,7 @@ Help improve Ralph Specum by submitting feedback or reporting issues.
 
 2. **If `gh` is available**, create an issue with the user's feedback:
    ```bash
-   gh issue create --repo tzachbon/smart-ralph --title "<short title from feedback>" --body "<full feedback message>"
+   gh issue create --repo informatico-madrid/ralphharness --title "<short title from feedback>" --body "<full feedback message>"
    ```
    - Extract a short, descriptive title from the feedback
    - Include the full feedback in the body
@@ -35,16 +35,16 @@ Help improve Ralph Specum by submitting feedback or reporting issues.
 3. **If `gh` is NOT available**, inform the user:
    > The `gh` CLI is not installed or not authenticated. Please submit your feedback manually at:
    >
-   > **https://github.com/tzachbon/smart-ralph/issues/new**
+   > **https://github.com/informatico-madrid/ralphharness/issues/new**
    >
-   > Or browse existing issues: https://github.com/tzachbon/smart-ralph/issues?q=sort%3Aupdated-desc+is%3Aissue+is%3Aopen
+   > Or browse existing issues: https://github.com/informatico-madrid/ralphharness/issues?q=sort%3Aupdated-desc+is%3Aissue+is%3Aopen
 
 4. **If no message was provided**, ask the user what feedback they'd like to submit.
 
 ## Example Usage
 
 ```
-/ralph-specum:feedback The task verification system sometimes misses TASK_COMPLETE markers
-/ralph-specum:feedback Feature request: add support for parallel task execution
-/ralph-specum:feedback Bug: cancel command doesn't cleanup .ralph-state.json properly
+/ralph-harness:feedback The task verification system sometimes misses TASK_COMPLETE markers
+/ralph-harness:feedback Feature request: add support for parallel task execution
+/ralph-harness:feedback Bug: cancel command doesn't cleanup .ralph-state.json properly
 ```

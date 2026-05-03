@@ -279,7 +279,7 @@ After POC validated, clean up code.
 
 ## Phase 4: Quality Gates
 
-> **IMPORTANT**: NEVER push directly to the default branch (main/master). Branch management is handled at startup via `/ralph-specum:start`. You should already be on a feature branch by this phase.
+> **IMPORTANT**: NEVER push directly to the default branch (main/master). Branch management is handled at startup via `/ralph-harness:start`. You should already be on a feature branch by this phase.
 
 > **Default Behavior**: When on a feature branch (not main/master), the final deliverable is a Pull Request with all CI checks passing. This is the default unless explicitly stated otherwise.
 

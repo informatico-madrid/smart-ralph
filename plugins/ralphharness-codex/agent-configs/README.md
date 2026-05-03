@@ -12,9 +12,9 @@ Codex agents are defined in `config.toml`. To add Ralph Specum agents:
 
 2. Open the `.toml.template` file for each agent you want to install
 
-3. Copy the `[agents.ralph-specum-<name>]` block into your `config.toml`
+3. Copy the `[agents.ralphharness-<name>]` block into your `config.toml`
 
-4. Uncomment the `developer_instructions` field and fill in the system prompt from the corresponding Claude agent file at `plugins/ralph-specum/agents/<name>.md`
+4. Uncomment the `developer_instructions` field and fill in the system prompt from the corresponding Claude agent file at `plugins/ralphharness/agents/<name>.md`
 
 5. Restart Codex
 
@@ -23,7 +23,7 @@ Codex agents are defined in `config.toml`. To add Ralph Specum agents:
 ```toml
 # In ~/.codex/config.toml or .codex/config.toml
 
-[agents.ralph-specum-spec-executor]
+[agents.ralphharness-spec-executor]
 description = "Autonomous task implementer"
 developer_instructions = """
 You are a spec-executor. Implement the assigned task, verify it works,

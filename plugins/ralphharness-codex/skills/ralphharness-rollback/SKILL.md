@@ -1,5 +1,5 @@
 ---
-name: ralph-specum-rollback
+name: ralphharness-rollback
 description: This skill should be used when the user asks to rollback a spec execution to the pre-execution git checkpoint.
 metadata:
   surface: helper
@@ -20,5 +20,5 @@ You are rolling back the working tree to the pre-execution git checkpoint stored
 ## Usage
 
 ```
-$ralph-specum-rollback [spec-name-or-path]
+$ralphharness-rollback [spec-name-or-path]
 ```
