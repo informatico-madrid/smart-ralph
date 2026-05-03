@@ -1096,7 +1096,7 @@ fix: Fix .roo/skills/quality-gate/ refs first, then re-run 4.4 verify. Also 6.9 
   - **Done when**: Command that returned >0 in Phase 0 now returns 0
   - **Commit**: `chore(rename): verify fix resolves original issue`
 
-- [ ] 4.10 Final summary: rename complete
+- [x] 4.10 Final summary: rename complete
   - **Do**:
     1. Output a summary of all changes made
     2. Confirm: all pre-change counts now at 0 for in-scope files

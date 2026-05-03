@@ -1,4 +1,4 @@
-# Gito project configuration for smart-ralph
+# Gito project configuration for RalphHarness
 
 # Exclude patterns — files that should NOT be reviewed
 exclude_files = [

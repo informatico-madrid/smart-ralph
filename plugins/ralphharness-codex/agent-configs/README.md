@@ -1,10 +1,10 @@
 # Agent Config Templates
 
-These are bootstrap templates for Codex custom agents used by Ralph Specum.
+These are bootstrap templates for Codex custom agents used by RalphHarness.
 
 ## How to Install
 
-Codex agents are defined in `config.toml`. To add Ralph Specum agents:
+Codex agents are defined in `config.toml`. To add RalphHarness agents:
 
 1. Open your Codex config file:
    - User-level: `~/.codex/config.toml`
@@ -14,7 +14,7 @@ Codex agents are defined in `config.toml`. To add Ralph Specum agents:
 
 3. Copy the `[agents.ralphharness-<name>]` block into your `config.toml`
 
-4. Uncomment the `developer_instructions` field and fill in the system prompt from the corresponding Claude agent file at `plugins/ralphharness/agents/<name>.md`
+4. Uncomment the `developer_instructions` field and fill in the system prompt from the corresponding Claude agent file at `plugins/ralphharness-codex/agents/<name>.md`
 
 5. Restart Codex
 
@@ -48,5 +48,5 @@ commit the changes, and output TASK_COMPLETE when done.
 ## Notes
 
 - Field names may vary by Codex version. Check the [Codex config reference](https://developers.openai.com/codex/config-reference) for the current field name (`developer_instructions` or `system_prompt`).
-- Agent `max_threads` defaults to 6. Ralph Specum typically uses 1-3 concurrent agents.
+- Agent `max_threads` defaults to 6. RalphHarness typically uses 1-3 concurrent agents.
 - Set `max_depth = 1` to prevent recursive agent fan-out.
