@@ -116,7 +116,7 @@ This spec is not complete until ALL criteria are met:
   - **Commit**: `rename(plugin): git mv codex skills batch 2 -> ralphharness{-help,-implement,-index,-refactor}`
   - _Requirements: AC-13.3, FR-31_
 
-- [ ] 1.6 [P] Codex skill directory renames -- batch 3
+- [x] 1.6 [P] Codex skill directory renames -- batch 3
   - **Do**:
     1. `git mv plugins/ralphharness-codex/skills/ralph-specum-requirements plugins/ralphharness-codex/skills/ralphharness-requirements`
     2. `git mv plugins/ralphharness-codex/skills/ralph-specum-research plugins/ralphharness-codex/skills/ralphharness-research`
