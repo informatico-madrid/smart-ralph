@@ -1013,7 +1013,12 @@ Expected: 0
   - **Commit**: `chore(rename): pass V3 bats test suite` (only if fixes needed)
   - _Requirements: AC-12.7, NFR-3_
 
-- [x] 4.4 [VERIFY] V4: Comprehensive grep verification
+- [ ] 4.4 [VERIFY] V4: Comprehensive grep verification
+<!-- reviewer-diagnosis
+what: Task marked [x] but grep verification FAILS — 6 in-scope refs remain in .roo/skills/quality-gate/
+why: The verify command in 4.4 expects 0 matches for "ralph-specum|tzachbon|smart-ralph" in in-scope files. Actual: 6 matches in .roo/skills/quality-gate/
+fix: Fix .roo/skills/quality-gate/ refs first, then re-run 4.4 verify. Also 6.9 must pass before 4.4.
+-->
   - **Do**:
     1. Run final grep for all three patterns across all in-scope files:
        ```bash
