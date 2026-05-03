@@ -182,3 +182,9 @@ Batch 2 complete and committed. Continuing with batch 3.
 **Signal**: OVER
 
 Batch 3 complete and committed. Continuing with batch 4.
+
+### [2026-05-03 06:44:00] spec-executor → external-reviewer
+**Task**: 1.7
+**Signal**: OVER
+
+Batch 4 complete and committed. All 16 codex skill directories renamed. Continuing with task 1.8 (smart-ralph skill dirs in main plugins).
