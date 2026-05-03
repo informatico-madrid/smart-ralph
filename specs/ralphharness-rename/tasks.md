@@ -6,7 +6,7 @@
 
 **Intent:** REFACTOR (rename-only) -- TDD workflow adapted: the "test" in TDD terms is: verify grep returns 0 for old names AND grep returns >0 for new names. The "implementation" is: applying the sed/git-mv changes. Tests pass immediately if the rename is correct.
 
-**Total tasks:** 80
+**Total tasks:** 90
 
 ## Completion Criteria (Autonomous Execution Standard)
 
@@ -1194,6 +1194,127 @@ NOTE: The executor MODIFIED the previous reviewer-diagnosis to weaken it — thi
   - _Requirements: FR-7, AC-14.4_
   <!-- reviewer-created-task: This task was created by the external-reviewer because the executor missed this reference. Independent grep verification found 1 in-scope ref remaining at resolve_spec_paths.py:117. The executor must complete this task before 4.4 can pass. -->
 
+## Phase 7: Remediation — Fix Deep Audit CRITICAL Gaps
+
+- [ ] 7.1 [P] Fix "Ralph Specum" title-case in codex SKILL.md files (batch 1)
+  - **Do**:
+    1. Open `platforms/codex/skills/` directory listing
+    2. For each of the 13 ralphharness* skill directories, run `sed -i 's/Ralph Specum/RalphHarness/g' SKILL.md`
+    3. Verify: `grep -c "Ralph Specum" platforms/codex/skills/ralphharness*/SKILL.md 2>/dev/null | awk -F: '{if($2>0){print "FAIL"; exit 1}}' && echo "SKILL_MD_CLEAN"`
+    4. If any FAIL output, manually inspect and fix remaining files
+  - **Files**: platforms/codex/skills/ralphharness{,-cancel,-design,-feedback,-help,-implement,-index,-refactor,-requirements,-research,-rollback,-start,-status,-switch,-tasks,-triage}/SKILL.md
+  - **Done when**: All 13 SKILL.md files have "RalphHarness" and zero occurrences of "Ralph Specum"
+  - **Verify**: `grep -c "Ralph Specum" platforms/codex/skills/ralphharness*/SKILL.md 2>/dev/null | awk -F: '{if($2>0){print "FAIL"; exit 1}}' && echo "SKILL_MD_CLEAN"`
+  - **Commit**: `fix(rename): replace "Ralph Specum" → "RalphHarness" in codex SKILL.md files`
+
+- [ ] 7.2 [P] Fix "Ralph Specum" → "RalphHarness" in codex agents and scripts (batch 2)
+  - **Do**:
+    1. For each of the 13 ralphharness* skill directories, run `sed -i 's/Ralph Specum/RalphHarness/g' agents/openai.yaml` to fix display_names
+    2. Open `platforms/codex/skills/ralphharness/scripts/resolve_spec_paths.py`, find "Ralph Specum" references on lines 2 and 172, replace with "RalphHarness"
+    3. Verify: `grep -rn "Ralph Specum" platforms/codex/skills/ralphharness*/agents/openai.yaml platforms/codex/skills/ralphharness/scripts/resolve_spec_paths.py` returns 0 matches
+  - **Files**: 13 agents/openai.yaml files + resolve_spec_paths.py
+  - **Done when**: Zero occurrences of "Ralph Specum" in codex agents and scripts
+  - **Verify**: `grep -rn "Ralph Specum" platforms/codex/skills/ralphharness*/agents/openai.yaml platforms/codex/skills/ralphharness/scripts/resolve_spec_paths.py 2>/dev/null | grep -v "No such" || echo "CODEX_AGENTS_SCRIPTS_CLEAN"`
+  - **Commit**: `fix(rename): replace "Ralph Specum" in codex agents and scripts`
+
+- [ ] 7.3 [P] Fix "Ralph Specum" → "RalphHarness" in plugin templates, commands, hooks, skills
+  - **Do**:
+    1. Run `sed -i 's/Ralph Specum/RalphHarness/g' plugins/ralphharness/templates/settings-template.md` (4 refs)
+    2. Run `sed -i 's/Ralph Specum/RalphHarness/g' plugins/ralphharness/commands/*.md` (feedback.md, help.md, status.md — ~5 refs)
+    3. Run `sed -i 's/Ralph Specum/RalphHarness/g' plugins/ralphharness/hooks/*.json` (5 refs)
+    4. Run `sed -i 's/Ralph Specum/RalphHarness/g' plugins/ralphharness/skills/ralphharness/SKILL.md` (2 refs)
+    5. Verify: `grep -rn "Ralph Specum" plugins/ralphharness/templates/ plugins/ralphharness/commands/ plugins/ralphharness/hooks/ plugins/ralphharness/skills/` returns 0 matches
+  - **Files**: settings-template.md, commands/{feedback,help,status,feedback,rollback,tasks,index}.md, hooks/hooks.json, skills/ralphharness/SKILL.md
+  - **Done when**: Zero occurrences of "Ralph Specum" in plugin files
+  - **Verify**: `grep -rn "Ralph Specum" plugins/ralphharness/ 2>/dev/null | grep -v "\.git" || echo "PLUGINS_CLEAN"`
+  - **Commit**: `fix(rename): replace "Ralph Specum" in plugin templates, commands, hooks, skills`
+
+- [ ] 7.4 [P] Fix "Ralph Specum" → "RalphHarness" in codex configs + TOML quote fixes
+  - **Do**:
+    1. For each of the 8 invalid TOML templates in `plugins/ralphharness-codex/agent-configs/` (architect-reviewer, product-manager, qa-engineer, refactor-specialist, research-analyst, spec-reviewer, task-planner, triage-analyst), run `sed -i 's/Ralph Specum/RalphHarness/g'` to fix the title-case reference
+    2. Additionally fix unescaped double quotes in those TOML strings: open each file, find string values containing double quotes, and either escape them with `\"` or use single quotes for the outer TOML string delimiters
+    3. Run `sed -i 's/Ralph Specum/RalphHarness/g' plugins/ralphharness-codex/README.md` (2 refs)
+    4. Run `sed -i 's/Ralph Specum/RalphHarness/g' plugins/ralphharness-codex/schemas/spec.schema.json` (1 ref)
+    5. Run `sed -i 's/Ralph Specum/RalphHarness/g' plugins/ralphharness-codex/references/workflow.md` (1 ref)
+    6. Verify TOML parsing: `for f in plugins/ralphharness-codex/agent-configs/*.toml.template; do python3 -c "import tomllib; tomllib.load(open('$f','rb'))" 2>/dev/null && echo "PASS $f" || echo "FAIL $f"; done`
+  - **Files**: 9 TOML templates + README.md + spec.schema.json + workflow.md
+  - **Done when**: All TOML files parse with Python tomllib and zero "Ralph Specum" in codex files
+  - **Verify**: `grep -rn "Ralph Specum" plugins/ralphharness-codex/ 2>/dev/null | grep -v "\.git" || echo "CODEX_CONFIGS_CLEAN"` && `for f in plugins/ralphharness-codex/agent-configs/*.toml.template; do python3 -c "import tomllib; tomllib.load(open('$f','rb'))" 2>/dev/null || echo "TOML_FAIL $f"; done || echo "TOML_ALL_VALID"`
+  - **Commit**: `fix(rename): replace "Ralph Specum" in codex configs + TOML quote fixes`
+
+- [ ] 7.5 [P] Fix command prefix `/ralph-harness:` → `/ralphharness:` in commands/
+  - **Do**:
+    1. Run `sed -i 's/\/ralph-harness:/\/ralphharness:/g' plugins/ralphharness/commands/{help.md,requirements.md,status.md,feedback.md,rollback.md,tasks.md,index.md}`
+    2. Count remaining: `grep -rc "/ralph-harness:" plugins/ralphharness/commands/` — should be all zeros
+    3. ~184 references total across the command files
+  - **Files**: commands/{help,requirements,status,feedback,rollback,tasks,index}.md
+  - **Done when**: Zero occurrences of `/ralph-harness:` in plugins/ralphharness/commands/
+  - **Verify**: `grep -r "/ralph-harness:" plugins/ralphharness/commands/ | wc -l | xargs -I{} bash -c 'if [ {} -eq 0 ]; then echo "COMMANDS_PREFIX_CLEAN"; else echo "FAIL: {} refs remain"; exit 1; end'`
+  - **Commit**: `fix(rename): replace /ralph-harness: → /ralphharness: in commands/`
+
+- [ ] 7.6 [P] Fix command prefix `/ralph-harness:` → `/ralphharness:` in agents/
+  - **Do**:
+    1. Run `sed -i 's/\/ralph-harness:/\/ralphharness:/g' plugins/ralphharness/agents/qa-engineer.md` (1 ref)
+    2. Run `sed -i 's/\/ralph-harness:/\/ralphharness:/g' plugins/ralphharness/agents/task-planner.md` (2 refs)
+    3. Verify: `grep -rn "/ralph-harness:" plugins/ralphharness/agents/` returns 0 matches
+  - **Files**: agents/qa-engineer.md, agents/task-planner.md
+  - **Done when**: Zero occurrences of `/ralph-harness:` in agents/
+  - **Verify**: `grep -rn "/ralph-harness:" plugins/ralphharness/agents/ 2>/dev/null | grep -v "\.git" || echo "AGENTS_PREFIX_CLEAN"`
+  - **Commit**: `fix(rename): replace /ralph-harness: → /ralphharness: in agents/`
+
+- [ ] 7.7 [P] Fix command prefix `/ralph-harness:` → `/ralphharness:` in remaining files
+  - **Do**:
+    1. Run `grep -rn "/ralph-harness:" plugins/ docs/ --include="*.md" --include="*.json" --include="*.sh"` to find remaining references outside commands/ and agents/
+    2. For each file found, run `sed -i 's/\/ralph-harness:/\/ralphharness:/g' <file>`
+    3. Primary target: `docs/ARCHITECTURE.md` (1 ref)
+    4. Verify: `grep -rn "/ralph-harness:" plugins/ docs/ 2>/dev/null | grep -v "\.git" | wc -l | xargs -I{} bash -c 'if [ {} -eq 0 ]; then echo "REMAINING_PREFIX_CLEAN"; else echo "FAIL: {} refs remain"; exit 1; end'`
+  - **Files**: docs/ARCHITECTURE.md + any other files with remaining `/ralph-harness:` refs
+  - **Done when**: Zero occurrences of `/ralph-harness:` across all in-scope files
+  - **Verify**: `grep -rn "/ralph-harness:" plugins/ docs/ 2>/dev/null | grep -v "\.git" || echo "ALL_PREFIX_CLEAN"`
+  - **Commit**: `fix(rename): replace /ralph-harness: → /ralphharness: in remaining files`
+
+- [ ] 7.8 Fix requirements.md AC-5.1 spec error
+  - **Do**:
+    1. Open `specs/ralphharness-rename/requirements.md`
+    2. Navigate to acceptance criterion AC-5.1 (line 62 area)
+    3. Change `/ralph-harness:` to `/ralphharness:` — the command prefix should match the plugin directory name (no hyphen)
+    4. Verify: `grep -n "ralph-harness:" specs/ralphharness-rename/requirements.md | grep -v "ralphharness:" | grep "AC-5\|AC 5\|5\.1" | head -1` should return empty
+  - **Files**: specs/ralphharness-rename/requirements.md
+  - **Done when**: AC-5.1 references `/ralphharness:` (no hyphen) matching the plugin directory name
+  - **Verify**: `grep -n "ralph-harness:" specs/ralphharness-rename/requirements.md | head -5 || echo "REQS_PREFIX_CLEAN"`
+  - **Commit**: `fix(spec): correct command prefix in requirements.md AC-5.1`
+
+- [ ] 7.9 Fix stop-watcher.sh and load-spec-context.sh bugs
+  - **Do**:
+    1. Open `plugins/ralphharness/hooks/scripts/stop-watcher.sh`, find `Ralph-speckit` → replace with `ralphharness-speckit`
+    2. Open `plugins/ralphharness/hooks/scripts/load-spec-context.sh`, find `return 1` inside function context → replace with `exit 1`
+    3. Verify: `bash -n plugins/ralphharness/hooks/scripts/stop-watcher.sh && echo "stop-watcher VALID" || echo "stop-watcher INVALID"` and `bash -n plugins/ralphharness/hooks/scripts/load-spec-context.sh && echo "load-spec VALID" || echo "load-spec INVALID"`
+  - **Files**: hooks/scripts/stop-watcher.sh, hooks/scripts/load-spec-context.sh
+  - **Done when**: Both scripts pass `bash -n` syntax check and have correct naming
+  - **Verify**: `bash -n plugins/ralphharness/hooks/scripts/stop-watcher.sh && bash -n plugins/ralphharness/hooks/scripts/load-spec-context.sh && echo "BASH_VALID" || echo "BASH_INVALID"`
+  - **Commit**: `fix(rename): fix stop-watcher.sh and load-spec-context.sh bugs`
+
+- [ ] 7.10 [VERIFY] Phase 7 comprehensive verification
+  - **Do**:
+    1. Run final grep for "Ralph Specum": `grep -rn "Ralph Specum" plugins/ platforms/codex/ docs/ 2>/dev/null | grep -v "\.git" | wc -l` — must return 0
+    2. Run final grep for `/ralph-harness:`: `grep -rn "/ralph-harness:" plugins/ platforms/codex/ docs/ 2>/dev/null | grep -v "\.git" | wc -l` — must return 0
+    3. Validate TOML files: `for f in plugins/ralphharness-codex/agent-configs/*.toml.template; do python3 -c "import tomllib; tomllib.load(open('$f','rb'))" 2>/dev/null || echo "TOML_FAIL: $f"; done` — no TOML_FAIL output
+    4. Verify plugin directory: `ls plugins/ | grep ralphharness` — must show `ralphharness` (no `ralph-specum`)
+  - **Done when**: All three verification checks pass with zero errors
+  - **Verify**:
+    ```bash
+    # Check 1: No "Ralph Specum"
+    SPECS=$(grep -rn "Ralph Specum" plugins/ platforms/codex/ docs/ 2>/dev/null | grep -v "\.git" | wc -l)
+    [ "$SPECS" -eq 0 ] && echo "CHECK1_PASS: no \"Ralph Specum\"" || echo "CHECK1_FAIL: $SPECS refs remain"
+    # Check 2: No /ralph-harness: prefix
+    PREFIX=$(grep -rn "/ralph-harness:" plugins/ platforms/codex/ docs/ 2>/dev/null | grep -v "\.git" | wc -l)
+    [ "$PREFIX" -eq 0 ] && echo "CHECK2_PASS: no hyphenated prefix" || echo "CHECK2_FAIL: $PREFIX refs remain"
+    # Check 3: All TOML valid
+    TOML_PASS=true; for f in plugins/ralphharness-codex/agent-configs/*.toml.template; do python3 -c "import tomllib; tomllib.load(open('$f','rb'))" 2>/dev/null || { echo "TOML_FAIL: $f"; TOML_PASS=false; }; done
+    $TOML_PASS && echo "CHECK3_PASS: all TOML valid" || echo "CHECK3_FAIL"
+    ```
+  - **Commit**: `chore(rename): pass Phase 7 comprehensive verification`
+
 ## Notes
 
 - **Sed expression order**: LONGER FIRST -- `ralph-specum:` must be replaced before `ralph-specum` to avoid double-substitution producing `ralph-harness-harness`
@@ -1202,5 +1323,5 @@ NOTE: The executor MODIFIED the previous reviewer-diagnosis to weaken it — thi
   - Version bumps for speckit (1.0.0 vs 0.6.0) and codex (5.0.0 vs 4.11.0) may need clarification if manifest values are wrong
   - `.claude/settings.json` key format (`ralphharness@informatico-madrid` vs `ralphharness@smart-ralph`) needs confirmation
 - **Quality checkpoints**: 15 checkpoints total across all phases (every 2-3 tasks)
-- **Total task count**: 80 tasks (increased from 58 due to 16 codex skill renames split into 4 tasks + 1 bmad-bridge dir rename + 3 quality gate additions + 1 VF task + Phase 3b remediation + 1 resolve_spec_paths.py fix)
+- **Total task count**: 90 tasks (80 existing + 10 new Phase 7 remediation tasks addressing 5 CRITICAL gaps: title-case "Ralph Specum", TOML syntax errors, command prefix mismatch, shell script bugs, requirements spec error)
 
