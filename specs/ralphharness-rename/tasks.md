@@ -59,7 +59,7 @@ This spec is not complete until ALL criteria are met:
 
 **Goal:** Rename directory structures with `git mv` and update all manifest files. Each change is immediately verified.
 
-- [ ] 1.1 [P] Rename main plugin directory with `git mv`
+- [x] 1.1 [P] Rename main plugin directory with `git mv`
 - **Do**:
   1. `git mv plugins/ralph-specum plugins/ralphharness`
   2. Verify directory exists at new path: `test -d plugins/ralphharness`
