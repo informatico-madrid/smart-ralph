@@ -1,11 +1,11 @@
 ---
 name: ralph-bmad:import
-description: Import BMAD planning artifacts into a smart-ralph spec
+description: Import BMAD planning artifacts into a RalphHarness spec
 ---
 
 # /ralph-bmad:import
 
-Import BMAD planning artifacts into a smart-ralph spec.
+Import BMAD planning artifacts into a RalphHarness spec.
 
 ## Usage
 

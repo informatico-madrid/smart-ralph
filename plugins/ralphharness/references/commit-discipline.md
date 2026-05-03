@@ -96,7 +96,7 @@ When running in parallel mode, use flock to prevent race conditions:
 ## Branch Rules
 
 - NEVER push directly to the default branch (main/master)
-- Branch management is handled at startup via `/ralph-specum:start`
+- Branch management is handled at startup via `/ralph-harness:start`
 - Only push to feature branches: `git push -u origin <feature-branch-name>`
 - If somehow on default branch during execution, STOP and alert the user
 

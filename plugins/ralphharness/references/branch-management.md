@@ -39,7 +39,7 @@ git rev-parse --verify origin/main 2>/dev/null && echo "main" || echo "master"
    |   |   - If spec name not yet known, use temp name: feat/spec-work-<timestamp>
    |   |   - Create and switch: git checkout -b <branch-name>
    |   |   - Inform user: "Created branch '<branch-name>' for this work"
-   |   |   - Suggest: "Run /ralph-specum:research to start the research phase."
+   |   |   - Suggest: "Run /ralph-harness:research to start the research phase."
    |   |   - Continue to Parse Arguments
    |   |
    |   +-- If user chooses 2 (worktree):
@@ -49,7 +49,7 @@ git rev-parse --verify origin/main 2>/dev/null && echo "main" || echo "master"
    |   |   - Inform user: "Created worktree at '<path>' on branch '<branch-name>'"
    |   |   - IMPORTANT: Suggest user to cd to worktree and resume conversation there:
    |   |     "For best results, cd to '<path>' and start a new Claude Code session from there."
-   |   |     "Then run /ralph-specum:research to begin."
+   |   |     "Then run /ralph-harness:research to begin."
    |   |   - STOP HERE - do not continue to Parse Arguments (user needs to switch directories)
    |   |
    |   +-- Continue to Parse Arguments
@@ -186,7 +186,7 @@ For best results, cd to the worktree directory and start a new Claude Code sessi
   cd <path>
   claude
 
-Then run /ralph-specum:research to begin the research phase.
+Then run /ralph-harness:research to begin the research phase.
 ```
 
 STOP the command here - do not continue to Parse Arguments or create spec files.

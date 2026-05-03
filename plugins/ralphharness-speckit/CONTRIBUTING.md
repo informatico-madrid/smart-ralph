@@ -15,10 +15,10 @@ Thank you for your interest in contributing to Ralph Speckit. This document outl
 ```bash
 # Clone the repository
 git clone <repository-url>
-cd ralph-speckit
+cd ralphharness-speckit
 
 # Test the plugin locally
-claude --plugin-dir ./plugins/ralph-speckit
+claude --plugin-dir ./plugins/ralphharness-speckit
 
 # Run a test workflow
 /speckit:constitution Test constitution
@@ -48,7 +48,7 @@ Use descriptive branch names:
 ### Version Updates
 
 For each change, update the version in BOTH files:
-- `plugins/ralph-speckit/.claude-plugin/plugin.json`
+- `plugins/ralphharness-speckit/.claude-plugin/plugin.json`
 - `.claude-plugin/marketplace.json` (root)
 
 Use semantic versioning:

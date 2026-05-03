@@ -19,7 +19,7 @@ if [ -z "$CWD" ]; then
 fi
 
 # Check for settings file to see if plugin is enabled
-SETTINGS_FILE="$CWD/.claude/ralph-speckit.local.md"
+SETTINGS_FILE="$CWD/.claude/ralphharness-speckit.local.md"
 if [ -f "$SETTINGS_FILE" ]; then
     # Extract enabled setting from YAML frontmatter (normalize case and strip quotes)
     ENABLED=$(sed -n '/^---$/,/^---$/p' "$SETTINGS_FILE" 2>/dev/null \
@@ -70,14 +70,14 @@ TRANSCRIPT_PATH=$(echo "$INPUT" | jq -r '.transcript_path // empty' 2>/dev/null 
 if [ -n "$TRANSCRIPT_PATH" ] && [ -f "$TRANSCRIPT_PATH" ]; then
     # Primary: 500 lines covers most sessions for reliable detection
     if tail -500 "$TRANSCRIPT_PATH" 2>/dev/null | grep -qE '^ALL_TASKS_COMPLETE$|^ALL_TASKS_COMPLETE[[:space:]]'; then
-        echo "[ralph-speckit] ALL_TASKS_COMPLETE detected in transcript" >&2
+        echo "[ralphharness-speckit] ALL_TASKS_COMPLETE detected in transcript" >&2
         # Note: State file cleanup is handled by the coordinator (implement.md Section 10)
         # Do not delete here to avoid race condition
         exit 0
     fi
     # Fallback: check last 20 lines for edge cases (very recent signal)
     if tail -20 "$TRANSCRIPT_PATH" 2>/dev/null | grep -qE '^ALL_TASKS_COMPLETE$'; then
-        echo "[ralph-speckit] ALL_TASKS_COMPLETE detected in transcript (tail-end)" >&2
+        echo "[ralphharness-speckit] ALL_TASKS_COMPLETE detected in transcript (tail-end)" >&2
         exit 0
     fi
 fi
@@ -115,14 +115,14 @@ GLOBAL_ITERATION=$(jq -r '.globalIteration // 1' "$STATE_FILE" 2>/dev/null || ec
 MAX_GLOBAL=$(jq -r '.maxGlobalIterations // 100' "$STATE_FILE" 2>/dev/null || echo "100")
 
 if [ "$GLOBAL_ITERATION" -ge "$MAX_GLOBAL" ]; then
-    echo "[ralph-speckit] ERROR: Maximum global iterations ($MAX_GLOBAL) reached. Review .progress.md for failure patterns." >&2
-    echo "[ralph-speckit] Recovery: fix issues manually, then run /speckit:implement or /speckit:cancel" >&2
+    echo "[ralphharness-speckit] ERROR: Maximum global iterations ($MAX_GLOBAL) reached. Review .progress.md for failure patterns." >&2
+    echo "[ralphharness-speckit] Recovery: fix issues manually, then run /speckit:implement or /speckit:cancel" >&2
     exit 0
 fi
 
 # Log current state
 if [ "$PHASE" = "execution" ]; then
-    echo "[ralph-speckit] Session stopped during feature: $FEATURE_NAME | Task: $((TASK_INDEX + 1))/$TOTAL_TASKS | Attempt: $TASK_ITERATION" >&2
+    echo "[ralphharness-speckit] Session stopped during feature: $FEATURE_NAME | Task: $((TASK_INDEX + 1))/$TOTAL_TASKS | Attempt: $TASK_ITERATION" >&2
 fi
 
 # Loop control: output continuation prompt if more tasks remain
@@ -139,7 +139,7 @@ if [ "$PHASE" = "execution" ] && [ "$TASK_INDEX" -lt "$TOTAL_TASKS" ]; then
     # so this guard is defensive-only and never fires in normal operation.
     STOP_HOOK_ACTIVE=$(echo "$INPUT" | jq -r '.stop_hook_active // false' 2>/dev/null || echo "false")
     if [ "$STOP_HOOK_ACTIVE" = "true" ]; then
-        echo "[ralph-speckit] stop_hook_active=true, skipping continuation to prevent re-invocation loop" >&2
+        echo "[ralphharness-speckit] stop_hook_active=true, skipping continuation to prevent re-invocation loop" >&2
         exit 0
     fi
 

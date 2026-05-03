@@ -144,7 +144,7 @@ Follow these five steps in order when onboarding a new agent:
 
 2. **Append DO NOT list section to agent file**
 
-   Add a `## DO NOT` section at the end of the agent's markdown file in `plugins/ralph-specum/agents/`. This enforces boundaries at the prompt level:
+   Add a `## DO NOT` section at the end of the agent's markdown file in `plugins/ralphharness/agents/`. This enforces boundaries at the prompt level:
 
    ````markdown
    ## DO NOT
@@ -158,7 +158,7 @@ Follow these five steps in order when onboarding a new agent:
 
 3. **Update channel-map.md if agent uses inter-agent channels**
 
-   If the new agent reads or writes any filesystem channel (e.g., `chat.md`, `task_review.md`), add an entry to the `## Channel Registry` table in `plugins/ralph-specum/references/channel-map.md`:
+   If the new agent reads or writes any filesystem channel (e.g., `chat.md`, `task_review.md`), add an entry to the `## Channel Registry` table in `plugins/ralphharness/references/channel-map.md`:
 
    ```
    | <channel-name> | `<basePath>/<channel-name>` | <writer>(s) | <reader>(s) | <timing> | <locking> |

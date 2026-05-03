@@ -21,10 +21,10 @@ Spec-driven development plugin for Claude Code using the [GitHub spec-kit](https
 
 ```bash
 # Install the plugin
-/plugin install ralph-speckit@claude-plugins-official
+/plugin install ralphharness-speckit@claude-plugins-official
 
 # Or install from local directory
-claude --plugin-dir /path/to/ralph-speckit
+claude --plugin-dir /path/to/ralphharness-speckit
 ```
 
 ## Quick Start

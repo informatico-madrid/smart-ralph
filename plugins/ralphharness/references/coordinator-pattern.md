@@ -41,7 +41,7 @@ Read `$SPEC_PATH/.ralph-state.json` to get current state:
 
 If state file missing or corrupt (invalid JSON, missing required fields):
 1. Output error: "ERROR: State file missing or corrupt at $SPEC_PATH/.ralph-state.json"
-2. Suggest: "Run /ralph-specum:implement to reinitialize execution state"
+2. Suggest: "Run /ralph-harness:implement to reinitialize execution state"
 3. Do NOT continue execution
 4. Do NOT output ALL_TASKS_COMPLETE
 
@@ -94,7 +94,7 @@ Read `$SPEC_PATH/tasks.md` and find the task at taskIndex (0-based).
 
 If tasks.md does not exist:
 1. Output error: "ERROR: Tasks file missing at $SPEC_PATH/tasks.md"
-2. Suggest: "Run /ralph-specum:tasks to generate task list"
+2. Suggest: "Run /ralph-harness:tasks to generate task list"
 3. Do NOT continue execution
 4. Do NOT output ALL_TASKS_COMPLETE
 
@@ -102,7 +102,7 @@ If tasks.md does not exist:
 
 If spec directory does not exist:
 1. Output error: "ERROR: Spec directory missing at $SPEC_PATH/"
-2. Suggest: "Run /ralph-specum:new <spec-name> to create a new spec"
+2. Suggest: "Run /ralph-harness:new <spec-name> to create a new spec"
 3. Do NOT continue execution
 4. Do NOT output ALL_TASKS_COMPLETE
 
@@ -333,9 +333,9 @@ Expected first signal:
                emitting the signal, or (C) the coordinator fell back to direct
                implementation which is forbidden.
     resolution:
-      1. Verify ralph-specum plugin is loaded (check Claude Code plugin config)
-      2. Verify subagent_type is "spec-executor" (not "ralph-specum:spec-executor")
-      3. Retry: /ralph-specum:implement --recovery-mode
+      1. Verify ralphharness plugin is loaded (check Claude Code plugin config)
+      2. Verify subagent_type is "spec-executor" (not "ralph-harness:spec-executor")
+      3. Retry: /ralph-harness:implement --recovery-mode
   ```
 
 > ⚠️ **Anti-pattern: coordinator self-implementation**
@@ -773,7 +773,7 @@ Before outputting:
    ```
 5. **Update Spec Index** (marks spec as completed):
    ```bash
-   ./plugins/ralph-specum/hooks/scripts/update-spec-index.sh --quiet
+   ./plugins/ralphharness/hooks/scripts/update-spec-index.sh --quiet
    ```
 6. **Commit all remaining spec changes** (progress, tasks, index):
    ```bash

@@ -75,7 +75,7 @@ Validation Sequence:
      quickMode: true, discoveredSkills: [] }
 6. Write .progress.md with original goal
 7. Update .current-spec (bare name or full path)
-8. Update Spec Index: ./plugins/ralph-specum/hooks/scripts/update-spec-index.sh --quiet
+8. Update Spec Index: ./plugins/ralphharness/hooks/scripts/update-spec-index.sh --quiet
 9. Skill Discovery Pass 1: scan skills, match against goal text, invoke matches
 10. Goal Type Detection (BUG_FIX BEFORE state capture):
     - Classify as "fix" or "add" using regex indicators
@@ -136,7 +136,7 @@ Scan all skill files and match against the goal text:
    e. Remove stopwords: a, an, the, to, for, with, and, or, in, on, by, is, be, that, this, of, it, should, used, when, asks, needs, about
 4. Count word overlap between context tokens and description tokens
 5. If overlap >= 2 AND skill not already in `discoveredSkills` with `invoked: true`:
-   - Invoke: `Skill({ skill: "ralph-specum:<name>" })`
+   - Invoke: `Skill({ skill: "ralph-harness:<name>" })`
    - On success: add `{ name, matchedAt: "start", invoked: true }` to `discoveredSkills`
    - On failure: set `invoked: false` -- add `{ name, matchedAt: "start", invoked: false }`, log warning, continue
 6. If no skills match across all scanned skills: log `- No skills matched`
@@ -167,7 +167,7 @@ Re-scan skills with enriched context after research completes:
    e. Remove stopwords: a, an, the, to, for, with, and, or, in, on, by, is, be, that, this, of, it, should, used, when, asks, needs, about
 4. Count word overlap between context tokens and description tokens
 5. If overlap >= 2 AND skill not already in `discoveredSkills` with `invoked: true`:
-   - Invoke: `Skill({ skill: "ralph-specum:<name>" })`
+   - Invoke: `Skill({ skill: "ralph-harness:<name>" })`
    - On success: add `{ name, matchedAt: "post-research", invoked: true }` to `discoveredSkills`
    - On failure: set `invoked: false` -- add `{ name, matchedAt: "post-research", invoked: false }`, log warning, continue
 6. If no skills match across all scanned skills: log `- No new skills matched`

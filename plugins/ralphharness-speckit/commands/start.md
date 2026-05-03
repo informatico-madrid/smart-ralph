@@ -6,7 +6,7 @@ allowed-tools: [Read, Write, Edit, Task, Bash]
 
 # Start Feature
 
-Smart entry point for ralph-speckit. Checks constitution, auto-generates feature ID, creates branch, initializes state.
+Smart entry point for ralphharness-speckit. Checks constitution, auto-generates feature ID, creates branch, initializes state.
 
 ## Constitution Check (FIRST)
 

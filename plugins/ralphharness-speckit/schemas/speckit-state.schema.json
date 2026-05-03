@@ -1,8 +1,8 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://github.com/ralph-speckit/speckit-state.schema.json",
+  "$id": "https://github.com/ralphharness-speckit/speckit-state.schema.json",
   "title": "SpecKit State",
-  "description": "State file for tracking feature execution progress in ralph-speckit plugin",
+  "description": "State file for tracking feature execution progress in ralphharness-speckit plugin",
   "type": "object",
   "properties": {
     "featureId": {

@@ -6,7 +6,7 @@ allowed-tools: [Read, Bash, Glob]
 
 # Ralph Speckit Status
 
-You are displaying status for the current feature in ralph-speckit.
+You are displaying status for the current feature in ralphharness-speckit.
 
 ## Gather Information
 

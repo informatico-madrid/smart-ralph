@@ -2,7 +2,7 @@
 # Paste this block into your .codex/config.toml
 # Check Codex docs for the exact field name (developer_instructions or system_prompt)
 
-[agents.ralph-specum-spec-executor]
+[agents.ralphharness-spec-executor]
 description = "Autonomous task implementer. Implements one task, verifies in real environment, commits, signals TASK_COMPLETE."
 # model = ""  # Leave empty to use default model
 

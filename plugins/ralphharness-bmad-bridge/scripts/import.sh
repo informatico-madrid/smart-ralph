@@ -2,7 +2,7 @@
 set -euo pipefail
 
 # BMAD Bridge — import.sh
-# Structural mapper: BMAD → smart-ralph spec files
+# Structural mapper: BMAD → RalphHarness spec files
 
 # Error handling helper
 function error_exit() {

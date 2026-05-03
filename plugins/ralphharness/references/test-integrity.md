@@ -4,7 +4,7 @@
 > **Severity**: Critical — silent data corruption in the spec audit trail.
 > **Fixed in**: spec-executor v0.4.8
 
-This reference documents the most important test-integrity rule in the ralph-specum
+This reference documents the most important test-integrity rule in the ralphharness
 system. Read this before writing any task that involves tests.
 
 ---

@@ -432,7 +432,7 @@ Original task (failed):
 ```markdown
 - [ ] 1.3 Add failure parser
   - **Do**: Add parsing logic to implement.md
-  - **Files**: plugins/ralph-speckit/commands/implement.md
+  - **Files**: plugins/ralphharness-speckit/commands/implement.md
   - **Done when**: Parser extracts error details
   - **Verify**: grep -q "Parse Failure" implement.md
   - **Commit**: feat(coordinator): add failure parser
@@ -454,7 +454,7 @@ Generated fix task:
     1. Analyze the failure: Checked alternate paths
     2. Review related code in Files list
     3. Implement fix for: File not found: src/parser.ts
-  - **Files**: plugins/ralph-speckit/commands/implement.md
+  - **Files**: plugins/ralphharness-speckit/commands/implement.md
   - **Done when**: Error "File not found: src/parser.ts" no longer occurs
   - **Verify**: grep -q "Parse Failure" implement.md
   - **Commit**: `fix(recovery): address missing file from task 1.3`

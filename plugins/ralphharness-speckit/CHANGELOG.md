@@ -54,4 +54,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Requires Ralph Loop plugin for autonomous execution
 
-[0.1.0]: https://github.com/tzachbon/smart-ralph/releases/tag/ralph-speckit-v0.1.0
+[0.1.0]: https://github.com/informatico-madrid/RalphHarness/releases/tag/ralphharness-speckit-v0.1.0

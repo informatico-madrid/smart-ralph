@@ -1,5 +1,5 @@
 ---
-name: smart-ralph
+name: RalphHarness
 description: Core Smart Ralph skill defining common arguments, execution modes, and shared behaviors across all Ralph plugins.
 version: 0.1.0
 ---

@@ -272,7 +272,7 @@ Spec Location Logic:
    -> OUTPUT awareness message (non-blocking, just inform):
      "Spec will be created in ./specs/
       Tip: You can organize specs in multiple directories.
-      See /ralph-specum:help for multi-directory setup."
+      See /ralph-harness:help for multi-directory setup."
    -> Use default directory as specsDir
    -> Continue immediately without waiting for response
 
@@ -299,7 +299,7 @@ fi
 
 Display hint if true:
 ```text
-Tip: Run /ralph-specum:index to scan your codebase and create indexed specs.
+Tip: Run /ralph-harness:index to scan your codebase and create indexed specs.
 This helps the research phase find relevant existing code patterns and components.
 ```
 
