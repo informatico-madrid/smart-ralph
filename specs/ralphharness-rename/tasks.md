@@ -394,7 +394,7 @@ This spec is not complete until ALL criteria are met:
   - **Commit**: `rename(plugin): sed skills/ -> skill names + identities`
   - _Requirements: AC-11.2, FR-7_
 
-- [ ] 2.11 [VERIFY] Core plugin checkpoint: ralphharness directory clean
+- [x] 2.11 [VERIFY] Core plugin checkpoint: ralphharness directory clean
   - **Do**:
     1. Verify zero `ralph-specum` references in entire `plugins/ralphharness/` directory
     2. Verify zero `tzachbon` references in `plugins/ralphharness/`
@@ -428,7 +428,7 @@ This spec is not complete until ALL criteria are met:
 - **Commit**: `rename(plugin): sed codex agent-configs/ -> TOML config keys`
 - _Requirements: FR-31_
 
-- [ ] 2.13 [P] Codex plugin: README.md (1 file)
+- [x] 2.13 [P] Codex plugin: README.md (1 file)
   - **Do**:
     1. Dry-run on `plugins/ralphharness-codex/README.md` to verify expected matches
     2. Apply sed:
@@ -447,7 +447,7 @@ This spec is not complete until ALL criteria are met:
   - **Commit**: `rename(plugin): sed codex README.md -> brand updates`
   - _Requirements: FR-31_
 
-- [ ] 2.14 [P] Codex plugin: skills directory (32 files)
+- [x] 2.14 [P] Codex plugin: skills directory (32 files)
   - **Do**:
     1. Dry-run on `plugins/ralphharness-codex/skills/` to verify expected matches
     2. Apply sed across all skill files:
@@ -465,7 +465,7 @@ This spec is not complete until ALL criteria are met:
   - **Commit**: `rename(plugin): sed codex skills/ -> skill name patterns`
   - _Requirements: FR-31_
 
-- [ ] 2.15 [P] Codex plugin: schemas, scripts, templates (7 files)
+- [x] 2.15 [P] Codex plugin: schemas, scripts, templates (7 files)
   - **Do**:
     1. Dry-run on remaining codex subdirs to verify expected matches
     2. Apply sed:
@@ -482,7 +482,7 @@ This spec is not complete until ALL criteria are met:
   - **Commit**: `rename(plugin): sed codex schemas/scripts/templates -> identity updates`
   - _Requirements: FR-31_
 
-- [ ] 2.16 [P] Codex plugin: agent-config README
+- [x] 2.16 [P] Codex plugin: agent-config README
   - **Do**:
     1. Apply sed on `plugins/ralphharness-codex/agent-configs/README.md`
     2. Update documentation references to new plugin paths
@@ -493,7 +493,7 @@ This spec is not complete until ALL criteria are met:
   - **Commit**: `rename(plugin): sed codex agent-configs README.md`
   - _Requirements: FR-31_
 
-- [ ] 2.17 [VERIFY] Codex content checkpoint: all codex subdirs clean
+- [x] 2.17 [VERIFY] Codex content checkpoint: all codex subdirs clean
   - **Do**:
     1. Verify zero `ralph-specum` references in entire `plugins/ralphharness-codex/`
     2. Verify zero `tzachbon` references in codex plugin
