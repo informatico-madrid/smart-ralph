@@ -1046,7 +1046,7 @@ fix: Fix .roo/skills/quality-gate/ refs first, then re-run 4.4 verify. Also 6.9 
   - **Commit**: `chore(rename): pass V5 CI pipeline check` (only if fixes needed)
   - _Requirements: Verification Contract_
 
-- [ ] 4.6 [VERIFY] V6: Acceptance criteria checklist
+- [x] 4.6 [VERIFY] V6: Acceptance criteria checklist
   - **Do**:
     1. Verify each acceptance criterion from requirements.md:
        - AC-1.6: `jq -r '.name' plugins/ralphharness/.claude-plugin/plugin.json` = `"ralphharness"`
@@ -1062,7 +1062,7 @@ fix: Fix .roo/skills/quality-gate/ refs first, then re-run 4.4 verify. Also 6.9 
   - **Commit**: `chore(rename): pass V6 acceptance criteria checklist` (only if fixes needed)
   - _Requirements: All AC-* entries from requirements.md_
 
-- [ ] 4.7 [VERIFY] V7: Plugin load and functional verification
+- [x] 4.7 [VERIFY] V7: Plugin load and functional verification
   - **Do**:
     1. Verify plugin directory structure is correct: `ls plugins/ralphharness/`
     2. Verify commands directory: `test -d plugins/ralphharness/commands && test $(ls plugins/ralphharness/commands/*.md | wc -l) -ge 10`
@@ -1075,7 +1075,7 @@ fix: Fix .roo/skills/quality-gate/ refs first, then re-run 4.4 verify. Also 6.9 
   - **Commit**: `chore(rename): pass V7 plugin load verification` (only if fixes needed)
   - _Requirements: AC-1.7, AC-13.1, AC-13.3_
 
-- [ ] 4.8 [VERIFY] V8: Git history preservation verification
+- [x] 4.8 [VERIFY] V8: Git history preservation verification
   - **Do**:
     1. Run `git log --follow -- plugins/ralphharness/ | head -5` and verify shows commits
     2. Run `git log --follow -- plugins/ralphharness-codex/ | head -5` and verify shows commits
