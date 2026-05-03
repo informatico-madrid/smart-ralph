@@ -3,7 +3,7 @@
 Auto-generated summary of all specs across configured directories.
 See [index-state.json](./index-state.json) for machine-readable data.
 
-**Last updated:** 2026-05-03T05:31:29Z
+**Last updated:** 2026-05-03T07:54:01Z
 
 ## Directories (1)
 
@@ -63,11 +63,11 @@ See [index-state.json](./index-state.json) for machine-readable data.
 | collaboration-resolution | ./specs | new |  |
 | loop-safety-infra | ./specs | completed | done |
 | pair-debug-auto-trigger | ./specs | new |  |
-| ralphharness-rename | ./specs | tasks | awaiting approval |
+| ralphharness-rename | ./specs | execution | 61/73 tasks |
 
 ---
 
 **Commands:**
-- `/ralph-specum:status` - Show detailed status
-- `/ralph-specum:switch <name>` - Switch active spec
-- `/ralph-specum:start <name>` - Create or resume spec
+- `/ralphharness:status` - Show detailed status
+- `/ralphharness:switch <name>` - Switch active spec
+- `/ralphharness:start <name>` - Create or resume spec

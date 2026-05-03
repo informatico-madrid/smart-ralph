@@ -896,7 +896,7 @@ This spec is not complete until ALL criteria are met:
 >
 > **Reference**: See chat.md [2026-05-03 07:33:00] for full FABRICATION analysis.
 
-- [ ] 6.1 [VERIFY] — Fix remaining references in root-level files
+- [x] 6.1 [VERIFY] — Fix remaining references in root-level files
 - **Do**:
 1. `grep -rn "ralph-specum\|tzachbon\|smart-ralph" . --exclude-dir=specs --exclude-dir=_bmad-output --exclude-dir=.git --exclude-dir=docs/brainstormmejora --exclude-dir=docs/plans --exclude-dir=platforms/codex/skills --exclude-dir=research --exclude-dir=plans | grep -v "platforms/codex/skills/" | head -50`
 2. For each file in root (`AGENTS.md`, `CLAUDE.md`, `LICENSE`, `README.md`, `TROUBLESHOOTING.md`, `CONTRIBUTING.md`):
@@ -904,7 +904,7 @@ This spec is not complete until ALL criteria are met:
   - `git add` and `git commit` with message: `fix(refs): update old references in {filename}`
 - **Verify**: `grep -c "ralph-specum\|tzachbon\|smart-ralph" AGENTS.md CLAUDE.md LICENSE README.md TROUBLESHOOTING.md CONTRIBUTING.md` returns 0 for each
 
-- [ ] 6.2 — Fix remaining references in .github/ workflows and templates
+- [x] 6.2 — Fix remaining references in .github/ workflows and templates
 - **Do**:
 1. `grep -rn "ralph-specum\|tzachbon\|smart-ralph" .github/ --exclude-dir=specs`
 2. For each workflow file (`.github/workflows/*.yml`) and template (`.github/ISSUE_TEMPLATE/*.yml`):
@@ -912,7 +912,7 @@ This spec is not complete until ALL criteria are met:
   - `git add` and `git commit`
 - **Verify**: `grep -c "ralph-specum\|tzachbon\|smart-ralph" .github/workflows/*.yml .github/ISSUE_TEMPLATE/*.yml` returns 0
 
-- [ ] 6.3 — Fix remaining references in .gito/ and .claude-plugin/
+- [x] 6.3 — Fix remaining references in .gito/ and .claude-plugin/
 - **Do**:
 1. `grep -rn "ralph-specum\|tzachbon\|smart-ralph" .gito/ .claude-plugin/`
 2. Fix all references in `.gito/config.toml` and `.claude-plugin/marketplace.json`
