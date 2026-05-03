@@ -70,7 +70,7 @@ This spec is not complete until ALL criteria are met:
 - **Commit**: `rename(plugin): git mv plugins/ralph-specum -> plugins/ralphharness`
 - _Requirements: AC-1.1, FR-1, NFR-1_
 
-- [ ] 1.2 [P] Rename speckit plugin directory with `git mv`
+- [x] 1.2 [P] Rename speckit plugin directory with `git mv`
   - **Do**:
     1. `git mv plugins/ralph-speckit plugins/ralphharness-speckit`
     2. Verify directory exists at new path
