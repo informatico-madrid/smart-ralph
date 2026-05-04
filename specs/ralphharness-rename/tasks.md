@@ -1333,8 +1333,8 @@ NOTE: The executor MODIFIED the previous reviewer-diagnosis to weaken it — thi
     # Check 2: No /ralph-harness: prefix
     PREFIX=$(grep -rn "/ralph-harness:" plugins/ platforms/codex/ docs/ 2>/dev/null | grep -v "\.git" | wc -l)
     [ "$PREFIX" -eq 0 ] && echo "CHECK2_PASS: no hyphenated prefix" || echo "CHECK2_FAIL: $PREFIX refs remain"
-    # Check 3: No "Smart-ralph" variants
-    SMART=$(grep -rn "Smart-ralph\|Smart-Ralph" plugins/ platforms/codex/ docs/ 2>/dev/null | grep -v "\.git" | wc -l)
+    # Check 3: No "Smart-ralph" variants (excluding out-of-scope brainstormmejora/)
+    SMART=$(grep -rn "Smart-ralph\|Smart-Ralph" plugins/ platforms/codex/ docs/ 2>/dev/null | grep -v "\.git" | grep -v "docs/brainstormmejora" | wc -l)
     [ "$SMART" -eq 0 ] && echo "CHECK3_PASS: no Smart-ralph variants" || echo "CHECK3_FAIL: $SMART refs remain"
     # Check 4: All TOML valid
     TOML_PASS=true; for f in plugins/ralphharness-codex/agent-configs/*.toml.template; do python3 -c "import tomllib; tomllib.load(open('$f','rb'))" 2>/dev/null || { echo "TOML_FAIL: $f"; TOML_PASS=false; }; done
