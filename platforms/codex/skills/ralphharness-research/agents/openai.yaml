@@ -1,5 +1,5 @@
 interface:
-  display_name: "Ralph Specum Research"
+  display_name: "RalphHarness Research"
   short_description: "Generate research for an active spec"
   default_prompt: "Use $ralphharness-research to write research.md, then ask me to `approve current artifact`, `request changes`, or `continue to requirements`."
 policy:

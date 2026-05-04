@@ -1,5 +1,5 @@
 interface:
-  display_name: "Ralph Specum Status"
+  display_name: "RalphHarness Status"
   short_description: "Show active spec and backlog status"
   default_prompt: "Use $ralphharness-status to show Ralph progress, approval state, and the next explicit action across configured specs."
 policy:

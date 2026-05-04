@@ -1207,7 +1207,7 @@ NOTE: The executor MODIFIED the previous reviewer-diagnosis to weaken it — thi
   - **Verify**: `grep -c "Ralph Specum" platforms/codex/skills/ralphharness*/SKILL.md 2>/dev/null | awk -F: '{if($2>0){print "FAIL"; exit 1}}' && echo "SKILL_MD_CLEAN"`
   - **Commit**: `fix(rename): replace "Ralph Specum" → "RalphHarness" in codex SKILL.md files`
 
-- [ ] 7.2 [P] Fix "Ralph Specum" → "RalphHarness" in codex agents and scripts (batch 2)
+- [x] 7.2 [P] Fix "Ralph Specum" → "RalphHarness" in codex agents and scripts (batch 2)
   - **Do**:
     1. For each of the 13 ralphharness* skill directories, run `sed -i 's/Ralph Specum/RalphHarness/g' agents/openai.yaml` to fix display_names
     2. Open `platforms/codex/skills/ralphharness/scripts/resolve_spec_paths.py`, find "Ralph Specum" references on lines 2 and 172, replace with "RalphHarness"
