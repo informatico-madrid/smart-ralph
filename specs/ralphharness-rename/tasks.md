@@ -1194,6 +1194,18 @@ NOTE: The executor MODIFIED the previous reviewer-diagnosis to weaken it — thi
   - **Commit**: `fix(docs): replace English "rule" with Spanish "regla" in FORENSIC-COMBINED.md`
   - _Classification: code-review-classification.md #1 — Consensus: REAL_
 
+- [x] 6.5 [P] Fix #7: Contradictory template directive in design.md
+  - **Do**:
+    1. Open plugins/ralphharness-codex/templates/design.md lines 183-190
+    2. Remove the "do NOT leave as template text" comment on line 183 (it contradicts the template placeholders below)
+    3. Replace with: "Fill from codebase scan" (matching line 193 style)
+    4. Verify no other template contradictions exist
+  - **Files**: plugins/ralphharness-codex/templates/design.md
+  - **Done when**: Contradictory "do NOT leave as template text" resolved
+  - **Verify**: grep -n "do NOT leave as template text" plugins/ralphharness-codex/templates/design.md returns empty
+  - **Commit**: fix(template): resolve contradictory directive in design.md test conventions
+  - Classification: code-review-classification.md #7 — Consensus: REAL
+
 - [x] 6.10 Fix remaining "ralph-specum" reference in resolve_spec_paths.py
   - **Do**:
     1. Open `platforms/codex/skills/ralphharness/scripts/resolve_spec_paths.py`

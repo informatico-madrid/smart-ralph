@@ -180,7 +180,7 @@ Tests marked `.skip` / `xit` / `xdescribe` / `test.skip` are FORBIDDEN unless:
 
 ### Test File Conventions
 
-<!-- Fill from codebase scan — do NOT leave as template text -->
+<!-- Fill from codebase scan -->
 
 - Test runner: {{vitest / jest / ...}}
 - Test file location: {{co-located `*.test.ts` / `__tests__/` / ...}}
