@@ -75,7 +75,7 @@ For each spec directory found:
 Group specs by their root directory. Show `[dir-path]` suffix for specs NOT in the default `./specs` directory.
 
 ```
-# Ralph Specum Status
+# RalphHarness Status
 
 Active spec: <name from .current-spec> (or "none")
 

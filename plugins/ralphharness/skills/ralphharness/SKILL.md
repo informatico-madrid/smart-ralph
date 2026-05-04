@@ -1,6 +1,6 @@
 ---
 name: ralphharness
-description: This skill should be used when the user asks about "ralph arguments", "quick mode", "commit spec", "max iterations", "ralph state file", "execution modes", "ralph loop", "coordinator behavior", "delegate to subagent", or needs guidance on Ralph plugin arguments, state management, delegation patterns, or execution loop behavior. Core behavioral skill for all Ralph Specum operations.
+description: This skill should be used when the user asks about "ralph arguments", "quick mode", "commit spec", "max iterations", "ralph state file", "execution modes", "ralph loop", "coordinator behavior", "delegate to subagent", or needs guidance on Ralph plugin arguments, state management, delegation patterns, or execution loop behavior. Core behavioral skill for all RalphHarness operations.
 version: 0.2.0
 user-invocable: false
 ---
@@ -63,7 +63,7 @@ When `commitSpec` is false:
 
 ## Task Execution Loop
 
-Ralph Specum v3.0.0+ has a self-contained execution loop via the stop-hook. No external dependencies required.
+RalphHarness v3.0.0+ has a self-contained execution loop via the stop-hook. No external dependencies required.
 
 Key signals:
 - `TASK_COMPLETE` - executor finished task

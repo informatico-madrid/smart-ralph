@@ -1,5 +1,5 @@
 #!/bin/bash
-# Spec Index Updater for Ralph Specum
+# Spec Index Updater for RalphHarness
 # Updates ./specs/.index/ with current spec state across all directories
 #
 # Usage: update-spec-index.sh [--quiet]

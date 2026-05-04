@@ -1,5 +1,5 @@
 #!/bin/bash
-# SessionStart Hook for Ralph Specum
+# SessionStart Hook for RalphHarness
 # Loads context for active spec on session start:
 # 1. Detects active spec from .current-spec
 # 2. Loads progress and state for context

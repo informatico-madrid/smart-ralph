@@ -1,12 +1,12 @@
 ---
-description: Show help for Ralph Specum plugin commands and workflow.
+description: Show help for RalphHarness plugin commands and workflow.
 ---
 
-# Ralph Specum Help
+# RalphHarness Help
 
 ## Overview
 
-Ralph Specum is a spec-driven development plugin that guides you through research, requirements, design, and task generation phases, then executes tasks autonomously with fresh context per task.
+RalphHarness is a spec-driven development plugin that guides you through research, requirements, design, and task generation phases, then executes tasks autonomously with fresh context per task.
 
 ## Commands
 

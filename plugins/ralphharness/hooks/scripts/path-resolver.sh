@@ -1,5 +1,5 @@
 #!/bin/bash
-# Path Resolution Helper for Ralph Specum
+# Path Resolution Helper for RalphHarness
 # Source this file in hooks and commands
 #
 # Functions provided:

@@ -1,5 +1,5 @@
 ---
-description: Submit feedback or report an issue for Ralph Specum plugin.
+description: Submit feedback or report an issue for RalphHarness plugin.
 arguments:
   - name: message
     description: Your feedback or issue description
@@ -18,7 +18,7 @@ assistant: I'll submit that feature request as a GitHub issue.
 
 # Submit Feedback
 
-Help improve Ralph Specum by submitting feedback or reporting issues.
+Help improve RalphHarness by submitting feedback or reporting issues.
 
 ## Instructions
 

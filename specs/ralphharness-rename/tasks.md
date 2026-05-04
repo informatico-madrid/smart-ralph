@@ -1217,7 +1217,7 @@ NOTE: The executor MODIFIED the previous reviewer-diagnosis to weaken it — thi
   - **Verify**: `grep -rn "Ralph Specum" platforms/codex/skills/ralphharness*/agents/openai.yaml platforms/codex/skills/ralphharness/scripts/resolve_spec_paths.py 2>/dev/null | grep -v "No such" || echo "CODEX_AGENTS_SCRIPTS_CLEAN"`
   - **Commit**: `fix(rename): replace "Ralph Specum" in codex agents and scripts`
 
-- [ ] 7.3 [P] Fix "Ralph Specum" → "RalphHarness" in plugin templates, commands, hooks, skills
+- [x] 7.3 [P] Fix "Ralph Specum" → "RalphHarness" in plugin templates, commands, hooks, skills
   - **Do**:
     1. Run `sed -i 's/Ralph Specum/RalphHarness/g' plugins/ralphharness/templates/settings-template.md` (4 refs)
     2. Run `sed -i 's/Ralph Specum/RalphHarness/g' plugins/ralphharness/commands/*.md` (feedback.md, help.md, status.md — ~5 refs)

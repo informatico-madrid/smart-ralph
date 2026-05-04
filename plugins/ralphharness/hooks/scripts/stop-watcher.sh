@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Stop Hook for Ralph Specum — Loop controller for task execution continuation
+# Stop Hook for RalphHarness — Loop controller for task execution continuation
 # Exits silently (code 0) when no active spec, outputs block JSON when tasks remain.
 
 # Read hook input from stdin
