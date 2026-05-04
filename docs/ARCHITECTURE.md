@@ -1,4 +1,4 @@
-# Ralph Specum — Complete Architecture Map
+# RalphHarness — Complete Architecture Map
 
 ## 1. File Structure
 

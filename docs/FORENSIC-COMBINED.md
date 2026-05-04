@@ -1,4 +1,4 @@
-# Ralph Specum — Informe Forense Combinado: Flujo de Testing y Detección de Fallos
+# RalphHarness — Informe Forense Combinado: Flujo de Testing y Detección de Fallos
 
 ## Fuentes
 
