@@ -164,7 +164,7 @@ This spec is not complete until ALL criteria are met:
   - **Commit**: `rename(plugin): git mv plugins/ralph-bmad-bridge -> plugins/ralphharness-bmad-bridge`
   - _Requirements: AC-3.1, FR-5_
 
-- [X] 1.10 Rename settings file and verify
+- [x] 1.10 Rename settings file and verify
   <!-- DEV: Source file .claude/ralph-specum.local.md never existed at repo root.
     Only exists at nested paths: plugins/ralphharness-codex/assets/bootstrap/ralph-specum.local.md
     and platforms/codex/skills/ralph-specum/assets/bootstrap/ralph-specum.local.md
