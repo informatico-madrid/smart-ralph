@@ -1,5 +1,5 @@
 interface:
-  display_name: "Ralph Specum Start"
+  display_name: "RalphHarness Start"
   short_description: "Create or resume a Ralph spec"
   default_prompt: "Use $ralphharness-start to create or resume a Ralph spec, then wait for explicit direction to continue to research unless I asked for quick or autonomous flow."
 policy:

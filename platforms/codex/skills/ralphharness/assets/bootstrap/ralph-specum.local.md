@@ -6,9 +6,9 @@ specs_dirs:
   - "./specs"
 ---
 
-# Ralph Specum Configuration
+# RalphHarness Configuration
 
-Use this file to configure Codex or Claude Ralph Specum flows for this project.
+Use this file to configure Codex or Claude RalphHarness flows for this project.
 
 ## Notes
 

@@ -1,12 +1,12 @@
 ---
 name: ralphharness-start
-description: This skill should be used only when the user explicitly asks to use `$ralphharness-start`, or explicitly asks Ralph Specum in Codex to start or resume a spec.
+description: This skill should be used only when the user explicitly asks to use `$ralphharness-start`, or explicitly asks RalphHarness in Codex to start or resume a spec.
 metadata:
   surface: helper
   action: start
 ---
 
-# Ralph Specum Start
+# RalphHarness Start
 
 Use this for the `start` and `new` entrypoints.
 

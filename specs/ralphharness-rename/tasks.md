@@ -1229,7 +1229,7 @@ NOTE: The executor MODIFIED the previous reviewer-diagnosis to weaken it — thi
   - **Verify**: `grep -rn "Ralph Specum" plugins/ralphharness/ 2>/dev/null | grep -v "\.git" || echo "PLUGINS_CLEAN"`
   - **Commit**: `fix(rename): replace "Ralph Specum" in plugin templates, commands, hooks, skills`
 
-- [ ] 7.4 [P] Fix "Ralph Specum" → "RalphHarness" in codex configs + TOML quote fixes
+- [x] 7.4 [P] Fix "Ralph Specum" → "RalphHarness" in codex configs + TOML quote fixes
   - **Do**:
     1. For each of the 8 invalid TOML templates in `plugins/ralphharness-codex/agent-configs/` (architect-reviewer, product-manager, qa-engineer, refactor-specialist, research-analyst, spec-reviewer, task-planner, triage-analyst), run `sed -i 's/Ralph Specum/RalphHarness/g'` to fix the title-case reference
     2. Additionally fix unescaped double quotes in those TOML strings: open each file, find string values containing double quotes, and either escape them with `\"` or use single quotes for the outer TOML string delimiters
@@ -1242,7 +1242,7 @@ NOTE: The executor MODIFIED the previous reviewer-diagnosis to weaken it — thi
   - **Verify**: `grep -rn "Ralph Specum" plugins/ralphharness-codex/ 2>/dev/null | grep -v "\.git" || echo "CODEX_CONFIGS_CLEAN"` && `for f in plugins/ralphharness-codex/agent-configs/*.toml.template; do python3 -c "import tomllib; tomllib.load(open('$f','rb'))" 2>/dev/null || echo "TOML_FAIL $f"; done || echo "TOML_ALL_VALID"`
   - **Commit**: `fix(rename): replace "Ralph Specum" in codex configs + TOML quote fixes`
 
-- [ ] 7.5 [P] Fix command prefix `/ralph-harness:` → `/ralphharness:` in commands/
+- [x] 7.5 [P] Fix command prefix `/ralph-harness:` → `/ralphharness:` in commands/
   - **Do**:
     1. Run `sed -i 's/\/ralph-harness:/\/ralphharness:/g' plugins/ralphharness/commands/{help.md,requirements.md,status.md,feedback.md,rollback.md,tasks.md,index.md}`
     2. Count remaining: `grep -rc "/ralph-harness:" plugins/ralphharness/commands/` — should be all zeros
@@ -1262,7 +1262,7 @@ NOTE: The executor MODIFIED the previous reviewer-diagnosis to weaken it — thi
   - **Verify**: `grep -rn "/ralph-harness:" plugins/ralphharness/agents/ 2>/dev/null | grep -v "\.git" || echo "AGENTS_PREFIX_CLEAN"`
   - **Commit**: `fix(rename): replace /ralph-harness: → /ralphharness: in agents/`
 
-- [ ] 7.7 [P] Fix command prefix `/ralph-harness:` → `/ralphharness:` in remaining files
+- [x] 7.7 [P] Fix command prefix `/ralph-harness:` → `/ralphharness:` in remaining files
   - **Do**:
     1. Run `grep -rn "/ralph-harness:" plugins/ docs/ --include="*.md" --include="*.json" --include="*.sh"` to find remaining references outside commands/ and agents/
     2. For each file found, run `sed -i 's/\/ralph-harness:/\/ralphharness:/g' <file>`
@@ -1317,7 +1317,7 @@ NOTE: The executor MODIFIED the previous reviewer-diagnosis to weaken it — thi
   - **Commit**: `fix(rename): replace "Smart-ralph" → "RalphHarness" in docs/ENGINE_ROADMAP.md`
   - _Requirements: FR-10, FR-19_
 
-- [ ] 7.12 [VERIFY] Phase 7 comprehensive verification
+- [x] 7.12 [VERIFY] Phase 7 comprehensive verification
   - **Do**:
     1. Run final grep for "Ralph Specum" across ALL in-scope files: `grep -rn "Ralph Specum" plugins/ platforms/codex/ docs/ 2>/dev/null | grep -v "\.git" | wc -l` — must return 0
     2. Run final grep for `/ralph-harness:`: `grep -rn "/ralph-harness:" plugins/ platforms/codex/ docs/ 2>/dev/null | grep -v "\.git" | wc -l` — must return 0

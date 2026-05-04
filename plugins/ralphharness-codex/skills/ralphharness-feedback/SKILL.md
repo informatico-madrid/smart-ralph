@@ -1,14 +1,14 @@
 ---
 name: ralphharness-feedback
-description: This skill should be used only when the user explicitly asks to use `$ralphharness-feedback`, or explicitly asks Ralph Specum in Codex to draft or submit feedback.
+description: This skill should be used only when the user explicitly asks to use `$ralphharness-feedback`, or explicitly asks RalphHarness in Codex to draft or submit feedback.
 metadata:
   surface: helper
   action: feedback
 ---
 
-# Ralph Specum Feedback
+# RalphHarness Feedback
 
-Use this to capture product feedback or bug reports for Ralph Specum.
+Use this to capture product feedback or bug reports for RalphHarness.
 
 ## Action
 

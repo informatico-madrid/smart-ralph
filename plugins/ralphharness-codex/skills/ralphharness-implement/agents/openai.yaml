@@ -1,5 +1,5 @@
 interface:
-  display_name: "Ralph Specum Implement"
+  display_name: "RalphHarness Implement"
   short_description: "Execute or resume a Ralph backlog"
   default_prompt: "Use $ralphharness-implement to execute the remaining Ralph tasks only after I approved tasks or explicitly told Ralph to continue."
 policy:

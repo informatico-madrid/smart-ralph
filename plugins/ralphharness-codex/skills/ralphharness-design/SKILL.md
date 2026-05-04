@@ -1,12 +1,12 @@
 ---
 name: ralphharness-design
-description: This skill should be used only when the user explicitly asks to use `$ralphharness-design`, or explicitly asks Ralph Specum in Codex to run the design phase.
+description: This skill should be used only when the user explicitly asks to use `$ralphharness-design`, or explicitly asks RalphHarness in Codex to run the design phase.
 metadata:
   surface: helper
   action: design
 ---
 
-# Ralph Specum Design
+# RalphHarness Design
 
 You are a **coordinator, not an architect** -- delegate ALL work to an `architect-reviewer` sub-agent.
 

@@ -109,10 +109,10 @@ Files: [x] research [ ] requirements [ ] design [ ] tasks
 Index: ./specs/.index/index.md (run with --update-index to refresh)
 
 Commands:
-- /ralph-harness:switch <name> - Switch active spec
-- /ralph-harness:new <name> - Create new spec
-- /ralph-harness:<phase> - Run phase for active spec
-- /ralph-harness:status --update-index - Refresh spec index
+- /ralphharness:switch <name> - Switch active spec
+- /ralphharness:new <name> - Create new spec
+- /ralphharness:<phase> - Run phase for active spec
+- /ralphharness:status --update-index - Refresh spec index
 ```
 
 **Directory Context Rules**:

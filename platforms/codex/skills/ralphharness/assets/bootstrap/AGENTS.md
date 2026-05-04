@@ -1,6 +1,6 @@
-# Ralph Specum Project Guidance
+# RalphHarness Project Guidance
 
-Use Ralph Specum as the spec workflow for this repo.
+Use RalphHarness as the spec workflow for this repo.
 
 ## Preferred Entry Surface
 

@@ -1,5 +1,5 @@
 interface:
-  display_name: "Ralph Specum Requirements"
+  display_name: "RalphHarness Requirements"
   short_description: "Generate requirements for an active spec"
   default_prompt: "Use $ralphharness-requirements to write requirements.md, then ask me to `approve current artifact`, `request changes`, or `continue to design`."
 policy:

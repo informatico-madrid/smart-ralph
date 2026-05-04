@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Stop hook for Ralph Specum Codex plugin.
+# Stop hook for RalphHarness Codex plugin.
 # Reads .ralph-state.json and outputs {"decision":"block","reason":"..."} to continue execution,
 # or exits 0 silently to let Codex stop.
 

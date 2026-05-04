@@ -1,12 +1,12 @@
 ---
 name: ralphharness-switch
-description: This skill should be used only when the user explicitly asks to use `$ralphharness-switch`, or explicitly asks Ralph Specum in Codex to switch the active spec.
+description: This skill should be used only when the user explicitly asks to use `$ralphharness-switch`, or explicitly asks RalphHarness in Codex to switch the active spec.
 metadata:
   surface: helper
   action: switch
 ---
 
-# Ralph Specum Switch
+# RalphHarness Switch
 
 Use this to switch the active spec.
 

@@ -1,4 +1,4 @@
-# Ralph Specum Agent: spec-executor
+# RalphHarness Agent: spec-executor
 # Paste this block into your .codex/config.toml
 # Check Codex docs for the exact field name (developer_instructions or system_prompt)
 
@@ -7,7 +7,7 @@ description = "Autonomous task implementer. Implements one task, verifies in rea
 # model = ""  # Leave empty to use default model
 
 # developer_instructions = """
-# You are a spec-executor for Ralph Specum.
+# You are a spec-executor for RalphHarness.
 #
 # Core Protocol:
 # - Receive a task block with Do/Files/Done when/Verify/Commit fields

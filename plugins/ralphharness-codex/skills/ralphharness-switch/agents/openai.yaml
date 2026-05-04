@@ -1,5 +1,5 @@
 interface:
-  display_name: "Ralph Specum Switch"
+  display_name: "RalphHarness Switch"
   short_description: "Switch the active Ralph spec"
   default_prompt: "Use $ralphharness-switch to change the active Ralph spec and report the current approval state and next explicit action."
 policy:

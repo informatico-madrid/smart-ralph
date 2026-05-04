@@ -1,6 +1,6 @@
-# Ralph Specum for Codex
+# RalphHarness for Codex
 
-Installable Codex skills for Ralph Specum live in this package. This is the Codex distribution surface for this repo. It is not meant to be copied into a project root as-is.
+Installable Codex skills for RalphHarness live in this package. This is the Codex distribution surface for this repo. It is not meant to be copied into a project root as-is.
 
 Package manifest: `platforms/codex/manifest.json`
 

@@ -32,11 +32,11 @@ specs_dirs: ["./specs", "./packages/api/specs", "./packages/web/specs"]
 **Resolve**:
 1. If `$ARGUMENTS` contains a spec name, use `ralph_find_spec()` to resolve it
 2. Otherwise, use `ralph_resolve_current()` to get the active spec path
-3. If no active spec, error: "No active spec. Run /ralph-harness:new <name> first."
+3. If no active spec, error: "No active spec. Run /ralphharness:new <name> first."
 
 **Validate**:
 1. Check the resolved spec directory exists
-2. Check the spec's tasks.md exists. If not: error "Tasks not found. Run /ralph-harness:tasks first."
+2. Check the spec's tasks.md exists. If not: error "Tasks not found. Run /ralphharness:tasks first."
 3. Set `$SPEC_PATH` to the resolved spec directory path. All references use this variable.
 
 ## Step 2: Parse Arguments
@@ -380,9 +380,9 @@ Then Read and follow these references in order. They contain the complete coordi
 
 ### Error States (never output ALL_TASKS_COMPLETE)
 
-- Missing/corrupt state file: error and suggest re-running /ralph-harness:implement
-- Missing tasks.md: error and suggest running /ralph-harness:tasks
-- Missing spec directory: error and suggest running /ralph-harness:new
+- Missing/corrupt state file: error and suggest re-running /ralphharness:implement
+- Missing tasks.md: error and suggest running /ralphharness:tasks
+- Missing spec directory: error and suggest running /ralphharness:new
 - Max retries exceeded: error with failure details, suggest manual fix then resume
 - Max fix task depth/count exceeded (recovery mode): error with fix history
 

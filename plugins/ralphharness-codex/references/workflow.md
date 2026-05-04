@@ -1,23 +1,23 @@
-# Ralph Specum Workflow
+# RalphHarness Workflow
 
 ## Entry Surface
 
 | Claude surface | Codex surface |
 |----------------|---------------|
-| `/ralph-harness:start` | `$ralphharness` or `$ralphharness-start` |
-| `/ralph-harness:new` | `$ralphharness` or `$ralphharness-start` |
-| `/ralph-harness:research` | `$ralphharness` or `$ralphharness-research` |
-| `/ralph-harness:requirements` | `$ralphharness` or `$ralphharness-requirements` |
-| `/ralph-harness:design` | `$ralphharness` or `$ralphharness-design` |
-| `/ralph-harness:tasks` | `$ralphharness` or `$ralphharness-tasks` |
-| `/ralph-harness:implement` | `$ralphharness` or `$ralphharness-implement` |
-| `/ralph-harness:status` | `$ralphharness` or `$ralphharness-status` |
-| `/ralph-harness:switch` | `$ralphharness` or `$ralphharness-switch` |
-| `/ralph-harness:cancel` | `$ralphharness` or `$ralphharness-cancel` |
-| `/ralph-harness:index` | `$ralphharness` or `$ralphharness-index` |
-| `/ralph-harness:refactor` | `$ralphharness` or `$ralphharness-refactor` |
-| `/ralph-harness:feedback` | `$ralphharness` or `$ralphharness-feedback` |
-| `/ralph-harness:help` | `$ralphharness` or `$ralphharness-help` |
+| `/ralphharness:start` | `$ralphharness` or `$ralphharness-start` |
+| `/ralphharness:new` | `$ralphharness` or `$ralphharness-start` |
+| `/ralphharness:research` | `$ralphharness` or `$ralphharness-research` |
+| `/ralphharness:requirements` | `$ralphharness` or `$ralphharness-requirements` |
+| `/ralphharness:design` | `$ralphharness` or `$ralphharness-design` |
+| `/ralphharness:tasks` | `$ralphharness` or `$ralphharness-tasks` |
+| `/ralphharness:implement` | `$ralphharness` or `$ralphharness-implement` |
+| `/ralphharness:status` | `$ralphharness` or `$ralphharness-status` |
+| `/ralphharness:switch` | `$ralphharness` or `$ralphharness-switch` |
+| `/ralphharness:cancel` | `$ralphharness` or `$ralphharness-cancel` |
+| `/ralphharness:index` | `$ralphharness` or `$ralphharness-index` |
+| `/ralphharness:refactor` | `$ralphharness` or `$ralphharness-refactor` |
+| `/ralphharness:feedback` | `$ralphharness` or `$ralphharness-feedback` |
+| `/ralphharness:help` | `$ralphharness` or `$ralphharness-help` |
 
 ## Delegation Rules
 

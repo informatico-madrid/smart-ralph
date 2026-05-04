@@ -6,7 +6,7 @@ metadata:
   action: rollback
 ---
 
-# Ralph Specum Checkpoint Rollback
+# RalphHarness Checkpoint Rollback
 
 You are rolling back the working tree to the pre-execution git checkpoint stored in the spec's state file.
 

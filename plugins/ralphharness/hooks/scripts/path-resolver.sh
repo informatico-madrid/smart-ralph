@@ -211,7 +211,7 @@ ralph_find_spec() {
         # Disambiguation needed
         echo "Multiple specs named '$name' found:" >&2
         echo "$found" | nl >&2
-        echo "Specify full path: /ralph-harness:switch <path>" >&2
+        echo "Specify full path: /ralphharness:switch <path>" >&2
         return 2
     fi
 }

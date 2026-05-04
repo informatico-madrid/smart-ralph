@@ -78,7 +78,7 @@ If no completion signal from spec-executor:
    - Output error: "ERROR: Max retries reached for task $taskIndex after $maxTaskIterations attempts"
    - Include last error/failure reason from spec-executor output
    - Suggest: "Review .progress.md Learnings section for failure details"
-   - Suggest: "Fix the issue manually then run /ralph-harness:implement to resume"
+   - Suggest: "Fix the issue manually then run /ralphharness:implement to resume"
    - Do NOT continue execution
    - Do NOT output ALL_TASKS_COMPLETE
 3. Otherwise: Retry the same task

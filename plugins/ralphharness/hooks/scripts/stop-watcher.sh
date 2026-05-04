@@ -303,7 +303,7 @@ The repair loop cannot fix a missing tool — human action is required.
 3. Ensure your MCP client config includes the server with --isolated --caps=testing
    (see mcp-playwright.skill.md § MCP Server Configuration)
 4. Resume verification:
-     /ralph-harness:implement
+     /ralphharness:implement
 DEGRADED_EOF
 )
             jq -n \
@@ -352,7 +352,7 @@ Automatic repair has been exhausted.
 5. Fix manually or clarify the spec
 6. Reset repair state: update .ralph-state.json — set phase back to "execution",
    repairIteration to 0, remove failedStory and originTaskIndex
-7. Resume with /ralph-harness:implement
+7. Resume with /ralphharness:implement
 ESCALATE_EOF
 )
             jq -n \
@@ -425,8 +425,8 @@ if ! jq empty "$STATE_FILE" 2>/dev/null; then
 ERROR: Corrupt state file at $SPEC_PATH/.ralph-state.json
 
 Recovery options:
-1. Reset state: /ralph-harness:implement (reinitializes from tasks.md)
-2. Cancel spec: /ralph-harness:cancel
+1. Reset state: /ralphharness:implement (reinitializes from tasks.md)
+2. Cancel spec: /ralphharness:cancel
 EOF
 )
 
@@ -455,7 +455,7 @@ MAX_GLOBAL=$(jq -r '.maxGlobalIterations // 100' "$STATE_FILE" 2>/dev/null || ec
 
 if [ "$GLOBAL_ITERATION" -ge "$MAX_GLOBAL" ]; then
     echo "[ralphharness] ERROR: Maximum global iterations ($MAX_GLOBAL) reached. Review .progress.md for failure patterns." >&2
-    echo "[ralphharness] Recovery: fix issues manually, then run /ralph-harness:implement or /ralph-harness:cancel" >&2
+    echo "[ralphharness] Recovery: fix issues manually, then run /ralphharness:implement or /ralphharness:cancel" >&2
     exit 0
 fi
 
@@ -473,7 +473,7 @@ if [ "$FIX_TASK_MAP" != "{}" ] && [ -n "$FIX_TASK_MAP" ]; then
             FIX_IDS=$(echo "$FIX_TASK_MAP" | jq -r --arg id "$TASK_ID" '.[$id].fixTaskIds // [] | join(", ")')
             echo "[ralphharness] ERROR: Max fix attempts ($MAX_FIX_ATTEMPTS) reached for task $TASK_ID" >&2
             echo "[ralphharness] Fix history: $FIX_IDS" >&2
-            echo "[ralphharness] Recovery: manual intervention required, then /ralph-harness:cancel" >&2
+            echo "[ralphharness] Recovery: manual intervention required, then /ralphharness:cancel" >&2
             exit 0
         fi
         # Check fix task chain depth: count dots in fix task IDs
@@ -794,4 +794,4 @@ fi
 find "$CWD/$SPEC_PATH" -name ".progress-task-*.md" -mmin +60 -delete 2>/dev/null || true
 
 # Note: .progress.md and .ralph-state.json are preserved for loop continuation
-# Use /ralph-harness:cancel to explicitly stop execution and cleanup state
+# Use /ralphharness:cancel to explicitly stop execution and cleanup state

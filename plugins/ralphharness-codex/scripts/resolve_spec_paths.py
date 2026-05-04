@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Resolve Ralph Specum roots, current spec, and named specs."""
+"""Resolve RalphHarness roots, current spec, and named specs."""
 
 from __future__ import annotations
 
@@ -169,7 +169,7 @@ def list_specs(cwd: Path, specs_dirs: list[str]) -> list[dict[str, str]]:
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Resolve Ralph Specum spec paths.")
+    parser = argparse.ArgumentParser(description="Resolve RalphHarness spec paths.")
     parser.add_argument("--cwd", default=".", help="Repository root")
     parser.add_argument("--current", action="store_true", help="Print current spec path")
     parser.add_argument("--list", action="store_true", help="Print all specs as JSON")

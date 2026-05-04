@@ -266,9 +266,9 @@ cat >> "$INDEX_DIR/index.md" << EOF
 ---
 
 **Commands:**
-- \`/ralph-harness:status\` - Show detailed status
-- \`/ralph-harness:switch <name>\` - Switch active spec
-- \`/ralph-harness:start <name>\` - Create or resume spec
+- \`/ralphharness:status\` - Show detailed status
+- \`/ralphharness:switch <name>\` - Switch active spec
+- \`/ralphharness:start <name>\` - Create or resume spec
 EOF
 
 log "Updated $INDEX_DIR/index.md"

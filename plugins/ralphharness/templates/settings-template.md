@@ -73,7 +73,7 @@ Specs are organized by package in this monorepo.
 ```
 
 With this setup:
-- `/ralph-harness:start my-feature` creates spec in `./specs/` (first configured dir)
-- `/ralph-harness:start my-feature --specs-dir ./packages/frontend/specs` creates in frontend
-- `/ralph-harness:status` lists all specs from all configured directories
-- `/ralph-harness:switch my-feature` prompts if name exists in multiple directories
+- `/ralphharness:start my-feature` creates spec in `./specs/` (first configured dir)
+- `/ralphharness:start my-feature --specs-dir ./packages/frontend/specs` creates in frontend
+- `/ralphharness:status` lists all specs from all configured directories
+- `/ralphharness:switch my-feature` prompts if name exists in multiple directories

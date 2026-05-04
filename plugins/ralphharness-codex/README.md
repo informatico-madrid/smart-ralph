@@ -1,4 +1,4 @@
-# Ralph Specum for Codex
+# RalphHarness for Codex
 
 Spec-driven development plugin for OpenAI Codex. Full parity with the Claude Code ralphharness plugin.
 
@@ -153,7 +153,7 @@ Requires `[features] codex_hooks = true` in config.toml. See `references/workflo
 <details>
 <summary>Migration from old skills (platforms/codex/)</summary>
 
-If you previously installed Ralph Specum skills from `platforms/codex/skills/` via `$skill-installer`:
+If you previously installed RalphHarness skills from `platforms/codex/skills/` via `$skill-installer`:
 
 **Step 1: Remove old skills**
 

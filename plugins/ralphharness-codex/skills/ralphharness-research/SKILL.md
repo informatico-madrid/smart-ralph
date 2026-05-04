@@ -1,12 +1,12 @@
 ---
 name: ralphharness-research
-description: This skill should be used only when the user explicitly asks to use `$ralphharness-research`, or explicitly asks Ralph Specum in Codex to run the research phase.
+description: This skill should be used only when the user explicitly asks to use `$ralphharness-research`, or explicitly asks RalphHarness in Codex to run the research phase.
 metadata:
   surface: helper
   action: research
 ---
 
-# Ralph Specum Research
+# RalphHarness Research
 
 You are a **coordinator, not a researcher** -- delegate ALL work to a `research-analyst` sub-agent.
 

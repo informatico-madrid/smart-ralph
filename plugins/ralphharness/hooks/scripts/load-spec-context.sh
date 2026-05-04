@@ -69,33 +69,33 @@ if [ -f "$STATE_FILE" ] && jq empty "$STATE_FILE" 2>/dev/null; then
     echo "[ralphharness] Phase: $PHASE | Task: $((TASK_INDEX + 1))/$TOTAL_TASKS | Awaiting approval: $AWAITING" >&2
 
     if [ "$PHASE" = "execution" ] && [ "$AWAITING" = "false" ]; then
-        echo "[ralphharness] Execution in progress. Run /ralph-harness:implement to continue." >&2
+        echo "[ralphharness] Execution in progress. Run /ralphharness:implement to continue." >&2
     elif [ "$AWAITING" = "true" ]; then
         case "$PHASE" in
             research)
-                echo "[ralphharness] Research complete. Run /ralph-harness:requirements to continue." >&2
+                echo "[ralphharness] Research complete. Run /ralphharness:requirements to continue." >&2
                 ;;
             requirements)
-                echo "[ralphharness] Requirements complete. Run /ralph-harness:design to continue." >&2
+                echo "[ralphharness] Requirements complete. Run /ralphharness:design to continue." >&2
                 ;;
             design)
-                echo "[ralphharness] Design complete. Run /ralph-harness:tasks to continue." >&2
+                echo "[ralphharness] Design complete. Run /ralphharness:tasks to continue." >&2
                 ;;
             tasks)
-                echo "[ralphharness] Tasks complete. Run /ralph-harness:implement to start execution." >&2
+                echo "[ralphharness] Tasks complete. Run /ralphharness:implement to start execution." >&2
                 ;;
         esac
     fi
 else
     # No state file - check what spec files exist
     if [ -f "$SPEC_PATH/tasks.md" ]; then
-        echo "[ralphharness] Tasks defined but no execution state. Run /ralph-harness:implement to start." >&2
+        echo "[ralphharness] Tasks defined but no execution state. Run /ralphharness:implement to start." >&2
     elif [ -f "$SPEC_PATH/design.md" ]; then
-        echo "[ralphharness] Design exists. Run /ralph-harness:tasks to generate tasks." >&2
+        echo "[ralphharness] Design exists. Run /ralphharness:tasks to generate tasks." >&2
     elif [ -f "$SPEC_PATH/requirements.md" ]; then
-        echo "[ralphharness] Requirements exist. Run /ralph-harness:design to continue." >&2
+        echo "[ralphharness] Requirements exist. Run /ralphharness:design to continue." >&2
     elif [ -f "$SPEC_PATH/research.md" ]; then
-        echo "[ralphharness] Research exists. Run /ralph-harness:requirements to continue." >&2
+        echo "[ralphharness] Research exists. Run /ralphharness:requirements to continue." >&2
     fi
 fi
 

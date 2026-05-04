@@ -6,9 +6,9 @@ quick_mode_default: false
 specs_dirs: ["./specs"]
 ---
 
-# Ralph Specum Configuration
+# RalphHarness Configuration
 
-This file configures Ralph Specum plugin behavior for this project.
+This file configures RalphHarness plugin behavior for this project.
 
 ## Settings
 
@@ -48,7 +48,7 @@ auto_commit_spec: false
 quick_mode_default: true
 ---
 
-# Ralph Specum Configuration
+# RalphHarness Configuration
 
 Custom settings for this project.
 ```
@@ -67,13 +67,13 @@ specs_dirs:
   - "./packages/shared/specs"
 ---
 
-# Ralph Specum Configuration
+# RalphHarness Configuration
 
 Specs are organized by package in this monorepo.
 ```
 
 With this setup:
-- `/ralph-harness:start my-feature` creates spec in `./specs/` (first configured dir)
-- `/ralph-harness:start my-feature --specs-dir ./packages/frontend/specs` creates in frontend
-- `/ralph-harness:status` lists all specs from all configured directories
-- `/ralph-harness:switch my-feature` prompts if name exists in multiple directories
+- `/ralphharness:start my-feature` creates spec in `./specs/` (first configured dir)
+- `/ralphharness:start my-feature --specs-dir ./packages/frontend/specs` creates in frontend
+- `/ralphharness:status` lists all specs from all configured directories
+- `/ralphharness:switch my-feature` prompts if name exists in multiple directories

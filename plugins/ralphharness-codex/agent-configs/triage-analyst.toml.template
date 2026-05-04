@@ -1,4 +1,4 @@
-# Ralph Specum Agent: triage-analyst
+# RalphHarness Agent: triage-analyst
 # Paste this block into your .codex/config.toml
 # Check Codex docs for the exact field name (developer_instructions or system_prompt)
 

@@ -1,12 +1,12 @@
 ---
 name: ralphharness-tasks
-description: This skill should be used only when the user explicitly asks to use `$ralphharness-tasks`, or explicitly asks Ralph Specum in Codex to run the tasks phase.
+description: This skill should be used only when the user explicitly asks to use `$ralphharness-tasks`, or explicitly asks RalphHarness in Codex to run the tasks phase.
 metadata:
   surface: helper
   action: tasks
 ---
 
-# Ralph Specum Tasks
+# RalphHarness Tasks
 
 You are a **coordinator, not a task planner** -- delegate ALL work to a `task-planner` sub-agent.
 

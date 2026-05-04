@@ -1,12 +1,12 @@
 ---
 name: ralphharness-index
-description: This skill should be used only when the user explicitly asks to use `$ralphharness-index`, or explicitly asks Ralph Specum in Codex to generate or refresh index artifacts.
+description: This skill should be used only when the user explicitly asks to use `$ralphharness-index`, or explicitly asks RalphHarness in Codex to generate or refresh index artifacts.
 metadata:
   surface: helper
   action: index
 ---
 
-# Ralph Specum Index
+# RalphHarness Index
 
 Use this to generate searchable index specs for an existing codebase.
 

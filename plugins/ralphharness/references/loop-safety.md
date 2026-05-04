@@ -33,12 +33,12 @@
 2. Inspect `circuitBreaker.trippedReason` for failure cause
 3. Fix underlying issue
 4. Manually reset: `jq '.circuitBreaker.state = "closed" | .circuitBreaker.consecutiveFailures = 0 | .circuitBreaker.openedAt = null | .circuitBreaker.sessionStartTime = now | strftime("%Y-%m-%dT%H:%M:%SZ")' .ralph-state.json > tmp && mv tmp .ralph-state.json`
-5. Resume with `/ralph-harness:implement`
+5. Resume with `/ralphharness:implement`
 
 ### Filesystem Health Recovery
 1. Check filesystem: `mount | grep "$(df "$spec_dir" | tail -1 | awk '{print $1}')"`
 2. If read-only: `sudo mount -o remount,rw "$(df "$spec_dir" | tail -1 | awk '{print $NF}')"`
-3. Or resume with `/ralph-harness:cancel` and re-run in a writable environment
+3. Or resume with `/ralphharness:cancel` and re-run in a writable environment
 
 ### Checkpoint Recovery
 1. If checkpoint SHA is null (no git repo or detached HEAD), checkpoint-rollback cannot proceed

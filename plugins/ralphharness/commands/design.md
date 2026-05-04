@@ -22,9 +22,9 @@ Create a task for each item and complete in order:
 ## Step 1: Gather Context
 
 1. If `$ARGUMENTS` contains a spec name, use `ralph_find_spec()` to resolve it; otherwise use `ralph_resolve_current()`
-2. If no active spec, error: "No active spec. Run /ralph-harness:new <name> first."
+2. If no active spec, error: "No active spec. Run /ralphharness:new <name> first."
 3. Check the resolved spec directory exists
-4. Check `requirements.md` exists. If not, error: "Requirements not found. Run /ralph-harness:requirements first."
+4. Check `requirements.md` exists. If not, error: "Requirements not found. Run /ralphharness:requirements first."
 5. Read `.ralph-state.json`; clear approval flag: `awaitingApproval: false`
 6. Read context: `requirements.md` (required), `research.md` (if exists), `.progress.md`
 
@@ -179,7 +179,7 @@ If commit or push fails, display warning but continue.
 
 (Does not apply in `--quick` mode.)
 
-1. Display: `-> Next: Run /ralph-harness:tasks`
+1. Display: `-> Next: Run /ralphharness:tasks`
 2. End your response immediately
-3. Wait for user to explicitly run `/ralph-harness:tasks`
+3. Wait for user to explicitly run `/ralphharness:tasks`
 </mandatory>

@@ -60,7 +60,7 @@ Spec Location Logic:
 4. If dirs.length == 1: OUTPUT awareness message (non-blocking):
    "Spec will be created in ./specs/
     Tip: You can organize specs in multiple directories.
-    See /ralph-harness:help for multi-directory setup."
+    See /ralphharness:help for multi-directory setup."
 5. Store specsDir for use in spec creation
 ```
 

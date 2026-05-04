@@ -22,15 +22,15 @@ Create a task for each item and complete in order:
 ## Step 1: Gather Context
 
 1. If `$ARGUMENTS` contains a spec name, use `ralph_find_spec()` to resolve it; otherwise use `ralph_resolve_current()`
-2. If no active spec, error: "No active spec. Run /ralph-harness:new <name> first."
+2. If no active spec, error: "No active spec. Run /ralphharness:new <name> first."
 3. Check the resolved spec directory exists
-4. Check `design.md` exists. If not, error: "Design not found. Run /ralph-harness:design first."
+4. Check `design.md` exists. If not, error: "Design not found. Run /ralphharness:design first."
 5. Check `requirements.md` exists
 6. Read `.ralph-state.json`; clear approval flag: `awaitingApproval: false`
 7. **`--tasks-size` flag handling**: Check `$ARGUMENTS` for `--tasks-size` flag:
-   - If value is `fine` or `coarse`: update `granularity` in `.ralph-state.json` to the given value (overrides any value set by `/ralph-harness:start`)
+   - If value is `fine` or `coarse`: update `granularity` in `.ralph-state.json` to the given value (overrides any value set by `/ralphharness:start`)
    - If value is invalid (not `fine` or `coarse`): warn the user (`⚠️ Invalid --tasks-size value "<value>", defaulting to fine`) and set `"granularity": "fine"` in `.ralph-state.json`
-   - If `--tasks-size` flag is absent: leave `granularity` unchanged in `.ralph-state.json` (preserve any value set by `/ralph-harness:start`)
+   - If `--tasks-size` flag is absent: leave `granularity` unchanged in `.ralph-state.json` (preserve any value set by `/ralphharness:start`)
 8. **Quick mode granularity default**: If `--quick` is present in `$ARGUMENTS` AND `granularity` is not set in `.ralph-state.json`, set `"granularity": "fine"` in `.ralph-state.json`
 9. Read context: `requirements.md`, `design.md`, `research.md` (if exists), `.progress.md`
 
@@ -60,7 +60,7 @@ Apply adaptive dialogue from `${CLAUDE_PLUGIN_ROOT}/skills/interview-framework/S
 
 **Granularity question skip conditions**: Only ask the "Task granularity" question when ALL of these are true:
 - `--quick` is NOT present in `$ARGUMENTS`
-- `granularity` is NOT already set in `.ralph-state.json` (i.e., not pre-set via `--tasks-size` flag on `/ralph-harness:start` or `/ralph-harness:tasks`)
+- `granularity` is NOT already set in `.ralph-state.json` (i.e., not pre-set via `--tasks-size` flag on `/ralphharness:start` or `/ralphharness:tasks`)
 
 If either condition is false, skip the granularity question:
 - In `--quick` mode: handled in Step 1 (quick mode granularity default)
@@ -210,7 +210,7 @@ If commit or push fails, display warning but continue.
 
 (Does not apply in `--quick` mode.)
 
-1. Display: `-> Next: Run /ralph-harness:implement to start execution`
+1. Display: `-> Next: Run /ralphharness:implement to start execution`
 2. End your response immediately
-3. Wait for user to explicitly run `/ralph-harness:implement`
+3. Wait for user to explicitly run `/ralphharness:implement`
 </mandatory>

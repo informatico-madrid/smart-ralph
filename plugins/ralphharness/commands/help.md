@@ -12,38 +12,38 @@ RalphHarness is a spec-driven development plugin that guides you through researc
 
 | Command | Description |
 |---------|-------------|
-| `/ralph-harness:start [name] [goal]` | Smart entry point: resume or create new |
-| `/ralph-harness:new <name> [goal]` | Create new spec and start research |
-| `/ralph-harness:research` | Run/re-run research phase |
-| `/ralph-harness:requirements` | Generate requirements (approves research) |
-| `/ralph-harness:design` | Generate design (approves requirements) |
-| `/ralph-harness:tasks` | Generate tasks (approves design) |
-| `/ralph-harness:implement` | Start execution loop (approves tasks) |
-| `/ralph-harness:status` | Show all specs and progress |
-| `/ralph-harness:switch <name>` | Change active spec |
-| `/ralph-harness:cancel` | Cancel active loop, cleanup state |
-| `/ralph-harness:feedback [message]` | Submit feedback or report an issue |
-| `/ralph-harness:help` | Show this help |
+| `/ralphharness:start [name] [goal]` | Smart entry point: resume or create new |
+| `/ralphharness:new <name> [goal]` | Create new spec and start research |
+| `/ralphharness:research` | Run/re-run research phase |
+| `/ralphharness:requirements` | Generate requirements (approves research) |
+| `/ralphharness:design` | Generate design (approves requirements) |
+| `/ralphharness:tasks` | Generate tasks (approves design) |
+| `/ralphharness:implement` | Start execution loop (approves tasks) |
+| `/ralphharness:status` | Show all specs and progress |
+| `/ralphharness:switch <name>` | Change active spec |
+| `/ralphharness:cancel` | Cancel active loop, cleanup state |
+| `/ralphharness:feedback [message]` | Submit feedback or report an issue |
+| `/ralphharness:help` | Show this help |
 
 ## Workflow
 
 ```
-/ralph-harness:new "my-feature"
+/ralphharness:new "my-feature"
     |
     v
 [Research Phase] - Automatic on new
     |
     v (review research.md)
-/ralph-harness:requirements
+/ralphharness:requirements
     |
     v (review requirements.md)
-/ralph-harness:design
+/ralphharness:design
     |
     v (review design.md)
-/ralph-harness:tasks
+/ralphharness:tasks
     |
     v (review tasks.md)
-/ralph-harness:implement
+/ralphharness:implement
     |
     v
 [Task-by-task execution with fresh context]
@@ -56,24 +56,24 @@ Done!
 
 ```bash
 # Easiest: use start (auto-detects resume or new)
-/ralph-harness:start user-auth Add JWT authentication
+/ralphharness:start user-auth Add JWT authentication
 
 # Or resume an existing spec
-/ralph-harness:start
+/ralphharness:start
 
 # Manual workflow with individual commands:
-/ralph-harness:new user-auth Add JWT authentication
-/ralph-harness:requirements
-/ralph-harness:design
-/ralph-harness:tasks
-/ralph-harness:implement
+/ralphharness:new user-auth Add JWT authentication
+/ralphharness:requirements
+/ralphharness:design
+/ralphharness:tasks
+/ralphharness:implement
 ```
 
 ## Options
 
 ### start command
 ```
-/ralph-harness:start [name] [goal] [--fresh] [--quick] [--commit-spec] [--no-commit-spec]
+/ralphharness:start [name] [goal] [--fresh] [--quick] [--commit-spec] [--no-commit-spec]
 ```
 - `--fresh`: Force new spec, overwrite if exists (skips "resume or fresh?" prompt)
 - `--quick`: Skip interactive phases, auto-generate all specs, start execution immediately
@@ -84,19 +84,19 @@ The `--commit-spec` setting is stored in `.ralph-state.json` and applies to all 
 
 ### new command
 ```
-/ralph-harness:new <name> [goal] [--skip-research]
+/ralphharness:new <name> [goal] [--skip-research]
 ```
 - `--skip-research`: Skip research phase, start with requirements
 
 ### phase commands (research, requirements, design, tasks)
 ```
-/ralph-harness:<phase> [spec-name]
+/ralphharness:<phase> [spec-name]
 ```
-Phase commands use the `commitSpec` setting from `.ralph-state.json` (set during `/ralph-harness:start`).
+Phase commands use the `commitSpec` setting from `.ralph-state.json` (set during `/ralphharness:start`).
 
 ### implement command
 ```
-/ralph-harness:implement [--max-task-iterations 5]
+/ralphharness:implement [--max-task-iterations 5]
 ```
 - `--max-task-iterations`: Max retries per task before failure (default: 5)
 
@@ -140,11 +140,11 @@ The `start` and `new` commands accept `--specs-dir` to specify where to create a
 
 ```bash
 # Create spec in default directory (./specs/)
-/ralph-harness:start my-feature Some goal
+/ralphharness:start my-feature Some goal
 
 # Create spec in a specific directory
-/ralph-harness:start my-feature Some goal --specs-dir ./packages/api/specs
-/ralph-harness:new api-auth --specs-dir ./packages/api/specs
+/ralphharness:start my-feature Some goal --specs-dir ./packages/api/specs
+/ralphharness:new api-auth --specs-dir ./packages/api/specs
 ```
 
 The specified directory must be listed in `specs_dirs` configuration.
@@ -188,7 +188,7 @@ Multiple specs named "auth-feature" found:
   2. ./packages/api/specs/auth-feature
 
 Specify the full path to switch:
-  /ralph-harness:switch ./packages/api/specs/auth-feature
+  /ralphharness:switch ./packages/api/specs/auth-feature
 ```
 
 Use the full path to target a specific spec when names are ambiguous.
@@ -225,13 +225,13 @@ Tasks follow a 4-phase structure:
 ## Troubleshooting
 
 **Spec not found?**
-- Run `/ralph-harness:status` to see available specs
-- Run `/ralph-harness:switch <name>` to change active spec
+- Run `/ralphharness:status` to see available specs
+- Run `/ralphharness:switch <name>` to change active spec
 
 **Task failing repeatedly?**
 - After 5 attempts, hook blocks with error message
-- Fix manually, then run `/ralph-harness:implement` to resume
+- Fix manually, then run `/ralphharness:implement` to resume
 
 **Want to restart?**
-- Run `/ralph-harness:cancel` to cleanup state
+- Run `/ralphharness:cancel` to cleanup state
 - Progress file is preserved with completed tasks

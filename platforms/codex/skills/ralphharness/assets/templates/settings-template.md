@@ -5,9 +5,9 @@ auto_commit_spec: true
 specs_dirs: ["./specs"]
 ---
 
-# Ralph Specum Configuration
+# RalphHarness Configuration
 
-This file configures Ralph Specum behavior for this project.
+This file configures RalphHarness behavior for this project.
 
 ## Settings
 

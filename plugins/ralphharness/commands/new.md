@@ -17,10 +17,10 @@ From `$ARGUMENTS`, extract:
 - **--specs-dir <path>**: Create spec in specified directory (must be in configured specs_dirs array)
 
 Examples:
-- `/ralph-harness:new user-auth` -> name="user-auth", goal=none
-- `/ralph-harness:new user-auth Add OAuth2 login` -> name="user-auth", goal="Add OAuth2 login"
-- `/ralph-harness:new user-auth --skip-research` -> name="user-auth", goal=none, skip research
-- `/ralph-harness:new api-auth --specs-dir ./packages/api/specs` -> create in specified dir
+- `/ralphharness:new user-auth` -> name="user-auth", goal=none
+- `/ralphharness:new user-auth Add OAuth2 login` -> name="user-auth", goal="Add OAuth2 login"
+- `/ralphharness:new user-auth --skip-research` -> name="user-auth", goal=none, skip research
+- `/ralphharness:new api-auth --specs-dir ./packages/api/specs` -> create in specified dir
 
 ## Multi-Directory Resolution
 
@@ -213,7 +213,7 @@ After research completes:
 After displaying the output, you MUST:
 1. End your response immediately
 2. Wait for the user to review research.md
-3. Only proceed to requirements when user explicitly runs `/ralph-harness:requirements`
+3. Only proceed to requirements when user explicitly runs `/ralphharness:requirements`
 
 DO NOT automatically invoke the product-manager or run the requirements phase.
 The user needs time to review research findings before proceeding.
@@ -243,7 +243,7 @@ Current phase: research (or requirements if skipped)
 
 Next steps:
 - Review the generated research.md (or requirements.md)
-- Run /ralph-harness:requirements to proceed (or /ralph-harness:design if skipped research)
+- Run /ralphharness:requirements to proceed (or /ralphharness:design if skipped research)
 ```
 
 **With --specs-dir:**
@@ -254,7 +254,7 @@ Current phase: research (or requirements if skipped)
 
 Next steps:
 - Review the generated research.md (or requirements.md)
-- Run /ralph-harness:requirements to proceed (or /ralph-harness:design if skipped research)
+- Run /ralphharness:requirements to proceed (or /ralphharness:design if skipped research)
 ```
 
 <mandatory>

@@ -36,7 +36,7 @@ Multiple specs named '$name' found:
 1. ./specs/$name
 2. ./packages/api/specs/$name
 
-Specify: /ralph-harness:cancel ./packages/api/specs/$name
+Specify: /ralphharness:cancel ./packages/api/specs/$name
 ```
 
 Do NOT automatically select one. User must specify the full path.
@@ -113,8 +113,8 @@ Cleanup:
 The spec and all its files have been permanently removed.
 
 To start a new spec:
-- Run /ralph-harness:new <name>
-- Or /ralph-harness:start <name> <goal>
+- Run /ralphharness:new <name>
+- Or /ralphharness:start <name> <goal>
 ```
 
 ## If No Active Loop
@@ -132,6 +132,6 @@ Cleanup:
 The spec has been removed.
 
 To start a new spec:
-- Run /ralph-harness:new <name>
-- Or /ralph-harness:start <name> <goal>
+- Run /ralphharness:new <name>
+- Or /ralphharness:start <name> <goal>
 ```

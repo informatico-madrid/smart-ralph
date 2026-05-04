@@ -12,12 +12,12 @@ Spec-driven development transforms feature requests into structured specs throug
 
 | Situation | Command |
 |-----------|---------|
-| New feature, want guidance | `/ralph-harness:start <name> <goal>` |
-| New feature, skip interviews | `/ralph-harness:start <name> <goal> --quick` |
-| Large feature needing decomposition | `/ralph-harness:triage <goal>` |
-| Resume existing spec | `/ralph-harness:start` (auto-detects) |
-| Jump to specific phase | `/ralph-harness:<phase>` |
-| Restart a phase from scratch | `/ralph-harness:<phase> --fresh` |
+| New feature, want guidance | `/ralphharness:start <name> <goal>` |
+| New feature, skip interviews | `/ralphharness:start <name> <goal> --quick` |
+| Large feature needing decomposition | `/ralphharness:triage <goal>` |
+| Resume existing spec | `/ralphharness:start` (auto-detects) |
+| Jump to specific phase | `/ralphharness:<phase>` |
+| Restart a phase from scratch | `/ralphharness:<phase> --fresh` |
 
 ## Single Spec Flow
 
@@ -31,11 +31,11 @@ Each phase produces a markdown artifact in `./specs/<name>/`. Normal mode pauses
 
 | Command | Agent | Output | Purpose |
 |---------|-------|--------|---------|
-| `/ralph-harness:research` | research-analyst | research.md | Explore feasibility, patterns, context |
-| `/ralph-harness:requirements` | product-manager | requirements.md | User stories, acceptance criteria, **project type** |
-| `/ralph-harness:design` | architect-reviewer | design.md | Architecture, components, interfaces |
-| `/ralph-harness:tasks` | task-planner | tasks.md | POC-first task breakdown, VE task numbering |
-| `/ralph-harness:implement` | spec-executor | commits | Autonomous task-by-task execution |
+| `/ralphharness:research` | research-analyst | research.md | Explore feasibility, patterns, context |
+| `/ralphharness:requirements` | product-manager | requirements.md | User stories, acceptance criteria, **project type** |
+| `/ralphharness:design` | architect-reviewer | design.md | Architecture, components, interfaces |
+| `/ralphharness:tasks` | task-planner | tasks.md | POC-first task breakdown, VE task numbering |
+| `/ralphharness:implement` | spec-executor | commits | Autonomous task-by-task execution |
 
 ### Requirements Phase — Project Type (MANDATORY)
 
@@ -117,8 +117,8 @@ triage -> [spec-1, spec-2, spec-3...] -> implement each in order
 ```
 
 **Entry points:**
-- `/ralph-harness:triage <goal>` -- create or resume an epic
-- `/ralph-harness:start` -- detects active epics, suggests next unblocked spec
+- `/ralphharness:triage <goal>` -- create or resume an epic
+- `/ralphharness:start` -- detects active epics, suggests next unblocked spec
 
 **File structure:**
 ```
@@ -134,37 +134,37 @@ specs/
 
 | Command | Purpose |
 |---------|---------|
-| `/ralph-harness:status` | Show all specs and progress |
-| `/ralph-harness:switch <name>` | Change active spec |
-| `/ralph-harness:cancel` | Cancel active execution |
-| `/ralph-harness:refactor` | Update spec files after execution |
+| `/ralphharness:status` | Show all specs and progress |
+| `/ralphharness:switch <name>` | Change active spec |
+| `/ralphharness:cancel` | Cancel active execution |
+| `/ralphharness:refactor` | Update spec files after execution |
 
 ## Common Workflows
 
 ### Quick prototype
 ```bash
-/ralph-harness:start my-feature "Build X" --quick
+/ralphharness:start my-feature "Build X" --quick
 # Runs all phases automatically, starts execution
 ```
 
 ### Guided development
 ```bash
-/ralph-harness:start my-feature "Build X"
+/ralphharness:start my-feature "Build X"
 # Interactive interviews at each phase
 # Review and approve each artifact
-/ralph-harness:implement
+/ralphharness:implement
 ```
 
 ### Large feature
 ```bash
-/ralph-harness:triage "Build entire auth system"
+/ralphharness:triage "Build entire auth system"
 # Decomposes into: auth-core, auth-oauth, auth-rbac
-/ralph-harness:start  # Picks next unblocked spec
+/ralphharness:start  # Picks next unblocked spec
 ```
 
 ### Restart a phase
 ```bash
-/ralph-harness:design --fresh
+/ralphharness:design --fresh
 # Discards current design.md and reruns the design phase from scratch
 # Warning: skipping requirements means Project type may be missing
 ```
