@@ -1,14 +1,14 @@
 ---
 name: ralphharness-help
-description: This skill should be used only when the user explicitly asks to use `$ralphharness-help`, or explicitly asks Ralph Specum in Codex for help or command guidance.
+description: This skill should be used only when the user explicitly asks to use `$ralphharness-help`, or explicitly asks RalphHarness in Codex for help or command guidance.
 metadata:
   surface: helper
   action: help
 ---
 
-# Ralph Specum Help
+# RalphHarness Help
 
-Use this to explain the Ralph Specum surface in Codex.
+Use this to explain the RalphHarness surface in Codex.
 
 ## Cover
 

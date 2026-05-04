@@ -1,13 +1,13 @@
 ---
 name: ralphharness
-description: Use only when the user explicitly invokes `$ralphharness`, requests Ralph Specum in Codex, asks Ralph Specum to handle a named phase, or explicitly requests autonomous or quick mode or continuation without pauses.
+description: Use only when the user explicitly invokes `$ralphharness`, requests RalphHarness in Codex, asks RalphHarness to handle a named phase, or explicitly requests autonomous or quick mode or continuation without pauses.
 metadata:
   surface: primary
 ---
 
-# Ralph Specum
+# RalphHarness
 
-Use this as the primary Codex surface for Ralph Specum. It carries the full reusable workflow and can handle the entire command surface directly when helper skills are not installed.
+Use this as the primary Codex surface for RalphHarness. It carries the full reusable workflow and can handle the entire command surface directly when helper skills are not installed.
 
 ## Read These References
 

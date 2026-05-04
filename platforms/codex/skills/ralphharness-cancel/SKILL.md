@@ -1,12 +1,12 @@
 ---
 name: ralphharness-cancel
-description: This skill should be used only when the user explicitly asks to use `$ralphharness-cancel`, or explicitly asks Ralph Specum in Codex to stop execution or remove a spec.
+description: This skill should be used only when the user explicitly asks to use `$ralphharness-cancel`, or explicitly asks RalphHarness in Codex to stop execution or remove a spec.
 metadata:
   surface: helper
   action: cancel
 ---
 
-# Ralph Specum Cancel
+# RalphHarness Cancel
 
 Use this to stop execution and optionally remove a spec.
 

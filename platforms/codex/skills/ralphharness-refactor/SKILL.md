@@ -1,12 +1,12 @@
 ---
 name: ralphharness-refactor
-description: This skill should be used only when the user explicitly asks to use `$ralphharness-refactor`, or explicitly asks Ralph Specum in Codex to revise spec artifacts after implementation learnings.
+description: This skill should be used only when the user explicitly asks to use `$ralphharness-refactor`, or explicitly asks RalphHarness in Codex to revise spec artifacts after implementation learnings.
 metadata:
   surface: helper
   action: refactor
 ---
 
-# Ralph Specum Refactor
+# RalphHarness Refactor
 
 Use this to revise spec artifacts after implementation learnings.
 

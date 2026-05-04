@@ -1,12 +1,12 @@
 ---
 name: ralphharness-triage
-description: This skill should be used only when the user explicitly asks to use `$ralphharness-triage`, or explicitly asks Ralph Specum in Codex to triage a large effort into multiple specs.
+description: This skill should be used only when the user explicitly asks to use `$ralphharness-triage`, or explicitly asks RalphHarness in Codex to triage a large effort into multiple specs.
 metadata:
   surface: helper
   action: triage
 ---
 
-# Ralph Specum Triage
+# RalphHarness Triage
 
 Use this for large goals that should be decomposed into multiple dependency-aware specs.
 

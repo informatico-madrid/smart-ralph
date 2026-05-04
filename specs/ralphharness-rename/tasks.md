@@ -6,7 +6,7 @@
 
 **Intent:** REFACTOR (rename-only) -- TDD workflow adapted: the "test" in TDD terms is: verify grep returns 0 for old names AND grep returns >0 for new names. The "implementation" is: applying the sed/git-mv changes. Tests pass immediately if the rename is correct.
 
-**Total tasks:** 90
+**Total tasks:** 92
 
 ## Completion Criteria (Autonomous Execution Standard)
 
@@ -1196,7 +1196,7 @@ NOTE: The executor MODIFIED the previous reviewer-diagnosis to weaken it — thi
 
 ## Phase 7: Remediation — Fix Deep Audit CRITICAL Gaps
 
-- [ ] 7.1 [P] Fix "Ralph Specum" title-case in codex SKILL.md files (batch 1)
+- [x] 7.1 [P] Fix "Ralph Specum" title-case in codex SKILL.md files (batch 1)
   - **Do**:
     1. Open `platforms/codex/skills/` directory listing
     2. For each of the 13 ralphharness* skill directories, run `sed -i 's/Ralph Specum/RalphHarness/g' SKILL.md`
@@ -1294,13 +1294,37 @@ NOTE: The executor MODIFIED the previous reviewer-diagnosis to weaken it — thi
   - **Verify**: `bash -n plugins/ralphharness/hooks/scripts/stop-watcher.sh && bash -n plugins/ralphharness/hooks/scripts/load-spec-context.sh && echo "BASH_VALID" || echo "BASH_INVALID"`
   - **Commit**: `fix(rename): fix stop-watcher.sh and load-spec-context.sh bugs`
 
-- [ ] 7.10 [VERIFY] Phase 7 comprehensive verification
+- [ ] 7.10 [P] Fix "Ralph Specum" in docs/ARCHITECTURE.md, docs/FORENSIC-COMBINED.md, docs/TESTING-SYSTEM.md
   - **Do**:
-    1. Run final grep for "Ralph Specum": `grep -rn "Ralph Specum" plugins/ platforms/codex/ docs/ 2>/dev/null | grep -v "\.git" | wc -l` — must return 0
+    1. Run `sed -i 's/Ralph Specum/RalphHarness/g' docs/ARCHITECTURE.md` (title, 1 ref)
+    2. Run `sed -i 's/Ralph Specum/RalphHarness/g' docs/FORENSIC-COMBINED.md` (title, 1 ref)
+    3. Run `sed -i 's/Ralph Specum/RalphHarness/g' docs/TESTING-SYSTEM.md` (title + line 620, 2 refs)
+    4. Verify: `grep -c "Ralph Specum" docs/ARCHITECTURE.md docs/FORENSIC-COMBINED.md docs/TESTING-SYSTEM.md` returns 0 for all
+  - **Files**: docs/ARCHITECTURE.md, docs/FORENSIC-COMBINED.md, docs/TESTING-SYSTEM.md
+  - **Done when**: Zero occurrences of "Ralph Specum" in all 3 docs
+  - **Verify**: `for f in docs/ARCHITECTURE.md docs/FORENSIC-COMBINED.md docs/TESTING-SYSTEM.md; do grep -c "Ralph Specum" "$f" 2>/dev/null && { echo "FAIL: $f"; exit 1; }; done; echo "DOCS_RENAMED"`
+  - **Commit**: `fix(rename): replace "Ralph Specum" → "RalphHarness" in docs/ARCHITECTURE, FORENSIC-COMBINED, TESTING-SYSTEM`
+  - _Requirements: FR-7, requirements.md line 248 (Active docs NOT excluded)_
+
+- [ ] 7.11 [P] Fix "Smart-ralph" → "RalphHarness" in docs/ENGINE_ROADMAP.md
+  - **Do**:
+    1. Run `sed -i 's/Smart-ralph/RalphHarness/g; s/Smart-Ralph/RalphHarness/g' docs/ENGINE_ROADMAP.md`
+    2. Verify: 5 refs (lines 11, 131, 133, 166, 386) replaced
+    3. Check no double-substitutions or broken text
+  - **Files**: docs/ENGINE_ROADMAP.md
+  - **Done when**: Zero occurrences of "Smart-ralph" or "Smart-Ralph" in ENGINE_ROADMAP.md
+  - **Verify**: `grep -c -i "smart-ralph" docs/ENGINE_ROADMAP.md` returns 0
+  - **Commit**: `fix(rename): replace "Smart-ralph" → "RalphHarness" in docs/ENGINE_ROADMAP.md`
+  - _Requirements: FR-10, FR-19_
+
+- [ ] 7.12 [VERIFY] Phase 7 comprehensive verification
+  - **Do**:
+    1. Run final grep for "Ralph Specum" across ALL in-scope files: `grep -rn "Ralph Specum" plugins/ platforms/codex/ docs/ 2>/dev/null | grep -v "\.git" | wc -l` — must return 0
     2. Run final grep for `/ralph-harness:`: `grep -rn "/ralph-harness:" plugins/ platforms/codex/ docs/ 2>/dev/null | grep -v "\.git" | wc -l` — must return 0
-    3. Validate TOML files: `for f in plugins/ralphharness-codex/agent-configs/*.toml.template; do python3 -c "import tomllib; tomllib.load(open('$f','rb'))" 2>/dev/null || echo "TOML_FAIL: $f"; done` — no TOML_FAIL output
-    4. Verify plugin directory: `ls plugins/ | grep ralphharness` — must show `ralphharness` (no `ralph-specum`)
-  - **Done when**: All three verification checks pass with zero errors
+    3. Run final grep for "Smart-ralph/Smart-Ralph": `grep -rn "Smart-ralph\|Smart-Ralph" plugins/ platforms/codex/ docs/ 2>/dev/null | grep -v "\.git" | wc -l` — must return 0
+    4. Validate TOML files: `for f in plugins/ralphharness-codex/agent-configs/*.toml.template; do python3 -c "import tomllib; tomllib.load(open('$f','rb'))" 2>/dev/null || echo "TOML_FAIL: $f"; done` — no TOML_FAIL output
+    5. Verify plugin directory: `ls plugins/ | grep ralphharness` — must show `ralphharness` (no `ralph-specum`)
+  - **Done when**: All four verification checks pass with zero errors
   - **Verify**:
     ```bash
     # Check 1: No "Ralph Specum"
@@ -1309,9 +1333,12 @@ NOTE: The executor MODIFIED the previous reviewer-diagnosis to weaken it — thi
     # Check 2: No /ralph-harness: prefix
     PREFIX=$(grep -rn "/ralph-harness:" plugins/ platforms/codex/ docs/ 2>/dev/null | grep -v "\.git" | wc -l)
     [ "$PREFIX" -eq 0 ] && echo "CHECK2_PASS: no hyphenated prefix" || echo "CHECK2_FAIL: $PREFIX refs remain"
-    # Check 3: All TOML valid
+    # Check 3: No "Smart-ralph" variants
+    SMART=$(grep -rn "Smart-ralph\|Smart-Ralph" plugins/ platforms/codex/ docs/ 2>/dev/null | grep -v "\.git" | wc -l)
+    [ "$SMART" -eq 0 ] && echo "CHECK3_PASS: no Smart-ralph variants" || echo "CHECK3_FAIL: $SMART refs remain"
+    # Check 4: All TOML valid
     TOML_PASS=true; for f in plugins/ralphharness-codex/agent-configs/*.toml.template; do python3 -c "import tomllib; tomllib.load(open('$f','rb'))" 2>/dev/null || { echo "TOML_FAIL: $f"; TOML_PASS=false; }; done
-    $TOML_PASS && echo "CHECK3_PASS: all TOML valid" || echo "CHECK3_FAIL"
+    $TOML_PASS && echo "CHECK4_PASS: all TOML valid" || echo "CHECK4_FAIL"
     ```
   - **Commit**: `chore(rename): pass Phase 7 comprehensive verification`
 
@@ -1323,5 +1350,5 @@ NOTE: The executor MODIFIED the previous reviewer-diagnosis to weaken it — thi
   - Version bumps for speckit (1.0.0 vs 0.6.0) and codex (5.0.0 vs 4.11.0) may need clarification if manifest values are wrong
   - `.claude/settings.json` key format (`ralphharness@informatico-madrid` vs `ralphharness@smart-ralph`) needs confirmation
 - **Quality checkpoints**: 15 checkpoints total across all phases (every 2-3 tasks)
-- **Total task count**: 90 tasks (80 existing + 10 new Phase 7 remediation tasks addressing 5 CRITICAL gaps: title-case "Ralph Specum", TOML syntax errors, command prefix mismatch, shell script bugs, requirements spec error)
+- **Total task count**: 92 tasks (80 existing + 12 new Phase 7 remediation tasks addressing 6 CRITICAL gaps: title-case "Ralph Specum", TOML syntax errors, command prefix mismatch, shell script bugs, requirements spec error, docs/ rename gaps)
 

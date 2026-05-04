@@ -1,12 +1,12 @@
 ---
 name: ralphharness-implement
-description: This skill should be used only when the user explicitly asks to use `$ralphharness-implement`, or explicitly asks Ralph Specum in Codex to run implementation for approved tasks, quick mode, or an explicit continue request.
+description: This skill should be used only when the user explicitly asks to use `$ralphharness-implement`, or explicitly asks RalphHarness in Codex to run implementation for approved tasks, quick mode, or an explicit continue request.
 metadata:
   surface: helper
   action: implement
 ---
 
-# Ralph Specum Implement
+# RalphHarness Implement
 
 Use this for the implementation phase.
 

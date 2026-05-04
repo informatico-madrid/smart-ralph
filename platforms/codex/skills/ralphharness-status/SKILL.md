@@ -1,12 +1,12 @@
 ---
 name: ralphharness-status
-description: This skill should be used only when the user explicitly asks to use `$ralphharness-status`, or explicitly asks Ralph Specum in Codex for status or active spec progress.
+description: This skill should be used only when the user explicitly asks to use `$ralphharness-status`, or explicitly asks RalphHarness in Codex for status or active spec progress.
 metadata:
   surface: helper
   action: status
 ---
 
-# Ralph Specum Status
+# RalphHarness Status
 
 Use this to report Ralph state across configured spec roots.
 
