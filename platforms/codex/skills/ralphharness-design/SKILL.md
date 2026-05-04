@@ -35,7 +35,7 @@ The result should cover architecture, interfaces, data flow, file changes, techn
 
 ## Response Handoff
 
-- After writing `design.md`, name `design.md` and summarize the design briefly.
+- After writing `design.md`, reference `design.md` and summarize the design briefly.
 - End with exactly one explicit choice prompt:
   - `approve current artifact`
   - `request changes`
