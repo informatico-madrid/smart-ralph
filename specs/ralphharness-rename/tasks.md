@@ -1284,7 +1284,7 @@ NOTE: The executor MODIFIED the previous reviewer-diagnosis to weaken it — thi
   - **Verify**: `grep -n "ralph-harness:" specs/ralphharness-rename/requirements.md | head -5 || echo "REQS_PREFIX_CLEAN"`
   - **Commit**: `fix(spec): correct command prefix in requirements.md AC-5.1`
 
-- [ ] 7.9 Fix stop-watcher.sh and load-spec-context.sh bugs
+- [x] 7.9 Fix stop-watcher.sh and load-spec-context.sh bugs
   - **Do**:
     1. Open `plugins/ralphharness/hooks/scripts/stop-watcher.sh`, find `Ralph-speckit` → replace with `ralphharness-speckit`
     2. Open `plugins/ralphharness/hooks/scripts/load-spec-context.sh`, find `return 1` inside function context → replace with `exit 1`

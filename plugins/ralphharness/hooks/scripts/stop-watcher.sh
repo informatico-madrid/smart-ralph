@@ -218,7 +218,7 @@ SWEEP_EOF
 )
                             jq -n \
                               --arg reason "$SWEEP_REASON" \
-                              --arg msg "Ralph-specum Phase 4: regression sweep for $SPEC_NAME dependencies" \
+                              --arg msg "RalphHarness Phase 4: regression sweep for $SPEC_NAME dependencies" \
                               '{
                                 "decision": "block",
                                 "reason": $reason,
@@ -308,7 +308,7 @@ DEGRADED_EOF
 )
             jq -n \
               --arg reason "$DEGRADED_REASON" \
-              --arg msg "Ralph-specum Phase 3: ESCALATION — VERIFICATION_DEGRADED (MCP Playwright not installed)" \
+              --arg msg "RalphHarness Phase 3: ESCALATION — VERIFICATION_DEGRADED (MCP Playwright not installed)" \
               '{
                 "decision": "block",
                 "reason": $reason,
@@ -357,7 +357,7 @@ ESCALATE_EOF
 )
             jq -n \
               --arg reason "$ESCALATE_REASON" \
-              --arg msg "Ralph-specum Phase 3: ESCALATION — repair exhausted for $FAILED_STORY" \
+              --arg msg "RalphHarness Phase 3: ESCALATION — repair exhausted for $FAILED_STORY" \
               '{
                 "decision": "block",
                 "reason": $reason,
@@ -407,7 +407,7 @@ REPAIR_EOF
 )
         jq -n \
           --arg reason "$REPAIR_REASON" \
-          --arg msg "Ralph-specum Phase 3: repair $NEXT_REPAIR/$MAX_REPAIR — $FAILED_STORY" \
+          --arg msg "RalphHarness Phase 3: repair $NEXT_REPAIR/$MAX_REPAIR — $FAILED_STORY" \
           '{
             "decision": "block",
             "reason": $reason,
@@ -432,7 +432,7 @@ EOF
 
     jq -n \
       --arg reason "$REASON" \
-      --arg msg "Ralph-specum: corrupt state file" \
+      --arg msg "RalphHarness: corrupt state file" \
       '{
         "decision": "block",
         "reason": $reason,
@@ -508,7 +508,7 @@ EOF
 )
     jq -n \
       --arg reason "$REASON" \
-      --arg msg "Ralph-specum quick mode: continue $PHASE phase" \
+      --arg msg "RalphHarness quick mode: continue $PHASE phase" \
       '{
         "decision": "block",
         "reason": $reason,
@@ -645,7 +645,7 @@ EOF
 )
             jq -n \
               --arg reason "$REASON" \
-              --arg msg "Ralph-specum: $UNCHECKED unchecked tasks remain in tasks.md" \
+              --arg msg "RalphHarness: $UNCHECKED unchecked tasks remain in tasks.md" \
               '{
                 "decision": "block",
                 "reason": $reason,
@@ -774,7 +774,7 @@ $PARALLEL_INSTRUCTIONS
 STOP_WATCHER_REASON_EOF
 )
 
-    SYSTEM_MSG="Ralph-specum iteration $GLOBAL_ITERATION | Task $((TASK_INDEX + 1))/$TOTAL_TASKS"
+    SYSTEM_MSG="RalphHarness iteration $GLOBAL_ITERATION | Task $((TASK_INDEX + 1))/$TOTAL_TASKS"
     if [ "$IS_PARALLEL" = "true" ]; then
         SYSTEM_MSG="$SYSTEM_MSG (PARALLEL GROUP)"
     fi
