@@ -110,7 +110,7 @@ spec-executor en una task Phase 3:
 
 ### 3.1 Lo que Dice el Código
 
-**task-planner.md** — No existe ninguna regla de orden entre implementación y tests. El único rule es que las tareas de Phase 3 se derivan de la Test Coverage Table (línea 330-356):
+**task-planner.md** — No existe ninguna regla de orden entre implementación y tests. La única regla es que las tareas de Phase 3 se derivan de la Test Coverage Table (línea 330-356):
 
 > "Generate one task per row in the table... use the row's data directly"
 

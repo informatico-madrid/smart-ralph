@@ -1183,6 +1183,17 @@ NOTE: The executor MODIFIED the previous reviewer-diagnosis to weaken it — thi
     
 ## Phase 6: Remediation — Fix resolve_spec_paths.py Reference
 
+- [x] 6.1 [P] Fix #1: Mixed language typo in Spanish documentation
+  - **Do**:
+    1. Open `docs/FORENSIC-COMBINED.md` line 113
+    2. Change "El único rule" to "La única regla"
+    3. Verify: `grep -n "El único rule" docs/FORENSIC-COMBINED.md` returns empty
+  - **Files**: `docs/FORENSIC-COMBINED.md`
+  - **Done when**: "El único rule" replaced with "La única regla"
+  - **Verify**: `grep -c "El único rule" docs/FORENSIC-COMBINED.md` returns 0
+  - **Commit**: `fix(docs): replace English "rule" with Spanish "regla" in FORENSIC-COMBINED.md`
+  - _Classification: code-review-classification.md #1 — Consensus: REAL_
+
 - [x] 6.10 Fix remaining "ralph-specum" reference in resolve_spec_paths.py
   - **Do**:
     1. Open `platforms/codex/skills/ralphharness/scripts/resolve_spec_paths.py`
