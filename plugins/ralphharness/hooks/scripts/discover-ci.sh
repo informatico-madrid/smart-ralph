@@ -14,7 +14,7 @@ discover_ci_commands() {
     for wf in "$repo_root/.github/workflows"/*.yml; do
       [ -f "$wf" ] || continue
       # Extract content after "- run:" from each workflow file
-      { grep -E '^[[:space:]]+-\s+run:' "$wf" 2>/dev/null \
+      { grep -E '^[[:space:]]+-[[:space:]]+run:' "$wf" 2>/dev/null \
           | sed -E 's/^[[:space:]]*-[[:space:]]+run:[[:space:]]*//' \
           | while IFS= read -r line || [[ -n "$line" ]]; do
               [ -z "$line" ] && continue
@@ -35,8 +35,8 @@ discover_ci_commands() {
       [ -f "$bats_file" ] || continue
       # Extract test runner invocations (e.g., "bats tests/", "test/unit.sh")
       grep -E '^[[:space:]]*(bats|test|./tests/)' "$bats_file" 2>/dev/null \
-        | grep -v '^\s*#' \
-        | grep -v '^\s*local ' \
+        | grep -v '^[[:space:]]*#' \
+        | grep -v '^[[:space:]]*local ' \
         | head -5 \
         | sed 's/^[[:space:]]*//' \
         | sed 's/[[:space:]]*$//' \
