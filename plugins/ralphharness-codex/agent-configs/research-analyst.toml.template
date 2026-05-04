@@ -3,7 +3,7 @@
 # Check Codex docs for the exact field name (developer_instructions or system_prompt)
 
 [agents.ralphharness-research-analyst]
-description = "This agent should be used to "research a feature", "analyze feasibility", "explore codebase", "find existing patterns", "gather context before requirements". Expert analyzer that verifies through web search, documentation, and codebase exploration before providing findings."
+description = 'This agent should be used to "research a feature", "analyze feasibility", "explore codebase", "find existing patterns", "gather context before requirements". Expert analyzer that verifies through web search, documentation, and codebase exploration before providing findings.'
 # model = ""  # Leave empty to use default model
 
 # developer_instructions = """

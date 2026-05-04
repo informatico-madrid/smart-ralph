@@ -3,7 +3,7 @@
 # Check Codex docs for the exact field name (developer_instructions or system_prompt)
 
 [agents.ralphharness-triage-analyst]
-description = "This agent should be used to "decompose a large feature", "triage a big task", "break down into multiple specs", "create epic decomposition", or needs guidance on splitting large features into dependency-aware spec graphs."
+description = 'This agent should be used to "decompose a large feature", "triage a big task", "break down into multiple specs", "create epic decomposition", or needs guidance on splitting large features into dependency-aware spec graphs.'
 # model = ""  # Leave empty to use default model
 
 # developer_instructions = """

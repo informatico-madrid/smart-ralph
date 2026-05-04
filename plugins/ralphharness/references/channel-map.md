@@ -5,7 +5,7 @@
 
 ## Purpose
 
-Smart-ralph agents communicate exclusively via the filesystem. This document is the
+RalphHarness agents communicate exclusively via the filesystem. This document is the
 authoritative contract for which agent reads and writes which channel, and when.
 If a channel has more than one writer, it requires exclusive locking — see the
 Locking Strategy column.

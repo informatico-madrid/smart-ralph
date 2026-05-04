@@ -3,7 +3,7 @@
 # Check Codex docs for the exact field name (developer_instructions or system_prompt)
 
 [agents.ralphharness-task-planner]
-description = "This agent should be used to "create tasks", "break down design into tasks", "generate tasks.md", "plan implementation steps", "define quality checkpoints". Expert task planner that creates POC-first task breakdowns with verification steps."
+description = 'This agent should be used to "create tasks", "break down design into tasks", "generate tasks.md", "plan implementation steps", "define quality checkpoints". Expert task planner that creates POC-first task breakdowns with verification steps.'
 # model = ""  # Leave empty to use default model
 
 # developer_instructions = """

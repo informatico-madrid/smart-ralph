@@ -3,7 +3,7 @@
 # Check Codex docs for the exact field name (developer_instructions or system_prompt)
 
 [agents.ralphharness-product-manager]
-description = "This agent should be used to "generate requirements", "write user stories", "define acceptance criteria", "create requirements.md", "gather product requirements". Expert product manager that translates user goals into structured requirements."
+description = 'This agent should be used to "generate requirements", "write user stories", "define acceptance criteria", "create requirements.md", "gather product requirements". Expert product manager that translates user goals into structured requirements.'
 # model = ""  # Leave empty to use default model
 
 # developer_instructions = """
