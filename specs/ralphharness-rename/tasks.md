@@ -1252,7 +1252,7 @@ NOTE: The executor MODIFIED the previous reviewer-diagnosis to weaken it — thi
   - **Verify**: `grep -r "/ralph-harness:" plugins/ralphharness/commands/ | wc -l | xargs -I{} bash -c 'if [ {} -eq 0 ]; then echo "COMMANDS_PREFIX_CLEAN"; else echo "FAIL: {} refs remain"; exit 1; end'`
   - **Commit**: `fix(rename): replace /ralph-harness: → /ralphharness: in commands/`
 
-- [ ] 7.6 [P] Fix command prefix `/ralph-harness:` → `/ralphharness:` in agents/
+- [x] 7.6 [P] Fix command prefix `/ralph-harness:` → `/ralphharness:` in agents/
   - **Do**:
     1. Run `sed -i 's/\/ralph-harness:/\/ralphharness:/g' plugins/ralphharness/agents/qa-engineer.md` (1 ref)
     2. Run `sed -i 's/\/ralph-harness:/\/ralphharness:/g' plugins/ralphharness/agents/task-planner.md` (2 refs)

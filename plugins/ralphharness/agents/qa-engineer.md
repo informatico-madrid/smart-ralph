@@ -616,7 +616,7 @@ UI verification was skipped. A static placeholder ui-map.local.md was written.
 
 VERIFICATION_DEGRADED
   reason: mcp-playwright-missing
-  resolution: Install @playwright/mcp and resume with /ralph-harness:implement
+  resolution: Install @playwright/mcp and resume with /ralphharness:implement
 ```
 
 ## AC Checklist Output Format
