@@ -455,7 +455,8 @@ Compare output against expected changes in the File Change Matrix. Any unexpecte
 2. Run sed script on `plugins/ralphharness-codex/`:
    Same patterns, plus update TOML agent config keys:
    ```bash
-   find plugins/ralphharness-codex -type f -exec sed -i \
+   find plugins/ralphharness-codex -type f \( -name '*.md' -o -name '*.json' -o -name '*.sh' -o -name '*.toml' -o -name '*.toml*' -o -name '*.yaml' -o -name '*.yml' -o -name '*.py' -o -name '*.bats' -o -name '*.txt' \) \
+     -exec sed -i \
      -e 's/ralph-specum:/ralph-harness:/g' \
      -e 's/ralph-specum/ralphharness/g' \
      -e 's/smart-ralph/ralphharness/g' \
@@ -483,13 +484,93 @@ Compare output against expected changes in the File Change Matrix. Any unexpecte
 
 ### Phase 4: External References
 
-1. Root docs: `sed -i` on README.md, CLAUDE.md, CONTRIBUTING.md, TROUBLESHOOTING.md, LICENSE
-2. Root configs: `.claude/settings.json`, `.gito/config.toml`, `.serena/project.yml`
-3. GitHub: workflows and issue templates
-4. Test files: all .bats files
-5. BMAD configs: `_bmad/` directory
-6. Skills outside plugins: `.claude/skills/`, `.agents/skills/`
-7. Other hidden configs
+1. Root docs:
+   ```bash
+   sed -i \
+     -e 's/ralph-specum/RalphHarness/g' \
+     -e 's/Ralph Specum/RalphHarness/g' \
+     -e 's/smart-ralph/RalphHarness/g' \
+     -e 's/Smart Ralph/RalphHarness/g' \
+     -e 's/tzachbon/informatico-madrid/g' \
+     README.md CLAUDE.md CONTRIBUTING.md TROUBLESHOOTING.md LICENSE
+   ```
+
+2. Root configs:
+   ```bash
+   sed -i \
+     -e 's/ralph-specum/RalphHarness/g' \
+     -e 's/Ralph Specum/RalphHarness/g' \
+     -e 's/smart-ralph/RalphHarness/g' \
+     -e 's/tzachbon/informatico-madrid/g' \
+     .claude/settings.json .gito/config.toml .serena/project.yml
+   ```
+
+3. GitHub workflows and templates:
+   ```bash
+   find .github \( -name '*.yml' -o -name '*.yaml' -o -name '*.md' \) \
+     -exec sed -i \
+       -e 's/ralph-specum/RalphHarness/g' \
+       -e 's/Ralph Specum/RalphHarness/g' \
+       -e 's/smart-ralph/RalphHarness/g' \
+       -e 's/tzachbon/informatico-madrid/g' \
+       {} +
+   ```
+
+4. Test files (.bats):
+   ```bash
+   find tests -name '*.bats' \
+     -exec sed -i \
+       -e 's/ralph-specum/ralphharness/g' \
+       -e 's/Ralph Specum/RalphHarness/g' \
+       -e 's/smart-ralph/ralphharness/g' \
+       -e 's/tzachbon/informatico-madrid/g' \
+       {} +
+   ```
+
+5. BMAD configs:
+   ```bash
+   find _bmad -type f \( -name '*.yml' -o -name '*.yaml' -o -name '*.toml' -o -name '*.md' \) \
+     -exec sed -i \
+       -e 's/ralph-specum/ralphharness/g' \
+       -e 's/Ralph Specum/RalphHarness/g' \
+       -e 's/smart-ralph/ralphharness/g' \
+       -e 's/tzachbon/informatico-madrid/g' \
+       {} +
+   ```
+
+6. Skills outside plugins:
+   ```bash
+   find .claude/skills .agents/skills -name '*.md' -type f \
+     -exec sed -i \
+       -e 's/ralph-specum/ralphharness/g' \
+       -e 's/Ralph Specum/RalphHarness/g' \
+       -e 's/smart-ralph/ralphharness/g' \
+       -e 's/tzachbon/informatico-madrid/g' \
+       {} +
+   ```
+
+7. Hooks manifests (JSON files that may contain "Ralph Specum" title-case):
+   ```bash
+   find plugins -name 'hooks.json' -type f \
+     -exec sed -i \
+       -e 's/Ralph Specum/RalphHarness/g' \
+       -e 's/ralph-specum/ralphharness/g' \
+       {} +
+   ```
+
+8. Root docs (non-historical):
+   ```bash
+   find docs -type f -name '*.md' \
+     -not -path 'docs/brainstormmejora/*' \
+     -not -path 'docs/plans/*' \
+     -exec sed -i \
+       -e 's/ralph-specum/RalphHarness/g' \
+       -e 's/Ralph Specum/RalphHarness/g' \
+       -e 's/smart-ralph/RalphHarness/g' \
+       -e 's/Smart Ralph/RalphHarness/g' \
+       -e 's/tzachbon/informatico-madrid/g' \
+       {} +
+   ```
 
 ### Phase 5: Verification
 
@@ -534,9 +615,9 @@ The rollback path is clean because:
 
 Document the baseline counts before any changes:
 ```bash
-# Pattern 1: ralph-specum (excluding specs/ and historical dirs)
-grep -rn "ralph-specum" . \
-  --include='*.md' --include='*.json' --include='*.sh' --include='*.yml' --include='*.yaml' \
+# Pattern 1: ralph-specum (case-insensitive, excluding specs/ and historical dirs)
+grep -rin "ralph-specum\|Ralph Specum" . \
+  --include='*.md' --include='*.json' --include='*.sh' --include='*.yml' --include='*.yaml' --include='*.py' --include='*.toml' \
   --exclude-dir=specs --exclude-dir=_bmad-output --exclude-dir=docs/brainstormmejora \
   --exclude-dir=docs/plans --exclude-dir=plans --exclude-dir=.git \
   --exclude-dir=.roo --exclude-dir=.cursor --exclude-dir=.gemini --exclude-dir=.qwen | wc -l
@@ -548,9 +629,9 @@ grep -rn "tzachbon" . \
   --exclude-dir=docs/plans --exclude-dir=plans --exclude-dir=.git \
   --exclude-dir=.roo --exclude-dir=.cursor --exclude-dir=.gemini --exclude-dir=.qwen | wc -l
 
-# Pattern 3: smart-ralph
-grep -rn "smart-ralph" . \
-  --include='*.md' --include='*.json' --include='*.sh' --include='*.yml' --include='*.yaml' \
+# Pattern 3: smart-ralph (case-insensitive to catch "Smart Ralph")
+grep -rin "smart-ralph\|Smart Ralph" . \
+  --include='*.md' --include='*.json' --include='*.sh' --include='*.yml' --include='*.yaml' --include='*.py' --include='*.toml' \
   --exclude-dir=specs --exclude-dir=_bmad-output --exclude-dir=docs/brainstormmejora \
   --exclude-dir=docs/plans --exclude-dir=plans --exclude-dir=.git \
   --exclude-dir=.roo --exclude-dir=.cursor --exclude-dir=.gemini --exclude-dir=.qwen | wc -l
@@ -560,8 +641,8 @@ grep -rn "smart-ralph" . \
 
 All patterns must return **0**:
 ```bash
-grep -rn "ralph-specum\|tzachbon\|smart-ralph" . \
-  --include='*.md' --include='*.json' --include='*.sh' --include='*.yml' --include='*.yaml' \
+grep -rin "ralph-specum\|Ralph Specum\|tzachbon\|smart-ralph\|Smart Ralph" . \
+  --include='*.md' --include='*.json' --include='*.sh' --include='*.yml' --include='*.yaml' --include='*.py' --include='*.toml' \
   --exclude-dir=specs --exclude-dir=_bmad-output --exclude-dir=docs/brainstormmejora \
   --exclude-dir=docs/plans --exclude-dir=plans --exclude-dir=.git \
   --exclude-dir=.roo --exclude-dir=.cursor --exclude-dir=.gemini --exclude-dir=.qwen | wc -l

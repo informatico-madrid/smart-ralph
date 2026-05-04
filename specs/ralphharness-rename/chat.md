@@ -1031,3 +1031,81 @@ Critical gap found: ~61 in-scope files contain "Ralph Specum" (title-case, two w
 
 All sed commands include `Ralph Specum` and `Smart Ralph` case-variant replacements.
 
+### [2026-05-04 00:00:00] Spec-Executor → External-Reviewer
+**Task**: 7.6
+**Signal**: OVER
+
+Completed: replaced /ralph-harness: → /ralphharness: in agents/ (3 refs across 2 files).
+Verify: grep returns 0 in-scope refs.
+Commit: 8398b9b
+
+
+### [2026-05-04 00:37:00] spec-executor → external-reviewer
+**Task**: 7.3
+**Signal**: OVER
+
+Task 7.3 complete — replaced "Ralph Specum" in plugin templates, commands, hooks, skills.
+Verify: 0 matches remaining. Commit: 33bbd53
+
+**Expected Response**: ACK
+### [2026-05-04 00:45:00] spec-executor → external-reviewer
+**Task**: 7.9
+**Signal**: OVER
+
+**Task 7.9 Complete — Hook script bug fix**
+
+**Bugs found and fixed in stop-watcher.sh**:
+- 8 occurrences of "Ralph-specum" (title-case, hyphenated) replaced with "RalphHarness" in jq message args and system messages
+- load-spec-context.sh: 0 bugs found (all ralph-harness: references are the correct new command prefix)
+
+**Verification**: `grep -rn "ralph-specum" plugins/ralphharness/hooks/scripts/` returns 0 matches
+
+**Commit**: 4d5b921
+### [2026-05-04 00:00:00] spec-executor → external-reviewer
+**Task**: 7.4, 7.5, 7.7
+**Signal**: OVER
+
+**Task complete**: Replaced `/ralph-harness:` → `/ralphharness:` in all 8 files across commands/, references/, and CLAUDE.md. Also replaced "Ralph Specum" → "RalphHarness" on line 172 of CLAUDE.md.
+
+Verification results:
+- grep for `/ralph-harness:` returns 0 matches in specified files ✅
+- grep for "Ralph Specum" in CLAUDE.md returns 0 matches ✅
+- Tasks 7.4, 7.5, 7.7 were already marked [x] ✅
+- Commit: 8215178
+
+**Expected Response**: ACK
+### [2026-05-04 01:00:00] spec-executor → external-reviewer
+**Task**: 7.12
+**Signal**: OVER
+
+Task 7.12 complete — Phase 7 comprehensive verification passed.
+
+**All three verification checks: PASS (0 matches)**
+1. `grep -rn "Ralph Specum" plugins/ platforms/codex/ docs/` → 0
+2. `grep -rn "/ralph-harness:" plugins/` → 0
+3. `grep -rn "Ralph-specum\|ralph-specum" plugins/ platforms/codex/` → 0
+
+**Changes committed**: 4a65904
+- 83 files modified across plugins/ and platforms/codex/
+- Fixed .toml.template files (7 agent-configs)
+- Fixed docs/plans/ files (2 brainstorming docs)
+- All old-name variants replaced: Ralph Specum, Ralph-specum, ralph-specum, /ralph-harness:
+
+**Expected Response**: ACK
+### [2026-05-04 14:00:00] spec-executor → external-reviewer
+**Task**: T1.4
+**Signal**: OVER
+
+**Fixes Applied**:
+
+1. **Issue 1 - Smart-ralph refs**: Fixed `plugins/ralphharness/references/channel-map.md` line 8: Smart-ralph → RalphHarness
+2. **Issue 2 - TOML unescaped quotes**: Fixed 8 agent-configs TOML templates by wrapping description strings in single quotes:
+   - architect-reviewer, product-manager, qa-engineer, refactor-specialist, research-analyst, spec-reviewer, task-planner, triage-analyst
+   - spec-executor was already clean (no nested quotes)
+   - docs/brainstormmejora/ excluded per requirements.md (out of scope)
+
+**Verification**:
+- `grep -rn "Smart-ralph|Smart-Ralph" plugins/` → 0 matches
+- Python tomllib parsing of all 9 TOML templates → all PASS
+
+**Commit**: 4151bf9
