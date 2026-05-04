@@ -332,7 +332,7 @@ load 'helpers/setup.bash'
     local stderr_output
     stderr_output=$(run_stop_watcher 2>&1 >/dev/null || true)
 
-    [[ "$stderr_output" == *"[ralph-specum]"* ]]
+    [[ "$stderr_output" == *"[ralphharness]"* ]]
     [[ "$stderr_output" == *"Task: 3/5"* ]]
     [[ "$stderr_output" == *"Attempt: 3"* ]]
 }

@@ -1,10 +1,10 @@
 {
   "version": "1.0",
-  "updated": "2026-05-02T17:36:23Z",
+  "updated": "2026-05-03T10:34:28Z",
   "directories": [
     {
       "path": "./specs",
-      "specsCount": 48,
+      "specsCount": 49,
       "isDefault": true
     }
   ],
