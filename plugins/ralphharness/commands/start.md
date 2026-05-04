@@ -83,7 +83,7 @@ fi
 
 **If no active epic AND goal appears complex** (multiple distinct components, cross-cutting concerns, user mentions "big" or "large"):
 - Suggest: "This looks like it might need multiple specs. Want to run `/triage` instead?"
-- If user accepts: invoke `/ralph-harness:triage` with no positional args and let triage collect epic-name + goal interactively. STOP.
+- If user accepts: invoke `/ralphharness:triage` with no positional args and let triage collect epic-name + goal interactively. STOP.
 - If user declines: continue normal Step 4 routing.
 
 ## Step 4: Route to Action
@@ -252,7 +252,7 @@ Output: $basePath/research.md
 **Feasibility**: [High/Medium/Low] | **Risk**: [High/Medium/Low] | **Effort**: [S/M/L/XL]
 ```
 
-Then STOP. Output: `-> Next: Run /ralph-harness:requirements`
+Then STOP. Output: `-> Next: Run /ralphharness:requirements`
 End response immediately.
 </mandatory>
 

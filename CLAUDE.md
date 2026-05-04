@@ -169,7 +169,7 @@ Spec-executor must output `TASK_COMPLETE` for coordinator to advance. Coordinato
 
 ### Dependencies
 
-Ralph Specum v3.0.0+ is self-contained with no external plugin dependencies. The execution loop is handled by the stop-hook.
+RalphHarness v3.0.0+ is self-contained with no external plugin dependencies. The execution loop is handled by the stop-hook.
 
 ## Key Files
 

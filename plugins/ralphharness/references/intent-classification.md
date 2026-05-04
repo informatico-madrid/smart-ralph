@@ -27,17 +27,17 @@ From `$ARGUMENTS`, extract:
 
 ### Examples
 
-- `/ralph-harness:start` -> Auto-detect: resume active or ask for new
-- `/ralph-harness:start user-auth` -> Resume or create user-auth
-- `/ralph-harness:start user-auth Add OAuth2` -> Create user-auth with goal
-- `/ralph-harness:start user-auth --fresh` -> Force new, overwrite if exists
-- `/ralph-harness:start "Build auth with JWT" --quick` -> Quick mode with goal string
-- `/ralph-harness:start my-feature "Add logging" --quick` -> Quick mode with name+goal
-- `/ralph-harness:start ./my-plan.md --quick` -> Quick mode with file input
-- `/ralph-harness:start my-feature ./plan.md --quick` -> Quick mode with name+file
-- `/ralph-harness:start my-feature --quick` -> Quick mode using existing plan.md
-- `/ralph-harness:start my-feature "Add logging" --tasks-size coarse` -> Coarse granularity (10-20 tasks)
-- `/ralph-harness:start my-feature --quick --tasks-size fine` -> Quick mode with fine granularity
+- `/ralphharness:start` -> Auto-detect: resume active or ask for new
+- `/ralphharness:start user-auth` -> Resume or create user-auth
+- `/ralphharness:start user-auth Add OAuth2` -> Create user-auth with goal
+- `/ralphharness:start user-auth --fresh` -> Force new, overwrite if exists
+- `/ralphharness:start "Build auth with JWT" --quick` -> Quick mode with goal string
+- `/ralphharness:start my-feature "Add logging" --quick` -> Quick mode with name+goal
+- `/ralphharness:start ./my-plan.md --quick` -> Quick mode with file input
+- `/ralphharness:start my-feature ./plan.md --quick` -> Quick mode with name+file
+- `/ralphharness:start my-feature --quick` -> Quick mode using existing plan.md
+- `/ralphharness:start my-feature "Add logging" --tasks-size coarse` -> Coarse granularity (10-20 tasks)
+- `/ralphharness:start my-feature --quick --tasks-size fine` -> Quick mode with fine granularity
 
 ## Detection Logic (Normal Mode)
 
@@ -91,8 +91,8 @@ Input Classification:
    b. KEBAB-CASE NAME: matches ^[a-z0-9-]+$
       - Use `ralph_find_spec($name)` to resolve spec path
       - If found and `$specPath/plan.md` exists: use plan.md content, name=$name
-      - If found but no plan.md: error "No plan.md found in $specPath/. Provide goal: /ralph-harness:start $name 'your goal' --quick"
-      - If not found: error "Spec '$name' not found. Provide goal: /ralph-harness:start $name 'your goal' --quick"
+      - If found but no plan.md: error "No plan.md found in $specPath/. Provide goal: /ralphharness:start $name 'your goal' --quick"
+      - If not found: error "Spec '$name' not found. Provide goal: /ralphharness:start $name 'your goal' --quick"
       - Example: `my-feature --quick` -> resolve spec path, check plan.md
 
    c. GOAL STRING: anything else (contains spaces, uppercase, special chars)
@@ -120,8 +120,8 @@ When kebab-case name provided without goal:
 1. Use `ralph_find_spec(name)` to locate existing spec
 2. If found: Check if `$specPath/plan.md` exists
    - If plan.md exists: read content, use as planContent
-   - If plan.md not exists: error "No plan.md found in $specPath. Provide goal: /ralph-harness:start $name 'your goal' --quick"
-3. If not found: error "Spec '$name' not found. Provide goal: /ralph-harness:start $name 'your goal' --quick"
+   - If plan.md not exists: error "No plan.md found in $specPath. Provide goal: /ralphharness:start $name 'your goal' --quick"
+3. If not found: error "Spec '$name' not found. Provide goal: /ralphharness:start $name 'your goal' --quick"
 
 ## Name Inference
 

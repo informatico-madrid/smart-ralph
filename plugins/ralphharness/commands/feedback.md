@@ -7,12 +7,12 @@ arguments:
 ---
 
 <example>
-user: /ralph-harness:feedback The task verification system sometimes misses TASK_COMPLETE markers
+user: /ralphharness:feedback The task verification system sometimes misses TASK_COMPLETE markers
 assistant: I'll create a GitHub issue for that feedback.
 </example>
 
 <example>
-user: /ralph-harness:feedback Feature request: add support for parallel task execution
+user: /ralphharness:feedback Feature request: add support for parallel task execution
 assistant: I'll submit that feature request as a GitHub issue.
 </example>
 
@@ -44,7 +44,7 @@ Help improve RalphHarness by submitting feedback or reporting issues.
 ## Example Usage
 
 ```
-/ralph-harness:feedback The task verification system sometimes misses TASK_COMPLETE markers
-/ralph-harness:feedback Feature request: add support for parallel task execution
-/ralph-harness:feedback Bug: cancel command doesn't cleanup .ralph-state.json properly
+/ralphharness:feedback The task verification system sometimes misses TASK_COMPLETE markers
+/ralphharness:feedback Feature request: add support for parallel task execution
+/ralphharness:feedback Bug: cancel command doesn't cleanup .ralph-state.json properly
 ```
