@@ -8,7 +8,7 @@ Rename el proyecto de Smart Ralph (ralph-specum) a RalphHarness, eliminando toda
 ### US-1: Plugin Principal Funciona con Nuevo Nombre
 **Como un** usuario de Claude Code
 **Quiero que** el plugin principal se llame `ralphharness` y cargue correctamente tras el rename
-**Para que** todos los comandos `/ralph-harness:*` funcionen sin errores
+**Para que** todos los comandos `/ralphharness:*` funcionen sin errores
 
 **Acceptance Criteria:**
 - [ ] AC-1.1: El directorio `plugins/ralph-specum/` se renombra a `plugins/ralphharness/` usando `git mv`
@@ -55,14 +55,14 @@ Rename el proyecto de Smart Ralph (ralph-specum) a RalphHarness, eliminando toda
 
 ### US-5: Prefijo de Comandos Actualizado
 **Como un** usuario interactuando con Claude Code
-**Quiero que** todos los comandos usen el prefijo `/ralph-harness:` en lugar de `/ralph-specum:`
+**Quiero que** todos los comandos usen el prefijo `/ralphharness:` en lugar de `/ralph-specum:`
 **Para que** la experiencia de uso refleje el nuevo nombre
 
 **Acceptance Criteria:**
-- [ ] AC-5.1: Todos los comandos en `plugins/ralphharness/commands/*.md` referencian `/ralph-harness:` en lugar de `/ralph-specum:`
+- [ ] AC-5.1: Todos los comandos en `plugins/ralphharness/commands/*.md` referencian `/ralphharness:` en lugar de `/ralph-specum:`
 - [ ] AC-5.2: Las invocaciones de skill `ralph-specum:<name>` cambian a `ralphharness:<name>` en todos los archivos (agents, commands, templates, references, skills)
-- [ ] AC-5.3: `grep "/ralph-harness:" plugins/ralphharness/commands/*.md` retorna > 0 resultados
-- [ ] AC-5.4: `grep -r "ralph-specum:" plugins/ralphharness/` retorna 0 resultados
+- [ ] AC-5.3: `grep "/ralphharness:" plugins/ralphharness/commands/*.md` retorna > 0 resultados
+- [ ] AC-5.4: `grep -rin "ralph-specum:" plugins/ralphharness/` retorna 0 resultados
 
 ### US-6: Referencias a tzachbon Eliminadas
 **Como un** maintainer del proyecto
@@ -97,6 +97,8 @@ Rename el proyecto de Smart Ralph (ralph-specum) a RalphHarness, eliminando toda
 - [ ] AC-8.2: Ruta `.claude/ralph-specum.local.md` cambia a `.claude/ralphharness.local.md` en todos los scripts (stop-watcher, load-spec-context, path-resolver, test-* files)
 - [ ] AC-8.3: `plugins/ralphharness/hooks/scripts/checkpoint.sh` actualiza commit message patterns
 - [ ] AC-8.4: `plugins/ralphharness/hooks/scripts/update-spec-index.sh` actualiza referencias a comandos
+- [ ] AC-8.5: `plugins/ralphharness/hooks/hooks.json` actualiza `"Ralph Specum"` a `"RalphHarness"` en description (si aplica)
+- [ ] AC-8.6: `plugins/ralphharness-codex/hooks/hooks.json` actualiza `"Ralph Specum"` a `"RalphHarness"` en description (si aplica)
 
 ### US-9: Archivos de Estado y Configuración Renombrados
 **Como un** usuario con specs existentes
@@ -144,12 +146,13 @@ Rename el proyecto de Smart Ralph (ralph-specum) a RalphHarness, eliminando toda
 - [ ] AC-12.5: `tests/interview-framework.bats` actualiza paths de plugin
 - [ ] AC-12.6: `tests/helpers/version-sync.sh` actualiza lectura de versiones de manifests
 - [ ] AC-12.7: `bats tests/*.bats` pasan sin errores
-- [ ] AC-12.8: Grep final post-rename confirma 0 referencias a `ralph-specum`, `tzachbon`, `smart-ralph` en archivos in-scope:
+- [ ] AC-12.8: Grep final post-rename confirma 0 referencias a `ralph-specum`, `Ralph Specum`, `tzachbon`, `smart-ralph` en archivos in-scope:
   ```bash
-  grep -rn "ralph-specum\|tzachbon\|smart-ralph" . \
-    --include='*.md' --include='*.json' --include='*.sh' --include='*.yml' --include='*.yaml' \
+  grep -rin "ralph-specum\|Ralph Specum\|tzachbon\|smart-ralph" . \
+    --include='*.md' --include='*.json' --include='*.sh' --include='*.yml' --include='*.yaml' --include='*.py' --include='*.toml' \
     --exclude-dir=specs --exclude-dir=_bmad-output --exclude-dir=docs/brainstormmejora \
-    --exclude-dir=docs/plans --exclude-dir=plans --exclude-dir=.git | wc -l
+    --exclude-dir=docs/plans --exclude-dir=plans --exclude-dir=research --exclude-dir=.roo --exclude-dir=.cursor \
+    --exclude-dir=.gemini --exclude-dir=.qwen --exclude-dir=.git | wc -l
   ```
   retorna `0`
 
@@ -179,7 +182,7 @@ Rename el proyecto de Smart Ralph (ralph-specum) a RalphHarness, eliminando toda
 - [ ] AC-14.1: `_bmad/bmm/config.yaml` actualizado con nuevos nombres de plugin
 - [ ] AC-14.2: `_bmad/config.toml` actualizado con nuevos nombres
 - [ ] AC-14.3: `.gito/config.toml` actualizado con nuevos nombres
-- [ ] AC-14.4: `.claude/skills/smart-ralph-review/SKILL.md` actualiza comandos `/ralph-specum:*` → `/ralph-harness:*`
+- [ ] AC-14.4: `.claude/skills/smart-ralph-review/SKILL.md` actualiza comandos `/ralph-specum:*` → `/ralphharness:*`
 
 ## Functional Requirements
 
@@ -195,7 +198,7 @@ Rename el proyecto de Smart Ralph (ralph-specum) a RalphHarness, eliminando toda
 | FR-8 | grep-sed `ralph-speckit` → `ralphharness-speckit` en archivos in-scope | High | 0 resultados en grep |
 | FR-9 | grep-sed `tzachbon` → `informatico-madrid` en archivos in-scope | High | 0 resultados en grep |
 | FR-10 | grep-sed `smart-ralph` → `ralphharness` en archivos in-scope | High | 0 resultados en grep |
-| FR-11 | grep-sed `ralph-specum:` → `ralph-harness:` en archivos in-scope | High | 0 resultados en grep |
+| FR-11 | grep-sed `ralph-specum:` → `ralphharness:` en archivos in-scope | High | 0 resultados en grep |
 | FR-12 | Actualizar ruta `ralph-specum.local.md` → `ralphharness.local.md` en hook scripts | High | grep returns 0 |
 | FR-13 | Rename `.claude/ralph-specum.local.md` a `.claude/ralphharness.local.md` | High | File exists with new name |
 | FR-14 | Rename skill dir `skills/smart-ralph/` → `skills/ralphharness/` | Medium | Directory renamed, SKILL.md updated |
@@ -242,6 +245,7 @@ Rename el proyecto de Smart Ralph (ralph-specum) a RalphHarness, eliminando toda
 - **Specs de usuario** (`specs/**/*.md`, `specs/**/*.progress.md`) — históricos, contienen PR/issue URLs que cambian
 - **BMAD output auto-generated** (`_bmad-output/**/*.md`) — artifacts generados automáticamente
 - **Historical docs** (`docs/brainstormmejora/`, `docs/plans/`, `research/`, `plans/*.md`) — contexto histórico
+- **Active docs NOT excluded** — `docs/ARCHITECTURE.md`, `docs/FORENSIC-COMBINED.md`, `docs/TESTING-SYSTEM.md` ARE in scope and must be renamed. These contain "Ralph Specum" title-case that was missed by lowercase-only grep patterns.
 - **Review reports** (`_bmad-output/reviews/**`) — revisiones históricas
 - **Version bump exact mapping** — epic dice 5.0.0 para ralph-specum principal pero no especifica versiones para plugins derivados (speckit, bmad-bridge, codex)
 - **IDE config directories** (`.roo/`, `.cursor/`, `.gemini/`, `.qwen/`) — contienen referencias que deben ser excluidas de verificaciones grep (no requieren rename)
@@ -254,11 +258,11 @@ Rename el proyecto de Smart Ralph (ralph-specum) a RalphHarness, eliminando toda
 
 ## Success Criteria
 - [ ] Plugin carga en Claude Code sin errores
-- [ ] `/ralph-harness:help` responde correctamente
-- [ ] `/ralph-harness:new test-spec` crea un spec funcional
+- [ ] `/ralphharness:help` responde correctamente
+- [ ] `/ralphharness:new test-spec` crea un spec funcional
 - [ ] `bats tests/*.bats` pasa todos los tests
 - [ ] `git log --follow plugins/ralphharness/` muestra historial completo
-- [ ] 0 referencias a `ralph-specum`, `tzachbon`, `smart-ralph` en archivos in-scope (verify: `grep -rn "ralph-specum\|tzachbon\|smart-ralph" . --include='*.md' --include='*.json' --include='*.sh' --include='*.yml' --include='*.yaml' --include='*.py' --include='*.toml' --exclude-dir=specs --exclude-dir=_bmad-output --exclude-dir=.git --exclude-dir=docs/brainstormmejora --exclude-dir=docs/plans --exclude-dir=plans --exclude-dir=research --exclude-dir=.roo --exclude-dir=.cursor --exclude-dir=.gemini --exclude-dir=.qwen | wc -l` returns 0)
+- [ ] 0 referencias a `ralph-specum`, `Ralph Specum`, `tzachbon`, `smart-ralph` en archivos in-scope (verify: `grep -rin "ralph-specum\|Ralph Specum\|tzachbon\|smart-ralph" . --include='*.md' --include='*.json' --include='*.sh' --include='*.yml' --include='*.yaml' --include='*.py' --include='*.toml' --exclude-dir=specs --exclude-dir=_bmad-output --exclude-dir=.git --exclude-dir=docs/brainstormmejora --exclude-dir=docs/plans --exclude-dir=plans --exclude-dir=research --exclude-dir=.roo --exclude-dir=.cursor --exclude-dir=.gemini --exclude-dir=.qwen | wc -l` returns 0)
 - [ ] `README.md` es coherente con nuevo brand RalphHarness
 - [ ] `marketplace.json` actualizado en ambos sistemas (`.claude-plugin/` y `.agents/plugins/`)
 - [ ] Todas las 4 direcciones de directorio renombradas con `git mv` e historial preservado
@@ -302,8 +306,8 @@ Rename el proyecto de Smart Ralph (ralph-specum) a RalphHarness, eliminando toda
 - PASS: `jq -r '.enabledPlugins."ralphharness@informatico-madrid"' .claude/settings.json` = `true`
 - PASS: Final grep (all in-scope dirs):
   ```bash
-  grep -rn "ralph-specum\|tzachbon\|smart-ralph" . \
-    --include='*.md' --include='*.json' --include='*.sh' --include='*.yml' --include='*.yaml' \
+  grep -rin "ralph-specum\|Ralph Specum\|tzachbon\|smart-ralph" . \
+    --include='*.md' --include='*.json' --include='*.sh' --include='*.yml' --include='*.yaml' --include='*.py' --include='*.toml' \
     --exclude-dir=specs --exclude-dir=_bmad-output --exclude-dir=docs/brainstormmejora \
     --exclude-dir=docs/plans --exclude-dir=plans --exclude-dir=research \
     --exclude-dir=.roo --exclude-dir=.cursor --exclude-dir=.gemini --exclude-dir=.qwen --exclude-dir=.git
@@ -332,8 +336,8 @@ Rename el proyecto de Smart Ralph (ralph-specum) a RalphHarness, eliminando toda
 **Dependency map**:
 - `.claude/settings.json` ↔ `plugins/ralphharness/` — plugin enablement
 - `.claude-plugin/marketplace.json` ↔ `plugins/ralphharness/` — discovery
-- `.agents/plugins/marketplace.json` ↔ `plugins/ralph-specum-codex/` — parallel discovery
-- `.github/workflows/` ↔ `plugins/ralph-specum-codex/` — CI triggers
+- `.agents/plugins/marketplace.json` ↔ `plugins/ralphharness-codex/` — parallel discovery
+- `.github/workflows/` ↔ `plugins/ralphharness-codex/` — CI triggers
 - `specs/.index/` ↔ `plugins/ralphharness/` — auto-generated, needs regeneration
 
 **Escalate if**:
@@ -352,7 +356,7 @@ Rename el proyecto de Smart Ralph (ralph-specum) a RalphHarness, eliminando toda
 ## Next Steps
 1. Aprobación de requirements.md por el user
 2. Ejecutar script de rename en fase de implementación (task-planner breaks into tasks)
-3. Verify con grep final: `grep -rn "ralph-specum\|tzachbon\|smart-ralph" . --include='*.md' --include='*.json' --include='*.sh' --include='*.yml' --include='*.yaml' --exclude-dir=specs --exclude-dir=_bmad-output --exclude-dir=docs/brainstormmejora --exclude-dir=docs/plans --exclude-dir=plans`
+3. Verify con grep final: `grep -rin "ralph-specum\|Ralph Specum\|tzachbon\|smart-ralph" . --include='*.md' --include='*.json' --include='*.sh' --include='*.yml' --include='*.yaml' --include='*.py' --include='*.toml' --exclude-dir=specs --exclude-dir=_bmad-output --exclude-dir=docs/brainstormmejora --exclude-dir=docs/plans --exclude-dir=plans`
 4. Ejecutar `bats tests/*.bats` para confirmar tests pasan
 5. Regenerar `specs/.index/` post-rename
 

@@ -1273,7 +1273,7 @@ NOTE: The executor MODIFIED the previous reviewer-diagnosis to weaken it — thi
   - **Verify**: `grep -rn "/ralph-harness:" plugins/ docs/ 2>/dev/null | grep -v "\.git" || echo "ALL_PREFIX_CLEAN"`
   - **Commit**: `fix(rename): replace /ralph-harness: → /ralphharness: in remaining files`
 
-- [ ] 7.8 Fix requirements.md AC-5.1 spec error
+- [x] 7.8 Fix requirements.md AC-5.1 spec error
   - **Do**:
     1. Open `specs/ralphharness-rename/requirements.md`
     2. Navigate to acceptance criterion AC-5.1 (line 62 area)
