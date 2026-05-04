@@ -8,7 +8,7 @@
 
 ## 0. The Single Objective
 
-Smart-ralph should be a spec-driven development engine where agents work autonomously for hours and leave branches in **"ready for human review"** state.
+RalphHarness should be a spec-driven development engine where agents work autonomously for hours and leave branches in **"ready for human review"** state.
 
 The human is always there as final arbiter — but only for **semantic/product judgment**, never for "tests are broken", "coverage is faked", "HOLD signals ignored", or "state is inconsistent". Those problems must be caught **mechanically** before they reach the human.
 
@@ -128,9 +128,9 @@ Plus duplications:
 **Real evidence**: In fix-emhass-sensor-attributes, reviewer recreated .ralph-state.json and reset taskIndex to 29 for Phase 4.
 
 #### I3: Missing Bmalph-Style Safety Infra
-**What**: Smart-ralph has no git checkpoint, circuit breaker, or loop metrics. Bmalph has all three.
+**What**: RalphHarness has no git checkpoint, circuit breaker, or loop metrics. Bmalph has all three.
 
-**Verified**: Smart-ralph has `maxTaskIterations` (per-task retry limit) and `maxGlobalIterations` (total loop limit) in implement.md, but no:
+**Verified**: RalphHarness has `maxTaskIterations` (per-task retry limit) and `maxGlobalIterations` (total loop limit) in implement.md, but no:
 - Pre-loop git checkpoint (rollback safety)
 - Circuit breaker (stop after N consecutive failures, not just total iterations)
 - Metrics append (per-task performance data)
@@ -163,7 +163,7 @@ No index relating high-level features/user flows to which specs/tasks cover them
 
 **Critical rules (HOLD, anti-fabrication, state integrity) are enforced through text interpretation instead of mechanical checks.**
 
-Bmalph avoids this by putting complexity in **infra** (git commands, exit codes, counters) rather than in **agent coordination** (text-based rules, chat protocols). Smart-ralph does the opposite.
+Bmalph avoids this by putting complexity in **infra** (git commands, exit codes, counters) rather than in **agent coordination** (text-based rules, chat protocols). RalphHarness does the opposite.
 
 **The solution**: Move critical rules from text to mechanics, borrow Bmalph's safety infra, add BMAD as a spec generator, and fix the verification layer contradiction.
 
@@ -383,7 +383,7 @@ Bmalph avoids this by putting complexity in **infra** (git commands, exit codes,
 | **Entry point** | `/ralph-bmad:import <bmad-project-path> <spec-name>` |
 | **Mapping**: | |
 
-| BMAD Artifact | Smart-Ralph Target |
+| BMAD Artifact | RalphHarness Target |
 |---------------|-------------------|
 | PRD / Product Brief | requirements.md → User Stories + FR/NFR |
 | User Stories + Acceptance Criteria | requirements.md → Verification Contract |

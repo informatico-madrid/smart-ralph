@@ -1294,7 +1294,7 @@ NOTE: The executor MODIFIED the previous reviewer-diagnosis to weaken it — thi
   - **Verify**: `bash -n plugins/ralphharness/hooks/scripts/stop-watcher.sh && bash -n plugins/ralphharness/hooks/scripts/load-spec-context.sh && echo "BASH_VALID" || echo "BASH_INVALID"`
   - **Commit**: `fix(rename): fix stop-watcher.sh and load-spec-context.sh bugs`
 
-- [ ] 7.10 [P] Fix "Ralph Specum" in docs/ARCHITECTURE.md, docs/FORENSIC-COMBINED.md, docs/TESTING-SYSTEM.md
+- [x] 7.10 [P] Fix "Ralph Specum" in docs/ARCHITECTURE.md, docs/FORENSIC-COMBINED.md, docs/TESTING-SYSTEM.md
   - **Do**:
     1. Run `sed -i 's/Ralph Specum/RalphHarness/g' docs/ARCHITECTURE.md` (title, 1 ref)
     2. Run `sed -i 's/Ralph Specum/RalphHarness/g' docs/FORENSIC-COMBINED.md` (title, 1 ref)
@@ -1306,7 +1306,7 @@ NOTE: The executor MODIFIED the previous reviewer-diagnosis to weaken it — thi
   - **Commit**: `fix(rename): replace "Ralph Specum" → "RalphHarness" in docs/ARCHITECTURE, FORENSIC-COMBINED, TESTING-SYSTEM`
   - _Requirements: FR-7, requirements.md line 248 (Active docs NOT excluded)_
 
-- [ ] 7.11 [P] Fix "Smart-ralph" → "RalphHarness" in docs/ENGINE_ROADMAP.md
+- [x] 7.11 [P] Fix "Smart-ralph" → "RalphHarness" in docs/ENGINE_ROADMAP.md
   - **Do**:
     1. Run `sed -i 's/Smart-ralph/RalphHarness/g; s/Smart-Ralph/RalphHarness/g' docs/ENGINE_ROADMAP.md`
     2. Verify: 5 refs (lines 11, 131, 133, 166, 386) replaced
