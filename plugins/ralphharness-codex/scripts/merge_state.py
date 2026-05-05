@@ -69,7 +69,10 @@ def main() -> int:
         print(encoded, end="")
         return 0
 
-    state_path.parent.mkdir(parents=True, exist_ok=True)
+    try:
+        state_path.parent.mkdir(parents=True, exist_ok=True)
+    except FileExistsError:
+        pass
     tmp_path = state_path.with_suffix(state_path.suffix + ".tmp")
     try:
         with tmp_path.open("w", encoding="utf-8") as handle:
