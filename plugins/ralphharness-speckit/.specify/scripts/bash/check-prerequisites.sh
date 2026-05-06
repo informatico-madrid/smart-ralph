@@ -87,7 +87,7 @@ if $PATHS_ONLY; then
     if $JSON_MODE; then
         # Minimal JSON paths payload (no validation performed)
         printf '{"REPO_ROOT":"%s","BRANCH":"%s","FEATURE_DIR":"%s","FEATURE_SPEC":"%s","IMPL_PLAN":"%s","TASKS":"%s"}\n' \
-            "$REPO_ROOT" "$CURRENT_BRANCH" "$FEATURE_DIR" "$FEATURE_SPEC" "$IMPL_PLAN" "$TASKS"
+            "$REPO_ROOT" "$CURRENT_BRANCH" "$(printf '%s' "$FEATURE_DIR" | jq -Rs .)" "$(printf '%s' "$FEATURE_SPEC" | jq -Rs .)" "$(printf '%s' "$IMPL_PLAN" | jq -Rs .)" "$(printf '%s' "$TASKS" | jq -Rs .)"
     else
         echo "REPO_ROOT: $REPO_ROOT"
         echo "BRANCH: $CURRENT_BRANCH"
@@ -148,7 +148,7 @@ if $JSON_MODE; then
         json_docs="[${json_docs%,}]"
     fi
     
-    printf '{"FEATURE_DIR":"%s","AVAILABLE_DOCS":%s}\n' "$FEATURE_DIR" "$json_docs"
+    printf '{"FEATURE_DIR":"%s","AVAILABLE_DOCS":%s}\n' "$(printf '%s' "$FEATURE_DIR" | jq -Rs .)" "$json_docs"
 else
     # Text output
     echo "FEATURE_DIR:$FEATURE_DIR"

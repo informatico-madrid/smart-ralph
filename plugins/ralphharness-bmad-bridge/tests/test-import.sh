@@ -364,9 +364,9 @@ As an admin, I want to manage users.
 **Then** I see all registered users
 EPICEOF
 bash -c "
-source '$import_sh'
-parse_epics '$td/epics.md' '$td/tasks.md' 2>/dev/null
-" || rc=$?
+source \"${import_sh}\"
+parse_epics \"${1}\" \"${2}\" 2>/dev/null
+" _ "$td/epics.md" "$td/tasks.md"
 rc=${rc:-0}
 grep -q 'Story 1.1' "$td/tasks.md" || rc=1
 grep -q 'Story 1.2' "$td/tasks.md" || rc=1
@@ -436,8 +436,8 @@ Another malformed line with no structure here
 - FR4: [Support] can reset passwords
 PRDEOF
 bash -c "
-source '$import_sh'
-parse_prd_frs '$td/prd.md' '$td/reqs.md' 2>/dev/null
+source \"$import_sh\"
+parse_prd_frs \"$td/prd.md\" \"$td/reqs.md\" 2>/dev/null
 exit 0
 "
 rc=0
@@ -479,9 +479,9 @@ As a registered user, I want to log in.
 As a user, I want to see my dashboard.
 EPICEOF
 bash -c "
-source '$import_sh'
-parse_epics '$td/epics.md' '$td/tasks.md' 2>/dev/null
-" || rc=$?
+source \"${import_sh}\"
+parse_epics \"${1}\" \"${2}\" 2>/dev/null
+" _ "$td/epics.md" "$td/tasks.md"
 rc=${rc:-0}
 # Both stories should appear in output
 grep -q 'Story 1.1' "$td/tasks.md" || rc=1
