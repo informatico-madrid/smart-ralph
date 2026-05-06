@@ -3,7 +3,7 @@
 Auto-generated summary of all specs across configured directories.
 See [index-state.json](./index-state.json) for machine-readable data.
 
-**Last updated:** 2026-05-06T17:08:19Z
+**Last updated:** 2026-05-06T21:44:41Z
 
 ## Directories (1)
 
@@ -69,6 +69,6 @@ See [index-state.json](./index-state.json) for machine-readable data.
 ---
 
 **Commands:**
-- `/ralph-specum:status` - Show detailed status
-- `/ralph-specum:switch <name>` - Switch active spec
-- `/ralph-specum:start <name>` - Create or resume spec
+- `/ralphharness:status` - Show detailed status
+- `/ralphharness:switch <name>` - Switch active spec
+- `/ralphharness:start <name>` - Create or resume spec

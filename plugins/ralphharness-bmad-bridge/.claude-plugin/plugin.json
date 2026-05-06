@@ -1,8 +1,10 @@
 {
   "name": "ralphharness-bmad-bridge",
-  "version": "5.0.0",
+  "version": "5.0.1",
   "description": "BMAD structural mapper — converts BMAD PRD, epics, and architecture artifacts into RalphHarness spec files",
   "license": "MIT",
-  "author": "informatico-madrid",
+  "author": {
+    "name": "informatico-madrid"
+  },
   "keywords": ["bmad", "import", "structural-mapper"]
 }

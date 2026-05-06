@@ -1,19 +1,32 @@
 {
   "name": "ralphharness-speckit",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Spec-driven development using GitHub spec-kit methodology. Constitution-first approach with specify, plan, tasks, and implement phases.",
-  "author": {
+  "owner": {
     "name": "informatico-madrid"
   },
-  "license": "MIT",
-  "keywords": [
-    "ralph",
-    "speckit",
-    "spec-driven",
-    "constitution",
-    "specify",
-    "plan",
-    "tasks",
-    "implement"
+  "metadata": {
+    "description": "Spec-driven development using GitHub spec-kit methodology"
+  },
+  "plugins": [
+    {
+      "name": "ralphharness-speckit",
+      "description": "Spec-driven development using GitHub spec-kit methodology. Constitution-first approach with specify, plan, tasks, and implement phases.",
+      "version": "5.0.0",
+      "author": {
+        "name": "informatico-madrid"
+      },
+      "source": "./plugins/ralphharness-speckit",
+      "category": "development",
+      "tags": [
+        "ralph",
+        "speckit",
+        "spec-driven",
+        "constitution",
+        "specify",
+        "plan",
+        "tasks"
+      ]
+    }
   ]
 }
