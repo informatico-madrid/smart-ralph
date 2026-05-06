@@ -133,7 +133,7 @@ ralph_resolve_current() {
     # Check default location for .current-spec
     if [ -f "$current_spec_file" ]; then
         local content
-        content=$(cat "$current_spec_file" 2>/dev/null | tr -d '[:space:]')
+        content=$(cat "$current_spec_file" 2>/dev/null | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
 
         if [ -z "$content" ]; then
             _ralph_warn ".current-spec file is empty"

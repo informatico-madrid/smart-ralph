@@ -56,7 +56,7 @@ assert_contains() {
     local needle="$2"
     local msg="$3"
 
-    if echo "$haystack" | grep -q "$needle"; then
+    if echo "$haystack" | grep -qF "$needle"; then
         echo -e "${GREEN}PASS${NC}: $msg"
         PASS_COUNT=$((PASS_COUNT + 1))
         return 0

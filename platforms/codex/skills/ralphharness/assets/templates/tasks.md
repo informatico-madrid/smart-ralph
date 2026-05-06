@@ -3,7 +3,7 @@
 ## Overview
 
 Total tasks: {{N}}
-POC-first workflow with 5 phases:
+POC-first workflow with 4 phases:
 1. Phase 1: Make It Work (POC) - Validate idea end-to-end
 2. Phase 2: Refactoring - Clean up code structure
 3. Phase 3: Testing - Add unit/integration/e2e tests

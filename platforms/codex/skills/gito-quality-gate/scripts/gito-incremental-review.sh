@@ -214,38 +214,38 @@ TOML
 }
 
 inject_context() {
-  # Use python to safely update TOML (sed is fragile with multi-line values)
-  python3 -c "
-import re, sys
+  # Use python via heredoc + env var to avoid shell injection (CONTEXT_BLOCK may contain quotes/backslashes)
+  GITO_CONFIG_PATH="$GITO_CONFIG" \
+  GITO_CONTEXT_BLOCK="$CONTEXT_BLOCK" \
+  python3 <<'PYEOF'
+import re, os, sys
 
-config_path = '$GITO_CONFIG'
-context = '''$CONTEXT_BLOCK'''
+config_path = os.environ['GITO_CONFIG_PATH']
+context = os.environ['GITO_CONTEXT_BLOCK']
 
 with open(config_path, 'r') as f:
     content = f.read()
 
 # Replace or add requirements in [prompt_vars]
-pattern = r'(requirements\s*=\s*\"\"\")[\\s\\S]*?(\"\"\")'
-replacement = r'requirements = \"\"\"' + context + r'\"\"\"'
+pattern = r'(requirements\s*=\s*""")[\s\S]*?(""")'
+replacement = 'requirements = """' + context + '"""'
 
 if re.search(pattern, content):
     new_content = re.sub(pattern, replacement, content, count=1)
 else:
     # Add [prompt_vars] section if missing
     if '[prompt_vars]' not in content:
-        new_content = content + '\\n[prompt_vars]\\nrequirements = \"\"\"' + context + '\"\"\"\\n'
+        new_content = content + '\n[prompt_vars]\nrequirements = """' + context + '"""\n'
     else:
-        new_content = content.replace('[prompt_vars]', '[prompt_vars]\\nrequirements = \"\"\"' + context + '\"\"\"\\n', 1)
+        new_content = content.replace('[prompt_vars]', '[prompt_vars]\nrequirements = """' + context + '"""\n', 1)
 
 with open(config_path, 'w') as f:
     f.write(new_content)
-" 2>/dev/null || {
-    # Fallback: simple sed replacement (less robust)
-    warn "Python injection failed, using sed fallback"
-    local escaped_context
-    escaped_context=$(echo "$CONTEXT_BLOCK" | sed 's/[\/&]/\\&/g' | tr '\n' '|')
-    sed -i "s/^requirements = .*/requirements = \"\"\"${escaped_context}\"\"\"/" "$GITO_CONFIG"
-  }
+PYEOF
+  if [[ $? -ne 0 ]]; then
+    warn "Context injection failed — config unchanged"
+    return 1
+  fi
   log "Injected context into $GITO_CONFIG"
 }
 
@@ -267,33 +267,34 @@ inject_context
 mkdir -p "$OUTPUT_DIR"
 log "Running Gito review (scope: $SCOPE, against: $AGAINST, output: $OUTPUT_DIR)"
 
-GITO_CMD="gito review --against $AGAINST -o $OUTPUT_DIR"
+# Use bash array to avoid eval / word-splitting / injection risks (#2, #3)
+GIT_CMD=("gito" "review" "--against" "$AGAINST" "-o" "$OUTPUT_DIR")
 
 # Add filter if we have changed files or a filter pattern
-if [[ "$SCOPE" == filter:* ]]; then
+if [[ "${SCOPE}" == filter:* ]]; then
   local_filter="${SCOPE#filter:}"
-  GITO_CMD="$GITO_CMD --filter \"$local_filter\""
+  GIT_CMD+=("--filter" "$local_filter")
 elif [[ -n "$CHANGED_FILES" ]]; then
   # Build comma-separated filter from file list
   local_filter=$(echo "$CHANGED_FILES" | tr '\n' ',' | sed 's/,$//')
-  GITO_CMD="$GITO_CMD --filter \"$local_filter\""
+  GIT_CMD+=("--filter" "$local_filter")
 fi
 
 # Add user-provided filter if specified
 if [[ -n "$FILTER" ]]; then
-  GITO_CMD="$GITO_CMD --filter \"$FILTER\""
+  GIT_CMD+=("--filter" "$FILTER")
 fi
 
 # Add refs for commit-based scopes
 if [[ "$SCOPE" == "last-commit" ]]; then
-  GITO_CMD="$GITO_CMD HEAD~1..HEAD"
-elif [[ "$SCOPE" == commits:* ]]; then
+  GIT_CMD+=("HEAD~1..HEAD")
+elif [[ "${SCOPE}" == commits:* ]]; then
   local n="${SCOPE#commits:}"
-  GITO_CMD="$GITO_CMD HEAD~${n}..HEAD"
+  GIT_CMD+=("HEAD~${n}..HEAD")
 fi
 
-log "Executing: $GITO_CMD"
-eval "$GITO_CMD" 2>&1 || {
+log "Executing: ${GIT_CMD[*]}"
+"${GIT_CMD[@]}" 2>&1 || {
   err "Gito review failed (exit code: $?)"
   exit 1
 }

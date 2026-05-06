@@ -47,7 +47,7 @@ pero si necesitas acceder manualmente:
 ```typescript
 // Atravesar shadow root explícitamente
 const haCard = page.locator('ha-card').first()
-const shadowContent = haCard.locator(':scope >> text=Ruta activa')
+const shadowContent = haCard.locator('text=Ruta activa')
 
 // Mejor: usa getByTestId si el componente lo expone
 const card = page.getByTestId('ev-route-card')

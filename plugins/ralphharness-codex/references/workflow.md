@@ -155,7 +155,7 @@ When hooks are disabled or unavailable, re-invoke the implement skill after each
 
 Use this path whenever `codex_hooks` is not set, when running on Windows, or when verifying hook behavior during development.
 
-## Manual Fallback Path
+## Manual Phase Execution
 
 When hooks are disabled (no `codex_hooks = true`, or on Windows), run phases manually:
 

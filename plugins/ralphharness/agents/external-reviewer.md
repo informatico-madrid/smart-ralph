@@ -497,7 +497,7 @@ lines = content.splitlines(keepends=True)
 marker_prefix = f'- [x] {task_id} '
 for i, line in enumerate(lines):
     stripped = line.lstrip()
-    if stripped.startswith('- [x] ') and task_id in stripped:
+        if stripped.startswith('- [x] ') and task_id == stripped[len('- [x] '):].split()[0]:
         lines[i] = line.replace('- [x] ', '- [ ] ', 1)
         # Insert diagnosis block after the unmarked task line
         diagnosis = (

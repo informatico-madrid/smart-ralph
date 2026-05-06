@@ -74,6 +74,7 @@ If state file exists, read and display:
    ```bash
    # Read active epic from .current-epic
    EPIC_NAME=$(cat "$CWD/specs/.current-epic" 2>/dev/null || true)
+   SPEC_NAME="${spec_path##*/}"
    if [ -n "$EPIC_NAME" ] && [ -f "$CWD/specs/_epics/$EPIC_NAME/.epic-state.json" ]; then
        EPIC_STATE="$CWD/specs/_epics/$EPIC_NAME/.epic-state.json"
        # Check if this spec exists in the epic's specs array

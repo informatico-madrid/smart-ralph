@@ -431,21 +431,3 @@ Final verification sequence (last 3 tasks of spec):
 ### Discovery
 
 Read research.md for actual project commands. Do NOT assume `pnpm lint` or `npm test` exists. Use the commands discovered from the codebase.
-
-## POC Target Task Count
-
-- Standard spec: 40-60+ tasks
-- Phase distribution: Phase 1 = 50-60%, Phase 2 = 15-20%, Phase 3 = 15-20%, Phase 4-5 = 10-15%
-
-## POC Behaviors Per Phase
-
-| Behavior | Phase 1 | Phase 2 | Phase 3 | Phase 4 | Phase 5 |
-|----------|---------|---------|---------|---------|---------|
-| Tests required | No | No | Yes | Yes | Yes |
-| Type check must pass | Yes | Yes | Yes | Yes | Yes |
-| Lint must pass | No | No | No | Yes | Yes |
-| Hardcoded values OK | Yes | No | No | No | No |
-| Error handling required | No | Yes | Yes | Yes | Yes |
-| CI must be green | No | No | No | Yes | Yes |
-| PR required | No | No | No | Yes | Yes |
-| Review comments resolved | No | No | No | No | Yes |
