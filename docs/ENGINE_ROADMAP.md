@@ -189,7 +189,7 @@ Bmalph avoids this by putting complexity in **infra** (git commands, exit codes,
 | What | Why | How |
 |------|-----|-----|
 | Text-based HOLD check | LLM reasons past the rule | Replace with `grep -c "\[HOLD\]\|\[PENDING\]\|\[URGENT\]"` + exit code |
-| 5-reference coordinator context (~2,118 lines) | Model loses attention | Split into modular refs, load on demand |
+| 5-reference coordinator context (~2,118 lines) | Model loses attention | ❌ CANCELLED — addressed via Specs 3-5 instead |
 | 8 Native Task Sync sections (duplicated pattern) | Each can fail silently, same logic repeated 8x | Consolidate to 2: "before delegation" and "after completion" |
 | Verification layers defined in 2 contradictory files | Anti-fabrication not always active | Single canonical source |
 | Quality checkpoint rules in 3 files | Divergence risk | Single source |
@@ -233,14 +233,14 @@ Bmalph avoids this by putting complexity in **infra** (git commands, exit codes,
 └──────────────────────┬──────────────────────────────┘
                        │
 ┌──────────────────────▼──────────────────────────────┐
-│  PHASE 2: Reduce Bloat                              │
-│  Spec: prompt-diet-refactor                         │
+│  PHASE 2: Reduce Bloat ❌ CANCELLED                  │
+│  Spec: prompt-diet-refactor (ABANDONED)             │
 │                                                     │
 │  1. Split coordinator-pattern.md → modular refs     │
 │  2. Eliminate duplications → single source each     │
 │  3. Remove dead text from agent context             │
 │  4. Consolidate 8 sync sections → 2                 │
-│  5. Target: <5,000 tokens per iteration (was 15K+)  │
+│  ⚠️ CANCELLED 2026-05-13: Risks > Benefits          │
 └──────────────────────┬──────────────────────────────┘
                        │
 ┌──────────────────────▼──────────────────────────────┐
@@ -315,18 +315,27 @@ Bmalph avoids this by putting complexity in **infra** (git commands, exit codes,
 
 ---
 
-### Spec 2: `prompt-diet-refactor`
+### Spec 2: `prompt-diet-refactor` ❌ **CANCELLED**
+
+> **Cancellation Date**: 2026-05-13
+> **Decision**: Analysis determined that the risks of this refactoring outweigh the benefits. The complexity of splitting coordinator-pattern.md into 5 modular references, consolidating 8 Native Task Sync sections, and eliminating duplications presented too much risk of introducing regressions and breaking existing functionality. The spec was **not executed** and is **formally abandoned**.
 
 **Targets**: I1
 
 | # | Change | Detail |
 |---|--------|--------|
-| 1 | **Split coordinator-pattern.md** (1,098 lines → ~150 lines core + references) | Extract to: `coordinator-core.md` (~150 lines: role, FSM, critical rules, signal protocol), `ve-verification-contract.md` (VE task delegation, skills loading, anti-patterns reference), `task-modification.md` (SPLIT/PREREQ/FOLLOWUP/SPEC_ADJUSTMENT, reindexing), `pr-lifecycle.md` (Phase 5 PR management), `git-strategy.md` (commit/push strategy) |
-| 2 | **Consolidate 8 Native Task Sync sections → 2** | "Before delegation" (Initial Setup + Pre-Delegation + Bidirectional + Parallel + Failure + Modification) and "After completion" (Post-Verification + Completion). Same graceful degradation pattern, defined once, referenced twice. |
-| 3 | **Single source of truth** for duplicated content | Quality checkpoints → ONLY in `quality-checkpoints.md`. Remove from `phase-rules.md` and `task-planner.md`. VE definitions → ONLY in `quality-checkpoints.md`. Remove from `phase-rules.md` and `task-planner.md`. E2E anti-patterns → ONLY in `e2e-anti-patterns.md`. Remove inline from `coordinator-pattern.md` (now `coordinator-core.md`). Intent classification → ONLY in `intent-classification.md`. Remove from `task-planner.md` and skills. Test integrity → ONLY in `test-integrity.md`. Remove from `quality-checkpoints.md`. |
-| 4 | **Move dead text out of agent context** | Detailed bash/jq scripts for atomic chat append, flock locks, jq merge patterns → `hooks/scripts/` (reference by name in prompts). VE-cleanup skip-forward pseudocode → `hooks/scripts/` (reference by name). Native Task Sync algorithm details → `hooks/scripts/` (reference by name). |
-| 5 | **Update implement.md reference list** | After split, coordinator loads: `coordinator-core.md` (always), plus one of `ve-verification-contract.md` / `task-modification.md` / `pr-lifecycle.md` / `git-strategy.md` (on demand, based on current task type). Never all at once. |
-| 6 | **Target metric** | <5,000 tokens per coordinator iteration (down from ~15,000+). Measured as total lines of references loaded × ~4 tokens/line. |
+| 1 | ~~**Split coordinator-pattern.md**~~ | ~~(1,098 lines → ~150 lines core + references)~~ |
+| 2 | ~~**Consolidate 8 Native Task Sync sections → 2**~~ | ~~"Before delegation" and "After completion"~~ |
+| 3 | ~~**Single source of truth** for duplicated content~~ | ~~Quality checkpoints, VE definitions, E2E anti-patterns~~ |
+| 4 | ~~**Move dead text out of agent context**~~ | ~~Bash/jq scripts → hooks/scripts/~~ |
+| 5 | ~~**Update implement.md reference list**~~ | ~~Modular loading never implemented~~ |
+
+**Cancellation Rationale**:
+- Risk of regressions in coordinator logic too high
+- Splitting 1,098-line file into 5 references risks breaking existing coordination patterns
+- 8 Native Task Sync sections have proven stable in practice
+- Token context problem was addressed partially via other means (specs 3-5)
+- Cost/benefit analysis: high complexity for uncertain gain
 
 ---
 
@@ -470,7 +479,7 @@ Bmalph avoids this by putting complexity in **infra** (git commands, exit codes,
 |------|--------|------|
 | `schemas/spec.schema.json` | Add nativeTaskMap, nativeSyncEnabled, nativeSyncFailureCount, chat.executor.lastReadLine | 1 |
 | `references/verification-layers.md` | **Canonical source** — update to 5 layers (add Layer 0 EXECUTOR_START, Layer 3 Anti-fabrication) | 1 |
-| `references/coordinator-pattern.md` | Reference unified verification, add mechanical HOLD check, then split in Spec 2 | 1 + 2 |
+| `references/coordinator-pattern.md` | Reference unified verification, add mechanical HOLD check | 1 |
 | `commands/implement.md` | State validator, mechanical HOLD, CI snapshot rule, checkpoint, circuit breaker, update reference list after split | 1 + 4 + 2 |
 | `references/quality-checkpoints.md` | Keep as canonical. Remove duplicated test integrity section. | 2 |
 | `references/phase-rules.md` | Remove duplicated quality checkpoint rules and VE definitions | 2 |
@@ -510,8 +519,8 @@ Bmalph avoids this by putting complexity in **infra** (git commands, exit codes,
 | 3 | **State drift detected at start** | Pre-loop validation: if tasks.md [x] count ≠ taskIndex, log to .progress.md and correct before proceeding. Test: manually change taskIndex, run implement, verify correction. |
 | 4 | **Schema complete** | All fields used in implement.md and coordinator-pattern.md are defined in spec.schema.json. Test: JSON schema validation passes for real .ralph-state.json files. |
 | 5 | **CI snapshot separated from task verify** | Executor reports task verification AND CI snapshot separately. One cannot mask the other. Test: create task where verify passes but ruff fails — both must be reported. |
-| 6 | **Coordinator context < 5,000 tokens** | After Spec 2: count lines of references loaded per iteration. Must be < ~1,200 lines. |
-| 7 | **No duplicated rules** | After Spec 2: grep for "Quality checkpoint", "VE0", "VE1", "page.goto" — each appears in only one canonical file. |
+| 6 | ~~**Coordinator context < 5,000 tokens**~~ | ❌ Spec 2 cancelled — not applicable. Context management deferred to future work. |
+| 7 | ~~**No duplicated rules**~~ | ❌ Spec 2 cancelled — dedup work deferred. Current duplication remains as acceptable technical debt. |
 | 8 | **No reviewer editing state files** | After Spec 3: role contract in all agent files. Test: ask reviewer to edit .ralph-state.json — it must refuse. |
 | 9 | **Rollback available** | After Spec 4: pre-loop checkpoint SHA stored in .ralph-state.json. Test: run spec, intentionally break code, `git reset --hard <SHA>` restores. |
 | 10 | **Circuit breaker stops runaway loops** | After Spec 4: after N consecutive failures, execution stops with error. Test: create spec with failing tasks, verify stop. |
