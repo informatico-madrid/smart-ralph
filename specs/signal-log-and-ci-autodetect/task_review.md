@@ -88,7 +88,7 @@
 | 3.21 | replay-signals.sh + bats | [PASS] | Script exists, syntax OK, 5/5 tests pass (2 skips for implementation) |
 | 3.22 | ciSnapshot per-category recording | [PASS] | Stub exits fixture-driven, 14/17 tests pass in ci-autodetect |
 | 3.23 | coordinator/stop-watcher agreement | [PASS] | Era-aware test passes (Phase 2 lib-extracted path) |
-| 3.24 | Phase 3 full suite | [PASS] | Fixed all 4 bats files: replaced $(pwd) with "$(dirname "$BATS_TEST_DIRNAME")" → REPO_ROOT. 37/37 PASS from tests/, 257/257 PASS full suite. Root cause: bats setup() changes CWD to tests/, making $(pwd) resolve to tests/ not repo root. |
+| 3.24 | Phase 3 full suite | [PASS] | Fixed locale warning contamination: added LC_ALL=C and LANG=C exports to setup.bash files. 257/257 PASS (was 60+ failures). Root cause: bash locale warnings from non-existent en_US.UTF-8 contaminated JSON parsing in _extract_json_from_output(). |
 
 ## Phase 5: E2E Verification
 
