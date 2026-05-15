@@ -52,7 +52,7 @@ Goal: a real test spec runs `/ralphharness:implement`, the engine reads HOLD sig
   - **Commit**: `docs(phase6): channel-map fd 204 for baseline lock (Step 0 follow-up)`
   - _Requirements: AC-1.4_
 
-- [ ] 1.3 [VERIFY] Post Step 0 sanity — fd refactor lands cleanly
+- [x] 1.3 [VERIFY] Post Step 0 sanity — fd refactor lands cleanly
   - **Phase**: 1 (POC)
   - **Maps to**: quality-checkpoints.md
   - **Verify**:
@@ -471,7 +471,7 @@ Goal: a real test spec runs `/ralphharness:implement`, the engine reads HOLD sig
   - **Commit**: `docs(phase6): verification-layers Layer 2 reads signals.jsonl (keeps one-release legacy grace sentence)`
   - _Requirements: AC-3.3, AC-3.6, NFR-6_
 
-- [ ] 1.24 [VERIFY] Reference-doc trio sanity (channel-map + verification-layers + atomic-append precursor)
+- [x] 1.24 [VERIFY] Reference-doc trio sanity (channel-map + verification-layers + atomic-append precursor)
   - **Phase**: 1 (POC)
   - **Maps to**: quality-checkpoints.md cadence rule
   - **Depends on**: 1.23
@@ -1048,7 +1048,7 @@ EOF
   - **Commit**: none (PR creation only; no code change)
   - **Output**: `PR_OPENED <#N> -> <url>`
 
-- [ ] V6 [VERIFY] AC checklist — every AC in requirements.md verified programmatically
+- [x] V6 [VERIFY] AC checklist — every AC in requirements.md verified programmatically
   - **Phase**: 4 (Quality Gates)
   - **Maps to**: quality-checkpoints.md final sequence, all AC-* in requirements.md
   - **Verify**:
