@@ -664,7 +664,7 @@ Goal: dedupe and clean up. No new features. Code that landed inline in Phase 1 m
   - **Verify**: `grep -E "Control signals.*signals.jsonl|signals.jsonl.*Control" plugins/ralphharness/templates/chat.md && echo OK`
   - **Commit**: `docs(phase6): chat.md signal legend split (control -> signals.jsonl, collaboration stays)`
 
-- [ ] 2.6 Wire Layer 3 (ciSnapshot) writer in coordinator
+- [x] 2.6 Wire Layer 3 (ciSnapshot) writer in coordinator
   - **Phase**: 2 (Refactor)
   - **Maps to**: FR-12, Gap C4
   - **Depends on**: 2.5

@@ -201,6 +201,46 @@ jq --argjson cmds "$combined" '.ciCommands = $cmds' "$STATE_FILE" > "${STATE_FIL
 
 # END ORCHESTRATOR
 
+# BEGIN CI-SNAPSHOT-WRITER
+# Write per-category CI results to .ralph-state.json.ciSnapshot after quality checkpoints.
+# Categories: lint, typecheck, test, build (not-run categories stay null).
+# Source shared helpers for jq + atomic write.
+source "$CLAUDE_PLUGIN_ROOT/hooks/scripts/lib-signals.sh"
+
+# Initialize ciSnapshot if missing (categories: lint, typecheck, test, build, other → null)
+jq '.ciSnapshot //= {lint:null, typecheck:null, test:null, build:null, other:null}' \
+  "$STATE_FILE" > "${STATE_FILE}.tmp" && mv "${STATE_FILE}.tmp" "$STATE_FILE"
+
+# Call this function after each quality checkpoint to record the result.
+# Usage: record_ci_snapshot "lint" 0 "ruff check ."
+record_ci_snapshot() {
+  local category="$1" result_code="$2" command_str="$3"
+  local timestamp iter result exit_code
+  timestamp=$(date -u +%FT%TZ)
+  iter=$(jq -r '.globalIteration // 1' "$STATE_FILE" 2>/dev/null || echo 1)
+  exit_code=$result_code
+  if [ "$exit_code" -eq 0 ]; then
+    result="pass"
+  elif [ "$exit_code" -eq 127 ]; then
+    result="skip"
+  else
+    result="fail"
+  fi
+  # Build the snapshot JSON object for this category
+  local snapshot_entry
+  snapshot_entry=$(jq -n \
+    --arg result "$result" \
+    --argjson exitCode "$exit_code" \
+    --arg timestamp "$timestamp" \
+    --argjson iteration "$iter" \
+    --arg command "$command_str" \
+    '{result: $result, exitCode: $exitCode, timestamp: $timestamp, iteration: $iteration, command: $command}')
+  # Atomically update ciSnapshot for this category
+  jq --arg cat "$category" --argjson entry "$snapshot_entry" \
+    '.ciSnapshot[$cat] = $entry' "$STATE_FILE" > "${STATE_FILE}.tmp" && mv "${STATE_FILE}.tmp" "$STATE_FILE"
+}
+# END CI-SNAPSHOT-WRITER
+
 **Preserved fields** (set by earlier phases, must NOT be removed):
 - `source`, `name`, `basePath`, `commitSpec`, `relatedSpecs`
 
