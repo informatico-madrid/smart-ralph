@@ -178,6 +178,10 @@ ci_cmds=$(discover_ci_commands "$REPO_ROOT")
 jq --argjson cmds "$ci_cmds" '.ciCommands = $cmds' "$STATE_FILE" > "${STATE_FILE}.tmp" && mv "${STATE_FILE}.tmp" "$STATE_FILE"
 ```
 
+# Loader-site #1 of N. See hooks/scripts/migrate-state.sh header for the canonical list.
+# Migrate legacy ciCommands shape (string[] -> [{command,category}]) before any consumer reads state.
+bash "$CLAUDE_PLUGIN_ROOT/hooks/scripts/migrate-state.sh" "$STATE_FILE"
+
 # BEGIN ORCHESTRATOR
 # Orchestrate CI command discovery: compose discover-ci.sh + detect-ci-commands.sh,
 # dedupe by (command, category) tuple, write to .ralph-state.json.ciCommands.
