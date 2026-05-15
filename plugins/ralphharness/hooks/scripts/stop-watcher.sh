@@ -16,6 +16,7 @@ fi
 
 # Source path resolver for spec directory resolution
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+CLAUDE_PLUGIN_ROOT="${CLAUDE_PLUGIN_ROOT:-$(cd "$SCRIPT_DIR/../../" && pwd)}"
 RALPH_CWD="$CWD"
 export RALPH_CWD
 source "$SCRIPT_DIR/path-resolver.sh"
@@ -33,6 +34,11 @@ fi
 
 # Resolve current spec using path resolver (handles multi-directory support)
 SPEC_PATH=$(ralph_resolve_current 2>/dev/null)
+# Ensure SPEC_PATH is absolute (ralph_resolve_current may return relative path)
+case "$SPEC_PATH" in
+    /*) ;; # already absolute
+    *) SPEC_PATH="$(cd "$CWD" && cd "$(dirname "$SPEC_PATH")" && pwd)/$(basename "$SPEC_PATH")" ;;
+esac
 if [ -z "$SPEC_PATH" ]; then
     exit 0
 fi
@@ -40,7 +46,11 @@ fi
 # Extract spec name from path (last component)
 SPEC_NAME=$(basename "$SPEC_PATH")
 
-STATE_FILE="$CWD/$SPEC_PATH/.ralph-state.json"
+if [[ "$SPEC_PATH" == /* ]]; then
+    STATE_FILE="$SPEC_PATH/.ralph-state.json"
+else
+    STATE_FILE="$CWD/$SPEC_PATH/.ralph-state.json"
+fi
 if [ ! -f "$STATE_FILE" ]; then
     exit 0
 fi
