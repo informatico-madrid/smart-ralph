@@ -80,7 +80,7 @@ Focus: Create the new reference file, make key additive changes that prove the c
   - _Requirements: FR-6, FR-7, AC-3.1, AC-3.2, AC-3.3, AC-3.4_
   - _Design: Component C3, Technical Decision D4_
 
-- [ ] 1.6 Extend `failure-recovery.md` — dedup and depth/limit rules
+- [x] 1.6 Extend `failure-recovery.md` — dedup and depth/limit rules
   - **Do**:
     1. Append dedup rule: before generating, check `fixTaskMap[task_id]` for existing fix task matching `criterion_failed` + `evidence`; if matched, skip generation and mark the duplicate row `resolved_at` = already-handled
     2. Append depth/limit rule: the new trigger runs existing "Check Fix Task Limits" and "Check Fix Task Depth" steps unchanged; on limit/depth exceeded, no fix task generated and existing block/escalate handling applies

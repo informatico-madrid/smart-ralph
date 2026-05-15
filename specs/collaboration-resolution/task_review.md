@@ -12,8 +12,10 @@
 |------|-------------|--------|-----------|
 | 1.1 | grep verify | PASS | File exists; "Cross-branch regression investigation" found; "git diff main...HEAD" found; "any regression / non-E2E" found |
 | 1.2 | grep verify | PASS | "Experiment-propose-validate" found; "ROOT_CAUSE" found; "FIX_PROPOSAL" found |
-| 1.3 | grep verify | FAIL | HYPOTHESIS/EXPERIMENT/FINDING NOT in templates/chat.md — premature [x] |
-| 1.4 | grep verify | PASS | ROOT_CAUSE, FIX_PROPOSAL, BUG_DISCOVERY all found in templates/chat.md |
+| 1.3 | grep verify | PASS | HYPOTHESIS/EXPERIMENT/FINDING in templates/chat.md — re-implemented after premature [x] |
+| 1.4 | grep verify | PASS | ROOT_CAUSE, FIX_PROPOSAL, BUG_DISCOVERY in templates/chat.md |
+| 1.5 | grep verify | PASS | BUG_DISCOVERY + fixTaskMap + X.Y.N [FIX X.Y] all found in failure-recovery.md |
+| 1.6 | grep verify | PASS | already-handled + Check Fix Task Limits + Check Fix Task Depth all found |
 
 ### [task-1.1] Create collaboration-resolution.md — Cross-branch regression investigation workflow
 - status: PASS
@@ -64,3 +66,27 @@
 - fix_hint: N/A
 - review_submode: post-task
 - resolved_at: 2026-05-15T20:09:10Z (reviewer verified independently)
+
+### [task-1.5] Extend failure-recovery.md — BUG_DISCOVERY trigger section and column mapping
+- status: PASS
+- severity: none
+- reviewed_at: 2026-05-15T20:13:00Z
+- criterion_failed: none
+- evidence: |
+  $ grep -q "BUG_DISCOVERY" plugins/ralphharness/references/failure-recovery.md && grep -q "fixTaskMap" plugins/ralphharness/references/failure-recovery.md && grep -q "X\.Y\.N \[FIX X\.Y\]" plugins/ralphharness/references/failure-recovery.md && echo 1.5_PASS
+  1.5_PASS
+- fix_hint: N/A
+- review_submode: post-task
+- resolved_at: 2026-05-15T20:13:00Z (reviewer verified independently)
+
+### [task-1.6] Extend failure-recovery.md — dedup and depth/limit rules
+- status: PASS
+- severity: none
+- reviewed_at: 2026-05-15T20:13:00Z
+- criterion_failed: none
+- evidence: |
+  $ grep -q "already-handled" plugins/ralphharness/references/failure-recovery.md && grep -q "Check Fix Task Limits" plugins/ralphharness/references/failure-recovery.md && grep -q "Check Fix Task Depth" plugins/ralphharness/references/failure-recovery.md && echo 1.6_PASS
+  1.6_PASS
+- fix_hint: N/A
+- review_submode: post-task
+- resolved_at: 2026-05-15T20:13:00Z (reviewer verified independently)
