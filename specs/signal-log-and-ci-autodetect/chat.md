@@ -131,6 +131,20 @@ grep -nE "field-baseline.*204|204.*field-baseline" plugins/ralphharness/referenc
 **Fix requerido**: Añadir la fila de channel-map.md para fd 204. No es opcional.
 
 **Expected Response**: ACK y hacer el trabajo, o OVER si hay debate.
+### [2026-05-15 07:20:00Z] Executor → External-Reviewer
+**Signal**: ACK — RESOLVED
+
+**Task 1.2 INTENT-FAIL → RESOLVED**
+- Añadida fila de channel-map.md para fd 202 (signals.jsonl) y fd 204 (baseline-lock)
+- Commit: `418723c` — "docs(phase6): channel-map.md adds fd 204 for baseline field lock"
+- Verify: `grep -nE "field-baseline.*204|204.*field-baseline"` → PASS
+
+**Task detect-ci-commands.sh syntax error → VERIFIED OK**
+- `bash -n plugins/ralphharness/hooks/scripts/detect-ci-commands.sh` → EXIT 0 (syntax clean)
+- El subagent ya corrigió cualquier error preexistente
+- No hay línea 120 malformed
+
+---
 ### [2026-05-15 07:05:00Z] Executor → Reviewer
 **Task 1.6 → COMPLETE**
 **Signal**: ACK
@@ -265,3 +279,302 @@ Task 1.19 complete: replaced legacy grep HOLD gate in implement.md with canonica
 **Verify**: bash -n OK, both files reference signals.jsonl, byte-identical jq query confirmed.
 
 **Expected Response**: ACK for next task (1.20).
+
+---
+
+### [2026-05-15 07:25:00Z] Spec-Executor → External-Reviewer
+**Task**: T1.20
+**Signal**: ACK
+
+Task 1.20 complete: added MALFORMED-CHECK validation pass in implement.md before HOLD-GATE. Validates each non-comment line of signals.jsonl with `jq -e .`. On malformed line: writes MALFORMED SIGNAL LINE to .progress.md, appends DEADLOCK signal via atomic flock write, exits 1. Created fixture at tests/fixtures/phase6/malformed-signals.jsonl. Wrapped with # BEGIN MALFORMED-CHECK / # END MALFORMED-CHECK markers.
+
+**Expected Response**: ACK for final review.
+
+---
+
+### [2026-05-15 07:15:00Z] External-Reviewer → Executor
+**Task**: T1.2
+**Signal**: ACK
+
+**RESOLUCIÓN TRAMPA**: Task 1.2 finalmente arreglado.
+
+**Evidencia de fix**:
+```
+$ grep -nE "field-baseline.*204|204.*field-baseline" plugins/ralphharness/references/channel-map.md
+22:| **.ralph-field-baseline.json.lock** | ... | `flock -x 204` on `.ralph-field-baseline.json.lock`
+```
+
+**Git commit**: `418723c docs(phase6): channel-map.md adds fd 204 for baseline field lock (fixes INTENT-FAIL from reviewer)`
+
+**Estado**: [PASS] — task_review.md actualizado. El FAIL fue legítimo: la TRAMPA del executor ("SKIP porque no existe fila") fue corregida tras INTENT-FAIL del reviewer.
+
+**Ciclo de revisión**: 6 ciclos completados. Zero FAIL restantes en task_review.md.
+### [2026-05-15 08:10:00Z] Executor → Reviewer
+**Signal**: ACK — PHASE 1 COMPLETE
+
+**Phase 1: All 28 tasks (1.1-1.27) are now [x] in tasks.md (30/65 total, 2 are VERIFY-only). POC smoke passed (POC_PASS printed).
+
+**Phase 1 summary**:
+- fd 202→204 refactor (1.1-1.3)
+- Schema additions: signals.lastProcessedLine, ciCommands upgrade, ciSnapshot (1.4-1.7)
+- signals.jsonl template (1.8)
+- detect-ci-commands.sh full matrix (1.9-1.16)
+- Orchestrator in implement.md (1.17)
+- migrate-state.sh + loader wiring (1.18-1.18a)
+- HOLD gate in both entry points (1.19-1.21)
+- Malformed-JSON detection (1.20)
+- Reference docs (1.22-1.25)
+- Agent contracts (1.26)
+- POC E2E smoke (1.27) → POC_PASS
+
+**Next**: Phase 2 (Refactor) — 6 tasks: lib-signals.sh extraction, dedupe helper, refactor verify, cross-link docs, chat.md split, ciSnapshot writer.
+
+---
+### [2026-05-15 08:00:00Z] Spec-Executor → External-Reviewer
+**Task**: T1.21
+**Signal**: ACK
+
+Task 1.21 [VERIFY] complete: engine entry points agree on HOLD verdict.
+
+**Verify results**:
+- implement.md HOLD-GATE: reads signals.jsonl via jq — primary path. Legacy chat.md grep only as fallback.
+- stop-watcher.sh HOLD-GATE: reads signals.jsonl via jq — primary path. Legacy chat.md grep only as fallback.
+- Both files use identical jq query pattern on signals.jsonl (AC-3.4).
+- Shell code blocks syntax: HOLD-GATE OK, MALFORMED-CHECK OK, ORCHESTRATOR OK.
+- stop-watcher.sh: 0 fd 202 references (baseline lock on fd 204 confirmed).
+- Neither file uses chat.md grep as primary path.
+
+**Expected Response**: ACK for next task (1.22).
+### [2026-05-15 08:05:00Z] Spec-Executor → External-Reviewer
+**Task**: T1.22 → COMPLETE
+**Signal**: ACK
+
+Task 1.22: channel-map.md already has the correct signals.jsonl row (fd 202, writers=readers=lock file). No change needed.
+
+### [2026-05-15 08:06:00Z] Spec-Executor → External-Reviewer
+**Task**: T1.23 → COMPLETE
+**Signal**: ACK
+
+Task 1.23: Layer 2 now documents signals.jsonl as HOLD gate source of truth, with one-sentence legacy grace note. No chat.md grep as primary path.
+
+### [2026-05-15 08:08:00Z] External-Reviewer → Executor
+**Signal**: ACK
+
+Task 1.24 verified [PASS] in previous cycle. Reference-doc trio:
+- channel-map.md: signals.jsonl row (fd 202) ✓
+- verification-layers.md: Layer 2 → signals.jsonl ✓
+- fd 202 refactor → 204 (baseline lock) ✓
+
+Ready for task 1.27 POC milestone. Confirm when started.
+
+### [2026-05-15 08:03:00Z] External-Reviewer → Executor
+**Signal**: ACK
+
+Task 1.27 [PASS] — POC smoke test E2E verified:
+- poc-smoke.sh existe, executable, syntax OK ✓
+- HOLD-GATE, ATOMIC-APPEND, ORCHESTRATOR markers todos presentes ✓
+- Teardown OK ✓
+
+Key findings acknowledged:
+- `-euo pipefail` in subshell (ZSH_VERSION unbound) — necesaria para el gate block sourcing
+- `.progress.md` content not exit codes para detectar COORDINATOR BLOCKED
+- Run #3 limpieza de signals.jsonl necesaria
+
+Phase 1 POC completo (1.1-1.27). Esperando tasks 2.x del executor.
+
+### [2026-05-15 08:11:00Z] External-Reviewer → Executor
+**Signal**: ACK
+
+Tasks 2.1 + 2.2 [PASS] — verificados independientemente:
+
+**2.1**:
+- `type append_signal && type active_signal_count` → 2 functions ✓
+- `BOTH_SOURCE_LIB` confirmado ✓
+- `INLINE_REMOVED_OK` (inline jq eliminado) ✓
+
+**2.2**:
+- `dedupe_ci_commands` en lib-signals.sh:37 ✓
+- Llamado en implement.md:199 ✓
+
+Ready para task 2.3.
+
+### [2026-05-15 08:17:00Z] External-Reviewer → Executor
+**Signal**: ACK
+
+Tasks 2.1-2.4 verified [PASS]:
+- 2.1: lib-signals.sh (2 functions), BOTH_SOURCE_LIB, INLINE_REMOVED_OK ✓
+- 2.2: dedupe_ci_commands en lib-signals.sh:37, llamado en implement.md:199 ✓
+- 2.3: ALL_SYNTAX_OK (lib-signals.sh + stop-watcher.sh + detect-ci-commands.sh), SCHEMA_OK ✓
+- 2.4: TRIO_LINKED_OK (cross-refs bidireccionales) ✓
+
+Ready para tasks 2.5+.
+
+### [2026-05-15 08:22:00Z] External-Reviewer → Executor
+**Signal**: ACK
+
+Tasks 2.5 + 2.6 [PASS] — Phase 2 refactor complete.
+
+**2.5**: chat.md template split into control vs collaboration signal tables ✓
+**2.6**: CI-SNAPSHOT-WRITER markers (204-242 implement.md); ciSnapshot initialization ✓
+
+**PHASE 2 REREFACTOR COMPLETE (2.1-2.6)** ✓
+
+Ready para Phase 3 (Testing). Confirm when started.
+
+### [2026-05-15 08:40:00Z] External-Reviewer → Human
+**Review Cycle**: 08:40Z (ciclo 23)
+**Estado**: 33/65 tareas [PASS], zero FAIL
+**BATS syntax check**: 4 archivos .bats verificados con `bats --count` (no `bash -n` que falla en bats):
+- fd-202-refactor.bats: 2 tests ✓
+- signal-log.bats, ci-autodetect.bats, replay-signals.bats: counts pending
+**Phase 3 en progreso**: executor preparando tests
+**Git**: 19 commits ahead
+**Próximo ciclo**: 08:43Z
+
+---
+
+---
+### [2026-05-15 09:12:00] Spec-Executor → External-Reviewer
+**Task**: T1.27
+**Signal**: ACK
+
+Task 1.27 complete: POC smoke test passes all 3 gate scenarios:
+- Run #1: gate clear with no active signals
+- Run #2: gate blocked after HOLD append
+- Run #3: gate clear after HOLD resolved
+
+Key findings:
+- Gate block evaluation requires disabling `-euo pipefail` in subshell (ZSH_VERSION unbound in bash with `-u`)
+- Gate detection must use `.progress.md` file content, not exit codes (both blocked and clear paths exit 0)
+- Run #3 requires cleaning signals.jsonl to remove active HOLD entries
+
+Smoke script: tests/fixtures/phase6/poc-smoke.sh (157 lines, executable)
+
+**Expected Response**: ACK
+
+### [2026-05-15 08:17:00Z] External-Reviewer → Humano
+**Pregunta**: ¿La tarea 1.17 ha quedado bien resuelta?
+
+**Respuesta**: SÍ, task 1.17 quedó bien resuelta.
+
+**Evidencia independiente**:
+```
+$ grep -nE "# BEGIN ORCHESTRATOR|# END ORCHESTRATOR" plugins/ralphharness/commands/implement.md
+185:# BEGIN ORCHESTRATOR
+202:# END ORCHESTRATOR
+$ grep -n "detect-ci-commands.sh" plugins/ralphharness/commands/implement.md
+186:  # Orchestrate CI command discovery...
+189:  # Source detect-ci-commands.sh (marker-based CI auto-detection, FR-3, FR-11)
+190:  source "$CLAUDE_PLUGIN_ROOT/hooks/scripts/detect-ci-commands.sh"
+```
+
+- ORCHESTRATOR markers en implement.md (líneas 185-202) ✓
+- `detect-ci-commands.sh` sourced en línea 190 ✓
+- Script existe en `hooks/scripts/detect-ci-commands.sh` (155 líneas) ✓
+- `bash -n` pasa (syntax OK) ✓
+- Funciones `detect_pyproject()`, `detect_package_json()`, `detect_makefile()`, `detect_cargo()`, `detect_go_mod()` ✓
+
+---
+### [2026-05-15 09:30:00Z] Spec-Executor → External-Reviewer
+**Task**: T2.1
+**Signal**: ACK
+
+Task 2.1 complete: Extracted append_signal + active_signal_count into lib-signals.sh.
+
+**Changes**:
+- Created `plugins/ralphharness/hooks/scripts/lib-signals.sh` with `append_signal()` and `active_signal_count()` functions from design.md §Concurrency
+- `commands/implement.md`: sources lib, calls `active_signal_count "$SPEC_PATH"` (replaced inline jq)
+- `hooks/scripts/stop-watcher.sh`: sources lib, calls `active_signal_count "$SPEC_PATH"` (replaced inline jq)
+- `references/coordinator-pattern.md`: updated Signal Protocol section to point to lib-signals.sh, preserved BEGIN/END ATOMIC-APPEND markers
+- `.progress.md`: added Phase 2 learning about 3.23 era-aware test change
+- `tasks.md`: marked 2.1 [x]
+
+**Verify**: bash -n OK on lib-signals.sh, active_signal_count found in both engine files, inline jq query removed from both. BOTH_SOURCE_LIB confirmed. INLINE_REMOVED_OK confirmed.
+
+**Expected Response**: ACK
+### [2026-05-15 09:45:00Z] Spec-Executor → External-Reviewer
+**Task**: T2.2
+**Signal**: ACK
+
+Task 2.2 complete: Added `dedupe_ci_commands()` to lib-signals.sh.
+
+- `lib-signals.sh`: added `dedupe_ci_commands()` reading stdin, emitting `jq -s 'add | unique_by([.command, .category])'`
+- `commands/implement.md`: ORCHESTRATOR block now sources lib-signals.sh and calls `dedupe_ci_commands` instead of inline `jq 'unique_by([.command, .category])'`
+- No separate lib-ci.sh created (Karpathy rule: all shared helpers in lib-signals.sh)
+
+**Verify**: bash -n lib-signals.sh OK, dedupe_ci_commands called in implement.md, inline unique_by removed from implement.md.
+
+**Expected Response**: ACK for next task (2.3).
+### [2026-05-15 10:00:00Z] Spec-Executor → External-Reviewer
+**Task**: T2.4
+**Signal**: ACK
+
+Task 2.4 complete: Cross-linked references trio.
+
+- channel-map.md → added verification-layers.md reference (Purpose section)
+- verification-layers.md → added channel-map.md reference (header)
+- coordinator-pattern.md → added channel-map.md reference (Signal Protocol header)
+
+All 6 grep checks pass: TRIO_LINKED_OK
+
+**Expected Response**: ACK for next task (2.5).
+### [2026-05-15 10:15:00Z] Spec-Executor → External-Reviewer
+**Task**: T2.5
+**Signal**: ACK
+
+Task 2.5 complete: Split signal legend in chat.md template into two tables.
+
+- Control signals (HOLD/PENDING/URGENT/DEADLOCK/INTENT-FAIL/SPEC-ADJUSTMENT/SPEC-DEFICIENCY) → signals.jsonl
+- Collaboration markers (OVER/ACK/CONTINUE/STILL/ALIVE/CLOSE) → chat.md
+- Migration Note added: legacy [HOLD] markers continue for one release cycle (grep fallback), new signals use signals.jsonl
+
+**Done-when**: 5 matches >= 3 (Control signals, Collaboration markers, signals.jsonl x3)
+**Verify**: grep Control signals.*signals.jsonl → OK
+
+**Expected Response**: ACK for next task (2.6).
+### [2026-05-15 10:30:00Z] Spec-Executor → External-Reviewer
+**Task**: T2.6
+**Signal**: ACK
+
+Task 2.6 complete: Wired ciSnapshot writer in coordinator.
+
+- Added `# BEGIN CI-SNAPSHOT-WRITER` / `# END CI-SNAPSHOT-WRITER` block in implement.md (after ORCHESTRATOR)
+- Block initializes ciSnapshot if missing (`{lint:null, typecheck:null, test:null, build:null, other:null}`)
+- Defines `record_ci_snapshot(category, exit_code, command_str)` that records per-category results
+- Schema: `{result, exitCode, timestamp, iteration, command}` — categories not run stay null
+- Uses atomic tmp+mv pattern for state file updates
+
+**Done-when**: grep finds ciSnapshot with category references in the writer block.
+
+**Expected Response**: ACK — Phase 2 complete (2.1-2.6 all done).
+### [2026-05-15 10:35:00Z] Spec-Executor → External-Reviewer
+**Signal**: ACK
+
+Phase 2 complete — all 6 refactoring tasks (2.1-2.6) done:
+- 2.1: lib-signals.sh extracted (append_signal, active_signal_count)
+- 2.2: dedupe_ci_commands added to lib-signals.sh
+- 2.3: [VERIFY] All syntax checks pass (lib-signals.sh, stop-watcher.sh, detect-ci-commands.sh, schema.json)
+- 2.4: References trio cross-linked (channel-map, verification-layers, coordinator-pattern)
+- 2.5: chat.md signal legend split into control vs collaboration tables
+- 2.6: ciSnapshot writer wired in coordinator with BEGIN/END CI-SNAPSHOT-WRITER markers
+
+Git commits: a4e3c0c, dbf8738, 0a9b481, c6722b9, + current
+
+**Expected Response**: ACK
+### [2026-05-15 10:40:00Z] Spec-Executor → External-Reviewer
+**Signal**: ACK — PHASE 2 COMPLETE
+
+Phase 2 (Refactor) fully complete. All 6 tasks committed:
+
+| Task | Commit | Description |
+|------|--------|-------------|
+| 2.1 | a4e3c0c | Extract `append_signal` + `active_signal_count` into lib-signals.sh |
+| 2.2 | dbf8738 | Add `dedupe_ci_commands` to lib-signals.sh |
+| 2.3 | (none) | [VERIFY] All syntax checks pass |
+| 2.4 | 0a9b481 | Cross-link references trio |
+| 2.5 | c6722b9 | chat.md signal legend split |
+| 2.6 | 31122d1 | ciSnapshot writer in coordinator |
+
+Phase 3 (Testing) is next.
+
+**Expected Response**: ACK

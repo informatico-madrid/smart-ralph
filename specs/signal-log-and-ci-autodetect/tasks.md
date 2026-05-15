@@ -686,7 +686,7 @@ Goal: derive one bats test per row of the Test Coverage Table in design.md §Tes
 
 ### Fixtures
 
-- [ ] 3.1 Create fixture directory and shared helpers
+- [x] 3.1 Create fixture directory and shared helpers
   - **Phase**: 3 (Testing)
   - **Maps to**: design.md §Fixtures & Test Data
   - **Depends on**: 2.6
@@ -709,7 +709,7 @@ Goal: derive one bats test per row of the Test Coverage Table in design.md §Tes
 
 ### tests/fd-202-refactor.bats
 
-- [ ] 3.2 bats: fd 204 baseline lock works identically to prior fd 202
+- [x] 3.2 bats: fd 204 baseline lock works identically to prior fd 202
   - **Phase**: 3 (Testing)
   - **Maps to**: design.md Test Coverage row "stop-watcher baseline lock refactor"
   - **Depends on**: 3.1
@@ -725,7 +725,7 @@ Goal: derive one bats test per row of the Test Coverage Table in design.md §Tes
 
 ### tests/signal-log.bats
 
-- [ ] 3.3 bats: signals.jsonl append immutability (hash stability)
+- [x] 3.3 bats: signals.jsonl append immutability (hash stability)
   - **Phase**: 3 (Testing)
   - **Maps to**: design.md Test Coverage row 1, AC-4.1
   - **Depends on**: 3.2
@@ -738,7 +738,7 @@ Goal: derive one bats test per row of the Test Coverage Table in design.md §Tes
   - **Verify**: `bats tests/signal-log.bats -f "append immutability"`
   - **Commit**: `test(phase6): hash-stability test for signals.jsonl append immutability`
 
-- [ ] 3.4 bats: active-signal jq query — only-active
+- [x] 3.4 bats: active-signal jq query — only-active
   - **Phase**: 3 (Testing)
   - **Maps to**: design.md Test Coverage row 2, AC-1.2
   - **Depends on**: 3.3
@@ -750,7 +750,7 @@ Goal: derive one bats test per row of the Test Coverage Table in design.md §Tes
   - **Verify**: `bats tests/signal-log.bats -f "active signal only-active"`
   - **Commit**: `test(phase6): active-signal jq query only counts status=active`
 
-- [ ] 3.5 bats: active-signal jq query — resolved ignored
+- [x] 3.5 bats: active-signal jq query — resolved ignored
   - **Phase**: 3 (Testing)
   - **Maps to**: design.md Test Coverage row 3, AC-1.3
   - **Depends on**: 3.4
@@ -762,7 +762,7 @@ Goal: derive one bats test per row of the Test Coverage Table in design.md §Tes
   - **Verify**: `bats tests/signal-log.bats -f "resolved ignored"`
   - **Commit**: `test(phase6): resolved entries do not appear in active count`
 
-- [ ] 3.6 [VERIFY] Phase 3 cadence checkpoint #1 — signal-log bats pass so far
+- [x] 3.6 [VERIFY] Phase 3 cadence checkpoint #1 — signal-log bats pass so far
   - **Phase**: 3 (Testing)
   - **Maps to**: quality-checkpoints.md
   - **Verify**:
@@ -770,7 +770,7 @@ Goal: derive one bats test per row of the Test Coverage Table in design.md §Tes
     - `bash -n` on all phase 6 scripts: `for f in plugins/ralphharness/hooks/scripts/*.sh; do bash -n "$f"; done`
   - **Commit**: none. Log to `.progress.md`.
 
-- [ ] 3.7 bats: non-control entries ignored
+- [x] 3.7 bats: non-control entries ignored
   - **Phase**: 3 (Testing)
   - **Maps to**: design.md Test Coverage row 4
   - **Depends on**: 3.6
@@ -782,7 +782,7 @@ Goal: derive one bats test per row of the Test Coverage Table in design.md §Tes
   - **Verify**: `bats tests/signal-log.bats -f "non-control ignored"`
   - **Commit**: `test(phase6): non-control entries are filtered out`
 
-- [ ] 3.8 bats: flock fd 202 isolation under 5 parallel writers
+- [x] 3.8 bats: flock fd 202 isolation under 5 parallel writers
   - **Phase**: 3 (Testing)
   - **Maps to**: design.md Test Coverage row 5, NFR-5
   - **Depends on**: 3.7
@@ -795,7 +795,7 @@ Goal: derive one bats test per row of the Test Coverage Table in design.md §Tes
   - **Verify**: `bats tests/signal-log.bats -f "flock fd 202 isolation"`
   - **Commit**: `test(phase6): concurrency — flock fd 202 isolates 5 parallel writers`
 
-- [ ] 3.9 bats: jq missing → grep fallback + WARN once
+- [x] 3.9 bats: jq missing → grep fallback + WARN once
   - **Phase**: 3 (Testing)
   - **Maps to**: design.md Test Coverage row "jq missing fallback", AC-1.6, NFR-3
   - **Depends on**: 3.8
@@ -807,7 +807,7 @@ Goal: derive one bats test per row of the Test Coverage Table in design.md §Tes
   - **Verify**: `bats tests/signal-log.bats -f "jq missing"`
   - **Commit**: `test(phase6): grep fallback engaged when jq is absent`
 
-- [ ] 3.10 [VERIFY] Phase 3 cadence checkpoint #2
+- [x] 3.10 [VERIFY] Phase 3 cadence checkpoint #2
   - **Phase**: 3 (Testing)
   - **Maps to**: quality-checkpoints.md
   - **Verify**: `bats tests/signal-log.bats tests/fd-202-refactor.bats` (all green).
@@ -815,7 +815,7 @@ Goal: derive one bats test per row of the Test Coverage Table in design.md §Tes
 
 ### tests/ci-autodetect.bats
 
-- [ ] 3.11 bats: detect-ci-commands.sh — pyproject.toml marker matrix
+- [x] 3.11 bats: detect-ci-commands.sh — pyproject.toml marker matrix
   - **Phase**: 3 (Testing)
   - **Maps to**: design.md Test Coverage row "detect-ci-commands.sh — pyproject markers", AC-2.2
   - **Depends on**: 3.10
@@ -828,7 +828,7 @@ Goal: derive one bats test per row of the Test Coverage Table in design.md §Tes
   - **Verify**: `bats tests/ci-autodetect.bats -f "pyproject"`
   - **Commit**: `test(phase6): detect-ci-commands.sh pyproject.toml matrix`
 
-- [ ] 3.12 bats: detect-ci-commands.sh — package.json + pnpm-lock prefers pnpm
+- [x] 3.12 bats: detect-ci-commands.sh — package.json + pnpm-lock prefers pnpm
   - **Phase**: 3 (Testing)
   - **Maps to**: design.md Test Coverage row "package.json + pnpm-lock", AC-2.2
   - **Depends on**: 3.11
@@ -840,7 +840,7 @@ Goal: derive one bats test per row of the Test Coverage Table in design.md §Tes
   - **Verify**: `bats tests/ci-autodetect.bats -f "package.json.*pnpm"`
   - **Commit**: `test(phase6): detect-ci-commands.sh respects pnpm-lock.yaml`
 
-- [ ] 3.13 bats: detect-ci-commands.sh — Makefile lint/test/check
+- [x] 3.13 bats: detect-ci-commands.sh — Makefile lint/test/check
   - **Phase**: 3 (Testing)
   - **Maps to**: design.md Test Coverage row "Makefile lint/test/check"
   - **Depends on**: 3.12
@@ -852,13 +852,13 @@ Goal: derive one bats test per row of the Test Coverage Table in design.md §Tes
   - **Verify**: `bats tests/ci-autodetect.bats -f "Makefile"`
   - **Commit**: `test(phase6): detect-ci-commands.sh Makefile targets`
 
-- [ ] 3.14 [VERIFY] Phase 3 cadence checkpoint #3
+- [x] 3.14 [VERIFY] Phase 3 cadence checkpoint #3
   - **Phase**: 3 (Testing)
   - **Maps to**: quality-checkpoints.md
   - **Verify**: `bats tests/ci-autodetect.bats` (all green so far).
   - **Commit**: none. Log to `.progress.md`.
 
-- [ ] 3.15 bats: detect-ci-commands.sh — Cargo + go.mod
+- [x] 3.15 bats: detect-ci-commands.sh — Cargo + go.mod
   - **Phase**: 3 (Testing)
   - **Maps to**: design.md Test Coverage row "Cargo + go.mod"
   - **Depends on**: 3.14
@@ -871,7 +871,7 @@ Goal: derive one bats test per row of the Test Coverage Table in design.md §Tes
   - **Verify**: `bats tests/ci-autodetect.bats -f "Cargo|go.mod"`
   - **Commit**: `test(phase6): detect-ci-commands.sh Cargo and go.mod markers`
 
-- [ ] 3.16 bats: `command -v` filter drops missing binaries
+- [x] 3.16 bats: `command -v` filter drops missing binaries
   - **Phase**: 3 (Testing)
   - **Maps to**: design.md Test Coverage row "command -v filter", AC-2.4
   - **Depends on**: 3.15
@@ -883,7 +883,7 @@ Goal: derive one bats test per row of the Test Coverage Table in design.md §Tes
   - **Verify**: `bats tests/ci-autodetect.bats -f "command -v"`
   - **Commit**: `test(phase6): command -v filter drops missing binaries at write time`
 
-- [ ] 3.17 bats: dedupe by (command, category) tuple
+- [x] 3.17 bats: dedupe by (command, category) tuple
   - **Phase**: 3 (Testing)
   - **Maps to**: design.md Test Coverage row "Dedupe by (command, category)", D4
   - **Depends on**: 3.16
@@ -896,7 +896,7 @@ Goal: derive one bats test per row of the Test Coverage Table in design.md §Tes
   - **Verify**: `bats tests/ci-autodetect.bats -f "dedupe"`
   - **Commit**: `test(phase6): tuple dedupe by (command, category)`
 
-- [ ] 3.18 bats: migration — legacy ciCommands string[] auto-wrap
+- [x] 3.18 bats: migration — legacy ciCommands string[] auto-wrap
   - **Phase**: 3 (Testing)
   - **Maps to**: design.md Test Coverage row "Migration: legacy ciCommands", AC-2.5
   - **Depends on**: 3.17
@@ -908,13 +908,13 @@ Goal: derive one bats test per row of the Test Coverage Table in design.md §Tes
   - **Verify**: `bats tests/ci-autodetect.bats -f "legacy.*string"`
   - **Commit**: `test(phase6): legacy ciCommands string[] auto-wraps to {command,category:other}`
 
-- [ ] 3.19 [VERIFY] Phase 3 cadence checkpoint #4
+- [x] 3.19 [VERIFY] Phase 3 cadence checkpoint #4
   - **Phase**: 3 (Testing)
   - **Maps to**: quality-checkpoints.md
   - **Verify**: `bats tests/ci-autodetect.bats tests/signal-log.bats tests/fd-202-refactor.bats` (all green).
   - **Commit**: none. Log to `.progress.md`.
 
-- [ ] 3.20 bats: migration — legacy [HOLD] in chat.md grep fallback
+- [x] 3.20 bats: migration — legacy [HOLD] in chat.md grep fallback
   - **Phase**: 3 (Testing)
   - **Maps to**: design.md §Failure Modes row "signals.jsonl missing on legacy spec / legacy `[HOLD]` markers still in chat.md", AC-3.6, NFR-6 (backward compat)
   - **Depends on**: 3.19
@@ -926,7 +926,7 @@ Goal: derive one bats test per row of the Test Coverage Table in design.md §Tes
   - **Verify**: `bats tests/signal-log.bats -f "legacy.*HOLD"`
   - **Commit**: `test(phase6): legacy [HOLD] in chat.md honoured for one release cycle`
 
-- [ ] 3.21 Create replay-signals.sh + bats: replay determinism at iteration N
+- [x] 3.21 Create replay-signals.sh + bats: replay determinism at iteration N
   - **Phase**: 3 (Testing)
   - **Maps to**: design.md Implementation Step 13, FR-13, AC-4.3, NFR-4
   - **Depends on**: 3.20
@@ -941,7 +941,7 @@ Goal: derive one bats test per row of the Test Coverage Table in design.md §Tes
   - **Commit**: `feat(phase6): replay-signals.sh + bats deterministic replay coverage`
   - _Requirements: FR-13, AC-4.3_
 
-- [ ] 3.22 bats: ciSnapshot per-category recording (fixture-driven stub exits)
+- [x] 3.22 bats: ciSnapshot per-category recording (fixture-driven stub exits)
   - **Phase**: 3 (Testing)
   - **Maps to**: design.md Test Coverage row "ciSnapshot per-category recording", FR-12
   - **Depends on**: 3.21
@@ -963,7 +963,7 @@ Goal: derive one bats test per row of the Test Coverage Table in design.md §Tes
   - **Verify**: `[ -s tests/fixtures/phase6/ci-stub-exits.env ] && bats tests/ci-autodetect.bats -f "ciSnapshot"`
   - **Commit**: `test(phase6): ciSnapshot records per-category results (fixture-driven stub exits)`
 
-- [ ] 3.23 bats: coordinator and stop-watcher agree on HOLD verdict (via shared lib call-site assertion)
+- [x] 3.23 bats: coordinator and stop-watcher agree on HOLD verdict (via shared lib call-site assertion)
   - **Phase**: 3 (Testing)
   - **Maps to**: design.md Test Coverage row "Coordinator/stop-watcher agreement", AC-3.4
   - **Depends on**: 3.22
@@ -981,7 +981,7 @@ Goal: derive one bats test per row of the Test Coverage Table in design.md §Tes
   - **Verify**: `bats tests/signal-log.bats -f "coordinator.*stop-watcher agree"`
   - **Commit**: `test(phase6): coordinator and stop-watcher share active_signal_count by construction (era-aware)`
 
-- [ ] 3.24 [VERIFY] Phase 3 full suite green
+- [x] 3.24 [VERIFY] Phase 3 full suite green
   - **Phase**: 3 (Testing)
   - **Maps to**: quality-checkpoints.md, NFR-2, NFR-4, NFR-5, NFR-7
   - **Verify**:
