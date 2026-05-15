@@ -35,7 +35,7 @@ Focus: Create the new reference file, make key additive changes that prove the c
   - _Requirements: FR-4, AC-2.1_
   - _Design: Component C1_
 
-- [ ] 1.3 Append 3 collaboration-marker rows to `chat.md` — HYPOTHESIS, EXPERIMENT, FINDING
+- [x] 1.3 Append 3 collaboration-marker rows to `chat.md` — HYPOTHESIS, EXPERIMENT, FINDING
   - **Do**:
     1. Read `plugins/ralphharness/templates/chat.md` to find the end of the Collaboration markers table
     2. Append 3 rows:
