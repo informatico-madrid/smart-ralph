@@ -426,7 +426,7 @@ Goal: a real test spec runs `/ralphharness:implement`, the engine reads HOLD sig
   - **Commit**: `feat(phase6): coordinator detects malformed signals.jsonl line and auto-DEADLOCKs (with fixture-driven smoke)`
   - _Requirements: NFR-5 (concurrency — torn line handling), Verification Contract escalation rule_
 
-- [ ] 1.21 [VERIFY] Engine entry points agree on HOLD verdict
+- [x] 1.21 [VERIFY] Engine entry points agree on HOLD verdict
   - **Phase**: 1 (POC)
   - **Maps to**: quality-checkpoints.md, AC-3.4
   - **Verify**:
@@ -437,7 +437,7 @@ Goal: a real test spec runs `/ralphharness:implement`, the engine reads HOLD sig
 
 ### Step 7-9 — Reference docs
 
-- [ ] 1.22 channel-map.md: add signals.jsonl row (fd 202)
+- [x] 1.22 channel-map.md: add signals.jsonl row (fd 202)
   - **Phase**: 1 (POC)
   - **Maps to**: FR-5, AC-1.4
   - **Depends on**: 1.21
@@ -451,7 +451,7 @@ Goal: a real test spec runs `/ralphharness:implement`, the engine reads HOLD sig
   - **Commit**: `docs(phase6): channel-map.md documents signals.jsonl (fd 202)`
   - _Requirements: AC-1.4_
 
-- [ ] 1.23 verification-layers.md: Layer 2 reads signals.jsonl (keep legacy-grace sentence)
+- [x] 1.23 verification-layers.md: Layer 2 reads signals.jsonl (keep legacy-grace sentence)
   - **Phase**: 1 (POC)
   - **Maps to**: FR-6, AC-3.3, AC-3.6, NFR-6
   - **Depends on**: 1.22
@@ -482,7 +482,7 @@ Goal: a real test spec runs `/ralphharness:implement`, the engine reads HOLD sig
     - Files staged so far in this phase parse cleanly: `for f in plugins/ralphharness/hooks/scripts/*.sh; do bash -n "$f" || exit 1; done`.
   - **Commit**: none — verification-only checkpoint. Log timestamp to `.progress.md`.
 
-- [ ] 1.25 coordinator-pattern.md: Signal Protocol section + atomic-append snippet (fd 202)
+- [x] 1.25 coordinator-pattern.md: Signal Protocol section + atomic-append snippet (fd 202)
   - **Phase**: 1 (POC)
   - **Maps to**: FR-10, FR-8, AC-1.4
   - **Depends on**: 1.24
@@ -500,7 +500,7 @@ Goal: a real test spec runs `/ralphharness:implement`, the engine reads HOLD sig
 
 ### Step 10-11 — Agent contracts + chat.md split
 
-- [ ] 1.26 Agent contracts: external-reviewer + spec-executor emit signals to signals.jsonl
+- [x] 1.26 Agent contracts: external-reviewer + spec-executor emit signals to signals.jsonl
   - **Phase**: 1 (POC)
   - **Maps to**: FR-8, AC-3.5
   - **Depends on**: 1.25
@@ -518,7 +518,7 @@ Goal: a real test spec runs `/ralphharness:implement`, the engine reads HOLD sig
 
 ### POC milestone
 
-- [ ] 1.27 POC milestone — end-to-end signals.jsonl + CI auto-detect via the live coordinator
+- [x] 1.27 POC milestone — end-to-end signals.jsonl + CI auto-detect via the live coordinator
   - **Phase**: 1 (POC) — MILESTONE
   - **Maps to**: design.md Implementation Steps 0-5 + 10, requirements Verification Contract
   - **Depends on**: 1.26
