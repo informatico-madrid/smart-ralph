@@ -321,6 +321,38 @@ Then Read and follow these references in order. They contain the complete coordi
 - **MANDATORY: Read task_review.md BEFORE delegating.** Before every task delegation, read `<basePath>/task_review.md` if it exists. If the current task is marked FAIL, DO NOT delegate—add a fix task first. If marked PENDING, treat it as a blocking state: do not delegate or advance to another task until the review is resolved.
 - **MANDATORY: Mechanical HOLD check BEFORE delegation.** Before delegating, run the canonical gate below.
   ```bash
+  # BEGIN MALFORMED-CHECK
+  # Validate signals.jsonl lines are valid JSON before active-signal query.
+  # A malformed line indicates a torn write — escalate to DEADLOCK and halt.
+  line_num=0
+  malformed_found=0
+  while IFS= read -r sig_line; do
+    line_num=$((line_num + 1))
+    # Skip comment lines
+    case "$sig_line" in
+      '#'*|''|' ') continue ;;
+    esac
+    if ! echo "$sig_line" | jq -e . >/dev/null 2>&1; then
+      echo "[ralphharness] ERROR: malformed JSON line in signals.jsonl at line $line_num" >> "$SPEC_PATH/.progress.md"
+      echo "MALFORMED SIGNAL LINE at line $line_num: $sig_line" >> "$SPEC_PATH/.progress.md"
+      malformed_found=1
+      break
+    fi
+  done < "$SPEC_PATH/signals.jsonl"
+  if [ "$malformed_found" -eq 1 ]; then
+    # Auto-emit DEADLOCK signal and halt
+    iter=$(jq -r '.globalIteration // 1' "$STATE_FILE" 2>/dev/null || echo 1)
+    deadlock_payload='{"type":"control","signal":"DEADLOCK","from":"coordinator","to":"all","task":"all","status":"active","timestamp":"'"$(date -u +%FT%TZ)"'","iteration":'"$iter"',"reason":"malformed JSON line in signals.jsonl"}'
+    # Atomic append via flock fd 202
+    (
+      exec 202>"${SPEC_PATH}/signals.jsonl.lock"
+      flock -x -w 5 202 || exit 75
+      printf '%s\n' "$deadlock_payload" >> "${SPEC_PATH}/signals.jsonl"
+    ) 202>"${SPEC_PATH}/signals.jsonl.lock"
+    exit 1
+  fi
+  # END MALFORMED-CHECK
+
   # BEGIN HOLD-GATE
   # Mechanical active-signal gate (Layer 2). Source of truth: signals.jsonl.
   # Legacy chat.md [HOLD] markers are honoured for one release cycle (NFR-6, AC-3.6)

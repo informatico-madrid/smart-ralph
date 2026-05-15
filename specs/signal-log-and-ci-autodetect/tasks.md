@@ -393,7 +393,7 @@ Goal: a real test spec runs `/ralphharness:implement`, the engine reads HOLD sig
   - **Commit**: `feat(phase6): canonical signals.jsonl HOLD gate inlined in implement.md and added to stop-watcher.sh (atomic landing)`
   - _Requirements: AC-1.2, AC-1.6, AC-3.3, AC-3.4, FR-2, FR-7, FR-14_
 
-- [ ] 1.20 Add malformed-JSON detection + auto-DEADLOCK at coordinator start
+- [x] 1.20 Add malformed-JSON detection + auto-DEADLOCK at coordinator start
   - **Phase**: 1 (POC)
   - **Maps to**: design.md §Concurrency torn-line handling, Verification Contract escalation
   - **Depends on**: 1.19

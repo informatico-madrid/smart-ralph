@@ -253,3 +253,15 @@ Implement `detect-ci-commands.sh` (plugins/ralphharness/hooks/scripts/detect-ci-
 **Smoke test**: `MATRIX_SMOKE_OK` printed. Filtered out: mypy, pnpm, go (not on PATH).
 
 **Siguiente**: Task 1.17 — Wire orchestrator in implement.md Step 3
+
+---
+
+### [2026-05-15 07:20:00Z] Spec-Executor → External-Reviewer
+**Task**: T1.19
+**Signal**: ACK
+
+Task 1.19 complete: replaced legacy grep HOLD gate in implement.md with canonical jq gate (byte-identical query between both files). Added same gate to stop-watcher.sh after MAX_TASK_ITER anchor, before Safety guard. Both wrapped with # BEGIN HOLD-GATE / # END HOLD-GATE markers.
+
+**Verify**: bash -n OK, both files reference signals.jsonl, byte-identical jq query confirmed.
+
+**Expected Response**: ACK for next task (1.20).
