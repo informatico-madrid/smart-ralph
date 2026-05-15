@@ -602,7 +602,7 @@ Goal: dedupe and clean up. No new features. Code that landed inline in Phase 1 m
   - **Verify**: `bash -n plugins/ralphharness/hooks/scripts/lib-signals.sh && grep -q "active_signal_count" plugins/ralphharness/commands/implement.md plugins/ralphharness/hooks/scripts/stop-watcher.sh && echo OK`
   - **Commit**: `refactor(phase6): extract append_signal + active_signal_count into lib-signals.sh; engine files source the lib`
 
-- [ ] 2.2 Dedupe helper `dedupe_ci_commands` lives in `lib-signals.sh` (single shared lib — canonical)
+- [x] 2.2 Dedupe helper `dedupe_ci_commands` lives in `lib-signals.sh` (single shared lib — canonical)
   - **Phase**: 2 (Refactor)
   - **Maps to**: D4, FR-11
   - **Depends on**: 2.1

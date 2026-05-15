@@ -189,11 +189,14 @@ bash "$CLAUDE_PLUGIN_ROOT/hooks/scripts/migrate-state.sh" "$STATE_FILE"
 # Source detect-ci-commands.sh (marker-based CI auto-detection, FR-3, FR-11)
 source "$CLAUDE_PLUGIN_ROOT/hooks/scripts/detect-ci-commands.sh"
 
+# Source shared signal helpers (lib-signals.sh for dedupe, FR-11)
+source "$CLAUDE_PLUGIN_ROOT/hooks/scripts/lib-signals.sh"
+
 # Discover marker-based CI commands
 detect_cmds=$(detect_ci_commands "$REPO_ROOT")
 
 # Compose: merge discover output + detect output via jq -s 'add', then dedupe by (command, category) tuple
-combined=$(printf '%s\n%s' "$ci_cmds" "$detect_cmds" | jq -s 'add' | jq 'unique_by([.command, .category])')
+combined=$(printf '%s\n%s' "$ci_cmds" "$detect_cmds" | dedupe_ci_commands)
 jq --argjson cmds "$combined" '.ciCommands = $cmds' "$STATE_FILE" > "${STATE_FILE}.tmp" && mv "${STATE_FILE}.tmp" "$STATE_FILE"
 
 # END ORCHESTRATOR

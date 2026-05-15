@@ -29,3 +29,12 @@ active_signal_count() {
     | wc -l | tr -d ' '
 }
 # END ACTIVE-SIGNAL-COUNT
+
+# BEGIN DEDUPE-CI-COMMANDS
+# Deduplicates CI command arrays by (command, category) tuple.
+# Reads concatenated JSON arrays from stdin, emits unique tuples.
+# Per D4: dedupe by (command, category) to preserve semantic distinction.
+dedupe_ci_commands() {
+  jq -s 'add | unique_by([.command, .category])'
+}
+# END DEDUPE-CI-COMMANDS
