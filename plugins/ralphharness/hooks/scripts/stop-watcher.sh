@@ -569,8 +569,8 @@ fi
 # Perform field-level validation if baseline is available and valid
 if [ $VALIDATION_SKIPPED -eq 0 ]; then
     (
-        exec 202>"${BASELINE_FILE}.lock"
-        flock -x 202 || exit 0
+        exec 204>"${BASELINE_FILE}.lock"
+        flock -x 204 || exit 0
 
         # Iterate over each field defined in the baseline (flat JSON format)
         # Flat format: {"field": "string" | ["array"]} — values are owners directly
@@ -621,7 +621,7 @@ if [ $VALIDATION_SKIPPED -eq 0 ]; then
             # In Phase 1, we report agent identity as "unknown"
             echo "[ralphharness] BOUNDARY_VIOLATION field=$FIELD owner=$BASELINE_OWNER severity=HIGH agent=unknown" >&2
         done
-    ) 202>"${BASELINE_FILE}.lock"
+    ) 204>"${BASELINE_FILE}.lock"
 fi
 # --- End Role Boundaries Validation ---
 
