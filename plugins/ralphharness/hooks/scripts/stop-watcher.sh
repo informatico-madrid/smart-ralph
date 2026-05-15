@@ -419,6 +419,9 @@ REPAIR_EOF
     # --- End Phase 3 ---
 fi  # closes: if [ -n "$TRANSCRIPT_PATH" ] && [ -f "$TRANSCRIPT_PATH" ]
 
+# Loader documentation: stop-watcher.sh reads .ralph-state.json via `jq empty` for corruption check only;
+# it does NOT read .ciCommands shape, so legacy ciCommands string[] does not affect this reader.
+# See hooks/scripts/migrate-state.sh for canonical loader list.
 # Validate state file is readable JSON
 if ! jq empty "$STATE_FILE" 2>/dev/null; then
     REASON=$(cat <<EOF

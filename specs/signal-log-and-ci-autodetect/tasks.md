@@ -293,7 +293,7 @@ Goal: a real test spec runs `/ralphharness:implement`, the engine reads HOLD sig
   - **Commit**: `feat(phase6): one-shot legacy ciCommands migrator (migrate-state.sh, invoked from implement.md Step 3)`
   - _Requirements: AC-2.5_
 
-- [ ] 1.18a Wire migrate-state.sh into every other state-file loader (stop-watcher, replay-signals, future readers)
+- [x] 1.18a Wire migrate-state.sh into every other state-file loader (stop-watcher, replay-signals, future readers)
   - **Phase**: 1 (POC)
   - **Maps to**: AC-2.5, H2 resolution — the migrator must run before any consumer reads .ralph-state.json
   - **Depends on**: 1.18
