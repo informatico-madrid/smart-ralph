@@ -65,7 +65,7 @@ Focus: Create the new reference file, make key additive changes that prove the c
   - _Requirements: FR-5, AC-2.2, AC-2.3, AC-2.4, NFR-5_
   - _Design: Component C2_
 
-- [ ] 1.5 Extend `failure-recovery.md` — BUG_DISCOVERY trigger section and column mapping
+- [x] 1.5 Extend `failure-recovery.md` — BUG_DISCOVERY trigger section and column mapping
   - **Do**:
     1. Read `plugins/ralphharness/references/failure-recovery.md` to find the end
     2. Append "BUG_DISCOVERY Fix-Task Trigger" section:

@@ -542,3 +542,52 @@ After fix task logging:
 ## Learnings
 - Some learning
 ```
+
+## BUG_DISCOVERY Fix-Task Trigger
+
+A `task_review.md` row with `status: BUG_DISCOVERY` triggers the same fix-task generation machinery as executor non-completion. This enables the external-reviewer to flag bugs found during investigation, causing the coordinator to generate fix tasks automatically.
+
+### Trigger
+
+When the coordinator reads `task_review.md` and finds a row with `status: BUG_DISCOVERY`, it treats the row as a failure source and proceeds to fix-task generation.
+
+### Column-to-Failure-Object Mapping
+
+The coordinator maps `task_review.md` columns onto the existing failure object:
+
+| Column (`task_review.md`) | Failure Object Field |
+|---------------------------|---------------------|
+| `task_id` | `taskId` |
+| `evidence` | `failure.error` |
+| `fix_hint` | `failure.attemptedFix` |
+| N/A (fixed) | `fix_type: bug_discovery` |
+
+### Reuse of Existing Machinery
+
+The BUG_DISCOVERY trigger reuses all existing fix-task infrastructure verbatim:
+
+- **Fix task format**: `X.Y.N [FIX X.Y] [fix_type:bug_discovery] Fix: <evidence>`
+- **Task insertion**: Inserted after the original task in `tasks.md` via the same `Insert Fix Task into tasks.md` algorithm
+- **State tracking**: `fixTaskMap` updated identically, `totalTasks` incremented
+- **Limit checks**: "Check Fix Task Limits" and "Check Fix Task Depth" apply identically
+- **Retry flow**: On fix task TASK_COMPLETE, retry original task per "Execute Fix Task and Retry Original"
+
+### Reviewer Write Boundary
+
+- The reviewer writes `BUG_DISCOVERY` rows to `task_review.md` (reviewer-owned file)
+- The coordinator reads these rows and inserts fix tasks into `tasks.md` (coordinator-owned)
+- The reviewer gains no new write permissions beyond what it already has
+
+### Dedup Rule
+
+Before generating a fix task from a BUG_DISCOVERY row, the coordinator checks `fixTaskMap[task_id]` for an existing fix task matching the same `criterion_failed` + `evidence`:
+
+- **Match found**: Skip fix-task generation. Mark the `task_review.md` row `resolved_at` = `already-handled`.
+- **No match**: Proceed to generate fix task normally.
+
+### Depth and Limit Rules
+
+The new BUG_DISCOVERY trigger runs the existing "Check Fix Task Limits" and "Check Fix Task Depth" steps without modification:
+
+- If `fixTaskMap[task_id].attempts >= maxFixTasksPerOriginal`: no fix task generated, existing block/escalate handling applies
+- If fix task depth exceeds `maxFixTaskDepth`: no fix task generated, existing block/escalate handling applies
