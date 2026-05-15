@@ -223,7 +223,7 @@ Focus: Verify all changes follow NFR-1 (additivity). No new features. Verificati
 
 Focus: Add comprehensive test coverage. One RED/GREEN pair per Test Coverage Table row. Integration tests exercise BUG_DISCOVERY behavioral assertions in a real temp workspace (`mktemp -d`) — not a mock. The simulation mechanism in each integration GREEN task: implement a bash function inline in the bats test that reads `task_review.md` and `fixTaskMap` from a temp workspace, performs the coordinator's Pre-Delegation Check logic (check `fixTaskMap` for dedup matching `criterion_failed` + `evidence`, check depth/limit via `fixTaskMap[task_id].attempts >= maxFixTasksPerOriginal`), and appends a `X.Y.N [FIX X.Y]` line to tasks.md if allowed.
 
-- [ ] 3.1 Create `tests/collaboration-resolution.bats` with repo-root path setup
+- [x] 3.1 Create `tests/collaboration-resolution.bats` with repo-root path setup
   - **Do**:
     1. Create `tests/collaboration-resolution.bats`
     2. Add setup: `REPO_ROOT="$(dirname "$BATS_TEST_DIRNAME")"`, `PLUGIN_REF="$REPO_ROOT/plugins/ralphharness/references"`, `PLUGIN_TPL="$REPO_ROOT/plugins/ralphharness/templates"`, `PLUGIN_AGENTS="$REPO_ROOT/plugins/ralphharness/agents"`, `TEST_WORKSPACE="$(mktemp -d)"`
@@ -236,7 +236,7 @@ Focus: Add comprehensive test coverage. One RED/GREEN pair per Test Coverage Tab
   - _Requirements: N/A — test harness_
   - _Design: Test File Conventions_
 
-- [ ] 3.2 [RED] Unit test: C1 collaboration-resolution.md exists with required structure
+- [x] 3.2 [RED] Unit test: C1 collaboration-resolution.md exists with required structure
   - **Do**: Write failing test asserting collaboration-resolution.md exists and contains:
     1. "Cross-branch regression investigation" block with `git diff main...HEAD` steps
     2. Explicit ANY-regression entry condition (non-E2E unit-test coverage stated)
@@ -248,7 +248,7 @@ Focus: Add comprehensive test coverage. One RED/GREEN pair per Test Coverage Tab
   - _Requirements: AC-1.1, AC-1.2, AC-1.4, AC-2.1_
   - _Design: Test Coverage Table row 1_
 
-- [ ] 3.3 [GREEN] Pass test: C1 collaboration-resolution.md structure check
+- [x] 3.3 [GREEN] Pass test: C1 collaboration-resolution.md structure check
   - **Do**: Write assertions for C1:
     1. `[ -f "$PLUGIN_REF/collaboration-resolution.md" ]`
     2. `grep -q "Cross-branch regression investigation" "$PLUGIN_REF/collaboration-resolution.md"`
@@ -262,7 +262,7 @@ Focus: Add comprehensive test coverage. One RED/GREEN pair per Test Coverage Tab
   - _Requirements: AC-1.1, AC-1.2, AC-1.4, AC-2.1_
   - _Design: Test Coverage Table row 1_
 
-- [ ] 3.4 [RED] Unit test: C2 chat.md Collaboration markers contain all 6 signals
+- [x] 3.4 [RED] Unit test: C2 chat.md Collaboration markers contain all 6 signals
   - **Do**: Write failing test asserting Collaboration markers table has all 6 signals with meanings and emitting agents
   - **Files**: `tests/collaboration-resolution.bats`
   - **Done when**: Test exists and fails (signals not yet added)
@@ -271,7 +271,7 @@ Focus: Add comprehensive test coverage. One RED/GREEN pair per Test Coverage Tab
   - _Requirements: AC-2.2, AC-2.4_
   - _Design: Test Coverage Table row 2_
 
-- [ ] 3.5 [GREEN] Pass test: C2 chat.md Collaboration markers check
+- [x] 3.5 [GREEN] Pass test: C2 chat.md Collaboration markers check
   - **Do**: Write assertions for C2:
     1. For each signal in HYPOTHESIS/EXPERIMENT/FINDING/ROOT_CAUSE/FIX_PROPOSAL/BUG_DISCOVERY: `grep -q "$signal" "$PLUGIN_TPL/chat.md"`
     2. Verify the signals appear in the Collaboration markers table section (after "Collaboration markers" header)
@@ -282,7 +282,7 @@ Focus: Add comprehensive test coverage. One RED/GREEN pair per Test Coverage Tab
   - _Requirements: AC-2.2, AC-2.4_
   - _Design: Test Coverage Table row 2_
 
-- [ ] 3.6 [RED] Unit test: C2 signals are collaboration markers, NOT control signals
+- [x] 3.6 [RED] Unit test: C2 signals are collaboration markers, NOT control signals
   - **Do**: Write failing test asserting 6 new signals are NOT in signals.jsonl or Control signals table
   - **Files**: `tests/collaboration-resolution.bats`
   - **Done when**: Test exists and fails
@@ -291,7 +291,7 @@ Focus: Add comprehensive test coverage. One RED/GREEN pair per Test Coverage Tab
   - _Requirements: AC-2.3, NFR-5_
   - _Design: Test Coverage Table row 2_
 
-- [ ] 3.7 [GREEN] Pass test: C2 signals in chat.md, not in signals.jsonl
+- [x] 3.7 [GREEN] Pass test: C2 signals in chat.md, not in signals.jsonl
   - **Do**: Write assertions for C2:
     1. `! grep -q "HYPOTHESIS\|EXPERIMENT\|FINDING\|ROOT_CAUSE\|FIX_PROPOSAL\|BUG_DISCOVERY" "$REPO_ROOT/plugins/ralphharness/templates/signals.jsonl"`
     2. Verify Control signals table in chat.md is unchanged (no new rows added there)
@@ -302,7 +302,7 @@ Focus: Add comprehensive test coverage. One RED/GREEN pair per Test Coverage Tab
   - _Requirements: AC-2.3, NFR-5_
   - _Design: Test Coverage Table row 2_
 
-- [ ] 3.8 [RED] Unit test: C3 failure-recovery.md documents BUG_DISCOVERY trigger
+- [x] 3.8 [RED] Unit test: C3 failure-recovery.md documents BUG_DISCOVERY trigger
   - **Do**: Write failing test asserting failure-recovery.md has BUG_DISCOVERY section with mapping, dedup, and depth/limit docs
   - **Files**: `tests/collaboration-resolution.bats`
   - **Done when**: Test exists and fails
@@ -311,7 +311,7 @@ Focus: Add comprehensive test coverage. One RED/GREEN pair per Test Coverage Tab
   - _Requirements: AC-3.1, AC-3.2_
   - _Design: Test Coverage Table row 3_
 
-- [ ] 3.9 [GREEN] Pass test: C3 failure-recovery.md BUG_DISCOVERY trigger check
+- [x] 3.9 [GREEN] Pass test: C3 failure-recovery.md BUG_DISCOVERY trigger check
   - **Do**: Write assertions for C3:
     1. `grep -q "BUG_DISCOVERY" "$PLUGIN_REF/failure-recovery.md"`
     2. `grep -q "fixTaskMap" "$PLUGIN_REF/failure-recovery.md"`
@@ -324,7 +324,7 @@ Focus: Add comprehensive test coverage. One RED/GREEN pair per Test Coverage Tab
   - _Requirements: AC-3.1, AC-3.2_
   - _Design: Test Coverage Table row 3_
 
-- [ ] 3.10 [RED] Unit test: NFR-3 append-only + NFR-4 machine-actionability
+- [x] 3.10 [RED] Unit test: NFR-3 append-only + NFR-4 machine-actionability
   - **Do**: Write failing test asserting:
     1. `collaboration-resolution.md` specifies that HYPOTHESIS/EXPERIMENT/FINDING/ROOT_CAUSE entries accumulate **append-only** in `chat.md` (grep for "append-only" or "never edit" or "append" in workflow text)
     2. `failure-recovery.md` documents that `BUG_DISCOVERY` entries carry `evidence` and `fix_hint` as **structured fields** the coordinator processes mechanically (grep for "evidence" AND "fix_hint" in BUG_DISCOVERY section)
@@ -335,7 +335,7 @@ Focus: Add comprehensive test coverage. One RED/GREEN pair per Test Coverage Tab
   - _Requirements: NFR-3, NFR-4_
   - _Design: C1, C3_
 
-- [ ] 3.11 [GREEN] Pass test: NFR-3 append-only + NFR-4 machine-actionability
+- [x] 3.11 [GREEN] Pass test: NFR-3 append-only + NFR-4 machine-actionability
   - **Do**: Write assertions for NFR-3/NFR-4:
     1. `grep -q "append.only\|append\|never overwrite\|never edit" "$PLUGIN_REF/collaboration-resolution.md"` (verifies append-only semantics documented)
     2. `grep -q "evidence" "$PLUGIN_REF/failure-recovery.md" && grep -q "fix_hint" "$PLUGIN_REF/failure-recovery.md"` (verifies structured fields documented)
@@ -346,7 +346,7 @@ Focus: Add comprehensive test coverage. One RED/GREEN pair per Test Coverage Tab
   - _Requirements: NFR-3, NFR-4_
   - _Design: C1, C3_
 
-- [ ] 3.12 [RED] Unit test: C4 spec-executor.md cross-branch detection
+- [x] 3.12 [RED] Unit test: C4 spec-executor.md cross-branch detection
   - **Do**: Write failing test asserting spec-executor.md has `git diff main...HEAD` in `<exit_code_gate>` and reference to collaboration-resolution.md
   - **Files**: `tests/collaboration-resolution.bats`
   - **Done when**: Test exists and fails
@@ -355,7 +355,7 @@ Focus: Add comprehensive test coverage. One RED/GREEN pair per Test Coverage Tab
   - _Requirements: AC-4.1, AC-4.2, AC-4.3_
   - _Design: Test Coverage Table row 7_
 
-- [ ] 3.13 [GREEN] Pass test: C4 spec-executor.md cross-branch detection check
+- [x] 3.13 [GREEN] Pass test: C4 spec-executor.md cross-branch detection check
   - **Do**: Write assertions for C4:
     1. `grep -q "git diff main...HEAD" "$PLUGIN_AGENTS/spec-executor.md"`
     2. `grep -q "collaboration-resolution" "$PLUGIN_AGENTS/spec-executor.md"`
@@ -367,7 +367,7 @@ Focus: Add comprehensive test coverage. One RED/GREEN pair per Test Coverage Tab
   - _Requirements: AC-4.1, AC-4.2, AC-4.3_
   - _Design: Test Coverage Table row 7_
 
-- [ ] 3.14 [RED] Unit test: C5 external-reviewer.md baseline-check rule
+- [x] 3.14 [RED] Unit test: C5 external-reviewer.md baseline-check rule
   - **Do**: Write failing test asserting external-reviewer.md has baseline-check rule, ambiguous case handling, BUG_DISCOVERY emit rule, and reference
   - **Files**: `tests/collaboration-resolution.bats`
   - **Done when**: Test exists and fails
@@ -376,7 +376,7 @@ Focus: Add comprehensive test coverage. One RED/GREEN pair per Test Coverage Tab
   - _Requirements: AC-5.1, AC-5.2, AC-5.3_
   - _Design: Test Coverage Table row 8_
 
-- [ ] 3.15 [GREEN] Pass test: C5 external-reviewer.md baseline-check rule check
+- [x] 3.15 [GREEN] Pass test: C5 external-reviewer.md baseline-check rule check
   - **Do**: Write assertions for C5:
     1. `grep -q "Baseline Check" "$PLUGIN_AGENTS/external-reviewer.md"`
     2. `grep -q "git diff main...HEAD" "$PLUGIN_AGENTS/external-reviewer.md"`
@@ -389,7 +389,7 @@ Focus: Add comprehensive test coverage. One RED/GREEN pair per Test Coverage Tab
   - _Requirements: AC-5.1, AC-5.2, AC-5.3_
   - _Design: Test Coverage Table row 8_
 
-- [ ] 3.16 [RED] Unit test: C6 channel-map.md writer reconciliation
+- [x] 3.16 [RED] Unit test: C6 channel-map.md writer reconciliation
   - **Do**: Write failing test asserting channel-map.md chat.md Writer(s) cell contains spec-executor
   - **Files**: `tests/collaboration-resolution.bats`
   - **Done when**: Test exists and fails
@@ -398,7 +398,7 @@ Focus: Add comprehensive test coverage. One RED/GREEN pair per Test Coverage Tab
   - _Requirements: FR-13b, D2_
   - _Design: Component C6_
 
-- [ ] 3.17 [GREEN] Pass test: C6 channel-map.md writer reconciliation check
+- [x] 3.17 [GREEN] Pass test: C6 channel-map.md writer reconciliation check
   - **Do**: Write assertion for C6:
     1. `grep "chat.md" "$PLUGIN_REF/channel-map.md" | head -1 | grep -q "spec-executor"`
   - **Files**: `tests/collaboration-resolution.bats`
@@ -408,7 +408,7 @@ Focus: Add comprehensive test coverage. One RED/GREEN pair per Test Coverage Tab
   - _Requirements: FR-13b, D2_
   - _Design: Component C6_
 
-- [ ] 3.18 [RED] Integration test: C3 BUG_DISCOVERY single discovery yields one fix task
+- [x] 3.18 [RED] Integration test: C3 BUG_DISCOVERY single discovery yields one fix task
   - **Do**: Write failing integration test for BUG_DISCOVERY trigger. Seed a real temp workspace (use `mktemp -d`) with one task (`3.2`), empty `task_review.md`, and `fixTaskMap: {}`. Seed a single `BUG_DISCOVERY` row in `task_review.md`. Simulate coordinator processing: implement a bash function inline in the bats test that reads `task_review.md` and `fixTaskMap` from the temp workspace, performs the coordinator's Pre-Delegation Check logic (check `fixTaskMap` for dedup — empty so no dedup needed; check depth/limit — under limit), and appends a `X.Y.N [FIX X.Y]` line to tasks.md if allowed. This test should FAIL initially.
   - **Files**: `tests/collaboration-resolution.bats`
   - **Done when**: Integration test exists that simulates single BUG_DISCOVERY and fails
@@ -417,7 +417,7 @@ Focus: Add comprehensive test coverage. One RED/GREEN pair per Test Coverage Tab
   - _Requirements: AC-3.1, AC-3.2_
   - _Design: Test Coverage Table row 4_
 
-- [ ] 3.19 [GREEN] Pass test: C3 BUG_DISCOVERY single discovery yields one fix task
+- [x] 3.19 [GREEN] Pass test: C3 BUG_DISCOVERY single discovery yields one fix task
   - **Do**: Write integration test that:
     1. Creates temp workspace with `tasks.md` containing one task, empty `task_review.md`, `.ralph-state.json` with empty `fixTaskMap` using `mktemp -d` (real temp workspace, not a mock)
     2. Seeds a `BUG_DISCOVERY` row in `task_review.md`
@@ -430,7 +430,7 @@ Focus: Add comprehensive test coverage. One RED/GREEN pair per Test Coverage Tab
   - _Requirements: AC-3.1, AC-3.2_
   - _Design: Test Coverage Table row 4, Fixtures row 1_
 
-- [ ] 3.20 [RED] Integration test: C3 duplicate BUG_DISCOVERY yields zero fix tasks
+- [x] 3.20 [RED] Integration test: C3 duplicate BUG_DISCOVERY yields zero fix tasks
   - **Do**: Write failing integration test for duplicate BUG_DISCOVERY. Seed workspace with matching `fixTaskMap` entry (same `task_id` + `criterion_failed` + `evidence`). Implement a bash function inline in the bats test that reads `task_review.md` and `fixTaskMap` from a real temp workspace (`mktemp -d`), performs the coordinator's Pre-Delegation Check logic (check `fixTaskMap` for dedup matching `criterion_failed` + `evidence` — matched so skip generation; mark row `resolved_at` = already-handled). This test should FAIL initially.
   - **Files**: `tests/collaboration-resolution.bats`
   - **Done when**: Integration test exists that simulates duplicate BUG_DISCOVERY and fails
@@ -439,7 +439,7 @@ Focus: Add comprehensive test coverage. One RED/GREEN pair per Test Coverage Tab
   - _Requirements: AC-7.1, AC-7.2, FR-8_
   - _Design: Test Coverage Table row 5_
 
-- [ ] 3.21 [GREEN] Pass test: C3 duplicate BUG_DISCOVERY yields zero fix tasks
+- [x] 3.21 [GREEN] Pass test: C3 duplicate BUG_DISCOVERY yields zero fix tasks
   - **Do**: Write integration test that:
     1. Creates temp workspace with `fixTaskMap` entry containing matching `lastError` using `mktemp -d` (real temp workspace, not a mock)
     2. Seeds a duplicate `BUG_DISCOVERY` row
@@ -452,7 +452,7 @@ Focus: Add comprehensive test coverage. One RED/GREEN pair per Test Coverage Tab
   - _Requirements: AC-7.1, AC-7.2, FR-8_
   - _Design: Test Coverage Table row 5, Fixtures row 2_
 
-- [ ] 3.22 [RED] Integration test: C3 depth-limit BUG_DISCOVERY yields zero fix tasks
+- [x] 3.22 [RED] Integration test: C3 depth-limit BUG_DISCOVERY yields zero fix tasks
   - **Do**: Write failing integration test for depth-limit. Seed `fixTaskMap` at the limit (`fixTaskMap["3.2"].attempts == maxFixTasksPerOriginal`). Implement a bash function inline in the bats test that reads `fixTaskMap` from a real temp workspace (`mktemp -d`), performs the coordinator's Pre-Delegation Check logic (check `fixTaskMap[task_id].attempts >= maxFixTasksPerOriginal` — at limit so no fix task generated, limit error fires). This test should FAIL initially.
   - **Files**: `tests/collaboration-resolution.bats`
   - **Done when**: Integration test exists that simulates depth-limit BUG_DISCOVERY and fails
@@ -461,7 +461,7 @@ Focus: Add comprehensive test coverage. One RED/GREEN pair per Test Coverage Tab
   - _Requirements: AC-8.1, AC-8.2, FR-9_
   - _Design: Test Coverage Table row 6_
 
-- [ ] 3.23 [GREEN] Pass test: C3 depth-limit BUG_DISCOVERY yields zero fix tasks
+- [x] 3.23 [GREEN] Pass test: C3 depth-limit BUG_DISCOVERY yields zero fix tasks
   - **Do**: Write integration test that:
     1. Creates temp workspace with `fixTaskMap["3.2"].attempts == maxFixTasksPerOriginal` (e.g., 3) using `mktemp -d` (real temp workspace, not a mock)
     2. Seeds a `BUG_DISCOVERY` row
@@ -474,7 +474,7 @@ Focus: Add comprehensive test coverage. One RED/GREEN pair per Test Coverage Tab
   - _Requirements: AC-8.1, AC-8.2, FR-9_
   - _Design: Test Coverage Table row 6, Fixtures row 3_
 
-- [ ] 3.24 [VERIFY] Quality checkpoint: run all bats tests
+- [x] 3.24 [VERIFY] Quality checkpoint: run all bats tests
   - **Do**: Run the full collaboration-resolution.bats test suite. All tests should pass.
   - **Verify**: `bats tests/collaboration-resolution.bats 2>&1 | grep -c "not ok" | grep -q "^0$"`
   - **Done when**: All bats tests pass
@@ -482,7 +482,7 @@ Focus: Add comprehensive test coverage. One RED/GREEN pair per Test Coverage Tab
   - _Requirements: NFR-1, NFR-3, NFR-5_
   - _Design: All components_
 
-- [ ] 3.25 [VERIFY] Quality checkpoint: bats smoke on existing test files
+- [x] 3.25 [VERIFY] Quality checkpoint: bats smoke on existing test files
   - **Do**: Run `bats tests/signal-log.bats` to confirm existing tests still pass (no regressions from spec-7 changes). Also run `bats tests/ci-autodetect.bats` if it exists.
   - **Verify**: `bats tests/signal-log.bats 2>&1 | grep -c "not ok" | grep -q "^0$"`
   - **Done when**: All existing bats tests still pass
@@ -490,7 +490,7 @@ Focus: Add comprehensive test coverage. One RED/GREEN pair per Test Coverage Tab
   - _Requirements: NFR-1, NFR-5_
   - _Design: All components_
 
-- [ ] 3.26 [RED] Unit test: Additivity invariant — git diff shows only additions in existing files
+- [x] 3.26 [RED] Unit test: Additivity invariant — git diff shows only additions in existing files
   - **Do**: Write failing test for NFR-1 additivity: git diff HEAD shows only additions, zero deletions in 4 modified existing files
   - **Files**: `tests/collaboration-resolution.bats`
   - **Done when**: Test exists and fails (no changes yet committed)
@@ -499,7 +499,7 @@ Focus: Add comprehensive test coverage. One RED/GREEN pair per Test Coverage Tab
   - _Requirements: NFR-1_
   - _Design: Test Coverage Table row 10_
 
-- [ ] 3.27 [GREEN] Pass test: Additivity invariant — git diff shows only additions
+- [x] 3.27 [GREEN] Pass test: Additivity invariant — git diff shows only additions
   - **Do**: Write assertion for additivity invariant:
     1. For each modified file in `templates/chat.md`, `references/failure-recovery.md`, `agents/spec-executor.md`, `agents/external-reviewer.md`: assert no lines starting with `-` (non-dash-prefixed) in `git diff HEAD`
     2. For `references/channel-map.md`: assert only the Writer(s) cell content changed, no structural deletions
@@ -510,7 +510,7 @@ Focus: Add comprehensive test coverage. One RED/GREEN pair per Test Coverage Tab
   - _Requirements: NFR-1_
   - _Design: Test Coverage Table row 10_
 
-- [ ] 3.28 [RED] Unit test: 8 ACs explicit coverage (AC-1.3 workflow format, AC-3.3/3.4 no-loop-write-boundary, AC-4.1-4.3 executor reference, AC-6.1-6.3 detection point)
+- [x] 3.28 [RED] Unit test: 8 ACs explicit coverage (AC-1.3 workflow format, AC-3.3/3.4 no-loop-write-boundary, AC-4.1-4.3 executor reference, AC-6.1-6.3 detection point)
   - **Do**: Write failing test asserting the remaining acceptance criteria not covered by dedicated C1-C6 tests:
     1. AC-1.3: `collaboration-resolution.md` written as a workflow (entry/exit conditions, numbered steps) not micro-rules
     2. AC-3.3: `failure-recovery.md` documents BUG_DISCOVERY does not change coordinator core loop
@@ -528,7 +528,7 @@ Focus: Add comprehensive test coverage. One RED/GREEN pair per Test Coverage Tab
   - _Requirements: AC-1.3, AC-3.3, AC-3.4, AC-4.1, AC-4.2, AC-4.3, AC-6.1, AC-6.2, AC-6.3_
   - _Design: C1, C3, C4, C6_
 
-- [ ] 3.29 [GREEN] Pass test: 8 ACs explicit coverage
+- [x] 3.29 [GREEN] Pass test: 8 ACs explicit coverage
   - **Do**: Write assertions for the 8 remaining ACs:
     1. `grep -q "entry condition\|exit condition" "$PLUGIN_REF/collaboration-resolution.md"` (AC-1.3 workflow format)
     2. `grep -q "core.loop\|core loop\|not modify" "$PLUGIN_REF/failure-recovery.md"` (AC-3.3)

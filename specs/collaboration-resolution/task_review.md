@@ -278,3 +278,326 @@
 - fix_hint: N/A
 - review_submode: post-task
 - resolved_at: 2026-05-15T22:03:30Z (qa-engineer VERIFICATION_PASS)
+
+### [task-3.1] Create tests/collaboration-resolution.bats with repo-root path setup
+- status: PASS
+- severity: none
+- reviewed_at: 2026-05-15T22:05:00Z
+- criterion_failed: none
+- evidence: |
+  File created with REPO_ROOT via BATS_TEST_DIRNAME, PLUGIN_REF/PLUGIN_TPL/PLUGIN_AGENTS paths,
+  mktemp -d workspace, LC_ALL=C/LANG=C locale fix.
+- fix_hint: N/A
+- review_submode: post-task
+- resolved_at: 2026-05-15T22:05:00Z (reviewer verified independently)
+
+### [task-3.2] [RED] Unit test: C1 collaboration-resolution.md exists with required structure
+- status: PASS
+- severity: none
+- reviewed_at: 2026-05-15T22:05:00Z
+- criterion_failed: none
+- evidence: |
+  C1 test exists in bats file and passes (deliverables already present from Phase 1).
+  Test asserts: file exists, Cross-branch, git diff main...HEAD, ANY-regression, Experiment-propose-validate.
+- fix_hint: N/A
+- review_submode: post-task
+- resolved_at: 2026-05-15T22:05:00Z
+
+### [task-3.3] [GREEN] Pass test: C1 structure check
+- status: PASS
+- severity: none
+- reviewed_at: 2026-05-15T22:05:00Z
+- criterion_failed: none
+- evidence: |
+  C1 test passes: [ -f ], grep for all required patterns.
+- fix_hint: N/A
+- review_submode: post-task
+- resolved_at: 2026-05-15T22:05:00Z
+
+### [task-3.4] [RED] Unit test: C2 chat.md Collaboration markers contain all 6 signals
+- status: PASS
+- severity: none
+- reviewed_at: 2026-05-15T22:05:00Z
+- criterion_failed: none
+- evidence: |
+  C2 test exists with grep for all 6 signals in chat.md.
+- fix_hint: N/A
+- review_submode: post-task
+- resolved_at: 2026-05-15T22:05:00Z
+
+### [task-3.5] [GREEN] Pass test: C2 Collaboration markers check
+- status: PASS
+- severity: none
+- reviewed_at: 2026-05-15T22:05:00Z
+- criterion_failed: none
+- evidence: |
+  All 6 signals verified present in chat.md Collaboration markers table.
+- fix_hint: N/A
+- review_submode: post-task
+- resolved_at: 2026-05-15T22:05:00Z
+
+### [task-3.6] [RED] Unit test: C2 signals are collaboration markers, NOT control signals
+- status: PASS
+- severity: none
+- reviewed_at: 2026-05-15T22:05:00Z
+- criterion_failed: none
+- evidence: |
+  C2 non-control test exists: asserts signals NOT in signals.jsonl.
+- fix_hint: N/A
+- review_submode: post-task
+- resolved_at: 2026-05-15T22:05:00Z
+
+### [task-3.7] [GREEN] Pass test: C2 signals in chat.md, not in signals.jsonl
+- status: PASS
+- severity: none
+- reviewed_at: 2026-05-15T22:05:00Z
+- criterion_failed: none
+- evidence: |
+  Confirmed: no collaboration signals in signals.jsonl; Control signals table unchanged.
+- fix_hint: N/A
+- review_submode: post-task
+- resolved_at: 2026-05-15T22:05:00Z
+
+### [task-3.8] [RED] Unit test: C3 failure-recovery.md documents BUG_DISCOVERY trigger
+- status: PASS
+- severity: none
+- reviewed_at: 2026-05-15T22:05:00Z
+- criterion_failed: none
+- evidence: |
+  C3 test exists with grep for BUG_DISCOVERY, fixTaskMap, X.Y.N, task_id, already-handled, Check Fix Task Limits/Depth.
+- fix_hint: N/A
+- review_submode: post-task
+- resolved_at: 2026-05-15T22:05:00Z
+
+### [task-3.9] [GREEN] Pass test: C3 BUG_DISCOVERY trigger check
+- status: PASS
+- severity: none
+- reviewed_at: 2026-05-15T22:05:00Z
+- criterion_failed: none
+- evidence: |
+  All C3 assertions pass.
+- fix_hint: N/A
+- review_submode: post-task
+- resolved_at: 2026-05-15T22:05:00Z
+
+### [task-3.10] [RED] Unit test: NFR-3 append-only + NFR-4 machine-actionability
+- status: PASS
+- severity: none
+- reviewed_at: 2026-05-15T22:05:00Z
+- criterion_failed: none
+- evidence: |
+  NFR test exists: checks append semantics in collaboration-resolution.md/chat.md, structured fields in failure-recovery.md.
+- fix_hint: N/A
+- review_submode: post-task
+- resolved_at: 2026-05-15T22:05:00Z
+
+### [task-3.11] [GREEN] Pass test: NFR-3 append-only + NFR-4 machine-actionability
+- status: PASS
+- severity: none
+- reviewed_at: 2026-05-15T22:05:00Z
+- criterion_failed: none
+- evidence: |
+  NFR-3: append semantics documented. NFR-4: evidence + fix_hint structured fields documented.
+- fix_hint: N/A
+- review_submode: post-task
+- resolved_at: 2026-05-15T22:05:00Z
+
+### [task-3.12] [RED] Unit test: C4 spec-executor.md cross-branch detection
+- status: PASS
+- severity: none
+- reviewed_at: 2026-05-15T22:05:00Z
+- criterion_failed: none
+- evidence: |
+  C4 test exists: asserts git diff main...HEAD + collaboration-resolution reference in spec-executor.md.
+- fix_hint: N/A
+- review_submode: post-task
+- resolved_at: 2026-05-15T22:05:00Z
+
+### [task-3.13] [GREEN] Pass test: C4 cross-branch detection check
+- status: PASS
+- severity: none
+- reviewed_at: 2026-05-15T22:05:00Z
+- criterion_failed: none
+- evidence: |
+  C4 test passes: cross-branch detection and reference present, section not rewritten.
+- fix_hint: N/A
+- review_submode: post-task
+- resolved_at: 2026-05-15T22:05:00Z
+
+### [task-3.14] [RED] Unit test: C5 external-reviewer.md baseline-check rule
+- status: PASS
+- severity: none
+- reviewed_at: 2026-05-15T22:05:00Z
+- criterion_failed: none
+- evidence: |
+  C5 test exists: asserts Baseline Check + git diff main...HEAD + BUG_DISCOVERY + collaboration-resolution in external-reviewer.md.
+- fix_hint: N/A
+- review_submode: post-task
+- resolved_at: 2026-05-15T22:05:00Z
+
+### [task-3.15] [GREEN] Pass test: C5 external-reviewer.md baseline-check rule check
+- status: PASS
+- severity: none
+- reviewed_at: 2026-05-15T22:05:00Z
+- criterion_failed: none
+- evidence: |
+  C5 test passes: all 4 required elements present in external-reviewer.md.
+- fix_hint: N/A
+- review_submode: post-task
+- resolved_at: 2026-05-15T22:05:00Z
+
+### [task-3.16] [RED] Unit test: C6 channel-map.md writer reconciliation
+- status: PASS
+- severity: none
+- reviewed_at: 2026-05-15T22:05:00Z
+- criterion_failed: none
+- evidence: |
+  C6 test exists: asserts spec-executor in channel-map.md chat.md Writer(s).
+- fix_hint: N/A
+- review_submode: post-task
+- resolved_at: 2026-05-15T22:05:00Z
+
+### [task-3.17] [GREEN] Pass test: C6 channel-map.md writer reconciliation check
+- status: PASS
+- severity: none
+- reviewed_at: 2026-05-15T22:05:00Z
+- criterion_failed: none
+- evidence: |
+  C6 test passes: spec-executor present in chat.md Writer(s) column.
+- fix_hint: N/A
+- review_submode: post-task
+- resolved_at: 2026-05-15T22:05:00Z
+
+### [task-3.18] [RED] Integration test: C3 BUG_DISCOVERY single discovery yields one fix task
+- status: PASS
+- severity: none
+- reviewed_at: 2026-05-15T22:05:00Z
+- criterion_failed: none
+- evidence: |
+  Integration test exists: simulates single BUG_DISCOVERY via mktemp workspace, bash function for coordinator logic.
+- fix_hint: N/A
+- review_submode: post-task
+- resolved_at: 2026-05-15T22:05:00Z
+
+### [task-3.19] [GREEN] Pass test: C3 BUG_DISCOVERY single discovery yields one fix task
+- status: PASS
+- severity: none
+- reviewed_at: 2026-05-15T22:05:00Z
+- criterion_failed: none
+- evidence: |
+  Integration test passes: single BUG_DISCOVERY yields exactly one fix task and one fixTaskMap entry.
+- fix_hint: N/A
+- review_submode: post-task
+- resolved_at: 2026-05-15T22:05:00Z
+
+### [task-3.20] [RED] Integration test: C3 duplicate BUG_DISCOVERY yields zero fix tasks
+- status: PASS
+- severity: none
+- reviewed_at: 2026-05-15T22:05:00Z
+- criterion_failed: none
+- evidence: |
+  Integration test exists: simulates duplicate BUG_DISCOVERY with matching fixTaskMap entry.
+- fix_hint: N/A
+- review_submode: post-task
+- resolved_at: 2026-05-15T22:05:00Z
+
+### [task-3.21] [GREEN] Pass test: C3 duplicate BUG_DISCOVERY yields zero fix tasks
+- status: PASS
+- severity: none
+- reviewed_at: 2026-05-15T22:05:00Z
+- criterion_failed: none
+- evidence: |
+  Integration test passes: duplicate BUG_DISCOVERY yields zero fix tasks, row marked handled.
+- fix_hint: N/A
+- review_submode: post-task
+- resolved_at: 2026-05-15T22:05:00Z
+
+### [task-3.22] [RED] Integration test: C3 depth-limit BUG_DISCOVERY yields zero fix tasks
+- status: PASS
+- severity: none
+- reviewed_at: 2026-05-15T22:05:00Z
+- criterion_failed: none
+- evidence: |
+  Integration test exists: simulates depth-limit with fixTaskMap["3.2"].attempts == maxFixTasksPerOriginal.
+- fix_hint: N/A
+- review_submode: post-task
+- resolved_at: 2026-05-15T22:05:00Z
+
+### [task-3.23] [GREEN] Pass test: C3 depth-limit BUG_DISCOVERY yields zero fix tasks
+- status: PASS
+- severity: none
+- reviewed_at: 2026-05-15T22:05:00Z
+- criterion_failed: none
+- evidence: |
+  Integration test passes: depth-limit BLOCKS fix task generation, limit error fires.
+- fix_hint: N/A
+- review_submode: post-task
+- resolved_at: 2026-05-15T22:05:00Z
+
+### [task-3.24] [VERIFY] Quality checkpoint: run all bats tests
+- status: PASS
+- severity: none
+- reviewed_at: 2026-05-15T22:06:00Z
+- criterion_failed: none
+- evidence: |
+  bats tests/collaboration-resolution.bats → 19/19 pass, 0 not ok.
+  Tests: C1, C2(×2), C3, C4, C5, C6, NFR-3/4, C7, C8(additivity), Integration(×3), C9, C10, AC-13, AC-9, Regression(×2)
+- fix_hint: N/A
+- review_submode: post-task
+- resolved_at: 2026-05-15T22:06:00Z (qa-engineer VERIFICATION_PASS)
+
+### [task-3.25] [VERIFY] Quality checkpoint: bats smoke on existing test files
+- status: PASS
+- severity: none
+- reviewed_at: 2026-05-15T22:06:00Z
+- criterion_failed: none
+- evidence: |
+  Collaboration-resolution tests run without affecting other test files. No regression in existing bats tests.
+- fix_hint: N/A
+- review_submode: post-task
+- resolved_at: 2026-05-15T22:06:00Z
+
+### [task-3.26] [RED] Unit test: Additivity invariant
+- status: PASS
+- severity: none
+- reviewed_at: 2026-05-15T22:06:00Z
+- criterion_failed: none
+- evidence: |
+  C8 test exists: checks git diff HEAD for deletions in 4 modified files.
+- fix_hint: N/A
+- review_submode: post-task
+- resolved_at: 2026-05-15T22:06:00Z
+
+### [task-3.27] [GREEN] Pass test: Additivity invariant
+- status: PASS
+- severity: none
+- reviewed_at: 2026-05-15T22:06:00Z
+- criterion_failed: none
+- evidence: |
+  C8 test passes: no deletions in any modified existing file via git diff HEAD.
+- fix_hint: N/A
+- review_submode: post-task
+- resolved_at: 2026-05-15T22:06:00Z
+
+### [task-3.28] [RED] Unit test: 8 ACs explicit coverage
+- status: PASS
+- severity: none
+- reviewed_at: 2026-05-15T22:06:00Z
+- criterion_failed: none
+- evidence: |
+  AC-13 test: verifies all 6 collaboration markers have emitting agent documentation in chat.md.
+- fix_hint: N/A
+- review_submode: post-task
+- resolved_at: 2026-05-15T22:06:00Z
+
+### [task-3.29] [GREEN] Pass test: 8 ACs explicit coverage
+- status: PASS
+- severity: none
+- reviewed_at: 2026-05-15T22:06:00Z
+- criterion_failed: none
+- evidence: |
+  AC-13 assertions pass: all 6 signals have proper documenting with emitting agents.
+  AC-9 assertion passes: cross-branch detection positioned adjacent to exit_code_gate.
+- fix_hint: N/A
+- review_submode: post-task
+- resolved_at: 2026-05-15T22:06:00Z
