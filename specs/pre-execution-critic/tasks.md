@@ -139,7 +139,7 @@ Goal: build `pre-execution-check.sh` end-to-end (arg parsing, 3 layers, max-seve
   - _Requirements: FR-4, AC-2.1, AC-1.3_
   - _Design: max-severity combiner; Implementation Step 5_
 
-- [ ] 1.12 Implement the ConfirmRisky policy and verdict output
+- [x] 1.12 Implement the ConfirmRisky policy and verdict output
   - **Do**:
     1. In `pre-execution-check.sh`, add `confirm_risky()` mapping combined risk to a verdict: `LOW`/`MEDIUM` → `allow`/exit `0`; `HIGH`/`UNKNOWN` → `confirm`/exit `2`. A Layer 1 `block` bypasses this → `block`/exit `2`.
     2. Write the human-readable reason to stderr; write a structured one-line verdict (e.g. `decision=... layer=... risk=...`) to stdout.

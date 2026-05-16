@@ -43,6 +43,10 @@ if [[ -n "$missing" ]]; then
   usage
 fi
 
+# Default optional flags (set -u requires initialized variables)
+PATHS="${PATHS:-}"
+COMMAND="${COMMAND:-}"
+
 # ── Severity-rank helpers ─────────────────────────────────────────
 
 # rank() — numeric rank for a risk severity string.
@@ -382,7 +386,7 @@ combine_risk() {
 
   # ── Short-circuit: Layer 1 violation → hard-block ─────────────
   if [[ "$l1_risk" == "violation" ]]; then
-    printf 'VERDICT:block|LAYER:role-contract|DRIVING_LAYER:role-contract'
+    printf 'VERDICT:block|LAYER:role-contract|DRIVING_LAYER:role-contract|RISK:HIGH'
     return 2
   fi
 
@@ -422,8 +426,55 @@ combine_risk() {
       ;;
   esac
 
-  printf 'VERDICT:%s|LAYER:%s|DRIVING_LAYER:%s' "$verdict" "$driving_layer" "$driving_layer"
+  printf 'VERDICT:%s|LAYER:%s|DRIVING_LAYER:%s|RISK:%s' \
+    "$verdict" "$driving_layer" "$driving_layer" "$best_risk"
   return 0
+}
+
+# ── ConfirmRisky policy ─────────────────────────────────────────
+
+# confirm_risky <combined_risk> <driving_layer>
+#   Maps the combined risk to a final verdict:
+#     LOW/MEDIUM  → allow, exit 0
+#     HIGH/UNKNOWN → confirm, exit 2
+#     block       → hard-block (bypasses confirm), exit 2
+#
+#   Outputs:
+#     - Human-readable reason to stderr
+#     - Structured verdict line (decision=... layer=... risk=...) to stdout
+#     - Sets exit code per verdict
+
+confirm_risky() {
+  local risk="${1:-LOW}"
+  local layer="${2:-none}"
+  local reason="${3:-}"
+
+  local decision exit_code
+  case "$risk" in
+    block)
+      decision="block"
+      exit_code=2
+      ;;
+    HIGH|UNKNOWN)
+      decision="confirm"
+      exit_code=2
+      ;;
+    LOW|MEDIUM|*)
+      decision="allow"
+      exit_code=0
+      ;;
+  esac
+
+  # Human-readable reason to stderr
+  # Human-readable reason to stderr
+  printf '%s: %s (layer=%s, risk=%s)\n' \
+    "$decision" "${reason:-no reason}" "$layer" "$risk" >&2
+
+  # Structured verdict to stdout
+  printf 'decision=%s layer=%s risk=%s\n' \
+    "$decision" "$layer" "$risk"
+
+  exit "$exit_code"
 }
 
 # ── Main flow ────────────────────────────────────────────────────
@@ -434,15 +485,25 @@ L2_OUTPUT=$(layer2_shell_pattern "${COMMAND:-}") || true
 L3_OUTPUT=$(layer3_risk) || true
 
 # Combine risks using max-severity policy
-COMBINED=$(combine_risk "$L1_OUTPUT" "$L2_OUTPUT" "$L3_OUTPUT")
+COMBINED=$(combine_risk "$L1_OUTPUT" "$L2_OUTPUT" "$L3_OUTPUT") || true
 
-# Extract verdict and driving layer
-VERDICT="${COMBINED%%|*}"
-VERDICT="${VERDICT#VERDICT:}"
-DRIVING_LAYER="${COMBINED##*DRIVING_LAYER:}"
+# Extract verdict, risk, layer, and reason from combined output
+# Format: VERDICT:<v>|LAYER:<l>|DRIVING_LAYER:<dl>|RISK:<r>
+COMBINED_VERDICT="${COMBINED%%|*}"
+COMBINED_VERDICT="${COMBINED_VERDICT#VERDICT:}"
+COMBINED_RISK="${COMBINED##*RISK:}"
+COMBINED_LAYER="${COMBINED##*LAYER:}"
+COMBINED_LAYER="${COMBINED_LAYER%%|*}"
 
-# Route: block always exits 2; confirm exits 2; allow exits 0
-case "$VERDICT" in
-  block|confirm) exit 2 ;;
-  *)             exit 0 ;;
-esac
+# Layer 1 block bypasses confirm_risky — hard-stop immediately
+if [[ "$COMBINED_VERDICT" == "block" ]]; then
+  printf 'block: role-contract violation (layer=%s, risk=%s)\n' \
+    "$COMBINED_LAYER" "$COMBINED_RISK" >&2
+  printf 'decision=block layer=%s risk=%s\n' \
+    "$COMBINED_LAYER" "$COMBINED_RISK"
+  exit 2
+fi
+
+# Apply ConfirmRisky policy for non-block cases — outputs verdict to stdout,
+# human-readable reason to stderr, and exits with appropriate code.
+confirm_risky "$COMBINED_RISK" "$COMBINED_LAYER" ""
