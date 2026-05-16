@@ -232,7 +232,7 @@ Goal: clean up the script, extend the schema, update the signals template and th
   - _Requirements: NFR-1_
   - _Design: Components; Existing Patterns to Follow_
 
-- [ ] 2.2 Refactor `pre-execution-check.sh` — consistent error handling
+- [x] 2.2 Refactor `pre-execution-check.sh` — consistent error handling
   - **Do**:
     1. Standardise the fail-safe path: every indeterminate state (missing contract, parse error, append failure) routes through one helper that sets `UNKNOWN` + a reason + WARNs to `.progress.md` where applicable.
     2. Ensure no code path can produce `allow` from an indeterminate state.

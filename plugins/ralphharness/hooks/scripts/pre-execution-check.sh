@@ -124,6 +124,36 @@ resolve_role_contracts_path() {
   printf '%s' "$rc_path"
 }
 
+# emit_unknown — Single source of truth for indeterminate states.
+#   Every indeterminate condition (missing contract, parse error, missing
+#   paths, unknown agent) routes here.  Never fail-open: UNKNOWN always
+#   maps to confirm (exit 2) via the combiner + ConfirmRisky path.
+#
+#   Inputs:
+#     $1 — Reason string (naming the indeterminate condition)
+#     $2 — Optional spec path for WARN to .progress.md (empty = skip WARN)
+#
+#   Outputs (stdout): RISK:UNKNOWN|REASON:<reason>
+#   Returns: 0 always.
+#
+#   Contract: Only this function may produce RISK:UNKNOWN.  No code path
+#   outside this function sets UNKNOWN, ensuring fail-safe behaviour.
+emit_unknown() {
+  local reason="${1:-indeterminate state}"
+  local spec_path="${2:-}"
+
+  printf 'RISK:UNKNOWN|REASON:%s' "$reason"
+
+  # Optional: WARN to .progress.md (only when we have a spec dir)
+  if [[ -n "$spec_path" && -f "${spec_path}/.progress.md" ]]; then
+    {
+      echo ""
+      echo "## $(date -u +%Y-%m-%d)"
+      echo "- WARN: indeterminate — $reason"
+    } >> "${spec_path}/.progress.md"
+  fi
+}
+
 # ═══════════════════════════════════════════════════════════════════
 # SECTION: Layer Functions
 # ═══════════════════════════════════════════════════════════════════
@@ -155,7 +185,7 @@ layer1_role_contract() {
 
   # 2. Existence check
   if [[ ! -f "$rc_path" ]]; then
-    printf 'RISK:UNKNOWN|REASON:role-contracts.md not found at %s' "$rc_path"
+    emit_unknown "role-contracts.md not found at $rc_path" "$SPEC_PATH"
     return 0
   fi
 
@@ -168,7 +198,7 @@ layer1_role_contract() {
   ' "$rc_path")
 
   if [[ -z "$matrix" ]]; then
-    printf 'RISK:UNKNOWN|REASON:Access Matrix section not found in role-contracts.md'
+    emit_unknown "Access Matrix section not found in role-contracts.md" "$SPEC_PATH"
     return 0
   fi
 
@@ -209,13 +239,13 @@ layer1_role_contract() {
   done <<< "$matrix"
 
   if (( ! found )); then
-    printf 'RISK:UNKNOWN|REASON:agent %q not found in Access Matrix' "$role"
+    emit_unknown "agent $role not found in Access Matrix" "$SPEC_PATH"
     return 0
   fi
 
   # --paths absent → UNKNOWN
   if [[ -z "$paths" || "$paths" =~ ^[[:space:]]*$ ]]; then
-    printf 'RISK:UNKNOWN|REASON:no paths provided'
+    emit_unknown "no paths provided" "$SPEC_PATH"
     return 0
   fi
 
@@ -367,7 +397,7 @@ layer2_shell_pattern() {
 #   Only examines task structure (paths + command presence).
 layer3_risk() {
   if [[ -z "${PATHS:-}" || "$PATHS" =~ ^[[:space:]]*$ ]]; then
-    printf 'RISK:UNKNOWN|REASON:no paths provided'
+    emit_unknown "no paths provided" "$SPEC_PATH"
     return 0
   fi
 
