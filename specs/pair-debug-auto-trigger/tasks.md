@@ -129,7 +129,7 @@ Focus: Implement the mechanical trigger, role files, placement step, and all app
   - _Requirements: FR-10, AC-2.2, AC-5.1_
   - _Design: Component 1, Step 3_
 
-- [ ] 1.9 Append Debug Logging section to spec-executor.md
+- [x] 1.9 Append Debug Logging section to spec-executor.md
   - **Do**: Append a new section after `</rules>` (after line ~397) titled "## Debug Logging in Pair-Debug Mode". Content:
     1. "In pair-debug mode, temporary `_LOGGER.warning()` / `console.log()` statements MAY be added as an investigation technique."
     2. "Every temporary log MUST carry a consistent `PAIR-DEBUG:` marker in its message and record the suspect variable/code path and the hypothesis it tests (decision-path capture), not a bare 'got here'."
@@ -141,7 +141,7 @@ Focus: Implement the mechanical trigger, role files, placement step, and all app
   - _Requirements: FR-9, AC-3.1, AC-3.2, AC-3.3_
   - _Design: Component 2 (Step 4), Test Coverage Table row "Debug-log cleanup"_
 
-- [ ] 1.10 Append Pair-Debug Placement Step to implement.md
+- [x] 1.10 Append Pair-Debug Placement Step to implement.md
   - **Do**: Append a new sub-section after "Parallel Reviewer Onboarding" (after the "**If user answers NO:** continue normal flow..." line) and before "---\n\nAfter writing the state file..." (before the "---" separator). Title: "### Pair-Debug Placement Step". Content:
     1. Dialog (asked alongside the parallel-reviewer question):
        ```
@@ -201,7 +201,7 @@ Focus: Implement the mechanical trigger, role files, placement step, and all app
   - _Requirements: FR-9, AC-3.3_
   - _Design: Test Coverage Table row "PAIR-DEBUG: grep cleanup"_
 
-- [ ] 1.13 Bump version 5.2.0 → 5.3.0 in plugin.json
+- [x] 1.13 Bump version 5.2.0 → 5.3.0 in plugin.json
   - **Do**: Change `"version": "5.2.0"` to `"version": "5.3.0"` in `plugins/ralphharness/.claude-plugin/plugin.json`.
   - **Files**: `plugins/ralphharness/.claude-plugin/plugin.json`
   - **Done when**: Version is 5.3.0 in plugin.json.
@@ -210,7 +210,7 @@ Focus: Implement the mechanical trigger, role files, placement step, and all app
   - _Requirements: AC-5.3, FR-11_
   - _Design: File Structure_
 
-- [ ] 1.14 [P] Bump version 5.2.0 → 5.3.0 in marketplace.json
+- [x] 1.14 [P] Bump version 5.2.0 → 5.3.0 in marketplace.json
   - **Do**: Change the `ralphharness` entry's `"version": "5.2.0"` to `"version": "5.3.0"` in `.claude-plugin/marketplace.json`.
   - **Files**: `.claude-plugin/marketplace.json`
   - **Done when**: Version is 5.3.0 for ralphharness entry in marketplace.json.
@@ -219,7 +219,7 @@ Focus: Implement the mechanical trigger, role files, placement step, and all app
   - _Requirements: AC-5.3, FR-11_
   - _Design: File Structure_
 
-- [ ] 1.15 [P] Add optional one-line note to chat.md template
+- [x] 1.15 [P] Add optional one-line note to chat.md template
   - **Do**: After the BUG_DISCOVERY line (line 36) in the Collaboration markers table, add one line: "### PAIR-DEBUG MODE ACTIVATED — Coordinator announcement when pair-debug mode triggers (not a signal, a section header in chat.md).". No change to the 6-signal legend.
   - **Files**: `plugins/ralphharness/templates/chat.md`
   - **Done when**: One new line added after BUG_DISCOVERY. No other changes. 6-signal legend unchanged.
