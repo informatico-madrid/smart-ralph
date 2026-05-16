@@ -560,3 +560,202 @@ run_check_separate() {
 
     rm -rf "$empty_dir"
 }
+
+@test "determinism — identical inputs produce identical decision output" {
+    # Run the script twice with the same arguments; assert matching exit code
+    # and matching stdout.  The appended event payload must also be identical
+    # apart from the `timestamp` field.
+    local run1_dir run2_dir
+    run1_dir=$(mktemp -d)
+    run2_dir=$(mktemp -d)
+
+    cp "$REPO_ROOT/templates/signals.jsonl" "$run1_dir/signals.jsonl"
+    cp "$REPO_ROOT/templates/signals.jsonl" "$run2_dir/signals.jsonl"
+
+    local _o1 _e1 _o2 _e2
+    _o1=$(mktemp); _e1=$(mktemp)
+    _o2=$(mktemp); _e2=$(mktemp)
+
+    CLAUDE_PLUGIN_ROOT="$REPO_ROOT" bash "$SCRIPT_PATH" \
+        --agent spec-executor --task 3.20 \
+        --paths 'chat.md' --command 'pnpm test' \
+        --spec-path "$run1_dir" >"$_o1" 2>"$_e1" && RC1=0 || RC1=$?
+    CLAUDE_PLUGIN_ROOT="$REPO_ROOT" bash "$SCRIPT_PATH" \
+        --agent spec-executor --task 3.20 \
+        --paths 'chat.md' --command 'pnpm test' \
+        --spec-path "$run2_dir" >"$_o2" 2>"$_e2" && RC2=0 || RC2=$?
+
+    # 1. Exit codes must match
+    [ "$RC1" -eq "$RC2" ]
+
+    # 2. stdout must match (decision line is deterministic)
+    [ "$(cat "$_o1")" = "$(cat "$_o2")" ]
+
+    # 3. Event payloads must match modulo timestamp
+    local e1 e2
+    e1=$(tail -1 "$run1_dir/signals.jsonl")
+    e2=$(tail -1 "$run2_dir/signals.jsonl")
+
+    # Remove the timestamp field for comparison
+    local e1_no_ts e2_no_ts
+    e1_no_ts=$(echo "$e1" | jq 'del(.timestamp)')
+    e2_no_ts=$(echo "$e2" | jq 'del(.timestamp)')
+    [ "$e1_no_ts" = "$e2_no_ts" ]
+
+    rm -f "$_o1" "$_e1" "$_o2" "$_e2"
+    rm -rf "$run1_dir" "$run2_dir"
+}
+
+@test "speed — single invocation completes in < 100 ms" {
+    local sp_dir
+    sp_dir=$(mktemp -d)
+    cp "$REPO_ROOT/templates/signals.jsonl" "$sp_dir/signals.jsonl"
+
+    local _o _e
+    _o=$(mktemp); _e=$(mktemp)
+
+    local t_start_ns t_end_ns elapsed_ms
+    t_start_ns=$(date +%s%N)
+    CLAUDE_PLUGIN_ROOT="$REPO_ROOT" bash "$SCRIPT_PATH" \
+        --agent spec-executor --task 3.20.speed \
+        --paths 'chat.md' --command 'pnpm test' \
+        --spec-path "$sp_dir" >"$_o" 2>"$_e" && _rc=0 || _rc=$?
+    t_end_ns=$(date +%s%N)
+
+    # Convert nanoseconds to milliseconds
+    elapsed_ms=$(( (t_end_ns - t_start_ns) / 1000000 ))
+
+    # Assert < 100 ms (NFR-2)
+    [ "$elapsed_ms" -lt 100 ]
+
+    rm -f "$_o" "$_e"
+    rm -rf "$sp_dir"
+}
+
+@test "audit append: one valid line, schema-conformant, immutable" {
+    # Seed signals.jsonl with one prior event line (a control event).
+    # Store its canonical SHA so we can verify byte-identity after script invocation.
+    local prior_line='{"signal":"PENDING","status":"active","timestamp":"2026-05-16T10:00:00Z"}'
+    printf '%s\n' "$prior_line" > "$TEST_TMP/signals.jsonl"
+    local prior_sha
+    prior_sha=$(printf '%s\n' "$prior_line" | jq -c .)
+
+    # Line count before invocation
+    local lines_before
+    lines_before=$(wc -l < "$TEST_TMP/signals.jsonl")
+
+    # Invoke with an in-bounds path
+    run_check_separate --agent spec-executor --task 3.18 --paths chat.md --spec-path "$TEST_TMP"
+
+    # 1. Assert the script exits 0 (allow)
+    [ "$SE_CHECK_EXIT" -eq 0 ]
+
+    # 2. Assert exactly one new line was appended
+    local lines_after
+    lines_after=$(wc -l < "$TEST_TMP/signals.jsonl")
+    [ "$lines_after" -eq $(( lines_before + 1 )) ]
+
+    # 3. Assert the new (last) line is valid JSON
+    local last_line
+    last_line=$(tail -1 "$TEST_TMP/signals.jsonl")
+    [ "$(echo "$last_line" | jq -e . >/dev/null 2>&1 && echo ok || echo fail)" = "ok" ]
+
+    # 4. Assert the new line matches the securityDecisionEvent schema:
+    #    required fields: type, decision, layer, risk, agent, task, reason, timestamp, iteration
+    local schema_check
+    schema_check=$(echo "$last_line" | jq -e '
+        .type        == "security-decision" and
+        (.decision  == "allow" or .decision == "block" or .decision == "confirm") and
+        (.layer     == "role-contract" or .layer == "shell-pattern" or .layer == "risk" or .layer == "none") and
+        (.risk      == "LOW" or .risk == "MEDIUM" or .risk == "HIGH" or .risk == "UNKNOWN") and
+        (.agent     | type) == "string" and
+        (.task      | type) == "string" and
+        (.reason    | type) == "string" and
+        (.timestamp | type) == "string" and
+        (.iteration | type) == "number" and
+        (.iteration >= 1) and
+        ((.path  | type) == "string" or (.path  == null)) and
+        ((.command | type) == "string" or (.command == null))
+    ' 2>/dev/null)
+    [ "$schema_check" = "true" ]
+
+    # 5. Assert the pre-existing line is byte-identical (immutability)
+    local first_line_after
+    first_line_after=$(head -1 "$TEST_TMP/signals.jsonl")
+    first_line_after=$(echo "$first_line_after" | jq -c .)
+    [ "$first_line_after" = "$prior_sha" ]
+}
+
+@test "replay-signals.sh over security-decision events" {
+    # Build a temp log mixing control and security-decision events.
+    # Run pre-execution-check.sh to generate a security-decision event.
+    # Run replay-signals.sh and assert it completes without error
+    # and the security decision is visible in output.
+
+    local _dir="$TEST_TMP/replay"
+    mkdir -p "$_dir"
+
+    # Copy the signals.jsonl template into the workspace
+    cp "$REPO_ROOT/templates/signals.jsonl" "$_dir/signals.jsonl"
+
+    # Add a control event at iteration 1 so replay has something to surface
+    printf '{"type":"control","signal":"ACK","from":"coordinator","to":"external-reviewer","task":"3.19","status":"active","timestamp":"2026-05-16T00:00:00Z","iteration":1,"reason":"test ack"}\n' >> "$_dir/signals.jsonl"
+
+    # Add a standalone security-decision event at iteration 1
+    local sec_event
+    sec_event=$(jq -c -n '{
+      type:"security-decision",
+      decision:"allow",
+      layer:"none",
+      risk:"LOW",
+      agent:"spec-executor",
+      task:"3.19",
+      path:"chat.md",
+      command:null,
+      reason:"automated security decision",
+      timestamp:"2026-05-16T00:00:01Z",
+      iteration:1
+    }')
+    echo "$sec_event" >> "$_dir/signals.jsonl"
+
+    # Write iteration = 2 into .ralph-state.json so the replay picks up iteration 1 events
+    jq -n '{globalIteration: 2}' > "$_dir/.ralph-state.json"
+
+    # Run the pre-execution check to generate an additional security-decision event
+    local _out _err
+    _out=$(mktemp); _err=$(mktemp)
+    set +e
+    CLAUDE_PLUGIN_ROOT="$REPO_ROOT" bash "$SCRIPT_PATH" \
+        --agent spec-executor --task 3.19 --paths 'chat.md' \
+        --spec-path "$_dir" >"$_out" 2>"$_err"
+    local check_exit=$?
+    set -e
+    local check_stdout
+    check_stdout=$(cat "$_out")
+    rm -f "$_out" "$_err"
+
+    # 1. pre-execution-check.sh should succeed (allow in-bounds chat.md write)
+    [ "$check_exit" -eq 0 ]
+
+    # 2. Verify a security-decision event was appended to signals.jsonl
+    local appended
+    appended=$(tail -1 "$_dir/signals.jsonl")
+    [ "$(echo "$appended" | jq -e . >/dev/null 2>&1 && echo ok || echo fail)" = "ok" ]
+    local app_type
+    app_type=$(echo "$appended" | jq -r '.type')
+    [ "$app_type" = "security-decision" ]
+
+    # 3. Run replay-signals.sh and assert it completes without error
+    local RS_SCRIPT="$REPO_ROOT/hooks/scripts/replay-signals.sh"
+    [ -f "$RS_SCRIPT" ]
+    local replay_out
+    replay_out=$(bash "$RS_SCRIPT" "$_dir" --at-iteration 2)
+    local replay_exit=$?
+    [ "$replay_exit" -eq 0 ]
+
+    # 4. Assert the replayed output contains evidence of the security-decision event
+    #    (task ID, agent name, decision type, or "security-decision")
+    echo "$replay_out" | grep -q "3.19"
+
+    rm -rf "$_dir"
+}

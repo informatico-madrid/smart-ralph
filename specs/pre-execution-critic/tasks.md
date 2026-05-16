@@ -443,16 +443,16 @@ Goal: implement the FULL Test Coverage Table from design.md as `tests/pre-exec-c
   - **Done when**: All tests through ConfirmRisky pass.
   - **Commit**: none. Log checkpoint timestamp to `.progress.md`.
 
-- [ ] 3.18 Test: audit append — one valid line, schema-conformant, immutable
+- [x] 3.18 Test: audit append — one valid line, schema-conformant, immutable
   - **Do**: Add a bats test — seed a temp `signals.jsonl` with one prior line; invoke the script; assert exactly one new line added, the new line is valid JSON matching the `securityDecisionEvent` schema (via `jq`), and the pre-existing line is byte-identical (immutability, AC-4.3).
   - **Files**: plugins/ralphharness/tests/pre-exec-check.bats
   - **Done when**: The test passes and verifies append-only behaviour.
   - **Verify**: `cd plugins/ralphharness && bats tests/pre-exec-check.bats --filter 'audit append' && echo T_OK`
-  - **Commit**: `test(pre-exec): audit append is one valid schema-conformant immutable line`
+  - **Commit**: `test(pre-exec): audit append — one valid schema-conformant immutable line`
   - _Requirements: AC-4.1, AC-4.2, AC-4.3_
   - _Design: Test Coverage Table (audit append)_
 
-- [ ] 3.19 Test: `replay-signals.sh` over `security-decision` events
+- [x] 3.19 Test: `replay-signals.sh` over `security-decision` events
   - **Do**: Add a bats integration test — build a temp log mixing `control` and `security-decision` events; run `replay-signals.sh`; assert it completes without error and the security decision is visible in output.
   - **Files**: plugins/ralphharness/tests/pre-exec-check.bats
   - **Done when**: The test passes.
@@ -461,7 +461,7 @@ Goal: implement the FULL Test Coverage Table from design.md as `tests/pre-exec-c
   - _Requirements: AC-4.4, NFR-6_
   - _Design: Test Coverage Table (replay-signals.sh)_
 
-- [ ] 3.20 Test: determinism + speed (<100ms NFR-2)
+- [x] 3.20 Test: determinism + speed (<100ms NFR-2)
   - **Do**: Add bats tests — (a) run identical inputs twice; assert identical exit code and identical event payload modulo `timestamp`; (b) `time` a single invocation and assert it completes < 100 ms.
   - **Files**: plugins/ralphharness/tests/pre-exec-check.bats
   - **Done when**: Both tests pass.
