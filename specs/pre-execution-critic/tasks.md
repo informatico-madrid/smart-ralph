@@ -121,13 +121,13 @@ Goal: build `pre-execution-check.sh` end-to-end (arg parsing, 3 layers, max-seve
   - _Requirements: FR-4, AC-2.1_
   - _Design: Layer 3 — risk classifier; Implementation Step 4_
 
-- [ ] 1.10 [VERIFY] Quality checkpoint: Layers 2 and 3
+- [x] 1.10 [VERIFY] Quality checkpoint: Layers 2 and 3
   - **Do**: Run `bash -n`; spot-check Layer 2 against each dangerous pattern and Layer 3 against the three input shapes.
   - **Verify**: `bash -n plugins/ralphharness/hooks/scripts/pre-execution-check.sh && echo CHECKPOINT_OK`
   - **Done when**: No syntax errors; Layers 2/3 behave per the design tables.
   - **Commit**: none. Log checkpoint timestamp to `.progress.md`.
 
-- [ ] 1.11 Implement the max-severity combiner
+- [x] 1.11 Implement the max-severity combiner
   - **Do**:
     1. In `pre-execution-check.sh`, add `combine_risk()`: if Layer 1 returned a `block` violation, short-circuit to `block` (hard-block, layer `role-contract`) before combining.
     2. Otherwise combine Layer 1 risk-contribution, Layer 2 risk, Layer 3 risk via `max_risk` (UNKNOWN > HIGH > MEDIUM > LOW).

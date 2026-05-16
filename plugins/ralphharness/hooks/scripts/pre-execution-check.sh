@@ -350,5 +350,99 @@ layer3_risk() {
   return 0
 }
 
-# ── Placeholder ──────────────────────────────────────────────────
-exit 0
+# ── Max-severity combiner ────────────────────────────────────────
+
+# combine_risk <l1_verdict> <l2_verdict> <l3_verdict>
+#   Combines the three layer verdicts using max-severity policy.
+#   Layer 1 violations SHORT-CIRCUIT: they produce a hard-block before
+#   the combiner considers other layers (hard-block, layer role-contract).
+#   Otherwise: max_risk() across layers (UNKNOWN > HIGH > MEDIUM > LOW).
+#
+#   Prints:
+#     VERDICT:block|LAYER:role-contract|DRIVING_LAYER:role-contract   — Layer 1 short-circuit
+#     VERDICT:confirm|LAYER:<layer>|DRIVING_LAYER:<layer>             — combined risk
+#     VERDICT:allow|LAYER:none|DRIVING_LAYER:none                     — clean result
+combine_risk() {
+  local l1_verdict="${1:-}"
+  local l2_verdict="${2:-}"
+  local l3_verdict="${3:-}"
+
+  # Extract risk value from each layer verdict
+  # Format: RISK:<value>|REASON:<reason> → extract <value> only
+  local l1_risk="${l1_verdict#RISK:}"
+  l1_risk="${l1_risk%%|*}"
+  local l2_risk="${l2_verdict#RISK:}"
+  l2_risk="${l2_risk%%|*}"
+  local l3_risk="${l3_verdict#RISK:}"
+  l3_risk="${l3_risk%%|*}"
+
+  # Default missing risks to LOW
+  l2_risk="${l2_risk:-LOW}"
+  l3_risk="${l3_risk:-LOW}"
+
+  # ── Short-circuit: Layer 1 violation → hard-block ─────────────
+  if [[ "$l1_risk" == "violation" ]]; then
+    printf 'VERDICT:block|LAYER:role-contract|DRIVING_LAYER:role-contract'
+    return 2
+  fi
+
+  # ── Max-severity: combine remaining layers ─────────────────────
+  # Map layer-internal "clear" to LOW for ranking; normalize UNKNOWN
+  [[ "$l1_risk" == "clear" ]] && l1_risk="LOW"
+  local best_risk="${l1_risk:-LOW}"
+  local best_layer="role-contract"
+
+  # Layer 1 clear/UNKNOWN → contributes to comparison
+  if (( $(rank "$best_risk") < $(rank "$l2_risk") )); then
+    best_risk="$l2_risk"
+    best_layer="shell-pattern"
+  fi
+
+  if (( $(rank "$best_risk") < $(rank "$l3_risk") )); then
+    best_risk="$l3_risk"
+    best_layer="task-baseline"
+  fi
+
+  # Map risk to verdict + driving layer
+  local verdict
+  local driving_layer
+
+  case "$best_risk" in
+    LOW|MEDIUM)
+      verdict="allow"
+      driving_layer="none"
+      ;;
+    HIGH)
+      verdict="confirm"
+      driving_layer="$best_layer"
+      ;;
+    UNKNOWN|*)
+      verdict="confirm"
+      driving_layer="$best_layer"
+      ;;
+  esac
+
+  printf 'VERDICT:%s|LAYER:%s|DRIVING_LAYER:%s' "$verdict" "$driving_layer" "$driving_layer"
+  return 0
+}
+
+# ── Main flow ────────────────────────────────────────────────────
+
+# Run all three layers
+L1_OUTPUT=$(layer1_role_contract "$AGENT" "$PATHS") || true
+L2_OUTPUT=$(layer2_shell_pattern "${COMMAND:-}") || true
+L3_OUTPUT=$(layer3_risk) || true
+
+# Combine risks using max-severity policy
+COMBINED=$(combine_risk "$L1_OUTPUT" "$L2_OUTPUT" "$L3_OUTPUT")
+
+# Extract verdict and driving layer
+VERDICT="${COMBINED%%|*}"
+VERDICT="${VERDICT#VERDICT:}"
+DRIVING_LAYER="${COMBINED##*DRIVING_LAYER:}"
+
+# Route: block always exits 2; confirm exits 2; allow exits 0
+case "$VERDICT" in
+  block|confirm) exit 2 ;;
+  *)             exit 0 ;;
+esac
