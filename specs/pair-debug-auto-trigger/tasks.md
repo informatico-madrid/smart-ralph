@@ -365,7 +365,7 @@ Focus: Implement the mechanical trigger, role files, placement step, and all app
 
 Focus: Clean up role file prose, improve self-containment, polish.
 
-- [ ] 2.1 Polish `pair-debug-driver.md` for clarity and self-containment
+- [x] 2.1 Polish `pair-debug-driver.md` for clarity and self-containment
   - **Do**: Review and improve: (1) make Section 0 Bootstrap steps clearer; (2) ensure the inlined flock blocks are complete and don't reference any plugin-only paths; (3) ensure Section 6 (References) inlines the loop summary and >10-cycle bound so a foreign runtime operates fully.
   - **Files**: `plugins/ralphharness/agents/pair-debug-driver.md`
   - **Done when**: Role file reads clearly, no external references except `references/pair-debug.md` and `references/collaboration-resolution.md`, and the inlined blocks are complete.
@@ -373,7 +373,7 @@ Focus: Clean up role file prose, improve self-containment, polish.
   - **Commit**: `refactor(pair-debug): polish pair-debug-driver.md for clarity and self-containment`
   - _Design: Component 2_
 
-- [ ] 2.2 Polish `pair-debug-navigator.md` for clarity and self-containment
+- [x] 2.2 Polish `pair-debug-navigator.md` for clarity and self-containment
   - **Do**: Review and improve: (1) make Section 0 Bootstrap clear; (2) ensure the anti-anchoring rule is unambiguous; (3) ensure Section 2 inlined flock blocks are complete; (4) ensure Section 5 (References) inlines the loop summary and >10-cycle bound.
   - **Files**: `plugins/ralphharness/agents/pair-debug-navigator.md`
   - **Done when**: Role file reads clearly, anti-anchoring rule is unambiguous, inlined blocks are complete.
@@ -381,7 +381,7 @@ Focus: Clean up role file prose, improve self-containment, polish.
   - **Commit**: `refactor(pair-debug): polish pair-debug-navigator.md for clarity and self-containment`
   - _Design: Component 3_
 
-- [ ] 2.3 Polish `pair-debug.md` — ensure all sections are concise and cross-reference correctly
+- [x] 2.3 Polish `pair-debug.md` — ensure all sections are concise and cross-reference correctly
   - **Do**: Review pair-debug.md: ensure all 7 sections are concise (<5 lines each where practical), cross-references to `collaboration-resolution.md` and `pair-debug-driver.md`/`pair-debug-navigator.md` are accurate, the runtime→path map includes the manual fallback for unknown runtimes.
   - **Files**: `plugins/ralphharness/references/pair-debug.md`
   - **Done when**: File is concise, well-structured, all cross-references are accurate.
@@ -389,7 +389,7 @@ Focus: Clean up role file prose, improve self-containment, polish.
   - **Commit**: `refactor(pair-debug): polish pair-debug.md for concision and cross-references`
   - _Design: Component 1_
 
-- [ ] 2.4 Update `.progress.md` with task-planning learnings
+- [x] 2.4 Update `.progress.md` with task-planning learnings
   - **Do**: Append a "Task Planning Learnings" subsection to `.progress.md` with key discoveries: trigger is mechanical (no LLM interpretation needed), role files are prompt markdown (verified structurally), Section 0 Bootstrap pattern is copyable from external-reviewer.md, export report must always include absolute paths.
   - **Files**: `specs/pair-debug-auto-trigger/.progress.md`
   - **Done when**: `.progress.md` contains the new learnings subsection.
@@ -397,7 +397,7 @@ Focus: Clean up role file prose, improve self-containment, polish.
   - **Commit**: `docs(pair-debug): append task-planning learnings to progress.md`
   - _Design: Design → Task Planning section_
 
-- [ ] 2.5 [VERIFY] Quality checkpoint: verify Phase 2 polish
+- [x] 2.5 [VERIFY] Quality checkpoint: verify Phase 2 polish
   - **Do**: Run the same structural checks as POC checkpoint (1.16) plus verify role files still pass the self-containment checks.
   - **Verify**: All structural checks pass (same as 1.16) plus:
     - `! grep -q 'CLAUDE_PLUGIN_ROOT' plugins/ralphharness/agents/pair-debug-driver.md`
@@ -409,7 +409,7 @@ Focus: Clean up role file prose, improve self-containment, polish.
 
 Focus: Comprehensive bats test suite. One task per row in the Test Coverage Table.
 
-- [ ] 3.1 [P] Create anti-anchoring bats test
+- [x] 3.1  Create anti-anchoring bats test
   - **Do**: Create `plugins/ralphharness/tests/test-anti-anchoring.bats` with test cases:
     1. `anti-anchoring-rule-present` — Verify the navigator role file contains the ">=2 independent hypotheses BEFORE first EXPERIMENT" rule.
     2. `anti-anchoring-in-pair-debug-md` — Verify pair-debug.md contains the anti-anchoring rule with >=2 hypotheses, evidence-based ROOT_CAUSE, and >10-cycle bound.
@@ -420,7 +420,7 @@ Focus: Comprehensive bats test suite. One task per row in the Test Coverage Tabl
   - _Requirements: FR-7_
   - _Design: Test Coverage Table row "anti-anchoring (>10-cycle) escalation"_
 
-- [ ] 3.2 [P] Create loop-bound bats test
+- [x] 3.2  Create loop-bound bats test
   - **Do**: Create `plugins/ralphharness/tests/test-loop-bound.bats` with test cases:
     1. `cycle-bound-10-in-pair-debug-md` — Verify pair-debug.md states >10 as the cycle bound.
     2. `cycle-bound-10-in-collaboration-resolution` — Verify collaboration-resolution.md states "more than 10 times".
@@ -434,7 +434,7 @@ Focus: Comprehensive bats test suite. One task per row in the Test Coverage Tabl
   - _Requirements: FR-13, AC-4.3_
   - _Design: Test Coverage Table row ">10-cycle escalation"_
 
-- [ ] 3.3 [P] Create placement-step bats test
+- [x] 3.3  Create placement-step bats test
   - **Do**: Create `plugins/ralphharness/tests/test-placement-step.bats` with test cases:
     1. `branch-a-same-instance` — Verify the placement step includes branch (a) with "this same instance" as default.
     2. `branch-b-second-instance` — Verify the placement step includes branch (b) with manual paths printed.
@@ -449,7 +449,7 @@ Focus: Comprehensive bats test suite. One task per row in the Test Coverage Tabl
   - _Requirements: FR-16, FR-17, FR-18, FR-19_
   - _Design: Test Coverage Table row "Placement step — dialog branches"_
 
-- [ ] 3.4 [P] Create export bats test
+- [x] 3.4  Create export bats test
   - **Do**: Create `plugins/ralphharness/tests/test-export.bats` with test cases:
     1. `runtime-map-roo-code` — Verify the runtime→path map in pair-debug.md maps Roo Code to `.roo/commands/`.
     2. `runtime-map-qwen` — Verify Qwen → `.qwen/commands/`.
@@ -463,7 +463,7 @@ Focus: Comprehensive bats test suite. One task per row in the Test Coverage Tabl
   - _Requirements: FR-18, FR-19_
   - _Design: Test Coverage Table row "Export — automatic copy writes correct path", "Export — manual mode prints absolute paths"_
 
-- [ ] 3.5 [P] Create atomic-append bats test
+- [x] 3.5  Create atomic-append bats test
   - **Do**: Create `plugins/ralphharness/tests/test-atomic-append.bats` with test cases:
     1. `flock-both-role-files` — Verify both role files contain the inlined flock blocks for chat.md (fd 200) and signals.jsonl (fd 202).
     2. `flock-blocks-self-contained` — Verify the inlined flock blocks reference only `$basePath`/`$SPEC_PATH` (no `${CLAUDE_PLUGIN_ROOT}`).
@@ -475,7 +475,7 @@ Focus: Comprehensive bats test suite. One task per row in the Test Coverage Tabl
   - _Requirements: AC-6.3, FR-15_
   - _Design: Test Coverage Table row "Atomic-append concurrency", Component 6_
 
-- [ ] 3.6 [P] Create role-file structure bats tests
+- [x] 3.6  Create role-file structure bats tests
   - **Do**: Create `plugins/ralphharness/tests/test-role-file-structure.bats` with test cases:
     1. `driver-sections-complete` — Verify driver role file has Sections 0 through 6.
     2. `navigator-sections-complete` — Verify navigator role file has Sections 0 through 5.
@@ -490,7 +490,7 @@ Focus: Comprehensive bats test suite. One task per row in the Test Coverage Tabl
   - _Requirements: FR-14, FR-15_
   - _Design: Test Coverage Table rows for "pair-debug-driver.md structure" and "pair-debug-navigator.md structure"_
 
-- [ ] 3.7 [P] Create trigger-repo fixture build script
+- [x] 3.7 [P] Create trigger-repo fixture build script
   - **Do**: Create `plugins/ralphharness/tests/fixtures/trigger-repo/build.sh` — a script that builds a temp git repo for trigger testing:
     1. Creates a temp dir with a git repo.
     2. Creates `tests/test_existing.py` with a simple test function.
@@ -507,7 +507,7 @@ Focus: Comprehensive bats test suite. One task per row in the Test Coverage Tabl
   - _Requirements: FR-3, FR-4, FR-5_
   - _Design: Fixtures & Test Data → Trigger Condition Checker_
 
-- [ ] 3.8 [P] Create export-repo fixture build script
+- [x] 3.8 [P] Create export-repo fixture build script
   - **Do**: Create `plugins/ralphharness/tests/fixtures/export-repo/build.sh` — a script that builds a temp repo for export testing:
     1. Creates a temp dir with `.roo/commands/` subdirectory.
     2. Provides a variant with an empty directory and a variant with a pre-existing `pair-debug-driver.md` (to test overwrite prompt).
@@ -518,7 +518,7 @@ Focus: Comprehensive bats test suite. One task per row in the Test Coverage Tabl
   - _Requirements: FR-17, FR-20_
   - _Design: Fixtures & Test Data → Export Mechanism_
 
-- [ ] 3.9 Create chat-11-cycles fixture
+- [x] 3.9 Create chat-11-cycles fixture
   - **Do**: Create `plugins/ralphharness/tests/fixtures/chat-11-cycles.md` — a pre-populated chat.md containing 11 HYPOTHESIS-EXPERIMENT-FINDING cycles with no ROOT_CAUSE. This is used by the loop-bound test to verify the >10-cycle escalation triggers.
   - **Files**: `plugins/ralphharness/tests/fixtures/chat-11-cycles.md`
   - **Done when**: Fixture file exists with exactly 11 hypothesis-experiment-finding cycles and no ROOT_CAUSE signal.
@@ -527,7 +527,7 @@ Focus: Comprehensive bats test suite. One task per row in the Test Coverage Tabl
   - _Requirements: AC-4.3_
   - _Design: Fixtures & Test Data → Anti-anchoring escalation_
 
-- [ ] 3.10 Verify test infrastructure completeness
+- [x] 3.1 0 Verify test infrastructure completeness
   - **Do**: Check that all expected test files exist:
     - `test-pair-debug-trigger.bats`
     - `test-anti-anchoring.bats`
@@ -544,13 +544,13 @@ Focus: Comprehensive bats test suite. One task per row in the Test Coverage Tabl
   - **Commit**: `chore(pair-debug): verify test infrastructure completeness`
   - _Design: Test Strategy_
 
-- [ ] 3.11 [VERIFY] Quality checkpoint: verify all test files exist
+- [x] 3.1 1 [VERIFY] Quality checkpoint: verify all test files exist
   - **Do**: Run the same checks as 3.10 plus verify each .bats file has at least 2 test cases.
   - **Verify**: All test files exist and have ≥2 test cases each.
   - **Done when**: All checks pass.
   - **Commit**: `chore(pair-debug): pass quality checkpoint — test suite complete`
 
-- [ ] 3.12 Verify no new subagent_type, hooks, or schema changes
+- [x] 3.1 2 Verify no new subagent_type, hooks, or schema changes
   - **Do**: Check that no new `subagent_type` is introduced in any file. No new hooks are created. No schema changes in `.ralph-state.json` keys or `spec.schema.json`.
   - **Files**: All plugin files (verification only)
   - **Done when**: No new subagent_type, hooks, or schema changes.
@@ -559,7 +559,7 @@ Focus: Comprehensive bats test suite. One task per row in the Test Coverage Tabl
   - _Requirements: NFR-5_
   - _Design: Component 1 Boundaries_
 
-- [ ] 3.13 Verify no new .ralph-state.json fields
+- [x] 3.1 3 Verify no new .ralph-state.json fields
   - **Do**: Check that no file introduces a `pairDebugMode` or any new field to `.ralph-state.json`.
   - **Files**: All plugin files (verification only)
   - **Done when**: No new .ralph-state.json fields.
@@ -570,7 +570,7 @@ Focus: Comprehensive bats test suite. One task per row in the Test Coverage Tabl
 
 ## Phase 4: Quality Gates + E2E
 
-- [ ] 4.1 [VERIFY] Verify role file structure and frontmatter
+- [x] 4.1 [VERIFY] Verify role file structure and frontmatter
   - **Do**:
     1. Verify both role files are valid markdown with proper frontmatter: `head -7 plugins/ralphharness/agents/pair-debug-driver.md` and `head -7 plugins/ralphharness/agents/pair-debug-navigator.md`.
     2. Verify `references/pair-debug.md` is non-empty and has all 7 sections.
@@ -580,7 +580,7 @@ Focus: Comprehensive bats test suite. One task per row in the Test Coverage Tabl
   - **Done when**: Role files and reference docs are structurally valid.
   - **Commit**: None
 
-- [ ] 4.2 [VERIFY] Verify version bumps and JSON validity
+- [x] 4.2 [VERIFY] Verify version bumps and JSON validity
   - **Do**:
     1. Verify `plugins/ralphharness/.claude-plugin/plugin.json` version is 5.3.0 and parses as valid JSON.
     2. Verify `.claude-plugin/marketplace.json` version for ralphharness is 5.3.0 and parses as valid JSON.
@@ -589,7 +589,7 @@ Focus: Comprehensive bats test suite. One task per row in the Test Coverage Tabl
   - **Done when**: Both JSON files parse and show version 5.3.0.
   - **Commit**: None
 
-- [ ] 4.3 [VERIFY] Verify test infrastructure completeness
+- [x] 4.3 [VERIFY] Verify test infrastructure completeness
   - **Do**:
     1. Verify all 8 .bats test files exist in `plugins/ralphharness/tests/`.
     2. Verify each .bats file parses without syntax errors (bats --dry-run or bash -n).
@@ -599,7 +599,7 @@ Focus: Comprehensive bats test suite. One task per row in the Test Coverage Tabl
   - **Done when**: All test files and fixtures are present.
   - **Commit**: None
 
-- [ ] 4.4 [VERIFY] Verify no new subagent_type, hooks, or schema changes
+- [x] 4.4 [VERIFY] Verify no new subagent_type, hooks, or schema changes
   - **Do**:
     1. Check no new `subagent_type` containing "debug" or "pair" in any agent file.
     2. Check no new hook files created under `hooks/`.
@@ -609,7 +609,7 @@ Focus: Comprehensive bats test suite. One task per row in the Test Coverage Tabl
   - **Done when**: No new subagent_type, hooks, or schema changes.
   - **Commit**: None
 
-- [ ] 4.5 [VERIFY] Verify no new .ralph-state.json fields
+- [x] 4.5 [VERIFY] Verify no new .ralph-state.json fields
   - **Do**:
     1. Check no file introduces a `pairDebugMode` or any new field to `.ralph-state.json`.
     2. Check no file adds `pairDebugMode` to any schema.
@@ -618,7 +618,7 @@ Focus: Comprehensive bats test suite. One task per row in the Test Coverage Tabl
   - **Done when**: No new .ralph-state.json fields.
   - **Commit**: None
 
-- [ ] 4.6 [VERIFY] Quality checkpoint: markdown formatting + JSON parse
+- [x] 4.6 [VERIFY] Quality checkpoint: markdown formatting + JSON parse
   - **Do**: Run quality checks. For this plugin (markdown + shell scripts):
     - Verify all modified .md files have no trailing whitespace issues (grep for trailing spaces).
     - Verify all .bats files parse without syntax errors (bash -n).
@@ -630,7 +630,7 @@ Focus: Comprehensive bats test suite. One task per row in the Test Coverage Tabl
 
 ## Phase 5: PR Lifecycle
 
-- [ ] 5.1 [VERIFY] Create PR and push branch
+- [x] 5.1 [VERIFY] Create PR and push branch
   - **Do**:
     1. Verify current branch is a feature branch: `git branch --show-current`
     2. If on default branch, STOP and alert user.
@@ -640,7 +640,7 @@ Focus: Comprehensive bats test suite. One task per row in the Test Coverage Tabl
   - **Done when**: PR created on GitHub with a valid URL and state OPEN.
   - **If CI fails**: Fix issues locally, push fixes, re-verify.
 
-- [ ] 5.2 [VERIFY] Verify all acceptance criteria are met
+- [x] 5.2 [VERIFY] Verify all acceptance criteria are met
   - **Do**: Systematically check each AC:
     - AC-1.1: `### PAIR-DEBUG MODE ACTIVATED` header present in failure-recovery.md and coordinator-pattern.md.
     - AC-1.2: Normal fix-task path unchanged when trigger does not fire.
@@ -663,7 +663,7 @@ Focus: Comprehensive bats test suite. One task per row in the Test Coverage Tabl
   - **Verify**: `echo "Verifying all 24 ACs..." && echo "AC checklist complete" && echo P5.2_PASS`
   - **Commit**: None
 
-- [ ] 5.3 [VERIFY] Final verification: verify the fix resolves original issue
+- [x] 5.3 [VERIFY] Final verification: verify the fix resolves original issue
   - **Do**: Final comprehensive verification:
     1. Confirm all 3 new files exist (pair-debug.md, pair-debug-driver.md, pair-debug-navigator.md).
     2. Confirm all 4 append-only edits are in place.
