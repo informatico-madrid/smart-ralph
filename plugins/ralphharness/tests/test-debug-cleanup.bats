@@ -1,6 +1,6 @@
 #!/usr/bin/env bats
-REPO_ROOT="$(dirname "$BATS_TEST_DIRNAME")"
 
+REPO_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || echo "$BATS_TEST_DIRNAME")"
 @test "grep-pair-debug-dirty" {
     local fixture="${REPO_ROOT}/plugins/ralphharness/tests/fixtures/with-pair-debug-logs.txt"
     mkdir -p "$(dirname "$fixture")"
@@ -13,6 +13,7 @@ REPO_ROOT="$(dirname "$BATS_TEST_DIRNAME")"
     local fixture="${REPO_ROOT}/plugins/ralphharness/tests/fixtures/cleaned.txt"
     mkdir -p "$(dirname "$fixture")"
     printf 'normal log line\nno special markers here\n' > "$fixture"
-    local result=$(grep -c 'PAIR-DEBUG:' "$fixture" 2>/dev/null || echo 0)
-    [ "$result" -eq 0 ]
+    local result
+    result=$(grep -c 'PAIR-DEBUG:' "$fixture" 2>/dev/null) || true
+    [ "${result:-0}" -eq 0 ]
 }

@@ -1,6 +1,6 @@
 #!/usr/bin/env bats
-REPO_ROOT="$(dirname "$BATS_TEST_DIRNAME")"
 
+REPO_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || echo "$BATS_TEST_DIRNAME")"
 @test "flock-both-role-files" {
     local driver="${REPO_ROOT}/plugins/ralphharness/agents/pair-debug-driver.md"
     local navigator="${REPO_ROOT}/plugins/ralphharness/agents/pair-debug-navigator.md"

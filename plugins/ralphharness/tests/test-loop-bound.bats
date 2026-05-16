@@ -1,9 +1,7 @@
 #!/usr/bin/env bats
 # bats test suite for >10 cycle bound verification
+REPO_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || echo "$BATS_TEST_DIRNAME")"
 
-setup() {
-    REPO_ROOT="$(cd "$(dirname "$BATS_TEST_DIRNAME")" && pwd)"
-}
 
 @test "cycle-bound-10-in-pair-debug-md" {
     local pair_debug="${REPO_ROOT}/plugins/ralphharness/references/pair-debug.md"

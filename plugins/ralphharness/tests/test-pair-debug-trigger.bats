@@ -1,6 +1,6 @@
 #!/usr/bin/env bats
-REPO_ROOT="$(dirname "$BATS_TEST_DIRNAME")"
 
+REPO_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || echo "$BATS_TEST_DIRNAME")"
 @test "all-three-conditions-hold" {
     # This test verifies the trigger logic is present in failure-recovery.md
     local fr="${REPO_ROOT}/plugins/ralphharness/references/failure-recovery.md"

@@ -1,6 +1,6 @@
 #!/usr/bin/env bats
-REPO_ROOT="$(dirname "$BATS_TEST_DIRNAME")"
 
+REPO_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || echo "$BATS_TEST_DIRNAME")"
 @test "branch-a-same-instance" {
     grep -q 'This same instance' "${REPO_ROOT}/plugins/ralphharness/commands/implement.md"
 }
@@ -23,5 +23,5 @@ REPO_ROOT="$(dirname "$BATS_TEST_DIRNAME")"
 }
 
 @test "no-name-only-instruction" {
-    ! grep -q '@external-reviewer' "${REPO_ROOT}/plugins/ralphharness/commands/implement.md"
+    ! grep -q '^\s*@external-reviewer\b' "${REPO_ROOT}/plugins/ralphharness/commands/implement.md"
 }

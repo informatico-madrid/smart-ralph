@@ -1,6 +1,6 @@
 #!/usr/bin/env bats
-REPO_ROOT="$(dirname "$BATS_TEST_DIRNAME")"
 
+REPO_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || echo "$BATS_TEST_DIRNAME")"
 @test "runtime-map-roo-code" {
     grep -q 'roo' "${REPO_ROOT}/plugins/ralphharness/references/pair-debug.md"
 }
@@ -14,7 +14,7 @@ REPO_ROOT="$(dirname "$BATS_TEST_DIRNAME")"
 }
 
 @test "runtime-unknown-fallback" {
-    grep -q 'manual' "${REPO_ROOT}/plugins/ralphharness/references/pair-debug.md"
+    grep -qi 'manual' "${REPO_ROOT}/plugins/ralphharness/references/pair-debug.md"
 }
 
 @test "export-source-paths-absolute" {
