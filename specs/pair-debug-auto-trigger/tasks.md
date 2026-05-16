@@ -176,7 +176,7 @@ Focus: Implement the mechanical trigger, role files, placement step, and all app
   - _Requirements: FR-16, FR-17, FR-18, FR-19, FR-20, AC-7.1, AC-7.2, AC-7.3, AC-7.4, AC-7.5, AC-7.6_
   - _Design: Component 4, Component 5_
 
-- [ ] 1.11 [P] Create trigger bats test
+- [x] 1.11 [P] Create trigger bats test
   - **Do**: Create `plugins/ralphharness/tests/test-pair-debug-trigger.bats` with test cases for the trigger checker:
     1. `trigger-all-true` — Stub inputs: `taskIteration=2`, `git diff` returns empty (test unchanged), no FAIL row → expect "activate".
     2. `trigger-taskIteration-1` — `taskIteration=1` → expect "do not activate" (condition b false).
@@ -189,7 +189,7 @@ Focus: Implement the mechanical trigger, role files, placement step, and all app
   - _Requirements: FR-2, FR-3, FR-4, FR-5_
   - _Design: Test Coverage Table row "Trigger checker — all 3 conditions true" through "Trigger checker — test file changed"_
 
-- [ ] 1.12 [P] Create debug-cleanup bats test
+- [x] 1.12 [P] Create debug-cleanup bats test
   - **Do**: Create `plugins/ralphharness/tests/test-debug-cleanup.bats` with test cases:
     1. `grep-pair-debug-dirty` — Use fixture file with `PAIR-DEBUG:` logs → `grep -rn 'PAIR-DEBUG:'` returns non-empty.
     2. `grep-pair-debug-clean` — Use cleaned fixture file → `grep -rn 'PAIR-DEBUG:'` returns empty.
@@ -228,7 +228,7 @@ Focus: Implement the mechanical trigger, role files, placement step, and all app
   - _Requirements: FR-12_
   - _Design: File Structure (optional modify)_
 
-- [ ] 1.16 [VERIFY] Quality checkpoint: verify role files + reference docs
+- [x] 1.16  [VERIFY] Quality checkpoint: verify role files + reference docs
   - **Do**: Run structural checks on all files created/modified in Phase 1.
   - **Files**: `plugins/ralphharness/references/pair-debug.md`, `plugins/ralphharness/agents/pair-debug-driver.md`, `plugins/ralphharness/agents/pair-debug-navigator.md`, `plugins/ralphharness/references/failure-recovery.md`, `plugins/ralphharness/references/coordinator-pattern.md`, `plugins/ralphharness/agents/spec-executor.md`, `plugins/ralphharness/commands/implement.md`, `plugins/ralphharness/.claude-plugin/plugin.json`, `.claude-plugin/marketplace.json`
   - **Verify**: All structural checks pass:
@@ -244,7 +244,7 @@ Focus: Implement the mechanical trigger, role files, placement step, and all app
   - **Done when**: All 9 checks pass.
   - **Commit**: `chore(pair-debug): pass quality checkpoint — all files present with correct content`
 
-- [ ] 1.17 Verify append-only edits preserve existing sections
+- [x] 1.17  Verify append-only edits preserve existing sections
   - **Do**: Verify that all append-only edits preserved existing content:
     - `failure-recovery.md`: "Max Retries (Non-Recovery Mode)" section still present before the new "Pair-Debug Mode Entry Point".
     - `coordinator-pattern.md`: "Signal Protocol" section still present before the new "Pair-Debug Mode Announcement".
@@ -257,7 +257,7 @@ Focus: Implement the mechanical trigger, role files, placement step, and all app
   - **Commit**: `chore(pair-debug): verify append-only edits preserved existing sections`
   - _Requirements: AC-5.2, NFR-3_
 
-- [ ] 1.18 Verify role files have no plugin-only path dependencies
+- [x] 1.18  Verify role files have no plugin-only path dependencies
   - **Do**: Check both role files for `${CLAUDE_PLUGIN_ROOT}` references. Any must be inlined (the flock blocks are inlined). No references to plugin-internal paths (like `hooks/scripts/lib-signals.sh`) that a foreign runtime cannot resolve.
   - **Files**: `plugins/ralphharness/agents/pair-debug-driver.md`, `plugins/ralphharness/agents/pair-debug-navigator.md`
   - **Done when**: No `${CLAUDE_PLUGIN_ROOT}` references in either role file, except the inlined flock blocks which are self-contained.
@@ -266,7 +266,7 @@ Focus: Implement the mechanical trigger, role files, placement step, and all app
   - _Requirements: FR-15, NFR-7_
   - _Design: Component 2/3 Section 6_
 
-- [ ] 1.19 Verify trigger is mechanical (no LLM interpretation)
+- [x] 1.19  Verify trigger is mechanical (no LLM interpretation)
   - **Do**: Check that the trigger conditions in `failure-recovery.md` and `pair-debug.md` use only mechanical operations: `git diff` (shell), `jq` (CLI), FAIL-row absence (grep on task_review.md). No LLM-interpretation language like "the agent should assess whether".
   - **Files**: `plugins/ralphharness/references/failure-recovery.md`, `plugins/ralphharness/references/pair-debug.md`
   - **Done when**: All 3 conditions use only mechanical operations.
@@ -275,7 +275,7 @@ Focus: Implement the mechanical trigger, role files, placement step, and all app
   - _Requirements: NFR-1_
   - _Design: Component 1_
 
-- [ ] 1.20 Verify coordinator announcement replaces normal announcement
+- [x] 1.20  Verify coordinator announcement replaces normal announcement
   - **Do**: Check that the "Pair-Debug Mode Announcement" section in `coordinator-pattern.md` explicitly states it replaces the normal delegation announcement for that one task only.
   - **Files**: `plugins/ralphharness/references/coordinator-pattern.md`
   - **Done when**: The section contains the replacement-note.
@@ -283,7 +283,7 @@ Focus: Implement the mechanical trigger, role files, placement step, and all app
   - **Commit**: `chore(pair-debug): verify coordinator announcement replaces normal announcement`
   - _Requirements: AC-5.1, FR-10_
 
-- [ ] 1.21 Verify debug logging has decision-path requirement
+- [x] 1.21  Verify debug logging has decision-path requirement
   - **Do**: Check that the debug-logging section in `spec-executor.md` includes the decision-path capture rule (logs must record suspect variable/code path + hypothesis, not just "got here").
   - **Files**: `plugins/ralphharness/agents/spec-executor.md`
   - **Done when**: The section contains the decision-path capture requirement.
@@ -291,7 +291,7 @@ Focus: Implement the mechanical trigger, role files, placement step, and all app
   - **Commit**: `chore(pair-debug): verify debug logging has decision-path requirement`
   - _Requirements: AC-3.2, FR-9_
 
-- [ ] 1.22 Verify export mechanism reports absolute paths
+- [x] 1.22  Verify export mechanism reports absolute paths
   - **Do**: Check that the placement step in `implement.md` always prints absolute paths (not just `@name`). No `@name`-only instruction without a path.
   - **Files**: `plugins/ralphharness/commands/implement.md`
   - **Done when**: Both export modes (automatic copy + manual print) print absolute paths. The export report template includes source/destination fields.
@@ -300,7 +300,7 @@ Focus: Implement the mechanical trigger, role files, placement step, and all app
   - _Requirements: FR-19, AC-7.4_
   - _Design: Component 5_
 
-- [ ] 1.23 Verify idempotent export in placement step
+- [x] 1.23  Verify idempotent export in placement step
   - **Do**: Check that the placement step in `implement.md` includes the overwrite/skip prompt for existing destination files.
   - **Files**: `plugins/ralphharness/commands/implement.md`
   - **Done when**: The placement step includes overwrite/skip logic.
@@ -309,7 +309,7 @@ Focus: Implement the mechanical trigger, role files, placement step, and all app
   - _Requirements: FR-20, AC-7.6_
   - _Design: Component 5_
 
-- [ ] 1.24 Verify loop bounds are present in both role files
+- [x] 1.24  Verify loop bounds are present in both role files
   - **Do**: Check both role files for >10-cycle bound and maxTaskIterations hard limit.
   - **Files**: `plugins/ralphharness/agents/pair-debug-driver.md`, `plugins/ralphharness/agents/pair-debug-navigator.md`
   - **Done when**: Both files reference >10 cycles and maxTaskIterations as exit conditions.
@@ -318,7 +318,7 @@ Focus: Implement the mechanical trigger, role files, placement step, and all app
   - _Requirements: AC-4.1, AC-4.2, AC-4.3, AC-4.4_
   - _Design: Component 2 Section 5, Component 3 Section 4_
 
-- [ ] 1.25 Verify anti-anchoring rule in navigator role file
+- [x] 1.25  Verify anti-anchoring rule in navigator role file
   - **Do**: Check navigator role file for the >=2 independent hypotheses BEFORE first EXPERIMENT rule.
   - **Files**: `plugins/ralphharness/agents/pair-debug-navigator.md`
   - **Done when**: The rule is present with explicit "BEFORE" ordering.
@@ -327,7 +327,7 @@ Focus: Implement the mechanical trigger, role files, placement step, and all app
   - _Requirements: FR-7, AC-2.3_
   - _Design: Component 3 Section 3_
 
-- [ ] 1.26 Verify pair-debug.md points to collaboration-resolution.md
+- [x] 1.26  Verify pair-debug.md points to collaboration-resolution.md
   - **Do**: Check pair-debug.md does NOT re-document the HYPOTHESIS→FIX_PROPOSAL loop but instead points to collaboration-resolution.md.
   - **Files**: `plugins/ralphharness/references/pair-debug.md`
   - **Done when**: pair-debug.md contains a pointer to collaboration-resolution.md but does not duplicate the 5-signal loop.
@@ -336,14 +336,14 @@ Focus: Implement the mechanical trigger, role files, placement step, and all app
   - _Requirements: AC-2.5, FR-1_
   - _Design: Component 1 Section 6_
 
-- [ ] 1.27 [VERIFY] POC Checkpoint — all core components implemented
+- [x] 1.27  [VERIFY] POC Checkpoint — all core components implemented
   - **Do**: Verify all POC components are in place: trigger (pair-debug.md + failure-recovery.md), roles (driver + navigator files), announcement (coordinator-pattern.md), debug logging (spec-executor.md), placement step (implement.md), version bump (both json files), cycle bound (collaboration-resolution.md).
   - **Files**: All files listed in verification commands above
   - **Done when**: All 3-condition trigger, 2 role files, coordinator announcement, debug-logging section, placement step, and version bump are confirmed present.
   - **Verify**: `grep -q '3.*Condition\|3-Condition' plugins/ralphharness/references/pair-debug.md && grep -q 'Pair-Debug Mode Entry Point' plugins/ralphharness/references/failure-recovery.md && grep -q '### PAIR-DEBUG MODE ACTIVATED' plugins/ralphharness/references/coordinator-pattern.md && grep -q 'Debug Logging in Pair-Debug Mode' plugins/ralphharness/agents/spec-executor.md && grep -q 'Pair-Debug Placement Step' plugins/ralphharness/commands/implement.md && grep -q '"5.3.0"' plugins/ralphharness/.claude-plugin/plugin.json && grep -q '"5.3.0"' .claude-plugin/marketplace.json && echo P1.27_PASS`
   - **Commit**: `feat(pair-debug): POC checkpoint — all core components implemented`
 
-- [ ] 1.28 Update all relevant documentation with pair-debug spec changes
+- [x] 1.28 Update all relevant documentation with pair-debug spec changes
   - **Do**: Systematically update every reference and agent document that needs to reflect pair-debug mode. This ensures all documentation is consistent and complete:
     1. `references/pair-debug.md` — ensure all 7 sections are written and cross-references to `collaboration-resolution.md`, `pair-debug-driver.md`, `pair-debug-navigator.md` are accurate
     2. `references/failure-recovery.md` — verify the Pair-Debug Mode Entry Point section has the complete 3-condition check with correct variable names (`$TASK_START_SHA`, `jq` filter, FAIL-row parse)
