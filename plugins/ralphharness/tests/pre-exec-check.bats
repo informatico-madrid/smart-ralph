@@ -94,3 +94,30 @@ run_check_separate() {
     [ "$risk" = "LOW" ]
     [ "$layer" = "none" ]
 }
+
+@test "Layer 1 Denylist write hard-blocks (exit 2)" {
+    # .ralph-state.json is in spec-executor Denylist in the fixture
+    run_check_separate --agent spec-executor --task 3.4 --paths '.ralph-state.json' --spec-path "$TEST_TMP"
+
+    # 1. Assert exit code 2 (hard-block)
+    [ "$SE_CHECK_EXIT" -eq 2 ]
+
+    # 2. Assert stdout has decision=block layer=role-contract
+    echo "$SE_CHECK_STDOUT" | grep -q 'decision=block'
+    echo "$SE_CHECK_STDOUT" | grep -q 'layer=role-contract'
+
+    # 3. Assert stderr mentions Layer 1 / role-contract
+    echo "$SE_CHECK_STDERR" | grep -qi 'layer[ -]*1\|role-contract\|denylist'
+
+    # 4. Assert the appended event has correct fields
+    local last_line
+    last_line=$(tail -1 "$TEST_TMP/signals.jsonl")
+    [ "$(echo "$last_line" | jq -e . >/dev/null 2>&1 && echo ok || echo fail)" = "ok" ]
+
+    local decision risk layer
+    decision=$(echo "$last_line" | jq -r '.decision')
+    risk=$(echo "$last_line" | jq -r '.risk')
+    layer=$(echo "$last_line" | jq -r '.layer')
+    [ "$decision" = "block" ]
+    [ "$layer" = "role-contract" ]
+}

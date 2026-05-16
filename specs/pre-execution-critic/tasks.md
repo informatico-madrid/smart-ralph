@@ -329,7 +329,7 @@ Goal: implement the FULL Test Coverage Table from design.md as `tests/pre-exec-c
   - _Requirements: AC-5.1, AC-4.2_
   - _Design: Test Coverage Table (in-bounds write)_
 
-- [ ] 3.4 Test: Layer 1 Denylist write hard-blocks
+- [x] 3.4 Test: Layer 1 Denylist write hard-blocks
   - **Do**: Add a bats test — `--paths` matching the fixture `Denylist`; assert exit `2`, stderr names Layer 1, event `decision:"block"`, `layer:"role-contract"`.
   - **Files**: plugins/ralphharness/tests/pre-exec-check.bats
   - **Done when**: The test passes.
