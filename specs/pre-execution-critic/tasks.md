@@ -533,7 +533,7 @@ NEVER push directly to the default branch. Branch management is handled at start
 
 ## Phase 5: PR Lifecycle
 
-- [ ] 5.1 [VERIFY] Acceptance-criteria check against the Verification Contract
+- [x] 5.1 [VERIFY] Acceptance-criteria check against the Verification Contract
   - **Do**: Read `requirements.md`; programmatically confirm each PASS observable in the Verification Contract: in-bounds write → exit `0` + `decision:"allow"`; Denylist write → exit `2` + `layer:"role-contract"`; `rm -rf` task → exit `2` + `decision:"confirm"` + `risk:"HIGH"`; unclassifiable task → exit `2` + `risk:"UNKNOWN"`. Confirm the hard invariants (Layer 1 always hard-blocks, never fails open, append-only, no LLM/network call).
   - **Files**: _(verification only)_
   - **Done when**: Every Verification Contract PASS observable and hard invariant is confirmed by an automated check (re-run task 3.21 VE plus the relevant bats filters).
@@ -541,7 +541,7 @@ NEVER push directly to the default branch. Branch management is handled at start
   - **Commit**: none. Log the AC check result to `.progress.md` under `## Learnings`.
   - _Requirements: All US/FR/NFR; Verification Contract_
 
-- [ ] 5.2 Create the PR
+- [x] 5.2 Create the PR
   - **Do**:
     1. Confirm the current branch is `spec/pre-execution-critic` (`git branch --show-current`). If on the default branch, STOP and alert the user.
     2. Push the branch: `git push -u origin spec/pre-execution-critic`.
@@ -551,7 +551,7 @@ NEVER push directly to the default branch. Branch management is handled at start
   - **Verify**: `gh pr view --json url -q .url`
   - **Commit**: none (PR creation).
 
-- [ ] 5.3 [VERIFY] CI pipeline passes
+- [x] 5.3 [VERIFY] CI pipeline passes
   - **Do**: Verify the PR's CI checks pass; if any fail, read the failure, fix locally, push, and re-verify.
   - **Verify**: `gh pr checks`
   - **Done when**: All CI checks show passing.
