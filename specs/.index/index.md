@@ -62,7 +62,7 @@ See [index-state.json](./index-state.json) for machine-readable data.
 | bmad-bridge-plugin | ./specs | completed | done |
 | collaboration-resolution | ./specs | done |  |
 | loop-safety-infra | ./specs | completed | done |
-| pair-debug-auto-trigger | ./specs | new |  |
+| pair-debug-auto-trigger | ./specs | completed | done |
 | ralphharness-rename | ./specs | execution | 96/122 tasks |
 | code-review-fixes | ./specs | new |  |
 | signal-log-and-ci-autodetect | ./specs | completed | done |
