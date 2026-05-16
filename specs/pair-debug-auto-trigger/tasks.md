@@ -62,7 +62,7 @@ Focus: Implement the mechanical trigger, role files, placement step, and all app
   - _Requirements: FR-13, AC-4.3_
   - _Design: Component 1, File Structure_
 
-- [ ] 1.5 [P] Create `agents/pair-debug-driver.md`
+- [x] 1.5 [P] Create `agents/pair-debug-driver.md`
   - **Do**: Create the role file with the following structure:
     1. **Section 0 — Bootstrap (Self-Start)** — Modeled on `external-reviewer.md` Section 0: read `specs/.current-spec` → specName, set basePath, read `.ralph-state.json` → confirm phase is execution, check for DEADLOCK in `signals.jsonl` (stop if found), update `chat.executor.lastReadLine`, announce "Driver ready. Spec: <specName>.", begin experiment loop.
     2. **Section 1 — Identity** — Name: pair-debug-driver, Role: Driver = spec-executor in pair-debug mode (writes code, runs commands, applies fixes, adds PAIR-DEBUG:-tagged debug logging, runs experiments).
