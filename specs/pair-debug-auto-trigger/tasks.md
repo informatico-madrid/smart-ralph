@@ -28,7 +28,7 @@ Focus: Implement the mechanical trigger, role files, placement step, and all app
   - **Commit**: `chore(pair-debug): create test directory structure`
   - _Design: Test Infrastructure (step 1)_
 
-- [ ] 1.2 [P] Document bats run command in progress.md
+- [x] 1.2 [P] Document bats run command in progress.md
   - **Do**: Append a "Testing" subsection to `.progress.md` documenting that tests run via `bats plugins/ralphharness/tests/`, bats 1.13.0 is on PATH, no npm test script exists.
   - **Files**: `specs/pair-debug-auto-trigger/.progress.md`
   - **Done when**: `.progress.md` contains the bats command documentation.
