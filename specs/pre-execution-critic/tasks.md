@@ -296,7 +296,7 @@ Goal: clean up the script, extend the schema, update the signals template and th
 
 Goal: implement the FULL Test Coverage Table from design.md as `tests/pre-exec-check.bats` with fixtures under `tests/fixtures/pre-exec/`. One task per Coverage Table row. No mocks — fixtures + temp dirs only (Test Double Policy). Test file location and `setup()`/`teardown()` per the design's Test File Conventions.
 
-- [ ] 3.1 Create the `pre-exec` test fixtures
+- [x] 3.1 Create the `pre-exec` test fixtures
   - **Do**:
     1. Create `plugins/ralphharness/tests/fixtures/pre-exec/role-contracts.full.md` — a minimal `## Access Matrix` with a `spec-executor` row whose `Writes` includes a path used as an in-bounds case and whose `Denylist` includes `.ralph-state.json`.
     2. Create `plugins/ralphharness/tests/fixtures/pre-exec/task-no-files.md` — a sample task block with no `**Files:**` field.
