@@ -3,7 +3,7 @@
 Auto-generated summary of all specs across configured directories.
 See [index-state.json](./index-state.json) for machine-readable data.
 
-**Last updated:** 2026-05-16T05:14:53Z
+**Last updated:** 2026-05-16T09:11:12Z
 
 ## Directories (1)
 
@@ -60,7 +60,7 @@ See [index-state.json](./index-state.json) for machine-readable data.
 | gito-fixes | ./specs | completed | done |
 | code-fixes-2 | ./specs | completed | done |
 | bmad-bridge-plugin | ./specs | completed | done |
-| collaboration-resolution | ./specs | done |  |
+| collaboration-resolution | ./specs | completed | done |
 | loop-safety-infra | ./specs | completed | done |
 | pair-debug-auto-trigger | ./specs | completed | done |
 | ralphharness-rename | ./specs | execution | 96/122 tasks |
