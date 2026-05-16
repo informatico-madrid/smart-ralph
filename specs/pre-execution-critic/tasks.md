@@ -44,13 +44,13 @@ Goal: build `pre-execution-check.sh` end-to-end (arg parsing, 3 layers, max-seve
   - _Requirements: AC-2.1_
   - _Design: max-severity combiner; Implementation Step 5_
 
-- [ ] 1.3 [VERIFY] Quality checkpoint: skeleton syntax + arg contract
+- [x] 1.3 [VERIFY] Quality checkpoint: skeleton syntax + arg contract
   - **Do**: Run `bash -n` on the script; confirm required/optional flag handling behaves per design.
   - **Verify**: `bash -n plugins/ralphharness/hooks/scripts/pre-execution-check.sh && echo CHECKPOINT_OK`
   - **Done when**: No syntax errors; arg parsing matches the CLI contract table.
   - **Commit**: none. Log checkpoint timestamp to `.progress.md` under `## Learnings`.
 
-- [ ] 1.4 Implement Layer 1 — locate and extract the Access Matrix table
+- [x] 1.4 Implement Layer 1 — locate and extract the Access Matrix table
   - **Do**:
     1. In `pre-execution-check.sh`, add `layer1_role_contract()`.
     2. Resolve `references/role-contracts.md` relative to `CLAUDE_PLUGIN_ROOT` (fall back to a path relative to the script's own dir if the env var is unset).
