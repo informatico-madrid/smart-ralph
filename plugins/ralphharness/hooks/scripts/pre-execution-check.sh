@@ -501,6 +501,44 @@ if [[ "$COMBINED_VERDICT" == "block" ]]; then
     "$COMBINED_LAYER" "$COMBINED_RISK" >&2
   printf 'decision=block layer=%s risk=%s\n' \
     "$COMBINED_LAYER" "$COMBINED_RISK"
+
+  # Emit security-decision event before block exit
+  local decision="${COMBINED_VERDICT:-block}"
+  [[ -z "$decision" ]] && decision="block"
+  payload=$(jq -n \
+    --arg type "security-decision" \
+    --arg decision "$decision" \
+    --arg layer "$COMBINED_LAYER" \
+    --arg risk "$COMBINED_RISK" \
+    --arg agent "${AGENT:-unknown}" \
+    --arg task "${TASK:-unknown}" \
+    --arg paths "${PATHS:-}" \
+    --arg command "${COMMAND:-}" \
+    --arg reason "automated security decision" \
+    --arg timestamp "$(date -u +%FT%TZ)" \
+    --argjson iteration "$iteration" \
+    '{
+      type: $type,
+      decision: (if $decision == "" then "allow" else $decision end),
+      layer: $layer,
+      risk: $risk,
+      agent: $agent,
+      task: $task,
+      path: (if $paths == "" then null else $paths end),
+      command: (if $command == "" then null else $command end),
+      reason: $reason,
+      timestamp: $timestamp,
+      iteration: $iteration
+    }')
+  if ! append_signal "$SPEC_PATH" "$payload"; then
+    {
+      echo ""
+      echo "## $(date -u +%Y-%m-%d)"
+      echo "- WARN: security-decision append_signal failed for block — audit trail incomplete"
+    } >> "${SPEC_PATH}/.progress.md"
+    exit 3
+  fi
+
   exit 2
 fi
 
