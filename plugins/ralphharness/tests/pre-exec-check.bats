@@ -376,6 +376,53 @@ run_check_separate() {
     [ "$risk" = "LOW" ]
 }
 
+@test "Layer 3 task with no Files field routes to UNKNOWN/confirm" {
+    # No --paths argument (simulates a task with no **Files:** field)
+    # Both Layer 1 and Layer 3 detect missing paths → UNKNOWN
+    local empty_dir
+    empty_dir=$(mktemp -d)
+
+    # Copy the signals.jsonl template into the workspace
+    cp "$REPO_ROOT/templates/signals.jsonl" "$empty_dir/signals.jsonl"
+
+    # Run the check with NO --paths argument
+    local _out_file _err_file
+    _out_file=$(mktemp)
+    _err_file=$(mktemp)
+    set +e
+    CLAUDE_PLUGIN_ROOT="$REPO_ROOT" bash "$SCRIPT_PATH" \
+        --agent spec-executor --task 3.14 --spec-path "$empty_dir" \
+        >"$_out_file" 2>"$_err_file"
+    local exit_code=$?
+    set -e
+    local stdout stderr
+    stdout=$(cat "$_out_file")
+    stderr=$(cat "$_err_file")
+    rm -f "$_out_file" "$_err_file"
+
+    # 1. Assert exit code 2 (confirm)
+    [ "$exit_code" -eq 2 ]
+
+    # 2. Assert stdout has decision=confirm
+    echo "$stdout" | grep -q 'decision=confirm'
+
+    # 3. Assert stderr mentions UNKNOWN / no paths
+    echo "$stderr" | grep -qi 'UNKNOWN\|no paths'
+
+    # 4. Assert the appended event has risk:"UNKNOWN" and decision:"confirm"
+    local last_line
+    last_line=$(tail -1 "$empty_dir/signals.jsonl")
+    [ "$(echo "$last_line" | jq -e . >/dev/null 2>&1 && echo ok || echo fail)" = "ok" ]
+
+    local decision risk
+    decision=$(echo "$last_line" | jq -r '.decision')
+    risk=$(echo "$last_line" | jq -r '.risk')
+    [ "$decision" = "confirm" ]
+    [ "$risk" = "UNKNOWN" ]
+
+    rm -rf "$empty_dir"
+}
+
 @test "combiner: Denylist + rm -rf together, Layer 1 wins" {
     # Both a Denylist path AND a dangerous command; Layer 1 hard-block must win
     run_check_separate --agent spec-executor --task 3.15 \
@@ -402,4 +449,114 @@ run_check_separate() {
     layer=$(echo "$last_line" | jq -r '.layer')
     [ "$decision" = "block" ]
     [ "$layer" = "role-contract" ]
+}
+
+@test "ConfirmRisky LOW -> allow, exit 0" {
+    # In-bounds path + no command -> Layer 1 clear(LOW) + Layer 2 LOW + Layer 3 LOW
+    run_check_separate --agent spec-executor --task 3.16 \
+        --paths 'chat.md' --spec-path "$TEST_TMP"
+
+    # 1. Assert exit code 0 (allow)
+    [ "$SE_CHECK_EXIT" -eq 0 ]
+
+    # 2. Assert the appended event has decision:"allow" and risk:"LOW"
+    local last_line
+    last_line=$(tail -1 "$TEST_TMP/signals.jsonl")
+    [ "$(echo "$last_line" | jq -e . >/dev/null 2>&1 && echo ok || echo fail)" = "ok" ]
+
+    local decision risk
+    decision=$(echo "$last_line" | jq -r '.decision')
+    risk=$(echo "$last_line" | jq -r '.risk')
+    [ "$decision" = "allow" ]
+    [ "$risk" = "LOW" ]
+}
+
+@test "ConfirmRisky MEDIUM -> allow, exit 0" {
+    # In-bounds path + benign command -> Layer 1 clear(LOW) + Layer 2 LOW + Layer 3 MEDIUM
+    run_check_separate --agent spec-executor --task 3.16 \
+        --paths 'chat.md' --command 'pnpm test' --spec-path "$TEST_TMP"
+
+    # 1. Assert exit code 0 (allow)
+    [ "$SE_CHECK_EXIT" -eq 0 ]
+
+    # 2. Assert the appended event has decision:"allow" and risk:"MEDIUM"
+    local last_line
+    last_line=$(tail -1 "$TEST_TMP/signals.jsonl")
+    [ "$(echo "$last_line" | jq -e . >/dev/null 2>&1 && echo ok || echo fail)" = "ok" ]
+
+    local decision risk
+    decision=$(echo "$last_line" | jq -r '.decision')
+    risk=$(echo "$last_line" | jq -r '.risk')
+    [ "$decision" = "allow" ]
+    [ "$risk" = "MEDIUM" ]
+}
+
+@test "ConfirmRisky HIGH -> confirm, exit 2" {
+    # In-bounds path + rm -rf -> Layer 1 clear + Layer 2 HIGH + Layer 3 MEDIUM
+    run_check_separate --agent spec-executor --task 3.16 \
+        --paths 'chat.md' --command 'rm -rf x' --spec-path "$TEST_TMP"
+
+    # 1. Assert exit code 2 (confirm)
+    [ "$SE_CHECK_EXIT" -eq 2 ]
+
+    # 2. Assert stdout has decision=confirm layer=shell-pattern risk=HIGH
+    echo "$SE_CHECK_STDOUT" | grep -q 'decision=confirm'
+    echo "$SE_CHECK_STDOUT" | grep -q 'layer=shell-pattern'
+    echo "$SE_CHECK_STDOUT" | grep -q 'risk=HIGH'
+
+    # 3. Assert the appended event has correct fields
+    local last_line
+    last_line=$(tail -1 "$TEST_TMP/signals.jsonl")
+    [ "$(echo "$last_line" | jq -e . >/dev/null 2>&1 && echo ok || echo fail)" = "ok" ]
+
+    local decision risk
+    decision=$(echo "$last_line" | jq -r '.decision')
+    risk=$(echo "$last_line" | jq -r '.risk')
+    [ "$decision" = "confirm" ]
+    [ "$risk" = "HIGH" ]
+}
+
+@test "ConfirmRisky UNKNOWN -> confirm, exit 2" {
+    # Empty dir -> no role-contracts.md -> Layer 1 UNKNOWN dominates
+    local empty_dir
+    empty_dir=$(mktemp -d)
+
+    cp "$REPO_ROOT/templates/signals.jsonl" "$empty_dir/signals.jsonl"
+
+    local _out_file _err_file
+    _out_file=$(mktemp)
+    _err_file=$(mktemp)
+    set +e
+    CLAUDE_PLUGIN_ROOT="$empty_dir" bash "$SCRIPT_PATH" \
+        --agent spec-executor --task 3.16 --paths 'chat.md' \
+        --spec-path "$empty_dir" \
+        >"$_out_file" 2>"$_err_file"
+    local exit_code=$?
+    set -e
+    local stdout stderr
+    stdout=$(cat "$_out_file")
+    stderr=$(cat "$_err_file")
+    rm -f "$_out_file" "$_err_file"
+
+    # 1. Assert exit code 2 (confirm)
+    [ "$exit_code" -eq 2 ]
+
+    # 2. Assert stdout has decision=confirm
+    echo "$stdout" | grep -q 'decision=confirm'
+
+    # 3. Assert stderr mentions UNKNOWN / role-contracts
+    echo "$stderr" | grep -qi 'UNKNOWN\|role-contracts'
+
+    # 4. Assert the appended event has risk:"UNKNOWN" and decision:"confirm"
+    local last_line
+    last_line=$(tail -1 "$empty_dir/signals.jsonl")
+    [ "$(echo "$last_line" | jq -e . >/dev/null 2>&1 && echo ok || echo fail)" = "ok" ]
+
+    local decision risk
+    decision=$(echo "$last_line" | jq -r '.decision')
+    risk=$(echo "$last_line" | jq -r '.risk')
+    [ "$decision" = "confirm" ]
+    [ "$risk" = "UNKNOWN" ]
+
+    rm -rf "$empty_dir"
 }
