@@ -93,7 +93,7 @@ Focus: Implement the mechanical trigger, role files, placement step, and all app
   - _Requirements: FR-14, FR-15, AC-6.2, AC-6.3_
   - _Design: Component 3_
 
-- [ ] 1.7 [P] Append Pair-Debug Mode Entry Point to failure-recovery.md
+- [x] 1.7 [P] Append Pair-Debug Mode Entry Point to failure-recovery.md
   - **Do**: Append a new section after "Max Retries (Non-Recovery Mode)" (after line 84) titled "## Pair-Debug Mode Entry Point". Content:
     1. Entry trigger: When `taskIteration >= 2` AND all 3 conditions hold (per `references/pair-debug.md` Section 1), BEFORE generating the fix task:
        - Condition (a): Pre-existing test failing, test file unchanged this spec — run `git diff $TASK_START_SHA..HEAD -- <failing-test-file>`; returns empty = unchanged.
@@ -110,7 +110,7 @@ Focus: Implement the mechanical trigger, role files, placement step, and all app
   - _Requirements: FR-8, FR-2, FR-3, FR-4, FR-5, AC-1.1, AC-1.2_
   - _Design: Component 1, Step 2_
 
-- [ ] 1.8 [P] Append Pair-Debug Mode Announcement to coordinator-pattern.md
+- [x] 1.8 [P] Append Pair-Debug Mode Announcement to coordinator-pattern.md
   - **Do**: Append a new section after the "Signal Protocol" section (after line ~202, before "Chat Protocol"). Title: "## Pair-Debug Mode Announcement". Content:
     1. Document the `### PAIR-DEBUG MODE ACTIVATED` chat.md message format.
     2. Message template:
