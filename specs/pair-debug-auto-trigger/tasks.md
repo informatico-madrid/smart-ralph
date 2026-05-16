@@ -20,7 +20,7 @@ created: 2026-05-16T21:00:00Z
 
 Focus: Implement the mechanical trigger, role files, placement step, and all append-only edits. Accept hardcoded values; polish in Phase 2.
 
-- [ ] 1.1 [P] Create test directory structure
+- [x] 1.1 [P] Create test directory structure
   - **Do**: Create `plugins/ralphharness/tests/` and `plugins/ralphharness/tests/fixtures/` directories.
   - **Files**: `plugins/ralphharness/tests/`, `plugins/ralphharness/tests/fixtures/`
   - **Done when**: Both directories exist.
