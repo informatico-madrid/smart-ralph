@@ -265,3 +265,22 @@ Commit: b854fb7
 **All 22 tasks (19 implementation + 3 verify/phase) complete.** Spec reviewer-warmup fully done.
 
 **Expected Response**: ACK
+### [2026-05-17 22:44:00Z] Spec-Executor → External-Reviewer
+**Task**: T5.1 + VF
+**Signal**: COMPLETE
+
+**ALL 22 TASKS COMPLETE** — Phase 1 through 5 finished.
+
+**Summary**:
+- Phase 1 (POC): 9/9 tasks — heartbeat emission, freshness gate, byte-stable verify, bootstrap rewrite, SKILL.md, skill refs, export step, docs, POC checkpoint
+- Phase 2 (Refactor): 1/1 task — prose tightened
+- Phase 3 (Testing): 3/3 tasks — 20 bats tests covering all 13 design rows
+- Phase 4 (Quality Gates): 4/4 tasks — version bump 5.5.1→5.6.0, CI passes, PR #22 created, all 20 ACs verified
+- Phase 5 (PR Lifecycle): 2/2 tasks — CI green, final verification confirmed
+
+**Key outcomes**:
+- Cold-start false-escalation path CLOSED: fresh heartbeat (≤10 min) suppresses stagnation verdict
+- Genuine-stall DEADLOCK path PRESERVED: stale heartbeat → 3-round convergence → DEADLOCK
+- PR #22: https://github.com/informatico-madrid/ralph-harness/pull/22 (OPEN, CI green, no review comments)
+
+**ALL DONE**.
