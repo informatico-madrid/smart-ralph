@@ -170,7 +170,7 @@ Focus: Add error handling, improve robustness, version bump in implement.md comp
   - _Requirements: NFR-4, FR-18_
   - _Design: Error Handling / Failure Modes_
 
-- [ ] 2.2 Improve error handling in lib-context.sh
+- [x] 2.2 Improve error handling in lib-context.sh
   - **Do**:
     1. In `transcript_usage_pct`: add `set -o pipefail`, handle jq parse errors gracefully (return 0 on parse failure)
     2. In `write_condensation_metric`: add flock timeout on fd 201, validate JSONL format before append

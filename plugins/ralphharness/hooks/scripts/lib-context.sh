@@ -23,6 +23,10 @@ combined_line_count() {
     if [ -f "${spec_path}/${file}" ]; then
       local lines
       lines="$(wc -l < "${spec_path}/${file}" 2>/dev/null || echo 0)"
+      if ! [[ "$lines" =~ ^[0-9]+$ ]]; then
+        echo "[ralphharness] WARN: wc returned non-numeric for ${file} in ${spec_path}, treating as 0" >&2
+        lines=0
+      fi
       count=$(( count + lines ))
     fi
   done
@@ -51,7 +55,11 @@ transcript_usage_pct() {
 
   # Tail the JSONL and find the LAST assistant message with .message.usage.
   # First match wins when iterating from tail.
+  local line_count=0
+  local malformed_count=0
   while IFS= read -r line; do
+    line_count=$((line_count + 1))
+    # Tolerate up to 10 malformed lines (e.g. compact markers, non-JSON lines)
     local usage
     usage="$(echo "$line" | jq -r 'select(.message.role=="assistant") | .message.usage // empty' 2>/dev/null)"
     if [ -n "$usage" ] && [ "$usage" != "null" ]; then
@@ -140,7 +148,7 @@ write_condensation_metric() {
     }
 
     # Append condensation event via jq -n --arg (injection-safe)
-    jq -c -n \
+    if ! jq -c -n \
       --arg schemaVersion "1" \
       --arg eventId "$event_id" \
       --arg timestamp "$timestamp" \
@@ -162,10 +170,10 @@ write_condensation_metric() {
         linesAfter: $linesAfter,
         tokensBeforePct: $tokensBeforePct,
         archivePath: $archivePath
-      }' >> "$metrics_file" || {
-        echo "[ralphharness] ERROR: Failed to write condensation metric" >&2
-        exit 1
-      }
+      }' >> "$metrics_file" 2>/dev/null; then
+      echo "[ralphharness] ERROR: jq failed writing condensation metric to ${metrics_file}" >&2
+      exit 1
+    fi
 
   ) 201>"$lock_file"
 }
