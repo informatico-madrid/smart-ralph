@@ -110,7 +110,7 @@ Focus: land all functional edits end-to-end. Heartbeat emit + reviewer gate + bo
   - _Requirements: FR-8, AC-5.1, AC-5.2, AC-5.3_
   - _Design: File Structure, Implementation Step 6_
 
-- [ ] 1.9 POC Checkpoint: heartbeat shape valid + non-blocking
+- [x] 1.9 POC Checkpoint: heartbeat shape valid + non-blocking
   - **Do**:
     1. Construct the sample heartbeat JSON line from the design and confirm it passes `jq -e .`.
     2. Source `lib-signals.sh` and run `active_signal_count` on a `signals.jsonl` containing one `ALIVE` line; confirm it returns `0` (heartbeat non-blocking).
