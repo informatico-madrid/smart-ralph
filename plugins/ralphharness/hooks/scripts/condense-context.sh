@@ -176,7 +176,32 @@ if [ -f "${SPEC_PATH}/chat.md" ]; then
       fi
     } > "${SPEC_PATH}/chat.md.tmp"
 
-    mv "${SPEC_PATH}/chat.md.tmp" "${SPEC_PATH}/chat.md"
+    # --- Validation (AC-1.4): temp file non-empty + protected suffix intact ---
+    if [ ! -s "${SPEC_PATH}/chat.md.tmp" ]; then
+      echo "[ralphharness] WARN: condensation produced empty temp file, discarding" >&2
+      rm -f "${SPEC_PATH}/chat.md.tmp"
+      exit 1
+    fi
+
+    # Verify protected suffix is present (last lines of original)
+    SUFFIX_LINES="${SUFFIX:-}"
+    SUFFIX_LINE_COUNT=0
+    if [ -n "$SUFFIX_LINES" ]; then
+      SUFFIX_LINE_COUNT="$(echo "$SUFFIX_LINES" | wc -l)"
+    fi
+    TMP_SUFFIX="$(tail -n "$SUFFIX_LINE_COUNT" "${SPEC_PATH}/chat.md.tmp" 2>/dev/null || true)"
+    if [ -n "$SUFFIX_LINES" ] && [ "$SUFFIX_LINES" != "$TMP_SUFFIX" ]; then
+      echo "[ralphharness] WARN: condensation protected suffix corrupted, discarding temp" >&2
+      rm -f "${SPEC_PATH}/chat.md.tmp"
+      exit 1
+    fi
+
+    # Atomic write: only replace original if validation passes
+    mv "${SPEC_PATH}/chat.md.tmp" "${SPEC_PATH}/chat.md" || {
+      echo "[ralphharness] ERROR: atomic mv of condensed chat.md failed, original preserved" >&2
+      rm -f "${SPEC_PATH}/chat.md.tmp"
+      exit 1
+    }
     CHAT_REWRITTEN=1
 
   ) 200>"$LOCK_FILE"
@@ -219,12 +244,19 @@ if [ "$CHAT_REWRITTEN" -eq 1 ] && [ -f "$STATE_FILE" ]; then
   if [ "$REMOVED" -lt 0 ]; then REMOVED=0; fi
 
   TEMP_STATE="${STATE_FILE}.tmp"
-  jq --argjson removed "$REMOVED" \
+  if ! jq --argjson removed "$REMOVED" \
     'if .chat then
       .chat.coordinator.lastReadLine = (if (.chat.coordinator.lastReadLine // 0) - $removed < 0 then 0 else (.chat.coordinator.lastReadLine // 0) - $removed end) |
       .chat.executor.lastReadLine = (if (.chat.executor.lastReadLine // 0) - $removed < 0 then 0 else (.chat.executor.lastReadLine // 0) - $removed end) |
       .chat.reviewer.lastReadLine = (if (.chat.reviewer.lastReadLine // 0) - $removed < 0 then 0 else (.chat.reviewer.lastReadLine // 0) - $removed end)
-    else . end' "$STATE_FILE" > "$TEMP_STATE" && mv "$TEMP_STATE" "$STATE_FILE"
+    else . end' "$STATE_FILE" > "$TEMP_STATE" 2>/dev/null; then
+    echo "[ralphharness] ERROR: jq failed updating state pointers (removed=$removed), original preserved" >&2
+    rm -f "$TEMP_STATE"
+  else
+    mv "$TEMP_STATE" "$STATE_FILE" || {
+      echo "[ralphharness] ERROR: atomic mv of state file failed, original preserved" >&2
+    }
+  fi
 fi
 
 # --- Log Condensation Metric (fd 201, AFTER flock closes) ---

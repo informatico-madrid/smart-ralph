@@ -158,7 +158,7 @@ Focus: Create middleware scripts, wire hooks, prove condensation works end-to-en
 
 Focus: Add error handling, improve robustness, version bump in implement.md completion.
 
-- [ ] 2.1 Add flock timeout and validation error handling to condense-context.sh
+- [x] 2.1 Add flock timeout and validation error handling to condense-context.sh
   - **Do**:
     1. Add `flock -w 10 -x 200` (10s timeout instead of infinite block) with graceful skip on contention
     2. Validate temp `chat.md` non-empty and contains protected suffix before `mv` — on failure, discard temp, keep original
