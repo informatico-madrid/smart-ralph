@@ -63,7 +63,7 @@ Focus: land all functional edits end-to-end. Heartbeat emit + reviewer gate + bo
   - _Requirements: FR-5, AC-3.1, AC-3.2, AC-3.3, AC-3.4_
   - _Design: Component C, Bootstrap Redesign, Implementation Step 3_
 
-- [ ] 1.5 Create reviewer-warmup SKILL.md (canonical rules)
+- [x] 1.5 Create reviewer-warmup SKILL.md (canonical rules)
   - **Do**:
     1. Create `plugins/ralphharness/skills/reviewer-warmup/SKILL.md` with frontmatter `name: reviewer-warmup`, `description`, `version: 0.1.0`, `user-invocable: false` (mirror `skills/reality-verification/SKILL.md`).
     2. Write the canonical Bootstrap section (full-read chat.md/.progress.md/git, `lastReadLine = 0`, mental model, preserve HOLD/PENDING/DEADLOCK).
