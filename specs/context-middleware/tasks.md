@@ -270,7 +270,7 @@ Focus: Comprehensive test coverage. One task per Test Coverage Table row. Real t
   - _Requirements: AC-3.1, AC-3.2, AC-3.3, AC-3.4, AC-5.1, FR-10, FR-11_
   - _Design: Test Coverage Table — evict-tool-result.sh_
 
-- [ ] 3.4 [P] Create test-context-scoping.bats: precompact + stop-watcher + implement.md + schema + hooks
+- [x] 3.4 [P] Create test-context-scoping.bats: precompact + stop-watcher + implement.md + schema + hooks
   - **Do**:
     1. Create `plugins/ralphharness/tests/test-context-scoping.bats`
     2. precompact-condense.sh: resolves spec, calls `--mode emergency`, exits 0 unconditionally
@@ -285,7 +285,7 @@ Focus: Comprehensive test coverage. One task per Test Coverage Table row. Real t
   - _Requirements: AC-2.5, AC-2.6, AC-4.1, AC-4.2, AC-4.3, AC-4.7, FR-1, FR-9, FR-19_
   - _Design: Test Coverage Table — precompact, two-gate, implement.md, schema, hooks_
 
-- [ ] 3.5 [VERIFY] Quality checkpoint: all bats tests pass
+- [x] 3.5 [VERIFY] Quality checkpoint: all bats tests pass
   - **Do**: Run the full bats test suite
   - **Verify**: `bats plugins/ralphharness/tests/ 2>&1 | tail -5`
   - **Done when**: All test files pass with zero failures
