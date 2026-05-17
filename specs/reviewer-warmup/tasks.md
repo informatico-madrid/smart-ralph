@@ -142,7 +142,7 @@ After POC validated, tighten the agent-prompt edits to match surrounding style.
 
 Build `test-reviewer-warmup.bats` per the design Test Coverage Table (11 rows). One test file, `bats` runner.
 
-- [ ] 3.1 Create test-reviewer-warmup.bats — heartbeat shape + non-regression + emission
+- [x] 3.1 Create test-reviewer-warmup.bats — heartbeat shape + non-regression + emission - pending-commit
   - **Do**:
     1. Create `plugins/ralphharness/tests/test-reviewer-warmup.bats` resolving `REPO_ROOT` via `git rev-parse --show-toplevel` (mirror `test-export.bats`).
     2. Add `@test`: a sample heartbeat line passes `jq -e .`, has `type=control`, `signal` ∈ {ALIVE,STILL}, `reason` matching `^step [0-9]+/[0-9]+: `.
@@ -155,7 +155,7 @@ Build `test-reviewer-warmup.bats` per the design Test Coverage Table (11 rows). 
   - _Requirements: AC-1.1, AC-1.3, AC-1.4, AC-1.5, AC-1.6_
   - _Design: Test Coverage Table rows 1-3_
 
-- [ ] 3.2 Add freshness-gate simulation tests (fresh / stale / skip-increment / empty)
+- [x] 3.2 Add freshness-gate simulation tests (fresh / stale / skip-increment / empty) - pending-commit
   - **Do**:
     1. In `test-reviewer-warmup.bats`, build inline `signals.jsonl` fixtures via `date -u -d` heredocs in `BATS_TEST_TMPDIR`: a fresh `ALIVE` (now − 90 s) and a stale `ALIVE` (now − 25 min).
     2. Add `@test` fresh case: 90 s-old heartbeat → gate yields `escalate=false` plus a deferral log string.
@@ -169,7 +169,7 @@ Build `test-reviewer-warmup.bats` per the design Test Coverage Table (11 rows). 
   - _Requirements: AC-2.2, AC-2.3, AC-2.4_
   - _Design: Test Coverage Table rows 4-7, Fixtures & Test Data_
 
-- [ ] 3.3 Add bootstrap, byte-stable guard, skill, reference, export, docs grep tests
+- [x] 3.3 Add bootstrap, byte-stable guard, skill, reference, export, docs grep tests - pending-commit
   - **Do**:
     1. Add `@test` Section 0 bootstrap: grep `external-reviewer.md` finds "Read chat.md IN FULL", ".progress.md", "git log"/"git diff --stat", `lastReadLine = 0`; the old "lastReadLine to the current line count" skip text is ABSENT.
     2. Add `@test` AC-2.5 byte-stable guard: grep finds the verbatim FABRICATION/verify-command-evidence sentence and the e2e anti-pattern reference string.
