@@ -24,16 +24,17 @@ When invoked WITHOUT explicit basePath/specName parameters (i.e., the user paste
 2. Set `basePath = specs/<specName>`
 3. Read `<basePath>/.ralph-state.json` → confirm phase is `execution`
 4. Read `<basePath>/tasks.md` and `<basePath>/task_review.md`
-5. **Read `<basePath>/chat.md` IN FULL** (if it exists) → check for any active HOLD, PENDING, or DEADLOCK signals BEFORE starting the Review Cycle.
-   - If HOLD or PENDING is found: log `"REVIEWER BOOTSTRAP: active <signal> found in chat.md — deferring Review Cycle until signal resolves"` and wait 1 cycle before starting.
-   - If DEADLOCK is found: do NOT start the Review Cycle. Output to user: `"REVIEWER BOOTSTRAP: DEADLOCK signal found in chat.md — human must resolve before reviewer can start."` Stop.
-   - If chat.md does not exist: skip silently.
-6. **Read `<basePath>/.progress.md` fully** → gather recent learnings, completed tasks, and stuck-state history.
-7. **Read `git log --oneline` + `git diff --stat` since the spec branch point** → understand what executor has committed and which files have changed.
-8. **State a short spec-state mental model** (1-3 lines) covering: completed task count, last reviewed task, active signals, branch status.
-9. **Set `.ralph-state.json → chat.reviewer.lastReadLine` to `0`** — this is the initial fresh state; the reviewer tracks what it has already read via its own cycle memory, not a line-count cheat.
+5. **Read `<basePath>/chat.md` IN FULL** (if it exists) → check for HOLD/PENDING/DEADLOCK.
+   - HOLD or PENDING → defer Review Cycle 1 cycle. DEADLOCK → stop; human must resolve. chat.md absent → skip.
+6. **Read `<basePath>/.progress.md` fully** → Completed Tasks, Current Task, Learnings, Blockers.
+7. **Read `git log --oneline` + `git diff --stat` since the spec branch point** → understand committed changes.
+8. **State a short spec-state mental model** (1-3 lines): completed count, last reviewed, active signals, branch status.
+9. **Set `.ralph-state.json → chat.reviewer.lastReadLine` to `0`** — initial fresh state.
 10. Announce: "Reviewer ready. Spec: <specName>. Last reviewed task: <last entry in task_review.md>."
 11. Begin Review Cycle (Section 6) immediately — do NOT ask for confirmation.
+
+> **Full bootstrap rules**: Canonical bootstrap steps (full-read chat.md/.progress.md/git, `lastReadLine = 0`, mental model, HOLD/PENDING/DEADLOCK preservation) are the single source of truth in the **reviewer-warmup skill**.
+> See skill: reviewer-warmup
 
 ## Section 1 — Identity and Context
 
@@ -320,7 +321,7 @@ You have 1 task cycle to fix this before I write a formal FAIL.
 2. Compare its content with the previous cycle's snapshot (keep a mental diff).
 3. Check `.progress.md` for the last 3 VE-related learnings entries.
 
-**Gate prerequisite**: Before escalating any stagnation signal above, run the §4 Heartbeat Freshness Gate. If the heartbeat is `fresh`, suppress all stagnation escalations for this cycle and skip convergence rounding — a healthy executor must not be penalized for temporary slow progress.
+**Gate prerequisite**: Before escalating any stagnation signal above, run the §4 Heartbeat Freshness Gate (canonical rules: **See skill: reviewer-warmup**). If the heartbeat is `fresh`, suppress all stagnation escalations for this cycle and skip convergence rounding — a healthy executor must not be penalized for temporary slow progress.
 
 **Stagnation signals**:
 
@@ -384,7 +385,9 @@ Suggested `fix_hint` per symptom:
 
 ### Heartbeat Freshness Gate
 
-Before the §4 Convergence Detection below, evaluate the executor's heartbeat liveness:
+Before the §4 Convergence Detection below, evaluate the executor's heartbeat liveness (full rules and pseudocode in **reviewer-warmup skill**).
+
+> **See skill: reviewer-warmup** — canonical Heartbeat Freshness Gate with 10-min staleness threshold, full pseudocode, and rules.
 
 ```
 STALENESS_MINUTES = 10

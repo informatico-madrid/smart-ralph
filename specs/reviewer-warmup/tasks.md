@@ -75,7 +75,7 @@ Focus: land all functional edits end-to-end. Heartbeat emit + reviewer gate + bo
   - _Requirements: FR-6, AC-4.1, AC-4.2_
   - _Design: Component D, Exportable Reviewer Skill, Implementation Step 4_
 
-- [ ] 1.6 Add skill references in external-reviewer.md Sections 0 and 4
+- [x] 1.6 Add skill references in external-reviewer.md Sections 0 and 4
   - **Do**:
     1. In `external-reviewer.md` Section 0, replace the verbose bootstrap text with a concise summary plus a `See skill: reviewer-warmup` pointer.
     2. In Section 4, add a `See skill: reviewer-warmup` pointer next to the freshness-gate block, keeping a concise inline summary.
