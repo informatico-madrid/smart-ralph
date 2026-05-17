@@ -397,7 +397,7 @@ To activate:
 
 Offer the reviewer-warmup skill export when the external reviewer runs in a foreign runtime.
 
-**Prerequisite**: skip this entire step if the user answered NO to parallel reviewer in Step 4, or if `$REVIEWER_EXISTS` is `1` (auto-detected).
+**Prerequisite**: skip if user answered NO in Step 4, or `$REVIEWER_EXISTS` is `1` (auto-detected).
 
 Ask the user:
 ```
@@ -409,14 +409,14 @@ If yes: where should reviewer-warmup.md run?
 (c) A foreign agent runtime (Roo Code, Qwen, Cursor, other)
 ```
 
-**(a) chosen** → no files copied, no further questions; skill runs in-session. Export step skipped silently. Behavior byte-identical to pre-spec.
+**(a)** → no files copied; skill runs in-session. Export skipped silently. Byte-identical to pre-spec.
 
-**(b) chosen** → manual print: absolute path of `skills/reviewer-warmup/SKILL.md`, plus the activation step "open a second Claude Code session and load via @skill: reviewer-warmup or paste the file contents as the session prompt."
+**(b)** → manual print: absolute path of `skills/reviewer-warmup/SKILL.md`, plus activation step "open a second Claude Code session, load via `@skill: reviewer-warmup` or paste contents as session prompt."
 
-**(c) chosen** → **which-runtime sub-question** (Roo Code / Qwen / Cursor / other), then **export-mode question** (automatic copy / manual print).
-- **Automatic copy**: resolve destination path from the runtime→path map (same map as Pair-Debug Placement Step, but filename is `reviewer-warmup.md` and source is `skills/reviewer-warmup/SKILL.md`). If destination already exists, prompt overwrite/skip per file. Copy `SKILL.md` to destination as `reviewer-warmup.md`. Print the report.
-- **Manual print**: print the absolute source path of `SKILL.md` AND the copy-paste-ready activation text. Print the report.
-- **Unknown runtime**: fall back to manual print with reason ("no known destination path for <runtime>").
+**(c)** → **which-runtime** sub-question (Roo Code / Qwen / Cursor / other), then **export-mode** (automatic copy / manual print).
+- **Automatic copy**: resolve destination from runtime→path map (same map as Pair-Debug, filename `reviewer-warmup.md`, source `skills/reviewer-warmup/SKILL.md`). If destination exists, prompt overwrite/skip. Copy `SKILL.md` as `reviewer-warmup.md`. Print report.
+- **Manual print**: print absolute source path of `SKILL.md` AND copy-paste-ready activation text. Print report.
+- **Unknown runtime**: fall back to manual print, reason: "no known destination path for <runtime>".
 
 **Export report** (printed in BOTH modes):
 ```

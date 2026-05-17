@@ -44,7 +44,7 @@ Received via Task delegation:
 4. READ task_review.md — apply <external_review> protocol
 5. Apply <ambiguity> detection — scan task block BEFORE implementation
 6. Parse task: Do, Files, Done when, Verify, Commit
-6.5. Heartbeat emit: on entering Do-steps and before/around a long Explore or design-doc read, emit a liveness heartbeat to `signals.jsonl` via `append_signal`. Emit `ALIVE` when progressed this turn, `STILL` when no progress (alive but idle). Use the JSON shape documented in the Signal Emission Contract below.
+6.5. Heartbeat emit: on entering Do-steps and before/around a long Explore or design-doc read, emit a liveness heartbeat to `signals.jsonl` via `append_signal`. `ALIVE` = progressed this turn; `STILL` = alive but no progress. Use the JSON shape documented in the Signal Emission Contract below.
 7. Execute Do steps. Modify only listed Files.
 8. Confirm Done-when criteria. Run Verify command. Retry on failure.
 9. Update progress file, mark [x] in tasks.md, commit all changes
@@ -395,8 +395,6 @@ Collaboration signals (ACK, HOLD, PENDING, CONTINUE, OVER, CLOSE, ALIVE, STILL, 
 
 ### Heartbeat JSON Shape
 
-The heartbeat event for `signals.jsonl` uses this JSON structure:
-
 ```json
 {
   "type": "control",
@@ -405,17 +403,17 @@ The heartbeat event for `signals.jsonl` uses this JSON structure:
   "to": "reviewer",
   "task": "<taskIndex, e.g. 0>",
   "status": "alive" | "stalled",
-  "timestamp": "<ISO 8601 UTC, e.g. 2026-05-17T21:30:00Z>",
+  "timestamp": "<ISO 8601 UTC>",
   "iteration": "<taskIteration from .ralph-state.json>",
   "reason": "step N/M: <activity description>"
 }
 ```
 
-- **`signal`**: `ALIVE` when the executor made progress this turn, `STILL` when alive but no progress observed (healthy, still reading/processing).
-- **`reason`** format: `"step N/M: <activity>"` — indicates which Do-step the executor is at and what it is doing. Examples: `"step 1/5: entering Do-steps"`, `"step 3/5: reading design.md"`.
-- **`timestamp`**: produced with `date -u +%Y-%m-%dT%H:%M:%SZ`.
-- **`task`** and **`iteration`**: read from `<basePath>/.ralph-state.json` (`taskIndex` and `taskIteration` fields).
-- **`type`** and **`from`** / **`to`** are fixed values for the executor heartbeat.
+- **`signal`**: `ALIVE` = progress this turn; `STILL` = healthy, still reading/processing.
+- **`reason`**: `"step N/M: <activity>"` — Do-step index + activity.
+- **`timestamp`**: `date -u +%Y-%m-%dT%H:%M:%SZ`.
+- **`task`** / **`iteration`**: from `<basePath>/.ralph-state.json`.
+- **`type`**, **`from`**, **`to`**: fixed values.
 
 ## DO NOT Edit — Role Boundaries
 

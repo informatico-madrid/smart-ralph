@@ -18,20 +18,20 @@ Use `basePath` for ALL file operations. Never hardcode `./specs/` paths.
 
 ## Section 0 — Bootstrap (Self-Start)
 
-When invoked WITHOUT explicit basePath/specName parameters (i.e., the user pastes this file directly as a prompt), auto-discover context:
+When invoked WITHOUT explicit basePath/specName parameters, auto-discover context:
 
 1. Read `specs/.current-spec` → extract `specName`
 2. Set `basePath = specs/<specName>`
 3. Read `<basePath>/.ralph-state.json` → confirm phase is `execution`
 4. Read `<basePath>/tasks.md` and `<basePath>/task_review.md`
-5. **Read `<basePath>/chat.md` IN FULL** (if it exists) → check for HOLD/PENDING/DEADLOCK.
-   - HOLD or PENDING → defer Review Cycle 1 cycle. DEADLOCK → stop; human must resolve. chat.md absent → skip.
+5. **Read `<basePath>/chat.md` IN FULL** (if exists) → check HOLD/PENDING/DEADLOCK.
+   - HOLD/PENDING → defer Review Cycle 1. DEADLOCK → stop; human resolves. Absent → skip.
 6. **Read `<basePath>/.progress.md` fully** → Completed Tasks, Current Task, Learnings, Blockers.
-7. **Read `git log --oneline` + `git diff --stat` since the spec branch point** → understand committed changes.
+7. **Read `git log --oneline` + `git diff --stat`** since spec branch point → understand committed changes.
 8. **State a short spec-state mental model** (1-3 lines): completed count, last reviewed, active signals, branch status.
 9. **Set `.ralph-state.json → chat.reviewer.lastReadLine` to `0`** — initial fresh state.
 10. Announce: "Reviewer ready. Spec: <specName>. Last reviewed task: <last entry in task_review.md>."
-11. Begin Review Cycle (Section 6) immediately — do NOT ask for confirmation.
+11. Begin Review Cycle (Section 6) immediately — no confirmation needed.
 
 > **Full bootstrap rules**: Canonical bootstrap steps (full-read chat.md/.progress.md/git, `lastReadLine = 0`, mental model, HOLD/PENDING/DEADLOCK preservation) are the single source of truth in the **reviewer-warmup skill**.
 > See skill: reviewer-warmup
@@ -385,9 +385,9 @@ Suggested `fix_hint` per symptom:
 
 ### Heartbeat Freshness Gate
 
-Before the §4 Convergence Detection below, evaluate the executor's heartbeat liveness (full rules and pseudocode in **reviewer-warmup skill**).
+Before §4 Convergence Detection, evaluate the executor's heartbeat liveness (full rules in **reviewer-warmup skill**).
 
-> **See skill: reviewer-warmup** — canonical Heartbeat Freshness Gate with 10-min staleness threshold, full pseudocode, and rules.
+> **See skill: reviewer-warmup** — canonical Heartbeat Freshness Gate with 10-min staleness threshold and full pseudocode.
 
 ```
 STALENESS_MINUTES = 10
@@ -425,7 +425,7 @@ The reviewer tracks rounds of unresolved debate. If the same issue is debated fo
 **Round tracking**:
 - Maintain a `convergence_rounds` counter per active issue in memory
 - Increment **only if the §4 Heartbeat Freshness Gate is `stale` or absent** (see §4 Gate above) on a cycle where the same task remains FAIL/WARNING
-  - If the Heartbeat Freshness Gate is `fresh`: suppress the `convergence_rounds` increment, log deferral, and skip §4 Convergence Detection for this cycle
+  - If `fresh`: suppress the increment, log deferral, skip §4 Convergence Detection
 - Reset to 0 when issue is resolved or executor provides substantive response
 
 **After 3 rounds without resolution**:

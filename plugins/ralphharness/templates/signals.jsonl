@@ -8,7 +8,7 @@
 # {"type":"control","signal":"HOLD","from":"external-reviewer","to":"coordinator","task":"task-1.1","status":"active","timestamp":"2026-01-01T00:00:00Z","iteration":1,"reason":"<why>"}
 # {"type":"control","signal":"HOLD","from":"external-reviewer","to":"coordinator","task":"task-1.1","status":"resolved","timestamp":"2026-01-01T00:05:00Z","iteration":2,"reason":"<resolution>"}
 # Heartbeat events (ALIVE/STILL) — executor liveness pings routed to signals.jsonl
-# These are non-blocking: ignored by the HOLD gate, active_signal_count returns 0.
+# Non-blocking: ignored by HOLD gate, active_signal_count returns 0.
 # Fields: type=control, signal=ALIVE|STILL, from=spec-executor, to=external-reviewer|coordinator,
 #         task="<id>", status="active", timestamp="<ISO8601>", iteration=<N>,
 #         reason="step N/M: <activity>"

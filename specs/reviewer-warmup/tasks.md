@@ -126,7 +126,7 @@ Focus: land all functional edits end-to-end. Heartbeat emit + reviewer gate + bo
 
 After POC validated, tighten the agent-prompt edits to match surrounding style.
 
-- [ ] 2.1 Tighten heartbeat + gate prose to match surrounding style
+- [x] 2.1 Tighten heartbeat + gate prose to match surrounding style
   - **Do**:
     1. Review the task 1.1/1.2/1.4 edits in `spec-executor.md` and `external-reviewer.md`; trim verbose prose to terse bullets / one-line steps matching the surrounding agent-prompt style.
     2. Ensure no duplicated rule text between the agent prompts and `SKILL.md` — agent prompts keep concise summaries; the skill stays canonical.

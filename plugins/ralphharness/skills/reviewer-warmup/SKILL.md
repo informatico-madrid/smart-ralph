@@ -54,9 +54,9 @@ else:
 ```
 
 **Rules:**
-- Fresh heartbeat (age < 10 min): suppress stagnation verdict, skip `convergence_rounds` increment, do NOT escalate this cycle.
-- Stale or absent heartbeat: §4 Convergence Detection runs unchanged with the existing 3-round escalation threshold.
-- No new time threshold is added by this gate — the staleness is strictly compared against the freshness gate; the convergence rounds counter remains at 3.
+- Fresh heartbeat (< 10 min): suppress stagnation verdict, skip `convergence_rounds` increment, do NOT escalate.
+- Stale/absent heartbeat: §4 Convergence Detection runs unchanged (3-round threshold).
+- No new time threshold added; convergence rounds counter stays at 3.
 
 ## Why This Matters
 
