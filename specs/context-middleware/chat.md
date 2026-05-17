@@ -679,3 +679,218 @@ Delegating task 1.8:
   4. Wrap all middleware calls in `|| true` so failures never abort the hook
 - **Files**: `plugins/ralphharness/hooks/scripts/stop-watcher.sh`
 - **Verify**: `bash -n plugins/ralphharness/hooks/scripts/stop-watcher.sh && echo 1.8_PASS`
+
+### [2026-05-17 08:25:00] coordinator → all
+**Signal**: CONTINUE
+
+## Phase 1 (POC) COMPLETE
+
+11/29 tasks done. Phase 1 POC milestone achieved:
+
+**Scripts created:**
+- lib-context.sh (5 shared helpers)
+- condense-context.sh (full condensation pipeline)
+- evict-tool-result.sh (per-kind thresholds)
+- precompact-condense.sh (PreCompact hook)
+
+**Scripts modified:**
+- stop-watcher.sh (two-gate condensation check)
+- implement.md (phase-conditional reference loading)
+- spec.schema.json (executionPhase enum)
+- hooks.json (PreCompact hook)
+
+**POE verification:** E2E test passed on 2081-line fixture. Archive, markers, metrics, pointer atomicity all verified.
+
+**Next: Phase 2 (Refactor)** — error handling improvements, spec-completion cleanup, coordinator-pattern.md docs
+
+### [2026-05-17 08:30:00Z] coordinator → all
+**Signal**: CONTINUE
+
+## Phase 2 (Refactor) Starting
+
+Task 2.1 delegated — Add flock timeout and validation error handling to condense-context.sh
+- flock -w 10 -x 200 (10s timeout)
+- Validate temp chat.md non-empty + protected suffix before mv
+- Error logging to stderr for all failure paths
+- Original files preserved on failure
+- Verify: `bash -n plugins/ralphharness/hooks/scripts/condense-context.sh && echo 2.1_PASS`
+
+### [2026-05-17 08:38:00Z] external-reviewer → spec-executor
+**Signal**: OVER
+
+**Task 2.4 (implement.md archive+tool-results cleanup) — FAIL**
+
+**Criterion**: AC-5.3 requires implement.md Step 5 to delete `.archive.*.md` and `.tool-results/` at spec completion.
+
+**Evidence**: `grep -A 3 'Step 5' implement.md | grep -c 'archive\|tool-results'` → 0. implement.md Step 5 (lines 672-686) has no archive cleanup and no tool-results cleanup.
+
+**Fix required**: Add to implement.md Step 5, after line 678 (the orphaned temp cleanup step):
+```bash
+rm -f "$SPEC_PATH"/.archive.*.md && echo "[ralphharness] Cleanup: archives removed" >&2
+rm -rf "$SPEC_PATH/.tool-results/" && echo "[ralphharness] Cleanup: tool-results removed" >&2
+```
+
+**Tasks verified this cycle**:
+- 2.1 PASS: flock -w 10 timeout, validation, error logging (condense-context.sh)
+- 2.2 PASS (with WARNING): lib-context.sh syntax OK but task verify is weak — no pipefail in transcript_usage_pct subshell, no flock timeout on fd 201
+- 2.3 PASS: tool_kind validation + pipefail (evict-tool-result.sh)
+- 2.4 FAIL: implement.md Step 5 missing archive + tool-results cleanup
+
+**Phase 2 progress**: 3/5 tasks PASS, 1/5 FAIL, tasks 2.4 and 2.5 remain.
+
+### [2026-05-17 08:38:00Z] external-reviewer → all
+**REVIEW CYCLE 2026-05-17T08:38:00Z**  
+Reviewed: [task-2.1 PASS, task-2.2 PASS/WARNING, task-2.3 PASS, task-2.4 FAIL]  
+Blockage signals: task-2.4 FAIL — implement.md Step 5 missing archive+tool-results cleanup  
+Phase 2 progress: 3/5 PASS, 1/5 FAIL, 1 pending  
+Next cycle in 3 min (sleep 180)
+
+### [2026-05-17 08:45:00Z] external-reviewer → all
+**REVIEW CYCLE 2026-05-17T08:45:00Z**  
+Reviewed: [task-2.1 PASS, task-2.2 PASS/WARNING, task-2.3 PASS, task-2.4 PASS (fixed), task-2.5 PENDING]  
+Blockage signals: task-2.5 not started (executionPhase doc: ✓, evict-tool-result.sh: ✗ function name not in file)  
+Phase 2 progress: 4/5 complete, task 2.5 pending  
+Executor working: coordinator-pattern.md modified (executionPhase section ✓, eviction section ✓ but verify command expects exact 'evict-tool-result' string)  
+Next cycle in 3 min (sleep 180)
+
+### [2026-05-17 08:50:00Z] external-reviewer → all
+**REVIEW CYCLE 2026-05-17T08:50:00Z**  
+Reviewed: [task-2.5 PASS, task-3.1 PASS]  
+Phase 2: 5/5 PASS ✓  
+Phase 3: 1/5 PASS (test-lib-context.bats 12/12 tests ✓)  
+Executor active: test-condense-context.bats (untracked) started for task 3.2  
+Next cycle in 3 min (sleep 180)
+
+### [2026-05-17 08:54:00Z] external-reviewer → all
+**REVIEW CYCLE 2026-05-17T08:54:00Z**  
+Reviewed: [no new completions]  
+Phase 2: 5/5 PASS ✓  
+Phase 3: 1/5 (3.1 PASS, tasks 3.2-3.5 in progress)  
+Executor: working on test-condense-context.bats (untracked, 7 min since last commit)  
+No stagnation — bats file creation is reasonable for a complex integration test  
+Next cycle in 3 min (sleep 180)
+
+### [2026-05-17 08:58:00Z] external-reviewer → spec-executor
+**Signal**: HOLD
+
+**Task 3.2 test-condense-context.bats — 4 FAILING TESTS before task marked [x]**
+
+**Test results**: `bats test-condense-context.bats` → 4 fail, 8 pass
+
+**FAILING TESTS**:
+1. Test 1: "combined lines reduced below 2000" — chat went 2107→2113 (INCREASED, not decreased)
+2. Test 5: "at most 15 message headers" — all 2107 lines preserved, no condensation
+3. Test 8: "Goal and Learnings preserved" — grep '# Goal' not found in condensed progress.md
+4. Test 9: "exactly 3 task entries" — count is 0
+
+**Root cause**: The test fixture's .ralph-state.json likely has min-pointer at or near 0 (all content in protected suffix), OR the condensation logic has a bug when the prefix is large.
+
+**Required fix**: Fix test fixture state or condensation logic before marking task 3.2 as [x].
+
+**Evidence**: `condensed: chat 2107->2113, progress 31->2` — chat INCREASED by 6 lines (added separators) instead of decreasing.
+
+### [2026-05-17 08:58:00Z] external-reviewer → all
+**REVIEW CYCLE 2026-05-17T08:58:00Z**  
+Reviewed: [task-3.2 WARNING — 4 bats tests failing]  
+Phase 3: 1/5 (3.1 PASS, 3.2 has 4 FAIL)  
+Executor working on test-condense-context.bats (202 lines, untracked)  
+Next cycle in 3 min (sleep 180)
+
+### [2026-05-17 09:05:00Z] external-reviewer → spec-executor
+**Signal**: INTENT-FAIL
+
+**Task 3.2 — FABRICATION: test fixture has SCHEMA MISMATCH**
+
+**Violation**: test-condense-context.bats uses `.state.chat` path but schema defines `.chat` at root level.
+
+**Evidence**:
+```
+# Test fixture (test-condense-context.bats line 48-61):
+{
+  "state": {
+    "executionPhase": "poc",
+    "chat": { "coordinator": {...}, "executor": {...}, "reviewer": {...} }
+  }
+}
+
+# Schema (spec.schema.json):
+"executionPhase": { enum: ["poc", "refactor", "test", "quality"] }  ← at ROOT
+"chat": { ... }  ← at ROOT, not under state
+
+# condense-context.sh jq path (line 102):
+.jq -r '[.chat.coordinator.lastReadLine // 0, ...] | min'  ← reads ROOT .chat
+```
+
+**Result**: jq returns `null` for all paths → `// 0` fallback → MIN_POINTER=0 → entire file in protected suffix → no condensation → all 2107 lines pass through unchanged.
+
+**Impact**: 4 tests fail because the fixture is structurally wrong, NOT because the script is broken.
+
+**Required fix**: Change test fixture from `.state.chat` to `.chat` at root (matching schema):
+```json
+{
+  "phase": "execution",
+  "taskIndex": 5,
+  "totalTasks": 20,
+  "executionPhase": "poc",
+  "chat": {
+    "coordinator": {"lastReadLine": 1500},
+    "executor": {"lastReadLine": 1200},
+    "reviewer": {"lastReadLine": 1000}
+  }
+}
+```
+
+**You have 1 cycle to fix this before I write a formal FAIL with FABRICATION label.**
+
+### [2026-05-17 09:09:00Z] external-reviewer → spec-executor
+**Task 3.2**: FAIL — FABRICATION (schema mismatch in test fixture)
+
+**Root cause confirmed**: test-condense-context.bats fixture uses `.state.chat` but schema defines `.chat` at root. condense-context.sh reads `.chat` at root. No condensation occurs → 5 tests fail.
+
+**Fix**: Move `chat` to root level in fixture. Update test jq reads from `.state.chat` to `.chat`.
+
+### [2026-05-17 09:09:00Z] external-reviewer → all
+**REVIEW CYCLE 2026-05-17T09:09:00Z**  
+Reviewed: [task-3.2 FAIL/FABRICATION]  
+Phase 3: 1/5 PASS (3.1), 1/5 FAIL (3.2 — fixture schema mismatch)  
+Executor: no response to INTENT-FAIL after 1 cycle  
+Next cycle in 3 min (sleep 180)
+
+### [2026-05-17 09:14:00Z] external-reviewer → all
+**REVIEW CYCLE 2026-05-17T09:14:00Z**  
+Reviewed: [task-3.2 partial PASS after schema fix]  
+Schema fix: executor moved `chat` from `.state.chat` → `.chat` at root.  
+Tests: 10/11 pass (1 minor: Test 3 — [HOLD] embedded in message block, not standalone line)  
+Condensation confirmed: 2207→1142 lines ✓  
+Phase 3: 1/5 PASS (3.1), task 3.2 in progress (10/11 bats pass)  
+Next cycle in 3 min (sleep 180)
+
+### [2026-05-17 09:18:00Z] external-reviewer → all
+**REVIEW CYCLE 2026-05-17T09:18:00Z**  
+Reviewed: [tasks 3.2, 3.3 — both PASS after executor fix]  
+Phase 3: 3/5 PASS (3.1, 3.2, 3.3 — all bats pass: 12+11+8=31 tests ✓)  
+Task 3.4: test-context-scoping.bats not yet created  
+Next cycle in 3 min (sleep 180)
+
+### [2026-05-17 09:22:00Z] external-reviewer → spec-executor
+**Signal**: HOLD
+
+**Task 3.4 — Test bugs (not implementation bugs): 2 jq paths wrong in test-context-scoping.bats**
+
+**Test 8 failure**: `jq -e '.properties.executionPhase.enum'` — wrong path
+- Test expects: `.properties.executionPhase.enum`
+- Actual path: `.definitions.state.properties.executionPhase.enum`
+- executionPhase is inside the `state` definition, not at root level
+
+**Test 9 failure**: `jq -r '.hooks.PreCompact.command'` — wrong path
+- Test expects: `.hooks.PreCompact.command`
+- Actual structure: PreCompact is an array `[{matcher:"*", hooks:[{type:"command", command:"..."}]}]`
+- Correct path: `.hooks.PreCompact[0].hooks[0].command` (or use jq to find first matching)
+
+**Required**: Fix the 2 jq paths in test assertions. Do NOT change implementation files.
+
+### [2026-05-17 09:22:00Z] external-reviewer → all
+**REVIEW CYCLE 2026-05-17T09:22:00Z**  
+Reviewed: [task-3.4 — 7/9 bats pass, 2 jq path bugs in tests]  
+Phase 3: 3/5 PASS (3.1, 3.2, 3.3), task 3.4 in progress (7/9 bats pass)  
+Next cycle in 3 min (sleep 180)

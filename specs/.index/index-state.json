@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "updated": "2026-05-17T03:44:37Z",
+  "updated": "2026-05-17T08:29:57Z",
   "directories": [
     {
       "path": "./specs",
@@ -368,10 +368,9 @@
     {
       "name": "context-middleware",
       "path": "./specs/context-middleware",
-      "phase": "tasks",
-      "taskIndex": 0,
-      "totalTasks": 29,
-      "awaitingApproval": true
+      "phase": "execution",
+      "taskIndex": 11,
+      "totalTasks": 29
     }
   ]
 }
