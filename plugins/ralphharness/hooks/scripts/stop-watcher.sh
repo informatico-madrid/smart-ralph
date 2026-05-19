@@ -943,7 +943,7 @@ gate_verify_sequential() {
       '{type:"control",signal:"DEADLOCK",from:"gate_verify_sequential",to:"coordinator",taskIndex:$taskIndex,status:$status,timestamp:$timestamp,reason:$reason}')
 
     if ! append_signal "$spec_path" "$deadlock_payload"; then
-      echo "[ralphharness] WARN: signals.jsonl write failed (read-only fs), skipping DEADLOCK signal" >> "$spec_path/.progress.md" 2>/dev/null
+      echo "[harness][gate] WARN: signals.jsonl write failed (read-only fs), skipping DEADLOCK" >> "$spec_path/.progress.md" 2>/dev/null
       return 0
     fi
     return 1
@@ -1050,7 +1050,7 @@ emit_task_metric() {
     local write_exit=0
     write_metric "$spec_path" "$status" "$task_index" "$task_iteration" "0" "$task_name" "implementation" "$task_id" "$commit_sha" || write_exit=$?
     if [ "$write_exit" -ne 0 ]; then
-        echo "[ralphharness] WARN: write_metric failed (exit $write_exit), skipping metric for task $task_index" >> "$spec_path/.progress.md" 2>/dev/null
+        echo "[harness][metric] WARN: write_metric failed (exit $write_exit)" >> "$spec_path/.progress.md" 2>/dev/null
     fi
 
     # Update lastMetricTaskIndex / lastMetricIteration in state (atomic)
@@ -1080,7 +1080,7 @@ gate_task_mark_integrity() {
 
     # If task_review.md absent — skip guard (no review to check)
     if [ ! -f "$review_file" ]; then
-        echo "[ralphharness] WARN: task_review.md absent from $spec_path; skipping task-mark integrity guard" >> "$CWD/$spec_path/.progress.md" 2>/dev/null
+        echo "[harness][gate] WARN: task_review.md absent from $spec_path; skipping integrity guard" >> "$CWD/$spec_path/.progress.md" 2>/dev/null
         return 0
     fi
 
@@ -1167,7 +1167,7 @@ gate_task_mark_integrity() {
               '{type:"control",signal:"DEADLOCK",from:"gate_task_mark_integrity",to:"coordinator",taskId:$taskId,status:$status,timestamp:$timestamp,reason:$reason}')
 
             if ! append_signal "$spec_path" "$payload"; then
-                echo "[ralphharness] WARN: signals.jsonl write failed, skipping DEADLOCK for task $tid" >> "$CWD/$spec_path/.progress.md" 2>/dev/null
+                echo "[harness][gate] WARN: signals.jsonl write failed, skipping DEADLOCK for task $tid" >> "$CWD/$spec_path/.progress.md" 2>/dev/null
             fi
         done
 

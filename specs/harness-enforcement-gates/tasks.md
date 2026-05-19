@@ -271,7 +271,7 @@ verify with direct shell invocation against ad-hoc fixtures.
 Focus: clean up the POC code — extract shared helpers, consistent error handling,
 match existing `stop-watcher.sh` / helper-script style. No behavior change.
 
-- [ ] 2.1 Normalize WARN/diagnostic logging across the 3 appended functions
+- [x] 2.1 Normalize WARN/diagnostic logging across the 3 appended functions
   - **Do**:
     1. Unify stderr/`.progress.md` WARN message format across `gate_verify_sequential`, `emit_task_metric`, `gate_task_mark_integrity` (consistent prefix, no duplicated literals).
   - **Files**: `plugins/ralphharness/hooks/scripts/stop-watcher.sh`
