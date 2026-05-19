@@ -913,12 +913,12 @@ gate_verify_sequential() {
     local blocked
     blocked=$(awk -v target="$task_index" '
         /^- \[[ x]\]/ {
+            if (/^- \[[ x\]].*\[VERIFY\]/ && /\[ \]/) {
+                print idx
+                exit 1
+            }
             if (idx >= target) exit
             idx++
-        }
-        /^- \[[ x\]][^]]*\[VERIFY\]/ && /\[ \]/ {
-            print idx
-            exit 1
         }
     ' "$tasks_file")
 
