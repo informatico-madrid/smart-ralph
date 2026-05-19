@@ -408,7 +408,7 @@ git-diff assertion and the E2E gate-integration task.
   - **Done when**: Both suites pass.
   - **Commit**: `chore(tests): pass quality checkpoint` (only if fixes needed)
 
-- [ ] 3.11 Add `stop-watcher.sh` append-only assertion to a bats suite
+- [x] 3.11 Add `stop-watcher.sh` append-only assertion to a bats suite
   - **Do**:
     1. In `test-verify-sequential-gate.bats` (or a small dedicated `@test`), git-diff the changed `stop-watcher.sh`: assert only appended lines + ≤3 in-block call lines; no edited pre-existing logic line (zero `^-` diff lines).
   - **Files**: `plugins/ralphharness/tests/test-verify-sequential-gate.bats`
@@ -418,7 +418,7 @@ git-diff assertion and the E2E gate-integration task.
   - _Requirements: FR-19, AC-6.1, AC-6.2, NFR-2_
   - _Design: Test Coverage Table row 19_
 
-- [ ] 3.12 E2E gate-integration test — drive a fixture spec through `stop-watcher.sh`
+- [x] 3.12 E2E gate-integration test — drive a fixture spec through `stop-watcher.sh`
   - **Do**:
     1. Create `plugins/ralphharness/tests/test-gate-integration-e2e.bats`.
     2. Build a real fixture spec directory (`tasks.md` multi-phase with a skipped preceding `[VERIFY]`, `signals.jsonl`, `task_review.md`, `.ralph-state.json`, `.metrics.jsonl`) in `$BATS_TMPDIR`.
