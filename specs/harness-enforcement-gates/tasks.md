@@ -463,7 +463,7 @@ NEVER push to the default branch. Use the existing feature branch and a PR.
   - **Done when**: All 36 ACs confirmed met via automated checks.
   - **Commit**: None
 
-- [ ] 4.4 Create PR and verify CI
+- [x] 4.4 Create PR and verify CI
   - **Do**:
     1. Verify current branch is a feature branch: `git branch --show-current`. If on default branch, STOP and alert user.
     2. Push branch: `git push -u origin <branch-name>`.
@@ -473,7 +473,7 @@ NEVER push to the default branch. Use the existing feature branch and a PR.
   - **Verify**: `gh pr checks` shows all checks passing.
   - **Commit**: None
 
-- [ ] 4.G [VERIFY] Phase 4 exit gate
+- [x] 4.G [VERIFY] Phase 4 exit gate
   - **Do**: Confirm all preceding tasks and checkpoints of Phase 4 are complete and green; PR open, CI green, version bumped.
   - **Verify**: All Phase 4 `[VERIFY]` tasks above are `[x]`; `gh pr checks` green; `jq -r .version plugins/ralphharness/.claude-plugin/plugin.json` is `5.7.0`.
   - **Done when**: Phase 4 fully satisfied; safe to advance to Phase 5.

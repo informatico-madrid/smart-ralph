@@ -76,7 +76,7 @@ graph TB
 **Signature**: `verify-fix-present.sh <file> [<pattern>]` → exit 0 (present) / non-zero (absent).
 
 **Algorithm**:
-```
+```text
 1. file=$1 ; pattern=$2
 2. base = git merge-base HEAD origin/main
    - if that fails (origin/main unreachable): fallback to recorded checkpoint SHA
@@ -193,14 +193,14 @@ sequenceDiagram
   - **Primary**: invoke the `bmad-consensus-party` SKILL via the Skill tool (confirmed at `.claude/skills/bmad-consensus-party/SKILL.md`). It runs BMAD Party Mode iteratively with context enrichment between rounds until agents reach consensus.
   - **Fallback** (skill absent — `[ -f .claude/skills/bmad-consensus-party/SKILL.md ]` is false): invoke 2–3 subagents via the Task tool — `external-reviewer` + `qa-engineer` (+ optionally a third reviewer) — each independently answering the same triage question; the coordinator takes the majority verdict.
   - **Triage input contract** (passed to skill or subagents):
-    ```
+    ```yaml
     - unmarked taskId and its task block from tasks.md
     - the task's task_review.md PASS entry (full YAML entry)
     - external_unmarks[taskId] current value + prior snapshot value
     - the git history of tasks.md around the un-mark (git log -p -- tasks.md, last 3 commits)
     ```
   - **Consensus output contract** (the skill / majority of subagents must return one of):
-    ```
+    ```text
     VERDICT: FALSE_POSITIVE   reason: <why the un-mark is actually legitimate/benign>
     VERDICT: GENUINE_CONFLICT reason: <why human intervention is required>
     ```
