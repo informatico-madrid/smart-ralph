@@ -55,7 +55,7 @@ else
     _ckpt_sha="$(jq -r '.checkpoint.sha // empty' "$_spec_path/.ralph-state.json" 2>/dev/null || true)"
     if [[ -n "$_ckpt_sha" ]] && [[ "$_ckpt_sha" != "null" ]]; then
       base="$_ckpt_sha"
-      echo "WARN: origin/main unreachable, base=$_ckpt_sha" >&2
+      echo "[harness][verify-fix] WARN: origin/main unreachable, base=$_ckpt_sha" >&2
     fi
   fi
   if [[ -z "$base" ]]; then
@@ -65,29 +65,18 @@ else
 fi
 
 # --- Three-state diff (task 1.3) ---
-changed=0
+# Committed, staged, and working-tree — any non-empty diff means the fix is present.
 
-# State 1: committed (base → HEAD)
-if ! git diff --quiet "$base" HEAD -- "$file" 2>/dev/null; then
-  changed=1
-fi
-
-# State 2: staged (index vs. base)
-if [[ "$changed" -eq 0 ]] && ! git diff --cached --quiet -- "$file" 2>/dev/null; then
-  changed=1
-fi
-
-# State 3: working-tree (working tree vs. index)
-if [[ "$changed" -eq 0 ]] && ! git diff --quiet -- "$file" 2>/dev/null; then
-  changed=1
-fi
-
-if [[ "$changed" -eq 0 ]]; then
-  echo "FIX ABSENT: $file unchanged since $base in all 3 states" >&2
+# Check all three states for changes
+if git diff --quiet "$base" HEAD -- "$file" 2>/dev/null && \
+   git diff --cached --quiet -- "$file" 2>/dev/null && \
+   git diff --quiet -- "$file" 2>/dev/null; then
+  # No changes in any state — fix not present
+  echo "FIX ABSENT: $file unchanged since $base in committed, staged, and working-tree" >&2
   exit 1
 fi
 
-# --- Optional pattern check ---
+# At least one state has a change — fix is present; verify optional pattern
 if [[ -n "$pattern" ]]; then
   if ! git show HEAD:"$file" 2>/dev/null | grep -qF -- "$pattern"; then
     echo "FIX PATTERN ABSENT" >&2

@@ -280,7 +280,7 @@ match existing `stop-watcher.sh` / helper-script style. No behavior change.
   - **Commit**: `refactor(stop-watcher): normalize gate WARN logging`
   - _Design: Existing Patterns to Follow_
 
-- [ ] 2.2 Tidy `verify-fix-present.sh` — clarify exit-code paths and diagnostics
+- [x] 2.2 Tidy `verify-fix-present.sh` — clarify exit-code paths and diagnostics
   - **Do**:
     1. Consolidate the three-state diff into a clear helper-local block; ensure each exit (0/1/2/3) has a single unambiguous diagnostic; stdout stays silent (composable).
   - **Files**: `plugins/ralphharness/hooks/scripts/verify-fix-present.sh`
