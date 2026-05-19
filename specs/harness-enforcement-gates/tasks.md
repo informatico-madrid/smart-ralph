@@ -451,13 +451,13 @@ NEVER push to the default branch. Use the existing feature branch and a PR.
   - _Requirements: NFR-5, AC-6.3_
   - _Design: File Structure (plugin.json, marketplace.json), Implementation Step 9_
 
-- [ ] 4.2 [VERIFY] Full local CI: bats suites + script syntax
+- [x] 4.2 [VERIFY] Full local CI: bats suites + script syntax
   - **Do**: Run all 6 new bats suites plus the existing suite set; `bash -n` on `stop-watcher.sh` and `verify-fix-present.sh`.
   - **Verify**: `bash -n plugins/ralphharness/hooks/scripts/stop-watcher.sh && bash -n plugins/ralphharness/hooks/scripts/verify-fix-present.sh && bats plugins/ralphharness/tests/test-verify-fix-present.bats plugins/ralphharness/tests/test-verify-sequential-gate.bats plugins/ralphharness/tests/test-phase-exit-gate.bats plugins/ralphharness/tests/test-task-metrics.bats plugins/ralphharness/tests/test-mark-integrity-gate.bats plugins/ralphharness/tests/test-gate-integration-e2e.bats`
   - **Done when**: All bats suites pass; no syntax errors.
   - **Commit**: `chore(harness): pass local CI` (only if fixes needed)
 
-- [ ] 4.3 [VERIFY] AC checklist verification
+- [x] 4.3 [VERIFY] AC checklist verification
   - **Do**: Read requirements.md; programmatically confirm each AC-* is satisfied — grep the codebase for each gate's implementation and run the relevant bats case.
   - **Verify**: `grep -q 'gate_verify_sequential' plugins/ralphharness/hooks/scripts/stop-watcher.sh && grep -q 'emit_task_metric' plugins/ralphharness/hooks/scripts/stop-watcher.sh && grep -q 'gate_task_mark_integrity' plugins/ralphharness/hooks/scripts/stop-watcher.sh && test -x plugins/ralphharness/hooks/scripts/verify-fix-present.sh && grep -qi 'Phase X exit gate' plugins/ralphharness/agents/task-planner.md && echo AC_PASS`
   - **Done when**: All 36 ACs confirmed met via automated checks.
