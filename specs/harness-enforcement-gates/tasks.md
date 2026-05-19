@@ -54,13 +54,13 @@ verify with direct shell invocation against ad-hoc fixtures.
   - _Requirements: FR-5, FR-6, AC-2.2, AC-2.3, AC-2.4_
   - _Design: Component 2, Implementation Step 1_
 
-- [ ] 1.4 [VERIFY] Quality checkpoint: verify-fix-present.sh shellcheck + smoke
+- [x] 1.4 [VERIFY] Quality checkpoint: verify-fix-present.sh shellcheck + smoke
   - **Do**: Run `shellcheck` (if available) and a direct-shell smoke of all three exit paths against a throwaway git fixture.
   - **Verify**: `command -v shellcheck >/dev/null && shellcheck plugins/ralphharness/hooks/scripts/verify-fix-present.sh || true; bash -n plugins/ralphharness/hooks/scripts/verify-fix-present.sh && echo PASS`
   - **Done when**: No syntax errors; smoke paths return expected codes.
   - **Commit**: `chore(verify-fix): pass quality checkpoint` (only if fixes needed)
 
-- [ ] 1.5 Append `gate_verify_sequential()` function to `stop-watcher.sh`
+- [x] 1.5 Append `gate_verify_sequential()` function to `stop-watcher.sh`
   - **Do**:
     1. **Append** (end of file) a new function `gate_verify_sequential <spec_path> <tasks_file> <task_index>`.
     2. Body: if `tasks_file` absent ⇒ return 0; `awk` scan `^- \[[ x]\]` lines with 0-based counter; for each line at index `< task_index` matching `\[VERIFY\]` with mark `\[ \]` collect index; if none ⇒ return 0; else log `BLOCKED: preceding VERIFY task N unsatisfied` to stderr and return 1.

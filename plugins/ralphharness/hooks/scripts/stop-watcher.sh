@@ -851,3 +851,38 @@ find "$CWD/$SPEC_PATH" -name ".progress-task-*.md" -mmin +60 -delete 2>/dev/null
 
 # Note: .progress.md and .ralph-state.json are preserved for loop continuation
 # Use /ralphharness:cancel to explicitly stop execution and cleanup state
+
+# Sequential [VERIFY] gate — blocks advancement when preceding [VERIFY] tasks
+# at lower indices remain unsatisfied.  Scans tasks.md for lines matching
+# "^- \\[[ x]\\]" and collects any [VERIFY] lines whose 0-based index is
+# strictly less than task_index and whose mark is " " (unchecked).
+gate_verify_sequential() {
+    local spec_path="$1"
+    local tasks_file="$2"
+    local task_index="$3"
+
+    # If tasks file does not exist there is nothing to check
+    if [ ! -f "$tasks_file" ]; then
+        return 0
+    fi
+
+    # Scan for unchecked [VERIFY] tasks below task_index
+    local blocked
+    blocked=$(awk -v target="$task_index" '
+        /^- \[[ x]\]/ {
+            if (idx >= target) exit
+            idx++
+        }
+        /^- \[[ x\]][^]]*\[VERIFY\]/ && /\[ \]/ {
+            print idx
+            exit 1
+        }
+    ' "$tasks_file")
+
+    if [ -z "$blocked" ]; then
+        return 0
+    fi
+
+    echo "BLOCKED: preceding VERIFY task ${blocked} unsatisfied" >&2
+    return 1
+}
