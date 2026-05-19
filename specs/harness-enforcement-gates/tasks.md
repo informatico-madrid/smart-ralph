@@ -430,7 +430,7 @@ git-diff assertion and the E2E gate-integration task.
   - _Requirements: US-1..US-6, Success Criteria_
   - _Design: Data Flow, Verification Contract_
 
-- [ ] 3.13 [VERIFY] Phase 3 exit gate
+- [x] 3.13 [VERIFY] Phase 3 exit gate
   - **Do**: Confirm all preceding tasks and checkpoints of Phase 3 are complete and green; run all 6 bats suites.
   - **Verify**: `bats plugins/ralphharness/tests/test-verify-fix-present.bats plugins/ralphharness/tests/test-verify-sequential-gate.bats plugins/ralphharness/tests/test-phase-exit-gate.bats plugins/ralphharness/tests/test-task-metrics.bats plugins/ralphharness/tests/test-mark-integrity-gate.bats plugins/ralphharness/tests/test-gate-integration-e2e.bats`
   - **Done when**: Phase 3 fully satisfied; all bats suites green; safe to advance to Phase 4.
