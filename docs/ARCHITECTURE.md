@@ -416,6 +416,14 @@ Circuit breaker, pre-loop git checkpoint, per-task metrics, and read-only detect
 - **Signal replay**: `replay-signals.sh` deterministic replay of signals.jsonl at iteration N for incident review
 - **Signal library**: `lib-signals.sh` provides shared helpers (append_signal, active_signal_count, dedupe_ci_commands)
 
+### 5.5 Reviewer Warmup (`skills/reviewer-warmup/SKILL.md`)
+
+Exportable skill encapsulating two external-reviewer improvements shipped in v5.6.0:
+
+- **Bootstrap full-read**: On session start, reviewer reads `chat.md` in full (`lastReadLine = 0`), reads `.progress.md` fully, runs `git log --oneline` + `git diff --stat`. States spec-state mental model before cycle 1. Eliminates cold-start overhead (~30–40 min per spec).
+- **Heartbeat freshness gate**: Prepended before §4 Convergence Detection. Checks latest ALIVE/STILL timestamp from `signals.jsonl`. Fresh (≤10 min) → suppresses stagnation verdict, skips `convergence_rounds` increment. Stale/absent → falls through to existing 3-round DEADLOCK. Prevents false DEADLOCK during executor long reads.
+- `user-invocable: false` — exported to foreign runtimes via `implement.md` Step 4 (reviewer-skill export sub-step).
+
 ## 5.5 BMAD Bridge Plugin (`plugins/ralph-bmad-bridge/`)
 
 Structural mapper that converts BMAD planning artifacts into ralphharness spec files using deterministic bash+jq parsing (no LLM).
@@ -660,8 +668,10 @@ Assembled from stop-watcher.sh detection logic and spec-executor.md output forma
 | URGENT (signals.jsonl) | agent → signals.jsonl | stop-watcher | Yes (jq filter) |
 | ACK (signals.jsonl) | agent → signals.jsonl | coordinator | No |
 | CONTINUE (signals.jsonl) | agent → signals.jsonl | coordinator | No |
+| ALIVE (signals.jsonl) | spec-executor → signals.jsonl | external-reviewer freshness gate | No (non-blocking) |
+| STILL (signals.jsonl) | spec-executor → signals.jsonl | external-reviewer freshness gate | No (non-blocking) |
 
 ---
 
 *Generated 2026-04-04 from codebase analysis, revised after counter-analysis review*
-*Updated 2026-05-15 — signals.jsonl channel, ciSnapshot, new hooks, 5-layer verification*
+*Updated 2026-05-19 — ALIVE/STILL heartbeat signals, reviewer-warmup skill (v5.6.0)*
