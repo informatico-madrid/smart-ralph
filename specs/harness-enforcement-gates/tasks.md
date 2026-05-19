@@ -343,7 +343,7 @@ git-diff assertion and the E2E gate-integration task.
   - **Done when**: All US-2 cases pass.
   - **Commit**: `chore(tests): pass quality checkpoint` (only if fixes needed)
 
-- [ ] 3.4 Create `test-verify-sequential-gate.bats` — pass / block / legacy
+- [x] 3.4 Create `test-verify-sequential-gate.bats` — pass / block / legacy — c1ff5c6
   - **Do**:
     1. Create the bats file; `setup()` writes a `fixture-multiphase` spec dir into `$BATS_TMPDIR`.
     2. Cases: preceding `[VERIFY]` `[ ]` ⇒ rc=1 + `BLOCKED:` stderr + DEADLOCK line in `signals.jsonl`; all preceding `[VERIFY]` `[x]` ⇒ rc=0, no signal; no `[VERIFY]` tasks ⇒ rc=0; read-only fs `signals.jsonl` ⇒ WARN + rc=0.
