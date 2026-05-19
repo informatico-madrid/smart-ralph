@@ -316,7 +316,7 @@ Focus: the 5 bats suites. One suite per gate, each covering pass / block /
 legacy-degradation per the design Test Coverage Table. Plus the append-only
 git-diff assertion and the E2E gate-integration task.
 
-- [ ] 3.1 Create `test-verify-fix-present.bats` — committed/staged/working-tree
+- [x] 3.1 Create `test-verify-fix-present.bats` — committed/staged/working-tree
   - **Do**:
     1. Create the bats file; `setup()` shell-builds a `fixture-git-fix` repo (`git init`, branch diverged from a local fake `origin/main`).
     2. Cases: fix committed ⇒ exit 0; fix staged not committed ⇒ exit 0; fix unstaged ⇒ exit 0.
@@ -327,7 +327,7 @@ git-diff assertion and the E2E gate-integration task.
   - _Requirements: FR-5, AC-2.2, NFR-6_
   - _Design: Test Coverage Table rows 4-6_
 
-- [ ] 3.2 Extend `test-verify-fix-present.bats` — absent + pattern + fallback
+- [x] 3.2 Extend `test-verify-fix-present.bats` — absent + pattern + fallback
   - **Do**:
     1. Add cases: file unchanged ⇒ exit 1 + `FIX ABSENT` stderr; pattern present ⇒ 0, pattern absent ⇒ exit 2; `origin/main` removed ⇒ checkpoint SHA used + WARN + correct verdict; no SHA ⇒ exit 3.
   - **Files**: `plugins/ralphharness/tests/test-verify-fix-present.bats`
@@ -337,7 +337,7 @@ git-diff assertion and the E2E gate-integration task.
   - _Requirements: FR-5, FR-6, AC-2.3, AC-2.4, AC-2.7, NFR-6_
   - _Design: Test Coverage Table rows 7-9_
 
-- [ ] 3.3 [VERIFY] Quality checkpoint: verify-fix-present suite green
+- [x] 3.3 [VERIFY] Quality checkpoint: verify-fix-present suite green
   - **Do**: Run the full `test-verify-fix-present.bats` suite.
   - **Verify**: `bats plugins/ralphharness/tests/test-verify-fix-present.bats`
   - **Done when**: All US-2 cases pass.
