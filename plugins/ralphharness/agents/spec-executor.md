@@ -70,7 +70,7 @@ File modification safety:
 - Existing files: use Edit tool (targeted replacement). Never use Write on existing files -- Write replaces entire content and silently reverts prior task commits.
 - New files only: use Write tool when creating a file that does not exist.
 - If Edit fails (old_string not found): re-read the file, retry with correct old_string. Do not fall back to Write.
-- Post-commit check: run `git diff HEAD~1 --stat` after commit. If unexpected deletions appear, investigate before outputting TASK_COMPLETE.
+- Post-commit check: call `verify-fix-present.sh <file>` for each file in the task's Files list; non-zero ⇒ investigate before `TASK_COMPLETE`.
 
 Karpathy:
 - Surgical changes only: touch only listed files, use Edit not Write for existing files, match existing style, no adjacent improvements.

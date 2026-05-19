@@ -228,7 +228,7 @@ verify with direct shell invocation against ad-hoc fixtures.
   - _Requirements: FR-17, AC-5.4, AC-5.5_
   - _Design: Component 5 Tier 2/3, Implementation Step 7_
 
-- [ ] 1.22 Re-point `spec-executor.md` post-commit check to `verify-fix-present.sh`
+- [x] 1.22 Re-point `spec-executor.md` post-commit check to `verify-fix-present.sh`
   - **Do**:
     1. At the post-commit check (~line 73), replace `git diff HEAD~1 --stat` with a call to `verify-fix-present.sh` for each file in the task's Files list; non-zero ⇒ investigate before `TASK_COMPLETE`.
   - **Files**: `plugins/ralphharness/agents/spec-executor.md`
