@@ -440,7 +440,7 @@ git-diff assertion and the E2E gate-integration task.
 
 NEVER push to the default branch. Use the existing feature branch and a PR.
 
-- [ ] 4.1 Bump plugin version to 5.7.0
+- [x] 4.1 Bump plugin version to 5.7.0
   - **Do**:
     1. Update `plugins/ralphharness/.claude-plugin/plugin.json` version 5.6.0 → 5.7.0.
     2. Update the matching `ralphharness` entry in `.claude-plugin/marketplace.json` to 5.7.0.
