@@ -884,5 +884,24 @@ gate_verify_sequential() {
     fi
 
     echo "BLOCKED: preceding VERIFY task ${blocked} unsatisfied" >&2
+
+    # Emit DEADLOCK control signal to signals.jsonl (FR-2, AC-1.2, AC-1.7)
+    if [ ! -f "$spec_path/signals.jsonl" ]; then
+      cp "$CLAUDE_PLUGIN_ROOT/templates/signals.jsonl" "$spec_path/signals.jsonl" 2>/dev/null || true
+    fi
+    source "$CLAUDE_PLUGIN_ROOT/hooks/scripts/lib-signals.sh" 2>/dev/null || true
+
+    deadlock_payload=$(jq -n \
+      --arg source "gate_verify_sequential" \
+      --arg reason "preceding VERIFY task ${blocked} unsatisfied" \
+      --argjson taskIndex "$blocked" \
+      --arg status "active" \
+      --arg timestamp "$(date -u +%FT%TZ)" \
+      '{type:"control",signal:"DEADLOCK",from:"gate_verify_sequential",to:"coordinator",taskIndex:$taskIndex,status:$status,timestamp:$timestamp,reason:$reason}')
+
+    if ! append_signal "$spec_path" "$deadlock_payload"; then
+      echo "[ralphharness] WARN: signals.jsonl write failed (read-only fs), skipping DEADLOCK signal" >> "$spec_path/.progress.md" 2>/dev/null
+      return 0
+    fi
     return 1
 }

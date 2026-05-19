@@ -72,7 +72,7 @@ verify with direct shell invocation against ad-hoc fixtures.
   - _Requirements: FR-1, FR-3, AC-1.1, AC-1.3, AC-1.4, AC-1.5_
   - _Design: Component 1, Implementation Step 2_
 
-- [ ] 1.6 Add DEADLOCK signal emission to `gate_verify_sequential()`
+- [x] 1.6 Add DEADLOCK signal emission to `gate_verify_sequential()`
   - **Do**:
     1. In `gate_verify_sequential`, before `return 1`: ensure `signals.jsonl` exists (idempotent `cp` of template, mirroring HOLD-GATE); `source lib-signals.sh`; `append_signal` a DEADLOCK control payload (`source:"gate_verify_sequential"`, `reason:"preceding VERIFY task <N> unsatisfied"`, `taskIndex`, `status:"active"`).
     2. If `signals.jsonl` cannot be created (read-only fs) ⇒ log WARN to `.progress.md`, skip append, `return 0`.
