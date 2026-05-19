@@ -149,7 +149,7 @@ verify with direct shell invocation against ad-hoc fixtures.
   - _Requirements: FR-11, AC-4.1, AC-6.2_
   - _Design: Component 4, Implementation Step 5_
 
-- [ ] 1.14 Remove LLM-discretionary metrics block from `implement.md`
+- [x] 1.14 Remove LLM-discretionary metrics block from `implement.md`
   - **Do**:
     1. Delete the LLM-discretionary metrics prompt block (~lines 680-708, "After TASK_COMPLETE — write metrics"). No fallback kept (a kept fallback risks the duplicate line FR-12 forbids).
   - **Files**: `plugins/ralphharness/commands/implement.md`
