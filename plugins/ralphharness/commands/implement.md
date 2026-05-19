@@ -663,6 +663,39 @@ fi
   # END HOLD-GATE
   ```
 
+- **DEADLOCK handler for integrity-triage (`source:"gate_task_mark_integrity"`).**
+  When HOLD-GATE blocks because an active DEADLOCK signal has `source:"gate_task_mark_integrity"`,
+  run the Tier 2 integrity-triage procedure BEFORE halting execution:
+  1. **Read the DEADLOCK payload** from `signals.jsonl` — extract `taskId`/`task` (un-marked task index),
+     `reason` (which task was illegitimately un-marked), and `timestamp`.
+  2. **Gather triage inputs:**
+     - Read the original task block from `tasks.md` (the un-marked task's full description).
+     - Read `task_review.md` for the PASS entry for that task (if any).
+     - Read `.ralph-state.json` for `external_unmarks` state delta (how many external un-marks
+       vs the prior snapshot).
+  3. **Invoke consensus triage** (choose ONE path):
+     - **Primary**: check if `[ -f "$CWD/.claude/skills/bmad-consensus-party/SKILL.md" ]`. If the
+       skill file exists, run `Skill bmad-consensus-party` with the triage inputs and a prompt
+       asking the BMAD Party to reach consensus on whether the un-mark is legitimate.
+     - **Fallback**: if the skill file does NOT exist, spawn 2-3 subagents via Task tool
+       (e.g., `external-reviewer` + `qa-engineer`) with the same triage inputs and the question:
+       "Is the un-mark of task <taskId> a false positive or a genuine conflict?" Each subagent
+       returns its verdict. Take the majority verdict.
+  4. **Output contract — verdict:** the consensus triage MUST return one of:
+     - `VERDICT: FALSE_POSITIVE` — the subagents determined the un-mark was spurious, the task
+       truly is complete, or the PASS entry in task_review.md confirms the work.
+     - `VERDICT: GENUINE_CONFLICT` — the subagents could not resolve the conflict; the un-mark
+       represents a genuine disagreement that requires human intervention.
+  5. **Handle verdict:**
+     - **FALSE_POSITIVE**: set `awaitingApproval=false`; use `jq` to set the DEADLOCK signal's
+       `status` to `"resolved"` in `signals.jsonl` (under flock); log the resolution to
+       `.progress.md`; remove the HOLD so the loop continues.
+     - **GENUINE_CONFLICT**: leave the DEADLOCK signal `status:"active"`; emit a human-facing
+       escalation block inline (same shape as existing ESCALATE blocks) that describes the
+       un-marked task, its PASS entry content from `task_review.md`, and the triage rationale;
+       set `awaitingApproval=true` in `.ralph-state.json` to pause execution pending human
+       review.
+
 - **MANDATORY: Read chat.md BEFORE delegating.** Before every task delegation, read `<basePath>/chat.md` for signals from external-reviewer. Obey HOLD, PENDING, DEADLOCK signals immediately—do not delegate if blocked.
 - **CRITICAL: Verify independently, never trust executor.** The executor may FABRICATE verification results (claimed tests passed when they failed, claimed coverage when coverage was 0%). 
   - **Rule**: NEVER trust pasted verification output from spec-executor. ALWAYS run the verify command independently.

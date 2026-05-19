@@ -199,13 +199,13 @@ verify with direct shell invocation against ad-hoc fixtures.
   - _Requirements: FR-15, AC-5.3, AC-6.2_
   - _Design: Component 5, Implementation Step 6_
 
-- [ ] 1.19 [VERIFY] Quality checkpoint: integrity gate syntax + append-only diff
+- [x] 1.19 [VERIFY] Quality checkpoint: integrity gate syntax + append-only diff
   - **Do**: `bash -n stop-watcher.sh`; `git diff` it and confirm zero deleted lines.
   - **Verify**: `bash -n plugins/ralphharness/hooks/scripts/stop-watcher.sh && git diff plugins/ralphharness/hooks/scripts/stop-watcher.sh | grep -c '^-' | grep -qx 0 && echo PASS`
   - **Done when**: No syntax errors; append-only invariant holds in the diff.
-  - **Commit**: `chore(stop-watcher): pass quality checkpoint` (only if fixes needed)
+  - **Commit**: `chore(stop-watcher): pass integrity gate quality checkpoint` (only if fixes needed)
 
-- [ ] 1.20 Add Tier 2 integrity-triage DEADLOCK handler to `implement.md`
+- [x] 1.20 Add Tier 2 integrity-triage DEADLOCK handler to `implement.md`
   - **Do**:
     1. Add a DEADLOCK handler dispatch keyed on `source:"gate_task_mark_integrity"` to the integrity-triage path.
     2. Primary: invoke `bmad-consensus-party` SKILL via the Skill tool; fallback when `[ -f .claude/skills/bmad-consensus-party/SKILL.md ]` is false: invoke 2-3 consensus subagents (external-reviewer + qa-engineer) via Task tool, take majority verdict.
