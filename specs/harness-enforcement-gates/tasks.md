@@ -392,7 +392,7 @@ git-diff assertion and the E2E gate-integration task.
   - _Requirements: FR-13, FR-14, FR-15, FR-18, AC-5.1..5.3, AC-5.6, AC-5.7, NFR-6_
   - _Design: Test Coverage Table rows 14-16_
 
-- [ ] 3.9 Extend `test-mark-integrity-gate.bats` — flock + legacy degradation
+- [x] 3.9 Extend `test-mark-integrity-gate.bats` — flock + legacy degradation
   - **Do**:
     1. Add cases: grep the script source confirms `tasks.md` access uses `flock -e 201`; missing `task_review.md` ⇒ rc=0 + WARN; missing `taskMarkSnapshot` ⇒ fresh snapshot + rc=0.
   - **Files**: `plugins/ralphharness/tests/test-mark-integrity-gate.bats`
