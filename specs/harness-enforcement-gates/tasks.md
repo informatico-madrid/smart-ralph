@@ -381,7 +381,7 @@ git-diff assertion and the E2E gate-integration task.
   - _Requirements: FR-11, AC-4.1, AC-4.2, AC-4.4, AC-4.5, NFR-6_
   - _Design: Test Coverage Table rows 11-13_
 
-- [ ] 3.8 Create `test-mark-integrity-gate.bats` — illegitimate / legitimate / no-revert
+- [x] 3.8 Create `test-mark-integrity-gate.bats` — illegitimate / legitimate / no-revert
   - **Do**:
     1. Create the bats file; `setup()` writes `fixture-multiphase` with `tasks.md`/`task_review.md`/state.
     2. Cases: `[x]`→`[ ]` w/ PASS entry + no `external_unmarks` increment ⇒ rc=1 + DEADLOCK signal; `[x]`→`[ ]` w/ matching `external_unmarks` increment ⇒ rc=0 no signal; after detection `tasks.md` mark unchanged + `external_unmarks` untouched.
