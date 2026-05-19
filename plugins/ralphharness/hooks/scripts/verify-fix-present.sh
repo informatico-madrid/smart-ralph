@@ -11,8 +11,8 @@ set -euo pipefail
 #
 # Usage: verify-fix-present.sh <file> [pattern]
 #
-# Components: 2 (three-state diff)
-# Requirements: FR-5, AC-2.1
+# Components: 2 (three-state diff, optional pattern check)
+# Requirements: FR-5, FR-6, AC-2.1, AC-2.2, AC-2.3, AC-2.4
 
 file="${1:-}"
 pattern="${2:-}"
@@ -64,7 +64,35 @@ else
   fi
 fi
 
-# TODO (task 1.3): three-state diff (committed $base→HEAD, staged, working-tree)
-#   + optional pattern check.
+# --- Three-state diff (task 1.3) ---
+changed=0
+
+# State 1: committed (base → HEAD)
+if ! git diff --quiet "$base" HEAD -- "$file" 2>/dev/null; then
+  changed=1
+fi
+
+# State 2: staged (index vs. base)
+if [[ "$changed" -eq 0 ]] && ! git diff --cached --quiet -- "$file" 2>/dev/null; then
+  changed=1
+fi
+
+# State 3: working-tree (working tree vs. index)
+if [[ "$changed" -eq 0 ]] && ! git diff --quiet -- "$file" 2>/dev/null; then
+  changed=1
+fi
+
+if [[ "$changed" -eq 0 ]]; then
+  echo "FIX ABSENT: $file unchanged since $base in all 3 states" >&2
+  exit 1
+fi
+
+# --- Optional pattern check ---
+if [[ -n "$pattern" ]]; then
+  if ! git show HEAD:"$file" 2>/dev/null | grep -qF -- "$pattern"; then
+    echo "FIX PATTERN ABSENT" >&2
+    exit 2
+  fi
+fi
 
 exit 0

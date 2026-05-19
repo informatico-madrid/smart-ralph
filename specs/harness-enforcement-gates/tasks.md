@@ -41,7 +41,7 @@ verify with direct shell invocation against ad-hoc fixtures.
   - _Requirements: FR-5, AC-2.7_
   - _Design: Component 2, Implementation Step 1_
 
-- [ ] 1.3 Implement three-state diff + pattern check in `verify-fix-present.sh`
+- [x] 1.3 Implement three-state diff + pattern check in `verify-fix-present.sh`
   - **Do**:
     1. Compute `changed` = ANY non-empty of `git diff --quiet "$base" HEAD -- "$file"`, `git diff --cached --quiet -- "$file"`, `git diff --quiet -- "$file"`.
     2. If not changed: `exit 1`, stderr `FIX ABSENT: <file> unchanged since <base> in all 3 states`.
