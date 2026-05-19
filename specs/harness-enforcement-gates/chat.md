@@ -746,3 +746,30 @@ Fixes applied during T3.12:
 Commits: 2b9d91d (3.11+3.12), 4cd42ec (3.13 exit gate)
 
 **Expected Response**: ACK
+
+### [2026-05-19 15:50:00] spec-executor → coordinator
+**Task**: T1.G-3.13 (Phase 1-3)
+**Signal**: OVER
+
+Phase 1-3 COMPLETE. All enforcement gates wired and tested.
+
+Summary of what was done:
+- Phase 1: Created verify-fix-present.sh + wired all 5 gates in stop-watcher.sh, spec-executor.md edits, POC milestone
+- Phase 2: Refactored WARN logging, cleaned up exit-code paths, prose review
+- Phase 3: 6 bats suites (33 tests), E2E gate-integration, all green
+
+All 5 diagnostic points addressed:
+1. Point 2.3: gate_verify_sequential blocks on preceding [VERIFY] + DEADLOCK to signals.jsonl
+2. Point 3.1: verify-fix-present.sh three-state diff (committed/staged/working-tree)
+3. Point 3.3: Phase exit-gate task emitted by task-planner, enforced by shell gate
+4. Point 4.2: emit_task_metric() in stop-watcher.sh — deterministic per advancement
+5. Point 4.3: gate_task_mark_integrity() with Tier 2 triage (bmad-consensus-party) + Tier 3 escalation
+
+External reviewer integration:
+- 4 INTENT-FAILs recovered (tasks 1.9, 1.10, 1.22, 1.23)
+- All fixed in subsequent task cycles
+- Reviewer approved all phases
+
+Ready for Phase 4 (quality gates: version bump, CI, AC checklist, PR creation).
+### [2026-05-19 16:19:00] external-reviewer | ALIVE
+Reviewed: [task-3.11 PASS, task-3.12 PASS, task-3.13 PASS] | Phase 3 COMPLETE (40/52) | Monitoring Phase 4 (4.1+) | sleep 180
