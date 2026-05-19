@@ -127,7 +127,7 @@ verify with direct shell invocation against ad-hoc fixtures.
   - **Done when**: Both edits present and consistent with design.
   - **Commit**: `chore(agents): pass quality checkpoint` (only if fixes needed)
 
-- [ ] 1.12 Append `emit_task_metric()` function to `stop-watcher.sh`
+- [x] 1.12 Append `emit_task_metric()` function to `stop-watcher.sh`
   - **Do**:
     1. **Append** (end of file) `emit_task_metric <spec_path> <state_file>`.
     2. Body: read `taskIndex`, `taskIteration`, `lastMetricTaskIndex` (`// -1`), `lastMetricIteration` from state; advancement detection — `taskIndex > lastMetricTaskIndex` ⇒ `pass` for index `taskIndex-1`; `taskIndex == lastMetricTaskIndex` and `taskIteration` increased ⇒ `fail` for current index; `source write-metric.sh`; derive `commit_sha` via `git -C "$CWD" log -1 --format=%H`; call `write_metric ...`; then `jq` + atomic `mv` to set `lastMetricTaskIndex`/`lastMetricIteration`.

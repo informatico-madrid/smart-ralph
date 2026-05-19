@@ -973,3 +973,76 @@ capture_task_marks() {
         fi
     fi
 }
+
+# Emit a per-task metric line to .metrics.jsonl.
+# Calls write_metric exactly once per advancement (new task or retry),
+# detected via lastMetricTaskIndex / lastMetricIteration idempotency guard.
+# Best-effort: always returns 0 (write_metric failure -> WARN).
+emit_task_metric() {
+    local spec_path="$1"
+    local state_file="$2"
+
+    if [ ! -f "$state_file" ]; then
+        return 0
+    fi
+
+    # Read current advancement state from state file
+    local task_index task_iteration last_metric_task_index last_metric_iteration
+    task_index=$(jq -r '.taskIndex // 0' "$state_file" 2>/dev/null || echo "0")
+    task_iteration=$(jq -r '.taskIteration // 0' "$state_file" 2>/dev/null || echo "0")
+    last_metric_task_index=$(jq -r '.lastMetricTaskIndex // -1' "$state_file" 2>/dev/null || echo "-1")
+    last_metric_iteration=$(jq -r '.lastMetricIteration // -1' "$state_file" 2>/dev/null || echo "-1")
+
+    # Advancement detection -- determine pass/fail for this step
+    local status="pass"
+    if [ "$task_index" -gt "$last_metric_task_index" ] 2>/dev/null; then
+        status="pass"
+    elif [ "$task_index" -eq "$last_metric_task_index" ] && [ "$task_iteration" -gt "$last_metric_iteration" ] 2>/dev/null; then
+        status="fail"
+    else
+        return 0
+    fi
+
+    # Resolve commit SHA from spec repo
+    local commit_sha
+    commit_sha=$(git -C "$spec_path" log -1 --format=%H 2>/dev/null || echo "unknown")
+
+    # Derive task name from tasks.md (first line of current task block)
+    local task_name="unknown"
+    local tasks_file="$CWD/$spec_path/tasks.md"
+    if [ -f "$tasks_file" ]; then
+        task_name=$(awk -v idx="$task_index" '
+            /^- \[[ x]\]/ && c == idx {
+                sub(/^[- ]* \[[ x]\] /, "")
+                print
+                exit
+            }
+            /^- \[[ x]\]/ { c++ }
+        ' "$tasks_file")
+    fi
+
+    # Source write-metric helper
+    source "$CLAUDE_PLUGIN_ROOT/hooks/scripts/write-metric.sh" 2>/dev/null || true
+
+    # Build task_id from index (e.g. "1.12")
+    local task_id="${task_index}.${task_iteration}"
+
+    # Call write_metric (best-effort: failure -> WARN, continue)
+    local write_exit=0
+    write_metric "$spec_path" "$status" "$task_index" "$task_iteration" "0" "$task_name" "implementation" "$task_id" "$commit_sha" || write_exit=$?
+    if [ "$write_exit" -ne 0 ]; then
+        echo "[ralphharness] WARN: write_metric failed (exit $write_exit), skipping metric for task $task_index" >> "$spec_path/.progress.md" 2>/dev/null
+    fi
+
+    # Update lastMetricTaskIndex / lastMetricIteration in state (atomic)
+    local tmp="${state_file}.tmp"
+    if jq --argjson ti "$task_index" --argjson ti2 "$task_iteration" \
+        '.lastMetricTaskIndex = $ti | .lastMetricIteration = $ti2' \
+        "$state_file" > "$tmp" 2>/dev/null; then
+        mv "$tmp" "$state_file"
+    else
+        rm -f "$tmp"
+    fi
+
+    return 0
+}
