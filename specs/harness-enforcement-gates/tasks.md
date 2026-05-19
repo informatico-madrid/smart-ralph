@@ -501,7 +501,7 @@ Continuous PR validation — CI monitoring, review-comment resolution, final ver
   - **Verify**: `gh pr view --json reviewDecision -q .reviewDecision` is not `CHANGES_REQUESTED`.
   - **Commit**: `fix(harness): address review comments` (only if fixes needed)
 
-- [ ] 5.3 [VERIFY] Final validation — zero regressions, all gates green
+- [x] 5.3 [VERIFY] Final validation — zero regressions, all gates green
   - **Do**: Re-run all 6 bats suites and the existing suite set; confirm append-only invariant on `stop-watcher.sh`; confirm no test regressions.
   - **Verify**: `git diff origin/main...HEAD -- plugins/ralphharness/hooks/scripts/stop-watcher.sh | grep -c '^-' | grep -qx 0 && bats plugins/ralphharness/tests/test-verify-fix-present.bats plugins/ralphharness/tests/test-verify-sequential-gate.bats plugins/ralphharness/tests/test-phase-exit-gate.bats plugins/ralphharness/tests/test-task-metrics.bats plugins/ralphharness/tests/test-mark-integrity-gate.bats plugins/ralphharness/tests/test-gate-integration-e2e.bats`
   - **Done when**: All suites green; zero deleted lines in `stop-watcher.sh`; no regressions.
