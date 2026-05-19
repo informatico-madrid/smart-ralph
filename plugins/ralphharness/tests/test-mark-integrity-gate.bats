@@ -1,9 +1,10 @@
 #!/usr/bin/env bats
-# Bats suite for gate_task_mark_integrity(): illegitimate / legitimate / no-revert.
+# Bats suite for gate_task_mark_integrity(): illegitimate / legitimate / no-revert / edge cases.
 #
 # Tests: [x]->[ ] with PASS but no ext unmark -> DEADLOCK,
 # [x]->[ ] with ext unmark increment -> legitimate,
-# tasks.md marks + external_un_marks untouched after gate runs.
+# no un-marks -> clean,
+# flock presence, missing review_file, missing taskMarkSnapshot.
 
 REPO_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
 
@@ -268,4 +269,55 @@ EOF
     dl_count=$(grep -c '"DEADLOCK"' "$SIGNALS_FILE" 2>/dev/null || echo "0")
     dl_count=${dl_count%%[^0-9]*}
     [ "$dl_count" -eq 0 ]
+}
+
+# ---- Case 4: flock presence in function source ----
+@test "flock -e 201 present in gate_task_mark_integrity" {
+    grep -q 'flock -e 201' <(declare -f gate_task_mark_integrity)
+}
+
+# ---- Case 5: missing task_review.md -> rc=0 no signal ----
+@test "missing task_review.md returns rc=0 and emits nothing" {
+    cat > "$TASKS_FILE" << 'EOF'
+- [x] 0.1 Base task
+- [x] 1.1 Phase 2 task
+- [x] 2.1 Phase 3 task
+EOF
+    capture_task_marks "$SPEC_PATH" "$TASKS_FILE" "$STATE_FILE"
+
+    # Remove review file so gate sees missing review
+    rm -f "$REVIEW_FILE"
+
+    gate_task_mark_integrity "$SPEC_PATH" "$STATE_FILE"
+
+    local dc
+    dc=$(grep -c '"DEADLOCK"' "$SIGNALS_FILE" 2>/dev/null) || dc=0
+    [ "$dc" -eq 0 ]
+}
+
+# ---- Case 6: missing taskMarkSnapshot -> fresh snapshot ----
+@test "missing taskMarkSnapshot creates fresh snapshot and emits nothing" {
+    cat > "$TASKS_FILE" << 'EOF'
+- [x] 0.1 Base task
+- [x] 1.1 Phase 2 task
+- [x] 2.1 Phase 3 task
+EOF
+    # Reset state without taskMarkSnapshot
+    jq -n '{taskIndex:0,taskIteration:0,lastMetricTaskIndex:-1,lastMetricIteration:-1}' > "$STATE_FILE"
+
+    # Write a review file (it exists but won't be used since snapshot=null)
+    cat > "$REVIEW_FILE" << 'EOF'
+### [task-1] Implement something
+- status: PASS
+- reviewed_at: 2026-05-19T12:00:00Z
+EOF
+
+    gate_task_mark_integrity "$SPEC_PATH" "$STATE_FILE"
+
+    grep -q '"DEADLOCK"' "$SIGNALS_FILE" && false
+
+    # Verify fresh snapshot was created with correct task IDs
+    local ids
+    ids=$(jq -c '.taskMarkSnapshot.checkedTaskIds' "$STATE_FILE")
+    [ "$ids" = '[0,1,2]' ]
 }
