@@ -110,9 +110,20 @@ if [ $EXIT_CODE -eq 0 ]; then
   # Get the base branch (the branch we're merging INTO, not main)
   # This should be the branch that existed before we created feat/$SPEC_NAME
   BASE_BRANCH=$(git show-branch --merge-base "$BRANCH_NAME" HEAD 2>/dev/null | \
-    git branch --contains 2>/dev/null | grep -v "$BRANCH_NAME" | head -1 || echo "main")
+    git branch --contains 2>/dev/null | grep -v "$BRANCH_NAME" | head -1)
   
   # Merge worktree branch into base branch (never main)
+  if [ -z "$BASE_BRANCH" ]; then
+    echo "[snap] ERROR: Could not auto-detect base branch. BRANCH_NAME=$BRANCH_NAME"
+    echo "[snap] Please ensure the worktree branch has a valid merge base."
+    exit 1
+  fi
+  
+  if [ "$BASE_BRANCH" = "main" ]; then
+    echo "[snap] ERROR: Cannot merge to main branch. BASE_BRANCH=$BASE_BRANCH, BRANCH_NAME=$BRANCH_NAME"
+    exit 1
+  fi
+  
   git checkout "$BASE_BRANCH"
   git merge --squash "$BRANCH_NAME"
   git branch -d "$BRANCH_NAME"  # Safe delete (merged)
