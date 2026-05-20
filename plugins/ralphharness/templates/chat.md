@@ -75,8 +75,8 @@ When sending a blocking signal, write it as a **standalone bracketed line** at t
 The implementation does not match the spec. The verify command fails with exit code 1.
 ```
 
-The coordinator runs: `grep -c '^\[HOLD\]$\|^\[PENDING\]$\|^\[URGENT\]$' "$SPEC_PATH/chat.md"`
-This only matches lines that are exactly `[HOLD]`, `[PENDING]`, or `[URGENT]` — not `**Signal**: HOLD`.
+The coordinator runs: `grep -c '^\[HOLD\]$\|^\[PENDING\]$\|^\[URGENT\]$\|^\[DEADLOCK\]$' "$SPEC_PATH/chat.md"`
+This only matches lines that are exactly `[HOLD]`, `[PENDING]`, `[URGENT]`, or `[DEADLOCK]` — not `**Signal**: HOLD`.
 
 <!-- Messages accumulate here. Append only. Do not edit or delete. -->
 ### Optional: Pair-Debug Mode Note
